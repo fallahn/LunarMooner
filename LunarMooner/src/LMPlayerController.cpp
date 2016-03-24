@@ -129,7 +129,7 @@ void PlayerController::destroy()
     Component::destroy();
     auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
     msg->type = LMEvent::PlayerDied;
-    auto bounds = m_entity->globalBounds();
+    //auto bounds = m_entity->globalBounds();
     msg->posX = m_entity->getPosition().x;// +(bounds.width / 2.f);
     msg->posY = m_entity->getPosition().y;// +(bounds.height / 2.f);
 }
