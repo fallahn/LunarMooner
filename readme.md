@@ -3,6 +3,19 @@ Lunar Mooner
 
 A simple arcade game in the vein of Lunar Rescue
 
+#####Building:
+Windows:  
+The included Visual Studio solution has everything required. Open it in
+Visual Studio 2015 and hit the build button.
+
+Linux:  
+The included CMake file has been tested on linux with g++ 4.9. You will
+need to have SFML installed (building the latest revision is recommended)
+and [xygine](https://github.com/fallahn/xygine/wiki/Building).
+
+OS X:  
+TODO.
+
 /*********************************************************************  
 Matt Marchant 2016  
 http://trederia.blogspot.com  
