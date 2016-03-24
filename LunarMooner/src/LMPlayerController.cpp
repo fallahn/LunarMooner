@@ -45,7 +45,7 @@ namespace
     const sf::Vector2f thrustUp(0.f, -3.8f);
 
     const float maxDockingVelocity = 15000.f;
-    const float maxLandingVelocity = 20000.f ;
+    const float maxLandingVelocity = 16000.f ;
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb)

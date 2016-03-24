@@ -33,7 +33,7 @@ using namespace lm;
 
 namespace
 {
-    const float barWidth = 40.f;
+    const float barWidth = 30.f;
     const float barLength = 600.f;
 }
 
@@ -58,11 +58,16 @@ void SpeedMeter::setValue(float val)
     m_shape.setSize({ barWidth, barLength * ratio });
 
     sf::Uint8 red = static_cast<sf::Uint8>(255.f * ratio);
-    sf::Uint8 green = static_cast<sf::Uint8>(255.f * (1.f - ratio));
+    sf::Uint8 green = 255 - red;
 
     m_shape.setFillColor({ red, green, 0 });
 
     m_currentValue = val;
+}
+
+sf::Vector2f SpeedMeter::getSize() const
+{
+    return{ barWidth, barLength };
 }
 
 //private
