@@ -1,0 +1,15 @@
+SET(LM_SRC
+  ${LM_DIR}/Game.cpp
+  ${LM_DIR}/LMAlienController.cpp
+  ${LM_DIR}/LMBulletController.cpp
+  ${LM_DIR}/LMCollisionComponent.cpp
+  ${LM_DIR}/LMCollisionWorld.cpp
+  ${LM_DIR}/LMGameController.cpp
+  ${LM_DIR}/LMHumanController.cpp
+  ${LM_DIR}/LMMothershipController.cpp
+  ${LM_DIR}/LMPlayerController.cpp
+  ${LM_DIR}/LMSpeedMeter.cpp
+  ${LM_DIR}/LMState.cpp
+  ${LM_DIR}/main.cpp
+  ${LM_DIR}/MainMenuState.cpp
+  ${LM_DIR}/MenuOptionState.cpp)
