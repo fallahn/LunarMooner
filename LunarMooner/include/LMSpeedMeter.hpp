@@ -45,6 +45,7 @@ namespace lm
         void entityUpdate(xy::Entity&, float) override;
 
         void setValue(float);
+        sf::Vector2f getSize() const;
 
     private:
         float m_currentValue;

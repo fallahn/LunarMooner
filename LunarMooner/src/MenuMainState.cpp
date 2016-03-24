@@ -87,9 +87,20 @@ void MenuMainState::buildMenu()
     const auto& font = m_fontResource.get("assets/fonts/VeraMono.ttf");
     
     auto button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Lunar Mooner");
+    button->setText("One Player");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 675.f);
+    button->setPosition(960.f, 375.f);
+    button->addCallback([this]()
+    {
+        close();
+        requestStackPush(States::ID::LunarMooner);
+    });
+    m_uiContainer.addControl(button);
+
+    button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button->setText("Two Player");
+    button->setAlignment(xy::UI::Alignment::Centre);
+    button->setPosition(960.f, 475.f);
     button->addCallback([this]()
     {
         close();
@@ -100,7 +111,7 @@ void MenuMainState::buildMenu()
     button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Options");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 775.f);
+    button->setPosition(960.f, 575.f);
     button->addCallback([this]()
     {
         close();
@@ -111,7 +122,7 @@ void MenuMainState::buildMenu()
     button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Quit");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 875.f);
+    button->setPosition(960.f, 675.f);
     button->addCallback([this]()
     {
         getContext().renderWindow.close();

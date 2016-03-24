@@ -52,6 +52,9 @@ namespace
     const sf::Vector2f playerSize(32.f, 42.f);
     const sf::Uint8 humanCount = 8;
     const sf::Vector2f bulletSize(6.f, 10.f);
+
+    const sf::Vector2f mothershipBounds(386.f, 1534.f);
+    const sf::Vector2f mothershipStart(386.f, 46.f);
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw)
@@ -227,7 +230,7 @@ void GameController::addPlayer()
     auto& humans = m_playerStates.back().humansRemaining;
     for (auto i = 0; i < humanCount; ++i)
     {
-        humans.emplace_back(xy::Util::Random::value(380.f, 1500.f), xy::Util::Random::value(1045.f, 1060.f));
+        humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
 }
 
@@ -291,7 +294,7 @@ void GameController::createMothership()
     drawable->getDrawable().setScale(12.f, 4.f);
     drawable->getDrawable().setFillColor(sf::Color::Yellow);
 
-    auto controller = xy::Component::create<lm::MothershipController>(getMessageBus(), sf::Vector2f(386.f, 1534.f));
+    auto controller = xy::Component::create<lm::MothershipController>(getMessageBus(), mothershipBounds);
 
     auto bounds = drawable->getDrawable().getGlobalBounds();
     auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, {bounds.width, bounds.height} }, CollisionComponent::ID::Mothership);
@@ -300,7 +303,7 @@ void GameController::createMothership()
     entity->addComponent(drawable);
     entity->addComponent(controller);
     entity->addComponent(collision);
-    entity->setPosition(386.f, 26.f);
+    entity->setPosition(mothershipStart);
     entity->addCommandCategories(LMCommandID::Mothership);
 
     m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
@@ -328,7 +331,7 @@ namespace
     }
 
     const sf::Uint8 alienCount = 12;
-    const sf::FloatRect alienArea(386.f, 200.f, 1148.f, 480.f);
+    const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
     const std::array<sf::FloatRect, 4u> alienSizes =
     {
         sf::FloatRect(0.f, 0.f, 20.f, 16.f),
@@ -501,12 +504,12 @@ void GameController::spawnBullet()
 
 void GameController::createUI()
 {
-    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), 30000.f);
+    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), 50000.f);
     auto entity = xy::Entity::create(getMessageBus());
     m_speedMeter = entity->addComponent(speedMeter);
 
-    entity->rotate(180.f);
-    entity->setPosition(alienArea.left - 50.f, 1080.f - ((1080.f - 600.f) / 2.f));
+    entity->rotate(-90.f);
+    entity->setPosition(alienArea.left + ((alienArea.width - m_speedMeter->getSize().y) / 2.f), m_speedMeter->getSize().x + 10.f);
 
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }
