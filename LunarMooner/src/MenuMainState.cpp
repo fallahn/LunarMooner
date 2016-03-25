@@ -29,12 +29,15 @@ source distribution.
 
 #include <xygine/App.hpp>
 #include <xygine/ui/Button.hpp>
+#include <xygine/Resource.hpp>
 
 #include <SFML/Window/Mouse.hpp>
 
-MenuMainState::MenuMainState(xy::StateStack& stack, Context context)
-    : State     (stack, context),
-    m_messageBus(context.appInstance.getMessageBus())
+MenuMainState::MenuMainState(xy::StateStack& stack, Context context, xy::TextureResource& tr, xy::FontResource& fr)
+    : State             (stack, context),
+    m_textureResource   (tr),
+    m_fontResource      (fr),
+    m_messageBus        (context.appInstance.getMessageBus())
 {
     m_cursorSprite.setTexture(m_textureResource.get("assets/images/ui/cursor.png"));
     m_cursorSprite.setPosition(context.renderWindow.mapPixelToCoords(sf::Mouse::getPosition(context.renderWindow)));
@@ -93,7 +96,7 @@ void MenuMainState::buildMenu()
     button->addCallback([this]()
     {
         close();
-        requestStackPush(States::ID::LunarMooner);
+        requestStackPush(States::ID::SinglePlayer);
     });
     m_uiContainer.addControl(button);
 
@@ -104,7 +107,7 @@ void MenuMainState::buildMenu()
     button->addCallback([this]()
     {
         close();
-        requestStackPush(States::ID::LunarMooner);
+        requestStackPush(States::ID::MultiPlayer);
     });
     m_uiContainer.addControl(button);
 
