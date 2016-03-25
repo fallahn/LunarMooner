@@ -63,6 +63,7 @@ struct LMEvent
     }type;
     float posX = 0.f;
     float posY = 0.f;
+    sf::Int16 value = 0;
 };
 
 enum LMParticleID

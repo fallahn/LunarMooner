@@ -28,6 +28,8 @@ source distribution.
 #ifndef LM_GAME_CONTROLLER_HPP_
 #define LM_GAME_CONTROLLER_HPP_
 
+#include <LMPlayerState.hpp>
+
 #include <xygine/components/Component.hpp>
 #include <xygine/components/ParticleSystem.hpp>
 #include <xygine/Scene.hpp>
@@ -41,6 +43,7 @@ namespace lm
     class PlayerController;
     class CollisionWorld;
     class SpeedMeter;
+    class ScoreDisplay;
     class GameController final : public xy::Component
     {
     public:
@@ -59,6 +62,7 @@ namespace lm
         xy::Scene& m_scene;
         CollisionWorld& m_collisionWorld;
         xy::TextureResource m_textureResource;
+        xy::FontResource m_fontResource;
 
         sf::Uint8 m_inputFlags;
 
@@ -90,15 +94,9 @@ namespace lm
         void spawnBullet();
 
         SpeedMeter* m_speedMeter;
+        ScoreDisplay* m_scoreDisplay;
         void createUI();
 
-        struct PlayerState final
-        {
-            sf::Uint32 score = 0;
-            sf::Uint8 lives = 3;
-            sf::Uint8 humansSaved = 0;
-            std::vector<sf::Vector2f> humansRemaining;
-        };
         std::vector<PlayerState> m_playerStates;
         std::size_t m_currentPlayer;
         void swapStates();
