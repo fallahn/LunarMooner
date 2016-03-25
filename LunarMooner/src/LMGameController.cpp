@@ -33,6 +33,7 @@ source distribution.
 #include <LMAlienController.hpp>
 #include <LMBulletController.hpp>
 #include <LMSpeedMeter.hpp>
+#include <LMPlayerInfoDisplay.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/components/SfDrawableComponent.hpp>
@@ -55,6 +56,8 @@ namespace
 
     const sf::Vector2f mothershipBounds(386.f, 1534.f);
     const sf::Vector2f mothershipStart(386.f, 46.f);
+
+    sf::Uint32 rescueScore = 50u;
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw)
@@ -66,6 +69,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_player        (nullptr),
     m_mothership    (nullptr),
     m_speedMeter    (nullptr),
+    m_scoreDisplay  (nullptr),
     m_currentPlayer (0)
 {
     xy::Component::MessageHandler handler;
@@ -78,6 +82,8 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         default: break;
         case LMEvent::PlayerDied:
         {
+            m_playerStates[m_currentPlayer].lives--;
+            
             m_delayedEvents.emplace_back();
             auto& de = m_delayedEvents.back();
             de.time = 2.f;
@@ -126,7 +132,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         case LMEvent::HumanRescued:
             addRescuedHuman();
             m_playerStates[m_currentPlayer].humansSaved++;
-            m_playerStates[m_currentPlayer].score += 50;
+            m_playerStates[m_currentPlayer].score += rescueScore;
             break;
         case LMEvent::AlienDied:
             spawnAlien();
@@ -163,6 +169,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_playerParticles[LMParticleID::Thruster].loadFromFile("assets/particles/thrust.xyp", m_textureResource);
     m_playerParticles[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_textureResource);
     m_playerParticles[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
+
 }
 
 //public
@@ -504,6 +511,7 @@ void GameController::spawnBullet()
 
 void GameController::createUI()
 {
+    //velocity meter
     auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), 50000.f);
     auto entity = xy::Entity::create(getMessageBus());
     m_speedMeter = entity->addComponent(speedMeter);
@@ -512,30 +520,42 @@ void GameController::createUI()
     entity->setPosition(alienArea.left + ((alienArea.width - m_speedMeter->getSize().y) / 2.f), m_speedMeter->getSize().x + 10.f);
 
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
+
+    //score / lives display etc
+    auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_fontResource, m_playerStates);
+    entity = xy::Entity::create(getMessageBus());
+    m_scoreDisplay = entity->addComponent(scores);
+
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }
 
 void GameController::swapStates()
 {
-    //store positions for current player
-    m_playerStates[m_currentPlayer].humansRemaining.clear();
-
-    for (auto& h : m_humans)
+    if (m_playerStates.size() > 1)
     {
-        m_playerStates[m_currentPlayer].humansRemaining.push_back(h->getPosition());
-        h->destroy();
-    }
-    m_humans.clear();
+        //store positions for current player
+        m_playerStates[m_currentPlayer].humansRemaining.clear();
 
-    //clear rescued humans from ship
-    auto& children = m_mothership->getChildren();
-    for (auto& c : children) c->destroy();
+        for (auto& h : m_humans)
+        {
+            m_playerStates[m_currentPlayer].humansRemaining.push_back(h->getPosition());
+            h->destroy();
+        }
+        m_humans.clear();
 
-    //restore next players state
-    m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
+        //clear rescued humans from ship
+        auto& children = m_mothership->getChildren();
+        for (auto& c : children) c->destroy();
 
-    spawnHumans();
-    for (auto i = 0; i < m_playerStates[m_currentPlayer].humansSaved; ++i)
-    {
-        addRescuedHuman();
+        //restore next players state
+        m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
+
+        m_scoreDisplay->showMessage("Player " + std::to_string(m_currentPlayer + 1) + "!");
+
+        spawnHumans();
+        for (auto i = 0; i < m_playerStates[m_currentPlayer].humansSaved; ++i)
+        {
+            addRescuedHuman();
+        }
     }
 }

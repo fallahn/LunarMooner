@@ -33,6 +33,14 @@ source distribution.
 
 #include <SFML/Window/Event.hpp>
 
+namespace
+{
+    //as variadic template captures by ref
+    //these need to remain here...
+    const sf::Uint8 onePlayer = 1;
+    const sf::Uint8 twoPlayer = 2;
+}
+
 Game::Game()
     : m_stateStack({ getRenderWindow(), *this })
 {
@@ -98,6 +106,6 @@ void Game::registerStates()
 {
     m_stateStack.registerState<MenuMainState>(States::ID::MenuMain, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuOptionState>(States::ID::MenuOptions, m_menuTextures, m_menuFonts);
-    m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, 1);
-    m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, 2);
+    m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, onePlayer);
+    m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, twoPlayer);
 }

@@ -129,6 +129,8 @@
     <ClInclude Include="include\LMHumanController.hpp" />
     <ClInclude Include="include\LMMothershipController.hpp" />
     <ClInclude Include="include\LMPlayerController.hpp" />
+    <ClInclude Include="include\LMPlayerInfoDisplay.hpp" />
+    <ClInclude Include="include\LMPlayerState.hpp" />
     <ClInclude Include="include\LMSpeedMeter.hpp" />
     <ClInclude Include="include\LMState.hpp" />
     <ClInclude Include="include\MenuMainState.hpp" />
@@ -145,6 +147,7 @@
     <ClCompile Include="src\LMHumanController.cpp" />
     <ClCompile Include="src\LMMothershipController.cpp" />
     <ClCompile Include="src\LMPlayerController.cpp" />
+    <ClCompile Include="src\LMPlayerInfoDisplay.cpp" />
     <ClCompile Include="src\LMSpeedMeter.cpp" />
     <ClCompile Include="src\LMState.cpp" />
     <ClCompile Include="src\main.cpp" />

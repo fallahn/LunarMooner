@@ -8,6 +8,7 @@ SET(LM_SRC
   ${LM_DIR}/LMHumanController.cpp
   ${LM_DIR}/LMMothershipController.cpp
   ${LM_DIR}/LMPlayerController.cpp
+  ${LM_DIR}/LMPlayerInfoDisplay.cpp
   ${LM_DIR}/LMSpeedMeter.cpp
   ${LM_DIR}/LMState.cpp
   ${LM_DIR}/main.cpp
