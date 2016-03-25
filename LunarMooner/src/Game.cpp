@@ -29,6 +29,7 @@ source distribution.
 #include <StateIds.hpp>
 #include <MenuMainState.hpp>
 #include <MenuOptionState.hpp>
+#include <GameOverState.hpp>
 #include <LMState.hpp>
 
 #include <SFML/Window/Event.hpp>
@@ -108,4 +109,5 @@ void Game::registerStates()
     m_stateStack.registerState<MenuOptionState>(States::ID::MenuOptions, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, onePlayer);
     m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, twoPlayer);
+    m_stateStack.registerState<GameOverState>(States::ID::GameOver, m_menuTextures, m_menuFonts);
 }

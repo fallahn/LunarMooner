@@ -74,12 +74,6 @@ void MenuOptionState::draw()
     rw.setView(getContext().defaultView);
 
     rw.draw(m_uiContainer);
-
-    for (const auto& t : m_texts)
-    {
-        rw.draw(t);
-    }
-
     rw.draw(m_cursorSprite);
 }
 

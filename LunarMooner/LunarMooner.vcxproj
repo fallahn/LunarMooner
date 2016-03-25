@@ -121,6 +121,7 @@
   <ItemGroup>
     <ClInclude Include="include\CommandIds.hpp" />
     <ClInclude Include="include\Game.hpp" />
+    <ClInclude Include="include\GameOverState.hpp" />
     <ClInclude Include="include\LMAlienController.hpp" />
     <ClInclude Include="include\LMBulletController.hpp" />
     <ClInclude Include="include\LMCollisionComponent.hpp" />
@@ -139,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GameOverState.cpp" />
     <ClCompile Include="src\LMAlienController.cpp" />
     <ClCompile Include="src\LMBulletController.cpp" />
     <ClCompile Include="src\LMCollisionComponent.cpp" />

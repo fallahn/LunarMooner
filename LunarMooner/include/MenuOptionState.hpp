@@ -62,7 +62,6 @@ private:
 
     xy::MessageBus& m_messageBus;
     sf::Sprite m_cursorSprite;
-    std::vector<sf::Text> m_texts;
 
     xy::UI::Container m_uiContainer;
 
