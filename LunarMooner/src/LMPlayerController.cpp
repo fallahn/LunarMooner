@@ -192,6 +192,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
 
                 auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
                 msg->type = LMEvent::PlayerLanded;
+                msg->value = cc->getScoreValue();
             }
         }
         else

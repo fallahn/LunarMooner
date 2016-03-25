@@ -66,9 +66,6 @@ void BulletController::collisionCallback(CollisionComponent* cc)
     default: 
         //destroy becasue we hit something
         m_entity->destroy();
-
-        //TODO raise message so we can do some particle effects
-
         break;
     }
 }

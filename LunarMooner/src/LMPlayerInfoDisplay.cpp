@@ -43,10 +43,13 @@ namespace
 
     const sf::Vector2f playerOnePosition(20.f, 20.f);
     const sf::Vector2f playerTwoPosition(1660, 20.f);
+
+    const float textSpeed = -200.f;
 }
 
 ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, xy::FontResource& fr, std::vector<PlayerState>& ps)
     : xy::Component         (mb, this),
+    m_fontResource          (fr),
     m_playerStates          (ps),
     m_showMessage           (false),
     m_messageDisplayTime    (0.f)
@@ -94,6 +97,17 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
             "Score: " + std::to_string(m_playerStates[1].score) + "\n"
             "Lives: " + std::to_string(m_playerStates[1].lives)); //TODO set this to 'Game Over' when -1
     }
+
+    //update any active scores and remove dead ones
+    for (auto& st : m_scoreTags)
+    {
+        st.update(dt);
+    }
+    m_scoreTags.erase(std::remove_if(m_scoreTags.begin(), m_scoreTags.end(),
+        [](const ScoreTag& st)
+    {
+        return (st.text.getFillColor().a == 0);
+    }), m_scoreTags.end());
 }
 
 void ScoreDisplay::showMessage(const std::string& msg)
@@ -105,10 +119,39 @@ void ScoreDisplay::showMessage(const std::string& msg)
     m_showMessage = true;
 }
 
+void ScoreDisplay::showScore(sf::Uint16 score, const sf::Vector2f& position, sf::Color colour)
+{
+    m_scoreTags.emplace_back();
+    auto& text = m_scoreTags.back().text;
+
+    text.setFont(m_fontResource.get("buns"));
+    text.setString(std::to_string(score));
+    xy::Util::Position::centreOrigin(text);
+    text.setFillColor(colour);
+    text.setPosition(position);
+}
+
 //private
 void ScoreDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     if(m_showMessage) rt.draw(m_messageText, states);
     rt.draw(m_playerOneText, states);
     rt.draw(m_playerTwoText, states);
+
+    for (const auto& st : m_scoreTags)
+    {
+        rt.draw(st.text);
+    }
+}
+
+
+//score diplayer thinger
+void ScoreDisplay::ScoreTag::update(float dt)
+{
+    text.move(0.f, textSpeed * dt);
+    alpha -= dt;
+
+    auto colour = text.getFillColor();
+    colour.a = static_cast<sf::Uint8>(255.f * std::max(0.f, alpha));
+    text.setFillColor(colour);
 }
