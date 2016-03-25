@@ -96,7 +96,8 @@ void Game::finalise()
 
 void Game::registerStates()
 {
-    m_stateStack.registerState<MenuMainState>(States::ID::MenuMain);
-    m_stateStack.registerState<MenuOptionState>(States::ID::MenuOptions);
-    m_stateStack.registerState<LunarMoonerState>(States::ID::LunarMooner);
+    m_stateStack.registerState<MenuMainState>(States::ID::MenuMain, m_menuTextures, m_menuFonts);
+    m_stateStack.registerState<MenuOptionState>(States::ID::MenuOptions, m_menuTextures, m_menuFonts);
+    m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, 1);
+    m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, 2);
 }

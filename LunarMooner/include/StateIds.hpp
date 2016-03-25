@@ -35,7 +35,8 @@ namespace States
         None = 0,
         MenuMain,
         MenuOptions,
-        LunarMooner
+        SinglePlayer,
+        MultiPlayer
     };
 }
 

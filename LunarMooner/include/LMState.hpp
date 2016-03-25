@@ -40,7 +40,7 @@ source distribution.
 class LunarMoonerState final : public xy::State
 {
 public:
-    LunarMoonerState(xy::StateStack&, Context);
+    LunarMoonerState(xy::StateStack&, Context, sf::Uint8);
     ~LunarMoonerState() = default;
 
     bool handleEvent(const sf::Event&) override;
@@ -48,9 +48,9 @@ public:
     bool update(float) override;
     void draw() override;
 
-    xy::StateId stateID() const { return States::LunarMooner; }
+    xy::StateId stateID() const { return (m_playerCount == 1) ? States::SinglePlayer : States::MultiPlayer; }
 private:
-
+    sf::Uint8 m_playerCount;
     xy::Scene m_scene;
     xy::MessageBus& m_messageBus;
 
@@ -62,6 +62,8 @@ private:
     sf::Text m_reportText;
 
     lm::CollisionWorld m_collisionWorld;
+
+    void parseControllerInput();
 };
 
 #endif //LUNAR_MOONER_STATE_HPP_

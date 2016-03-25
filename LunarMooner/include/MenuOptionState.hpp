@@ -31,9 +31,7 @@ source distribution.
 #include <StateIds.hpp>
 
 #include <xygine/State.hpp>
-#include <xygine/Resource.hpp>
 #include <xygine/ui/Container.hpp>
-#include <xygine/ui/Window.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -41,11 +39,13 @@ source distribution.
 namespace xy
 {
     class MessageBus;
+    class TextureResource;
+    class FontResource;
 }
 class MenuOptionState final : public xy::State
 {
 public:
-    MenuOptionState(xy::StateStack& stateStack, Context context);
+    MenuOptionState(xy::StateStack& stateStack, Context context, xy::TextureResource&, xy::FontResource&);
     ~MenuOptionState() = default;
 
     bool update(float dt) override;
@@ -57,15 +57,14 @@ public:
         return States::ID::MenuOptions;
     }
 private:
+    xy::TextureResource& m_textureResource;
+    xy::FontResource& m_fontResource;
+
     xy::MessageBus& m_messageBus;
-    sf::Sprite m_menuSprite;
     sf::Sprite m_cursorSprite;
     std::vector<sf::Text> m_texts;
 
-    xy::TextureResource m_textureResource;
-    xy::FontResource m_fontResource;
-
-    xy::UI::Window m_window;
+    xy::UI::Container m_uiContainer;
 
     void buildMenu(const sf::Font&);
     void close();

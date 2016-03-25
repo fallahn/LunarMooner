@@ -29,6 +29,7 @@ source distribution.
 #define GAME_HPP_
 
 #include <xygine/App.hpp>
+#include <xygine/Resource.hpp>
 
 class Game final : public xy::App
 {
@@ -41,6 +42,11 @@ public:
 private:
 
     xy::StateStack m_stateStack;
+
+    //these are shared by menu states
+    //to speed up times between switching menus
+    xy::TextureResource m_menuTextures;
+    xy::FontResource m_menuFonts;
 
     void handleEvent(const sf::Event&) override;
     void handleMessage(const xy::Message&) override;
