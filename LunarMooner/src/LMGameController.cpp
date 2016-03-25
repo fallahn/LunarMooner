@@ -127,15 +127,21 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 }
             }
             m_humans[index]->getComponent<HumanController>()->setDestination(pos);
+
+            m_playerStates[m_currentPlayer].score += msgData.value;
+            m_scoreDisplay->showScore(msgData.value, m_player->getPosition());
         }
             break;
         case LMEvent::HumanRescued:
             addRescuedHuman();
             m_playerStates[m_currentPlayer].humansSaved++;
             m_playerStates[m_currentPlayer].score += rescueScore;
+            m_scoreDisplay->showScore(rescueScore, m_player->getPosition(), sf::Color::Magenta);
             break;
         case LMEvent::AlienDied:
             spawnAlien();
+            m_playerStates[m_currentPlayer].score += msgData.value;
+            m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
             break;
         }
     };
@@ -248,6 +254,8 @@ void GameController::start()
     createMothership();
     spawnHumans();
     createUI();
+
+    m_scoreDisplay->showMessage("Start!");
 }
 
 //private
@@ -386,6 +394,7 @@ void GameController::spawnAlien()
     auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);
     lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);
     collision->setCallback(cb);
+    collision->setScoreValue(static_cast<sf::Uint16>(size.width + size.height));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
@@ -458,6 +467,9 @@ void GameController::createTerrain()
         std::make_pair(sf::Vector2f(150.f, 290.f), sf::Vector2f(520.f, 1080.f - 290.f)),
         std::make_pair(sf::Vector2f(220.f, 60.f), sf::Vector2f(900.f, 1080.f - 60.f))
     };
+    //hack in some scores for now until we decide a better way to generate terrain
+    std::array<sf::Uint16, 3u> scores = {30, 10, 50};
+    int i = 0;
 
     for (const auto& p : positions)
     {
@@ -466,6 +478,7 @@ void GameController::createTerrain()
         drawable->getDrawable().setSize(p.first);
 
         collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f }, p.first }, lm::CollisionComponent::ID::Tower);
+        collision->setScoreValue(scores[i++]);
 
         entity = xy::Entity::create(getMessageBus());
         entity->addComponent(drawable);
@@ -548,7 +561,17 @@ void GameController::swapStates()
         for (auto& c : children) c->destroy();
 
         //restore next players state
-        m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
+        std::size_t count = 0;
+        do
+        {
+            m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
+        } while (m_playerStates[m_currentPlayer].lives < 0 && count < m_playerStates.size());
+
+        if (count == m_playerStates.size())
+        {
+            //everyone is dead! request end game
+            return;
+        }
 
         m_scoreDisplay->showMessage("Player " + std::to_string(m_currentPlayer + 1) + "!");
 
@@ -557,5 +580,10 @@ void GameController::swapStates()
         {
             addRescuedHuman();
         }
+    }
+    else
+    {
+        //check player still has lives left
+        //and end game if not
     }
 }

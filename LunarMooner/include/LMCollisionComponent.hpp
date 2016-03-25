@@ -60,6 +60,9 @@ namespace lm
 
         ID getID() const;
 
+        void setScoreValue(sf::Uint16 v) { m_scoreValue = v; }
+        sf::Uint16 getScoreValue() const { return m_scoreValue; }
+
         using Callback = std::function<void(CollisionComponent*)>;
         void setCallback(const Callback&);
 
@@ -69,6 +72,8 @@ namespace lm
         xy::Entity* m_entity;
         sf::FloatRect m_localBounds;
         ID m_id;
+
+        sf::Uint16 m_scoreValue;
 
         Callback resolve;
         std::vector<CollisionComponent*> m_collisions;

@@ -53,8 +53,10 @@ namespace lm
         void entityUpdate(xy::Entity&, float) override; 
 
         void showMessage(const std::string&);
+        void showScore(sf::Uint16, const sf::Vector2f&, sf::Color = sf::Color::Yellow);
 
     private:
+        xy::FontResource& m_fontResource;
         std::vector<PlayerState>& m_playerStates;
 
         sf::Text m_messageText;
@@ -63,6 +65,14 @@ namespace lm
 
         sf::Text m_playerOneText;
         sf::Text m_playerTwoText;
+
+        struct ScoreTag final
+        {
+            sf::Text text;
+            float alpha = 1.f;
+            void update(float);
+        };
+        std::list<ScoreTag> m_scoreTags;
 
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

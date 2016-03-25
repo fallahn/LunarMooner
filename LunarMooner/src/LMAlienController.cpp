@@ -95,6 +95,7 @@ void AlienController::collisionCallback(CollisionComponent* cc)
         msg->type = LMEvent::AlienDied;
         msg->posX = m_entity->getPosition().x;
         msg->posY = m_entity->getPosition().y;
+        msg->value = m_entity->getComponent<CollisionComponent>()->getScoreValue();
         m_entity->destroy();
     }
         break;
