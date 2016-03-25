@@ -25,20 +25,56 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef STATE_IDS_HPP_
-#define STATE_IDS_HPP_
+#ifndef LM_GAME_OVER_STATE_HPP_
+#define LM_GAME_OVER_STATE_HPP_
 
-namespace States
+#include <StateIds.hpp>
+
+#include <xygine/State.hpp>
+#include <xygine/ui/Container.hpp>
+
+#include <SFML/Graphics/Sprite.hpp>
+
+namespace xy
 {
-    enum ID
-    {
-        None = 0,
-        MenuMain,
-        MenuOptions,
-        SinglePlayer,
-        MultiPlayer,
-        GameOver
-    };
+    class TextureResource;
+    class FontResource;
+    class MessageBus;
 }
 
-#endif //STATE_IDS_HPP_
+namespace sf
+{
+    class Font;
+}
+
+class GameOverState final : public xy::State
+{
+public:
+    GameOverState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&);
+    ~GameOverState() = default;
+
+    bool update(float) override;
+    void draw() override;
+    bool handleEvent(const sf::Event&) override;
+    void handleMessage(const xy::Message&) override;
+
+    xy::StateId stateID() const override
+    {
+        return States::ID::GameOver;
+    }
+
+
+private:
+
+    xy::TextureResource& m_textureResource;
+    xy::FontResource& m_fontResource;
+
+    xy::MessageBus& m_messageBus;
+    xy::UI::Container m_uiContainer;
+    sf::Sprite m_cursorSprite;
+
+    void buildMenu(const sf::Font&);
+    void close();
+};
+
+#endif //LM_GAMEOVER_STATE_HPP_

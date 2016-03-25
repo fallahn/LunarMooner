@@ -570,6 +570,8 @@ void GameController::swapStates()
         if (count == m_playerStates.size())
         {
             //everyone is dead! request end game
+            auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
+            msg->type = LMEvent::GameOver;
             return;
         }
 
@@ -585,5 +587,10 @@ void GameController::swapStates()
     {
         //check player still has lives left
         //and end game if not
+        if (m_playerStates[m_currentPlayer].lives < 0)
+        {
+            auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
+            msg->type = LMEvent::GameOver;
+        }
     }
 }

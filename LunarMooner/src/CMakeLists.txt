@@ -1,5 +1,6 @@
 SET(LM_SRC
   ${LM_DIR}/Game.cpp
+  ${LM_DIR}/GameOverState.cpp
   ${LM_DIR}/LMAlienController.cpp
   ${LM_DIR}/LMBulletController.cpp
   ${LM_DIR}/LMCollisionComponent.cpp

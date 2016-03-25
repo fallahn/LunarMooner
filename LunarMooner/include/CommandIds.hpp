@@ -59,7 +59,8 @@ struct LMEvent
         PlayerLanded,
         HumanRescued,
         HumanPickedUp,
-        AlienDied
+        AlienDied,
+        GameOver
     }type;
     float posX = 0.f;
     float posY = 0.f;

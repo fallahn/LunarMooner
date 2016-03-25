@@ -178,6 +178,18 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
 void LunarMoonerState::handleMessage(const xy::Message& msg)
 {
     m_scene.handleMessage(msg);
+
+    if (msg.id == LMMessageId::LMMessage)
+    {
+        auto& msgData = msg.getData<LMEvent>();
+        switch (msgData.type)
+        {
+        case LMEvent::GameOver:
+            requestStackPush(States::ID::GameOver);
+            break;
+        default:break;
+        }
+    }
 }
 
 bool LunarMoonerState::update(float dt)

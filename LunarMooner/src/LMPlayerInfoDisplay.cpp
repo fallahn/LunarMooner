@@ -85,17 +85,19 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
     }
 
     //update player info graphics - TODO we can better adapt to multiple players
+    std::string lives = (m_playerStates[0].lives > -1) ? "Lives: " + std::to_string(m_playerStates[0].lives) : "GAME OVER";
     m_playerOneText.setString(
         "Player One\n"
         "Score: " + std::to_string(m_playerStates[0].score) + "\n"
-        "Lives: " + std::to_string(m_playerStates[0].lives)); //TODO set this to 'Game Over' when -1
+        + lives);
 
     if (m_playerStates.size() > 1)
     {
+        lives = (m_playerStates[0].lives > -1) ? "Lives: " + std::to_string(m_playerStates[1].lives) : "GAME OVER";
         m_playerTwoText.setString(
             "Player Two\n"
             "Score: " + std::to_string(m_playerStates[1].score) + "\n"
-            "Lives: " + std::to_string(m_playerStates[1].lives)); //TODO set this to 'Game Over' when -1
+            + lives);
     }
 
     //update any active scores and remove dead ones
