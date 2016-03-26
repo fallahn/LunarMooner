@@ -74,10 +74,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;extlibs/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>extlibs/box2d-2.3.2;extlibs/sfml;extlibs/xygine</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>extlibs/lib/box2d-2.3.2;extlibs/lib/sfml;extlibs/lib/xygine</AdditionalLibraryDirectories>
       <AdditionalDependencies>Box2D-d.lib;sfml-audio-d.lib;sfml-graphics-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;xygine-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -95,12 +95,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;extlibs/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>extlibs/box2d-2.3.2;extlibs/sfml;extlibs/xygine</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>extlibs/lib/box2d-2.3.2;extlibs/lib/sfml;extlibs/lib/xygine</AdditionalLibraryDirectories>
       <AdditionalDependencies>Box2D.lib;sfml-audio.lib;sfml-graphics.lib;sfml-main.lib;sfml-network.lib;sfml-system.lib;sfml-window.lib;xygine.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
