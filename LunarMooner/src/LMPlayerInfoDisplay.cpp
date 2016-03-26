@@ -33,6 +33,9 @@ source distribution.
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include <sstream>
+#include <iomanip>
+
 using namespace lm;
 
 namespace
@@ -101,12 +104,20 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
     std::string lives;
     for (auto i = 0u; i < m_playerStates.size(); ++i)
     {
+        std::stringstream ss;
+        ss << std::setw(2) << std::setfill('0') 
+            << static_cast<std::uint32_t>(m_playerStates[i].timeRemaining / 60.f) << ":" 
+            << std::setw(2) << std::setfill('0')
+            << std::floor(std::fmod(m_playerStates[i].timeRemaining, 60.f));
+        std::string remainingTime = ss.str();
+        
         lives = (m_playerStates[i].lives > -1) ? "Lives: " + std::to_string(m_playerStates[i].lives) : "GAME OVER";
         m_playerTexts[i].setString(
             "Player " + names[i] + "\n"
             "Score: " + std::to_string(m_playerStates[i].score) + "\n"
             "Level: " + std::to_string(m_playerStates[i].level) + "\n"
-            + lives);
+            + lives + "\n"
+            + remainingTime);
     }
 
     //update any active scores and remove dead ones
