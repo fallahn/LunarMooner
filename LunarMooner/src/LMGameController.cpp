@@ -51,7 +51,7 @@ using namespace std::placeholders;
 namespace
 {
     const sf::Vector2f playerSize(32.f, 42.f);
-    const sf::Uint8 humanCount = 8;
+    const sf::Uint8 humanCount = 2;
     const sf::Vector2f bulletSize(6.f, 10.f);
 
     const sf::Vector2f mothershipBounds(386.f, 1534.f);
@@ -84,25 +84,18 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         {
             m_playerStates[m_currentPlayer].lives--;
             
-            m_delayedEvents.emplace_back();
-            auto& de = m_delayedEvents.back();
-            de.time = 2.f;
-            de.action = [this]()
+            //if died carrying last human move up to next level
+            if (m_playerStates[m_currentPlayer].lives > -1
+                && m_humans.empty())
             {
-                swapStates();
-                m_spawnReady = true;
-
-                auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-                dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
-                dropshipDrawable->getDrawable().setSize(playerSize);
-                xy::Util::Position::centreOrigin(dropshipDrawable->getDrawable());
-
-                auto entity = xy::Entity::create(getMessageBus());
-                auto bounds = m_mothership->getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->getDrawable().getGlobalBounds();
-                entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
-                entity->addComponent(dropshipDrawable);
-                m_mothership->addChild(entity);
-            };
+                moveToNextRound();
+            }
+            else
+            {
+                storeState();
+            }
+            
+            addDelayedRespawn();
 
             m_player = nullptr;
         }
@@ -137,9 +130,15 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             m_playerStates[m_currentPlayer].humansSaved++;
             m_playerStates[m_currentPlayer].score += rescueScore;
             m_scoreDisplay->showScore(rescueScore, m_player->getPosition(), sf::Color::Magenta);
+
+            if (m_humans.empty())
+            {
+                moveToNextRound();
+                addDelayedRespawn();
+            }
             break;
         case LMEvent::AlienDied:
-            spawnAlien();
+            //spawnAlien();
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
             break;
@@ -295,6 +294,7 @@ void GameController::spawnPlayer()
         entity->addComponent(thrust);
         entity->addComponent(rcsLeft);
         entity->addComponent(rcsRight);
+        entity->addCommandCategories(LMCommandID::Player);
 
         m_scene.addEntity(entity, xy::Scene::BackFront);
 
@@ -394,7 +394,9 @@ void GameController::spawnAlien()
     auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);
     lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);
     collision->setCallback(cb);
-    collision->setScoreValue(static_cast<sf::Uint16>(size.width + size.height));
+    //smaller are worth more because they arew harder to hit
+    //this cludge assumes max size is 50 x 50
+    collision->setScoreValue(100 - static_cast<sf::Uint16>(size.width + size.height));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
@@ -542,32 +544,35 @@ void GameController::createUI()
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }
 
+void GameController::storeState()
+{
+    //store positions for current player
+    m_playerStates[m_currentPlayer].humansRemaining.clear();
+
+    for (auto& h : m_humans)
+    {
+        m_playerStates[m_currentPlayer].humansRemaining.push_back(h->getPosition());
+        h->destroy();
+    }
+    m_humans.clear();
+}
+
 void GameController::swapStates()
 {
-    if (m_playerStates.size() > 1)
+    //if (m_playerStates.size() > 1)
     {
-        //store positions for current player
-        m_playerStates[m_currentPlayer].humansRemaining.clear();
-
-        for (auto& h : m_humans)
-        {
-            m_playerStates[m_currentPlayer].humansRemaining.push_back(h->getPosition());
-            h->destroy();
-        }
-        m_humans.clear();
-
         //clear rescued humans from ship
         auto& children = m_mothership->getChildren();
         for (auto& c : children) c->destroy();
 
-        //restore next players state
+        //restore next (living) player's state
         std::size_t count = 0;
         do
         {
             m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
-        } while (m_playerStates[m_currentPlayer].lives < 0 && count < m_playerStates.size());
+        } while (m_playerStates[m_currentPlayer].lives < 0 && ++count < m_playerStates.size());
 
-        if (count == m_playerStates.size())
+        if (count >= m_playerStates.size())
         {
             //everyone is dead! request end game
             auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
@@ -583,14 +588,72 @@ void GameController::swapStates()
             addRescuedHuman();
         }
     }
-    else
+    //else
+    //{
+    //    //check player still has lives left
+    //    //and end game if not
+    //    if (m_playerStates[m_currentPlayer].lives < 0)
+    //    {
+    //        auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
+    //        msg->type = LMEvent::GameOver;
+    //    }
+    //}
+}
+
+void GameController::moveToNextRound()
+{
+    m_scoreDisplay->showMessage("Round Complete!");
+    
+    //remove player from scene
+    xy::Command cmd;
+    cmd.category = LMCommandID::Player;
+    cmd.action = [](xy::Entity& entity, float)
     {
-        //check player still has lives left
-        //and end game if not
-        if (m_playerStates[m_currentPlayer].lives < 0)
-        {
-            auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-            msg->type = LMEvent::GameOver;
-        }
+        entity.destroy();
+    };
+    m_scene.sendCommand(cmd);
+    m_player = nullptr;
+    
+    //create a new set of humans
+    auto& ps = m_playerStates[m_currentPlayer];
+    
+    //TODO increase count with round
+    auto& humans = ps.humansRemaining;
+    humans.clear();
+    for (auto i = 0; i < humanCount; ++i)
+    {
+        humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
+
+    ps.humansSaved = 0;
+    ps.level++;
+
+    //TODO display a round summary
+
+    //TODO gen a new terrain
+
+    //TODO increase aliens
+}
+
+void GameController::addDelayedRespawn()
+{
+    m_delayedEvents.emplace_back();
+    auto& de = m_delayedEvents.back();
+    de.time = 2.f;
+    de.action = [this]()
+    {
+        swapStates();
+        m_spawnReady = true;
+
+        auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
+        dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
+        dropshipDrawable->getDrawable().setSize(playerSize);
+        xy::Util::Position::centreOrigin(dropshipDrawable->getDrawable());
+
+        auto entity = xy::Entity::create(getMessageBus());
+        auto bounds = m_mothership->getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->getDrawable().getGlobalBounds();
+        entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
+        entity->addComponent(dropshipDrawable);
+        m_mothership->addChild(entity);
+    };
 }

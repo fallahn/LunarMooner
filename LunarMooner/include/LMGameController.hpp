@@ -99,7 +99,11 @@ namespace lm
 
         std::vector<PlayerState> m_playerStates;
         std::size_t m_currentPlayer;
+        void storeState();
         void swapStates();
+
+        void moveToNextRound();
+        void addDelayedRespawn();
     };
 }
 

@@ -55,7 +55,6 @@ namespace lm
         sf::Vector2f getPosition() const;
         float getSpeed() const;
 
-        void destroy() override;
         void collisionCallback(CollisionComponent*);
 
     private:
@@ -76,6 +75,8 @@ namespace lm
 
         void flyingState(xy::Entity&, float);
         void landedState(xy::Entity&, float);
+
+        void broadcastDeath();
     };
 }
 

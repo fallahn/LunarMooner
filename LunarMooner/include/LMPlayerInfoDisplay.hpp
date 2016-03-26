@@ -63,8 +63,7 @@ namespace lm
         bool m_showMessage;
         float m_messageDisplayTime;
 
-        sf::Text m_playerOneText;
-        sf::Text m_playerTwoText;
+        std::vector<sf::Text> m_playerTexts;
 
         struct ScoreTag final
         {
