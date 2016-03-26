@@ -44,6 +44,7 @@ namespace lm
         sf::Uint8 humansSaved = 0;
         std::vector<sf::Vector2f> humansRemaining;
         bool startNewRound = false;
+        float timeRemaining = 0.f;
     };
 }
 

@@ -78,6 +78,13 @@ namespace
         { 0.f, 0.f, 14.f, 16.f },
         { 0.f, 0.f, 18.f, 26.f }
     };
+
+    //time limits per level
+    const std::array<float, 10u> roundTimes =
+    {
+        30.f, 40.f, 50.f, 60.f, 70.f,
+        80.f, 90.f, 100.f, 110.f, 120.f
+    };
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw)
@@ -108,7 +115,15 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             if (m_playerStates[m_currentPlayer].lives > -1
                 && m_humans.empty())
             {
-                moveToNextRound();
+                if (m_playerStates[m_currentPlayer].humansSaved > 0)
+                {
+                    moveToNextRound();
+                }
+                else
+                {
+                    //you killed everyone! no more game for you.
+                    m_playerStates[m_currentPlayer].lives = -1;
+                }
             }
             else
             {
@@ -234,6 +249,9 @@ void GameController::entityUpdate(xy::Entity&, float dt)
     {
         m_speedMeter->setValue(m_player->getSpeed());
     }
+
+    //count down round time
+    m_playerStates[m_currentPlayer].timeRemaining = std::max(0.f, m_playerStates[m_currentPlayer].timeRemaining - dt);
 }
 
 void GameController::setInput(sf::Uint8 input)
@@ -275,6 +293,7 @@ void GameController::addPlayer()
     }
 
     state.alienCount = alienCounts[0];
+    state.timeRemaining = roundTimes[0];
 }
 
 void GameController::start()
@@ -649,8 +668,7 @@ void GameController::moveToNextRound()
     //update state with new round values
     auto& ps = m_playerStates[m_currentPlayer];
     ps.humansSaved = 0;
-    ps.level++;    
-
+        
     //new human count
     auto& humans = ps.humansRemaining;
     humans.clear();
@@ -664,6 +682,10 @@ void GameController::moveToNextRound()
     //increase aliens
     ps.alienCount = alienCounts[std::min(ps.level, static_cast<sf::Uint8>(alienCounts.size() - 1))];
 
+    //set new time limit - TODO adjust times once beyond level 10
+    ps.timeRemaining = roundTimes[std::min(ps.level, static_cast<sf::Uint8>(roundTimes.size() - 1))];
+
+    ps.level++;
     ps.startNewRound = true;
 
     //TODO display a round summary
