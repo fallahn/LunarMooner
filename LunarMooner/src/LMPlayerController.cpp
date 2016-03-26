@@ -104,6 +104,7 @@ void PlayerController::onDelayedStart(xy::Entity& entity)
 
 void PlayerController::setInput(sf::Uint8 input)
 {
+    //TODO this can be applied before particle systems are assigned!
     if (input != m_inputFlags)
     {
         (input & LMInputFlags::SteerRight) ? m_rcsRight->start() : m_rcsRight->stop();
@@ -124,22 +125,13 @@ float PlayerController::getSpeed() const
     return xy::Util::Vector::lengthSquared(m_velocity);
 }
 
-void PlayerController::destroy()
-{
-    Component::destroy();
-    auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-    msg->type = LMEvent::PlayerDied;
-    //auto bounds = m_entity->globalBounds();
-    msg->posX = m_entity->getPosition().x;// +(bounds.width / 2.f);
-    msg->posY = m_entity->getPosition().y;// +(bounds.height / 2.f);
-}
-
 void PlayerController::collisionCallback(CollisionComponent* cc)
 {
     switch (cc->getID())
     {
     case CollisionComponent::ID::Alien:
         m_entity->destroy();
+        broadcastDeath();
         break;
     case CollisionComponent::ID::Bounds:
     {
@@ -176,6 +168,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             {
                 //oh noes!
                 m_entity->destroy();
+                broadcastDeath();
                 break;
             }
 
@@ -199,6 +192,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
         {
             //crashded :(
             m_entity->destroy();
+            broadcastDeath();
         }
     }
         break;
@@ -263,4 +257,13 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
 void PlayerController::landedState(xy::Entity& entity, float dt)
 {
     //wweeee we are empty! do something about this :)
+}
+
+void PlayerController::broadcastDeath()
+{
+    auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
+    msg->type = LMEvent::PlayerDied;
+    //auto bounds = m_entity->globalBounds();
+    msg->posX = m_entity->getPosition().x;// +(bounds.width / 2.f);
+    msg->posY = m_entity->getPosition().y;// +(bounds.height / 2.f);
 }

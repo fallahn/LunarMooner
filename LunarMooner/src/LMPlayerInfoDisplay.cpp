@@ -41,8 +41,21 @@ namespace
     const float messageDisplayTime = 2.f;
     const sf::Vector2f messagePosition(960.f, 540.f);
 
-    const sf::Vector2f playerOnePosition(20.f, 20.f);
-    const sf::Vector2f playerTwoPosition(1660, 20.f);
+    const std::array<sf::Vector2f, 4u> textPositions = 
+    {
+        sf::Vector2f(20.f, 20.f),
+        sf::Vector2f(1660, 20.f),
+        sf::Vector2f(20.f, 560.f),
+        sf::Vector2f(1660, 560.f)
+    };
+
+    const std::array<std::string, 4u> names =
+    {
+        "One",
+        "Two",
+        "Three",
+        "Four"
+    };
 
     const float textSpeed = -200.f;
 }
@@ -59,12 +72,12 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, xy::FontResource& fr, std::vector
     m_messageText.setFont(font);
     m_messageText.setCharacterSize(80u);
 
-    m_playerOneText.setFont(font);
-    m_playerOneText.setPosition(playerOnePosition);
-    m_playerOneText.setCharacterSize(24u);
-    m_playerTwoText.setFont(font);
-    m_playerTwoText.setPosition(playerTwoPosition);
-    m_playerTwoText.setCharacterSize(24u);
+    XY_ASSERT(ps.size() <= 4, "Currently only supporting 4 player display");
+    for (auto i = 0u; i < ps.size(); ++i)
+    {
+        m_playerTexts.emplace_back("",font, 24u);
+        m_playerTexts.back().setPosition(textPositions[i]);
+    }
 }
 
 //public
@@ -84,19 +97,15 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
         }
     }
 
-    //update player info graphics - TODO we can better adapt to multiple players
-    std::string lives = (m_playerStates[0].lives > -1) ? "Lives: " + std::to_string(m_playerStates[0].lives) : "GAME OVER";
-    m_playerOneText.setString(
-        "Player One\n"
-        "Score: " + std::to_string(m_playerStates[0].score) + "\n"
-        + lives);
-
-    if (m_playerStates.size() > 1)
+    //update player info graphics
+    std::string lives;
+    for (auto i = 0u; i < m_playerStates.size(); ++i)
     {
-        lives = (m_playerStates[0].lives > -1) ? "Lives: " + std::to_string(m_playerStates[1].lives) : "GAME OVER";
-        m_playerTwoText.setString(
-            "Player Two\n"
-            "Score: " + std::to_string(m_playerStates[1].score) + "\n"
+        lives = (m_playerStates[i].lives > -1) ? "Lives: " + std::to_string(m_playerStates[i].lives) : "GAME OVER";
+        m_playerTexts[i].setString(
+            "Player " + names[i] + "\n"
+            "Score: " + std::to_string(m_playerStates[i].score) + "\n"
+            "Level: " + std::to_string(m_playerStates[i].level) + "\n"
             + lives);
     }
 
@@ -137,12 +146,15 @@ void ScoreDisplay::showScore(sf::Uint16 score, const sf::Vector2f& position, sf:
 void ScoreDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     if(m_showMessage) rt.draw(m_messageText, states);
-    rt.draw(m_playerOneText, states);
-    rt.draw(m_playerTwoText, states);
+    
+    for (const auto& text : m_playerTexts)
+    {
+        rt.draw(text, states);
+    }
 
     for (const auto& st : m_scoreTags)
     {
-        rt.draw(st.text);
+        rt.draw(st.text, states);
     }
 }
 

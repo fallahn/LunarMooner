@@ -34,7 +34,8 @@ enum LMCommandID
 {
     Mothership = 0x1,
     GameController = 0x2,
-    Human = 0x4
+    Human = 0x4,
+    Player = 0x8
 };
 
 enum LMInputFlags

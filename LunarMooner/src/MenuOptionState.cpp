@@ -138,7 +138,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
 {
     static const sf::Vector2f windowOffset(448.f, 156.f);
 
-    auto soundSlider = std::make_shared<xy::UI::Slider>(font, m_textureResource.get("assets/images/ui/slider_handle.png"), 375.f);
+    auto soundSlider = xy::UI::create<xy::UI::Slider>(font, m_textureResource.get("assets/images/ui/slider_handle.png"), 375.f);
     soundSlider->setPosition(152.f, 314.f);
     soundSlider->move(windowOffset);
     soundSlider->setText("Volume");
@@ -154,7 +154,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     soundSlider->setValue(getContext().appInstance.getAudioSettings().volume); //set this *after* callback is set
     m_uiContainer.addControl(soundSlider);
 
-    auto muteCheckbox = std::make_shared<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
+    auto muteCheckbox = xy::UI::create<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
     muteCheckbox->setPosition(622.f, 274.f);
     muteCheckbox->move(windowOffset);
     muteCheckbox->setText("Mute");
@@ -167,7 +167,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     m_uiContainer.addControl(muteCheckbox);
 
 
-    auto resolutionBox = std::make_shared<xy::UI::Selection>(font, m_textureResource.get("assets/images/ui/scroll_arrow.png"), 375.f);
+    auto resolutionBox = xy::UI::create<xy::UI::Selection>(font, m_textureResource.get("assets/images/ui/scroll_arrow.png"), 375.f);
     resolutionBox->setPosition(152.f, 354.f);
     resolutionBox->move(windowOffset);
 
@@ -189,7 +189,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
 
     m_uiContainer.addControl(resolutionBox);
 
-    auto fullscreenCheckbox = std::make_shared<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
+    auto fullscreenCheckbox = xy::UI::create<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
     fullscreenCheckbox->setPosition(622.f, 354.f);
     fullscreenCheckbox->move(windowOffset);
     fullscreenCheckbox->setText("Full Screen");
@@ -200,7 +200,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     fullscreenCheckbox->check((getContext().appInstance.getVideoSettings().WindowStyle & sf::Style::Fullscreen) != 0);
     m_uiContainer.addControl(fullscreenCheckbox);
 
-    auto difficultySelection = std::make_shared<xy::UI::Selection>(font, m_textureResource.get("assets/images/ui/scroll_arrow.png"), 375.f);
+    auto difficultySelection = xy::UI::create<xy::UI::Selection>(font, m_textureResource.get("assets/images/ui/scroll_arrow.png"), 375.f);
     difficultySelection->setPosition(152.f, 434.f);
     difficultySelection->move(windowOffset);
     difficultySelection->addItem("Easy", static_cast<int>(xy::Difficulty::Easy));
@@ -217,7 +217,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     difficultySelection->selectItem(static_cast<int>(getContext().appInstance.getGameSettings().difficulty));
     m_uiContainer.addControl(difficultySelection);
 
-    auto controllerCheckbox = std::make_shared<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
+    auto controllerCheckbox = xy::UI::create<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
     controllerCheckbox->setPosition(622.f, 434.f);
     controllerCheckbox->move(windowOffset);
     controllerCheckbox->setText("Enable Controller");
@@ -230,7 +230,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     controllerCheckbox->check(getContext().appInstance.getGameSettings().controllerEnabled);
     m_uiContainer.addControl(controllerCheckbox);
 
-    auto applyButton = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/button.png"));
+    auto applyButton = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/button.png"));
     applyButton->setText("Apply");
     applyButton->setAlignment(xy::UI::Alignment::Centre);
     applyButton->setPosition(392.f, 614.f);
@@ -250,7 +250,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     });
     m_uiContainer.addControl(applyButton);
 
-    auto backButton = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/button.png"));
+    auto backButton = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/button.png"));
     backButton->setText("Back");
     backButton->setAlignment(xy::UI::Alignment::Centre);
     backButton->setPosition(632.f, 614.f);

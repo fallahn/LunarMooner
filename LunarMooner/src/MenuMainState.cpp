@@ -89,7 +89,7 @@ void MenuMainState::buildMenu()
 {
     const auto& font = m_fontResource.get("assets/fonts/VeraMono.ttf");
     
-    auto button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("One Player");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(960.f, 375.f);
@@ -100,7 +100,7 @@ void MenuMainState::buildMenu()
     });
     m_uiContainer.addControl(button);
 
-    button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Two Player");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(960.f, 475.f);
@@ -111,7 +111,7 @@ void MenuMainState::buildMenu()
     });
     m_uiContainer.addControl(button);
 
-    button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Options");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(960.f, 575.f);
@@ -122,7 +122,7 @@ void MenuMainState::buildMenu()
     });
     m_uiContainer.addControl(button);
 
-    button = std::make_shared<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Quit");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(960.f, 675.f);
