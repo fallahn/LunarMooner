@@ -57,7 +57,22 @@ namespace
     const sf::Vector2f mothershipBounds(386.f, 1534.f);
     const sf::Vector2f mothershipStart(386.f, 46.f);
 
-    sf::Uint32 rescueScore = 50u;
+    const sf::Uint32 rescueScore = 50u;
+
+    //aliens per level
+    const std::array<sf::Uint8, 10u> alienCounts =
+    {
+        12, 14, 16, 18, 21, 24, 27, 31, 35, 38
+    };
+
+    const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
+    const std::array<sf::FloatRect, 4u> alienSizes =
+    {
+        sf::FloatRect(0.f, 0.f, 20.f, 16.f),
+        { 0.f, 0.f, 28.f, 30.f },
+        { 0.f, 0.f, 14.f, 16.f },
+        { 0.f, 0.f, 18.f, 26.f }
+    };
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw)
@@ -139,6 +154,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             break;
         case LMEvent::AlienDied:
             //spawnAlien();
+            m_playerStates[m_currentPlayer].alienCount--;
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
             break;
@@ -202,6 +218,12 @@ void GameController::entityUpdate(xy::Entity&, float dt)
         return ent->destroyed();
     }), m_humans.end());
 
+    //clear dead aliens
+    m_aliens.erase(std::remove_if(m_aliens.begin(), m_aliens.end(), [](const xy::Entity* entity) 
+    {
+        return entity->destroyed();
+    }), m_aliens.end());
+
     //update UI
     if (m_player)
     {
@@ -211,8 +233,8 @@ void GameController::entityUpdate(xy::Entity&, float dt)
 
 void GameController::setInput(sf::Uint8 input)
 {
-    if ((input & LMInputFlags::Start) == 0 
-        && (m_inputFlags & LMInputFlags::Start) != 0)
+    if ((input & LMInputFlags::Shoot) == 0 
+        && (m_inputFlags & LMInputFlags::Shoot) != 0)
     {
         //start was released, try spawning
         spawnPlayer();
@@ -239,18 +261,22 @@ void GameController::addPlayer()
 {
     m_playerStates.emplace_back();
 
-    auto& humans = m_playerStates.back().humansRemaining;
+    auto& state = m_playerStates.back();
+
+    auto& humans = state.humansRemaining;
     for (auto i = 0; i < humanCount; ++i)
     {
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
+
+    state.alienCount = alienCounts[0];
 }
 
 void GameController::start()
 {
     createTerrain();
-    createAliens();
     createMothership();
+    spawnAliens();
     spawnHumans();
     createUI();
 
@@ -344,16 +370,6 @@ namespace
         drawable->getDrawable().setScale(1.f, 1.4f);
         return std::move(drawable);
     }
-
-    const sf::Uint8 alienCount = 12;
-    const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
-    const std::array<sf::FloatRect, 4u> alienSizes =
-    {
-        sf::FloatRect(0.f, 0.f, 20.f, 16.f),
-        { 0.f, 0.f, 28.f, 30.f },
-        { 0.f, 0.f, 14.f, 16.f },
-        { 0.f, 0.f, 18.f, 26.f }
-    };
 }
 
 void GameController::spawnHuman(const sf::Vector2f& position)
@@ -403,13 +419,14 @@ void GameController::spawnAlien()
     entity->addComponent(controller);
     entity->addComponent(collision);
     entity->setPosition(position);
+    entity->addCommandCategories(LMCommandID::Alien);
 
-    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    m_aliens.push_back(m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle));
 }
 
-void GameController::createAliens()
+void GameController::spawnAliens()
 {
-    for (auto i = 0; i < alienCount; ++i)
+    for (auto i = 0; i < m_playerStates[m_currentPlayer].alienCount; ++i)
     {
         spawnAlien();
     }
@@ -552,52 +569,58 @@ void GameController::storeState()
     for (auto& h : m_humans)
     {
         m_playerStates[m_currentPlayer].humansRemaining.push_back(h->getPosition());
-        h->destroy();
     }
-    m_humans.clear();
 }
 
 void GameController::swapStates()
 {
-    //if (m_playerStates.size() > 1)
+    //restore next (living) player's state
+    std::size_t count = 0;
+    std::size_t lastPlayer = m_currentPlayer;
+    do
     {
-        //clear rescued humans from ship
-        auto& children = m_mothership->getChildren();
-        for (auto& c : children) c->destroy();
+        m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
+    } while (m_playerStates[m_currentPlayer].lives < 0 && ++count < m_playerStates.size());
 
-        //restore next (living) player's state
-        std::size_t count = 0;
-        do
-        {
-            m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
-        } while (m_playerStates[m_currentPlayer].lives < 0 && ++count < m_playerStates.size());
-
-        if (count >= m_playerStates.size())
-        {
-            //everyone is dead! request end game
-            auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-            msg->type = LMEvent::GameOver;
-            return;
-        }
-
-        m_scoreDisplay->showMessage("Player " + std::to_string(m_currentPlayer + 1) + "!");
-
-        spawnHumans();
-        for (auto i = 0; i < m_playerStates[m_currentPlayer].humansSaved; ++i)
-        {
-            addRescuedHuman();
-        }
+    if (count >= m_playerStates.size())
+    {
+        //everyone is dead! request end game
+        auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
+        msg->type = LMEvent::GameOver;
+        return;
     }
-    //else
-    //{
-    //    //check player still has lives left
-    //    //and end game if not
-    //    if (m_playerStates[m_currentPlayer].lives < 0)
-    //    {
-    //        auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-    //        msg->type = LMEvent::GameOver;
-    //    }
-    //}
+
+    //restore new state 
+    if (lastPlayer != m_currentPlayer
+        || m_playerStates[m_currentPlayer].startNewRound)
+    {
+        restoreState();
+        m_playerStates[m_currentPlayer].startNewRound = false;
+    }
+}
+
+void GameController::restoreState()
+{
+    m_scoreDisplay->showMessage("Player " + std::to_string(m_currentPlayer + 1) + "!");
+
+    //clear and restore aliens
+    for (auto a : m_aliens) a->destroy();
+    m_aliens.clear();
+    spawnAliens();
+
+    //clear humans and restore
+    for (auto h : m_humans) h->destroy();
+    m_humans.clear();
+    spawnHumans();
+        
+    //clear rescued humans from ship
+    auto& children = m_mothership->getChildren();
+    for (auto& c : children) c->destroy();
+    //and restore from state
+    for (auto i = 0; i < m_playerStates[m_currentPlayer].humansSaved; ++i)
+    {
+        addRescuedHuman();
+    } 
 }
 
 void GameController::moveToNextRound()
@@ -632,7 +655,10 @@ void GameController::moveToNextRound()
 
     //TODO gen a new terrain
 
-    //TODO increase aliens
+    //increase aliens
+    ps.alienCount = alienCounts[std::min(ps.level, static_cast<sf::Uint8>(alienCounts.size() - 1))];
+
+    ps.startNewRound = true;
 }
 
 void GameController::addDelayedRespawn()
