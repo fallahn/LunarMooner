@@ -51,13 +51,18 @@ using namespace std::placeholders;
 namespace
 {
     const sf::Vector2f playerSize(32.f, 42.f);
-    const sf::Uint8 humanCount = 2;
     const sf::Vector2f bulletSize(6.f, 10.f);
 
     const sf::Vector2f mothershipBounds(386.f, 1534.f);
     const sf::Vector2f mothershipStart(386.f, 46.f);
 
     const sf::Uint32 rescueScore = 50u;
+
+    //humans to rescue per level
+    std::array<sf::Uint8, 10u> humanCounts = 
+    {
+        3, 4, 4, 5, 6, 6, 8, 8, 10, 12
+    };
 
     //aliens per level
     const std::array<sf::Uint8, 10u> alienCounts =
@@ -107,7 +112,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             }
             else
             {
-                storeState();
+                storePlayerState();
             }
             
             addDelayedRespawn();
@@ -264,7 +269,7 @@ void GameController::addPlayer()
     auto& state = m_playerStates.back();
 
     auto& humans = state.humansRemaining;
-    for (auto i = 0; i < humanCount; ++i)
+    for (auto i = 0; i < humanCounts[0]; ++i)
     {
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
@@ -512,9 +517,13 @@ void GameController::addRescuedHuman()
 {
     auto drawable = getHumanDrawable(getMessageBus());
 
-    float offset = static_cast<float>(humanCount - (m_humans.size() + 1)) * 26.f;
+    float width = m_mothership->globalBounds().width;
+    width -= 8.f; //4 px padding each end
+
+    float offset = width / static_cast<float>(humanCounts[std::min(m_playerStates[m_currentPlayer].level, static_cast<sf::Uint8>(humanCounts.size() - 1))]);
+    offset *= m_playerStates[m_currentPlayer].humansSaved;
     auto entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(offset + 4.f, 16.f);
+    entity->setPosition(offset + 4.f, 24.f);
     entity->addComponent(drawable);
     m_mothership->addChild(entity);
 }
@@ -561,7 +570,7 @@ void GameController::createUI()
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }
 
-void GameController::storeState()
+void GameController::storePlayerState()
 {
     //store positions for current player
     m_playerStates[m_currentPlayer].humansRemaining.clear();
@@ -572,7 +581,7 @@ void GameController::storeState()
     }
 }
 
-void GameController::swapStates()
+void GameController::swapPlayerState()
 {
     //restore next (living) player's state
     std::size_t count = 0;
@@ -594,12 +603,12 @@ void GameController::swapStates()
     if (lastPlayer != m_currentPlayer
         || m_playerStates[m_currentPlayer].startNewRound)
     {
-        restoreState();
+        restorePlayerState();
         m_playerStates[m_currentPlayer].startNewRound = false;
     }
 }
 
-void GameController::restoreState()
+void GameController::restorePlayerState()
 {
     m_scoreDisplay->showMessage("Player " + std::to_string(m_currentPlayer + 1) + "!");
 
@@ -637,28 +646,28 @@ void GameController::moveToNextRound()
     m_scene.sendCommand(cmd);
     m_player = nullptr;
     
-    //create a new set of humans
+    //update state with new round values
     auto& ps = m_playerStates[m_currentPlayer];
-    
-    //TODO increase count with round
+    ps.humansSaved = 0;
+    ps.level++;    
+
+    //new human count
     auto& humans = ps.humansRemaining;
     humans.clear();
-    for (auto i = 0; i < humanCount; ++i)
+    for (auto i = 0; i < humanCounts[std::min(ps.level, static_cast<sf::Uint8>(humanCounts.size() - 1))]; ++i)
     {
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
 
-    ps.humansSaved = 0;
-    ps.level++;
-
-    //TODO display a round summary
-
-    //TODO gen a new terrain
+    //TODO gen a new terrain?
 
     //increase aliens
     ps.alienCount = alienCounts[std::min(ps.level, static_cast<sf::Uint8>(alienCounts.size() - 1))];
 
     ps.startNewRound = true;
+
+    //TODO display a round summary
+
 }
 
 void GameController::addDelayedRespawn()
@@ -668,7 +677,7 @@ void GameController::addDelayedRespawn()
     de.time = 2.f;
     de.action = [this]()
     {
-        swapStates();
+        swapPlayerState();
         m_spawnReady = true;
 
         auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
