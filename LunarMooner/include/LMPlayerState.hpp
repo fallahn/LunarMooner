@@ -40,8 +40,10 @@ namespace lm
         sf::Uint32 score = 0;
         sf::Int8 lives = 3;
         sf::Uint8 level = 1;
+        sf::Uint8 alienCount = 0;
         sf::Uint8 humansSaved = 0;
         std::vector<sf::Vector2f> humansRemaining;
+        bool startNewRound = false;
     };
 }
 

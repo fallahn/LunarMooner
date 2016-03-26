@@ -85,8 +85,9 @@ namespace lm
         };
         std::list<DelayedEvent> m_delayedEvents;
 
+        std::vector<xy::Entity*> m_aliens;
         void spawnAlien();
-        void createAliens();
+        void spawnAliens();
 
         void createTerrain();
 
@@ -101,6 +102,7 @@ namespace lm
         std::size_t m_currentPlayer;
         void storeState();
         void swapStates();
+        void restoreState();
 
         void moveToNextRound();
         void addDelayedRespawn();
