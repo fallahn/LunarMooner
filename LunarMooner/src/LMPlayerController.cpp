@@ -105,7 +105,7 @@ void PlayerController::onDelayedStart(xy::Entity& entity)
 void PlayerController::setInput(sf::Uint8 input)
 {
     //TODO this can be applied before particle systems are assigned!
-    if (input != m_inputFlags)
+    if (input != m_inputFlags && m_rcsRight)
     {
         (input & LMInputFlags::SteerRight) ? m_rcsRight->start() : m_rcsRight->stop();
         (input & LMInputFlags::SteerLeft) ? m_rcsLeft->start() : m_rcsLeft->stop();
