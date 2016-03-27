@@ -45,7 +45,7 @@ namespace xy
 class MenuOptionState final : public xy::State
 {
 public:
-    MenuOptionState(xy::StateStack& stateStack, Context context, xy::TextureResource&, xy::FontResource&);
+    MenuOptionState(xy::StateStack& stateStack, Context context, xy::TextureResource&, xy::FontResource&, bool = false);
     ~MenuOptionState() = default;
 
     bool update(float dt) override;
@@ -64,6 +64,8 @@ private:
     sf::Sprite m_cursorSprite;
 
     xy::UI::Container m_uiContainer;
+
+    bool m_pausedGame;
 
     void buildMenu(const sf::Font&);
     void close();

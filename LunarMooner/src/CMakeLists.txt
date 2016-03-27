@@ -14,4 +14,5 @@ SET(LM_SRC
   ${LM_DIR}/LMState.cpp
   ${LM_DIR}/main.cpp
   ${LM_DIR}/MenuMainState.cpp
-  ${LM_DIR}/MenuOptionState.cpp)
+  ${LM_DIR}/MenuOptionState.cpp
+  ${LM_DIR}/MenuPauseState.cpp)

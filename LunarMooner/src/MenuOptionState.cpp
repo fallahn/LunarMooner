@@ -44,11 +44,12 @@ namespace
     
 }
 
-MenuOptionState::MenuOptionState(xy::StateStack& stateStack, Context context, xy::TextureResource& tr, xy::FontResource& fr)
+MenuOptionState::MenuOptionState(xy::StateStack& stateStack, Context context, xy::TextureResource& tr, xy::FontResource& fr, bool paused)
     : State             (stateStack, context),
     m_textureResource   (tr),
     m_fontResource      (fr),
-    m_messageBus        (context.appInstance.getMessageBus())
+    m_messageBus        (context.appInstance.getMessageBus()),
+    m_pausedGame        (paused)
 {
     m_cursorSprite.setTexture(m_textureResource.get("assets/images/ui/cursor.png"));
     m_cursorSprite.setPosition(context.renderWindow.mapPixelToCoords(sf::Mouse::getPosition(context.renderWindow)));
@@ -65,7 +66,7 @@ MenuOptionState::MenuOptionState(xy::StateStack& stateStack, Context context, xy
 bool MenuOptionState::update(float dt)
 {
     m_uiContainer.update(dt);
-    return true;
+    return !m_pausedGame;
 }
 
 void MenuOptionState::draw()
@@ -258,7 +259,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     backButton->addCallback([this]()
     {
         close();
-        requestStackPush(States::ID::MenuMain);
+        requestStackPush((m_pausedGame)? States::ID::Pause : States::ID::MenuMain);
     });
     m_uiContainer.addControl(backButton);
 }

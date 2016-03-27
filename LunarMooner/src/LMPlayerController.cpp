@@ -72,6 +72,7 @@ PlayerController::PlayerController(xy::MessageBus& mb)
         case LMEvent::HumanPickedUp:
             m_velocity = { 0.f, -82.5f };
             updateState = std::bind(&PlayerController::flyingState, this, _1, _2);
+            m_carrying = true;
             break;
         }
     };
@@ -180,7 +181,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             if (!m_carrying)
             {
                 //stop and pickup
-                m_carrying = true;
+                //m_carrying = true;
                 updateState = std::bind(&PlayerController::landedState, this, _1, _2);
 
                 auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);

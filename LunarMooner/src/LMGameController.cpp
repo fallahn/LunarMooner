@@ -173,10 +173,15 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             }
             break;
         case LMEvent::AlienDied:
-            //spawnAlien();
             m_playerStates[m_currentPlayer].alienCount--;
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
+            //1/5 chance we spawn a new alien
+            if (xy::Util::Random::value(0, 5) == 3)
+            {
+                spawnAlien({ alienArea.left, xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height) });
+                m_playerStates[m_currentPlayer].alienCount++;
+            }
             break;
         }
     };
@@ -256,10 +261,12 @@ void GameController::entityUpdate(xy::Entity&, float dt)
 
 void GameController::setInput(sf::Uint8 input)
 {
-    if ((input & LMInputFlags::Shoot) == 0 
-        && (m_inputFlags & LMInputFlags::Shoot) != 0)
+    
+    bool shoot = ((input & LMInputFlags::Shoot) != 0
+        && (m_inputFlags & LMInputFlags::Shoot) == 0);
+    if(shoot)
     {
-        //start was released, try spawning
+        //shoot was released, try spawning
         spawnPlayer();
     }
 
@@ -270,8 +277,7 @@ void GameController::setInput(sf::Uint8 input)
 
         //hook player shoot event here
         //as bullets are technically entities in their own right
-        if ((input & LMInputFlags::Shoot) != 0
-            && (m_inputFlags & LMInputFlags::Shoot) == 0)
+        if (shoot && m_player->carryingHuman())
         {
             spawnBullet();
         }
@@ -419,11 +425,9 @@ void GameController::spawnHumans()
     }
 }
 
-void GameController::spawnAlien()
+void GameController::spawnAlien(const sf::Vector2f& position)
 {
     auto size = alienSizes[xy::Util::Random::value(0, alienSizes.size() - 1)];
-    auto position = sf::Vector2f(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width),
-        xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height));
 
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
     drawable->getDrawable().setFillColor(sf::Color::Red);
@@ -452,7 +456,9 @@ void GameController::spawnAliens()
 {
     for (auto i = 0; i < m_playerStates[m_currentPlayer].alienCount; ++i)
     {
-        spawnAlien();
+        auto position = sf::Vector2f(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width),
+            xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height));
+        spawnAlien(position);
     }
 }
 

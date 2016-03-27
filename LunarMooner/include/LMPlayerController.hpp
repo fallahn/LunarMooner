@@ -54,6 +54,7 @@ namespace lm
 
         sf::Vector2f getPosition() const;
         float getSpeed() const;
+        bool carryingHuman() const { return m_carrying; }
 
         void collisionCallback(CollisionComponent*);
 
