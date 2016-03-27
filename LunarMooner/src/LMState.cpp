@@ -134,6 +134,9 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         case keyFire:
             m_inputFlags |= LMInputFlags::Shoot;
             break;
+        case sf::Keyboard::P:
+            requestStackPush(States::ID::Pause);
+            break;
         default:break;
         }
         break;
@@ -151,7 +154,8 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
             m_inputFlags |= LMInputFlags::Shoot;
             break;
         case buttonStart:
-            m_inputFlags |= LMInputFlags::Start;
+            //m_inputFlags |= LMInputFlags::Start;
+            requestStackPush(States::ID::Pause);
             break;
         }
         break;
@@ -165,9 +169,9 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         case buttonB:
             m_inputFlags &= ~LMInputFlags::Shoot;
             break;
-        case buttonStart:
-            m_inputFlags &= ~LMInputFlags::Start;
-            break;
+        //case buttonStart:
+        //    m_inputFlags &= ~LMInputFlags::Start;
+        //    break;
         }
         break;
     default: break;

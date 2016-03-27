@@ -30,6 +30,7 @@ source distribution.
 #include <MenuMainState.hpp>
 #include <MenuOptionState.hpp>
 #include <GameOverState.hpp>
+#include <MenuPauseState.hpp>
 #include <LMState.hpp>
 
 #include <SFML/Window/Event.hpp>
@@ -107,7 +108,9 @@ void Game::registerStates()
 {
     m_stateStack.registerState<MenuMainState>(States::ID::MenuMain, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuOptionState>(States::ID::MenuOptions, m_menuTextures, m_menuFonts);
+    m_stateStack.registerState<MenuOptionState>(States::ID::PausedOptions, m_menuTextures, m_menuFonts, true);
     m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, onePlayer);
     m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, twoPlayer);
     m_stateStack.registerState<GameOverState>(States::ID::GameOver, m_menuTextures, m_menuFonts);
+    m_stateStack.registerState<MenuPauseState>(States::ID::Pause, m_menuTextures, m_menuFonts);
 }

@@ -86,7 +86,7 @@ namespace lm
         std::list<DelayedEvent> m_delayedEvents;
 
         std::vector<xy::Entity*> m_aliens;
-        void spawnAlien();
+        void spawnAlien(const sf::Vector2f&);
         void spawnAliens();
 
         void createTerrain();

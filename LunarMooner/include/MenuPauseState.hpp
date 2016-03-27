@@ -25,22 +25,52 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef STATE_IDS_HPP_
-#define STATE_IDS_HPP_
+#ifndef LM_PAUSE_STATE_HPP_
+#define LM_PAUSE_STATE_HPP_
 
-namespace States
+#include <StateIds.hpp>
+
+#include <xygine/State.hpp>
+#include <xygine/ui/Container.hpp>
+
+#include <SFML/Graphics/Sprite.hpp>
+
+namespace xy
 {
-    enum ID
-    {
-        None = 0,
-        MenuMain,
-        MenuOptions,
-        PausedOptions,
-        SinglePlayer,
-        MultiPlayer,
-        GameOver,
-        Pause
-    };
+    class TextureResource;
+    class FontResource;
+    class MessageBus;
 }
 
-#endif //STATE_IDS_HPP_
+namespace sf
+{
+    class Font;
+}
+
+class MenuPauseState final : public xy::State
+{
+public:
+    MenuPauseState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&);
+    ~MenuPauseState() = default;
+
+    bool update(float) override;
+    void draw() override;
+    bool handleEvent(const sf::Event&) override;
+    void handleMessage(const xy::Message&) override;
+
+    xy::StateId stateID() const override { return States::Pause; }
+
+private:
+    xy::TextureResource& m_textureResource;
+    xy::FontResource& m_fontResource;
+
+    xy::MessageBus& m_messageBus;
+    xy::UI::Container m_uiContainer;
+    sf::Sprite m_cursorSprite;
+
+    void buildMenu(const sf::Font&);
+    void close();
+};
+
+
+#endif //LM_PAUSE_STATE_HPP_
