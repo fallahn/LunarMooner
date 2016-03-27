@@ -32,6 +32,7 @@ source distribution.
 #include <LMHumanController.hpp>
 #include <LMAlienController.hpp>
 #include <LMBulletController.hpp>
+#include <LMAsteroidController.hpp>
 #include <LMSpeedMeter.hpp>
 #include <LMPlayerInfoDisplay.hpp>
 #include <CommandIds.hpp>
@@ -212,10 +213,12 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     pd.loadFromFile("assets/particles/small_explosion.xyp", m_textureResource);
     pc->addDefinition(LMParticleID::SmallExplosion, pd);
 
-    m_playerParticles[LMParticleID::Thruster].loadFromFile("assets/particles/thrust.xyp", m_textureResource);
-    m_playerParticles[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_textureResource);
-    m_playerParticles[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
+    m_particleDefs[LMParticleID::Thruster].loadFromFile("assets/particles/thrust.xyp", m_textureResource);
+    m_particleDefs[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_textureResource);
+    m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
+    m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_textureResource);
 
+    addDelayedAsteroid();
 }
 
 //public
@@ -332,13 +335,13 @@ void GameController::spawnPlayer()
         CollisionComponent::Callback cb = std::bind(&PlayerController::collisionCallback, playerController.get(), _1);
         collision->setCallback(cb);
 
-        auto thrust = m_playerParticles[LMParticleID::Thruster].createSystem(getMessageBus());
+        auto thrust = m_particleDefs[LMParticleID::Thruster].createSystem(getMessageBus());
         thrust->setName("thrust");
 
-        auto rcsLeft = m_playerParticles[LMParticleID::RcsLeft].createSystem(getMessageBus());
+        auto rcsLeft = m_particleDefs[LMParticleID::RcsLeft].createSystem(getMessageBus());
         rcsLeft->setName("rcsLeft");
 
-        auto rcsRight = m_playerParticles[LMParticleID::RcsRight].createSystem(getMessageBus());
+        auto rcsRight = m_particleDefs[LMParticleID::RcsRight].createSystem(getMessageBus());
         rcsRight->setName("rcsRight");
 
         auto entity = xy::Entity::create(getMessageBus());
@@ -718,5 +721,46 @@ void GameController::addDelayedRespawn()
         entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
         entity->addComponent(dropshipDrawable);
         m_mothership->addChild(entity);
+    };
+}
+
+void GameController::spawnAsteroid()
+{
+    auto size = alienSizes[xy::Util::Random::value(0, alienSizes.size() - 1)];
+    sf::Vector2f position(xy::Util::Random::value(alienArea.left + (alienArea.width / 2.f), alienArea.left + alienArea.width), -size.height * 2);
+
+    auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
+    drawable->getDrawable().setFillColor(sf::Color(255, 127, 0));
+    drawable->getDrawable().setSize({ size.width, size.height });
+    drawable->getDrawable().setOrigin({ size.width / 2.f, size.height / 2.f });
+
+    auto controller = xy::Component::create<AsteroidController>(getMessageBus(), alienArea);
+
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);
+    //lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);
+    //collision->setCallback(cb);
+    collision->setScoreValue(100);
+
+    auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
+
+    auto entity = xy::Entity::create(getMessageBus());
+    entity->addComponent(drawable);
+    entity->addComponent(ps);
+    entity->addComponent(controller);
+    entity->addComponent(collision);
+    entity->setPosition(position);
+
+    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+}
+
+void GameController::addDelayedAsteroid()
+{
+    m_delayedEvents.emplace_back();
+    auto& de = m_delayedEvents.back();
+    de.time = xy::Util::Random::value(18.f, 28.f);
+    de.action = [this]()
+    {
+        spawnAsteroid();
+        addDelayedAsteroid();
     };
 }

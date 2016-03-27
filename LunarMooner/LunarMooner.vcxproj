@@ -75,6 +75,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>include;extlibs/include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_DEBUG_</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>extlibs/lib/box2d-2.3.2;extlibs/lib/sfml;extlibs/lib/xygine</AdditionalLibraryDirectories>
@@ -123,6 +124,7 @@
     <ClInclude Include="include\Game.hpp" />
     <ClInclude Include="include\GameOverState.hpp" />
     <ClInclude Include="include\LMAlienController.hpp" />
+    <ClInclude Include="include\LMAsteroidController.hpp" />
     <ClInclude Include="include\LMBulletController.hpp" />
     <ClInclude Include="include\LMCollisionComponent.hpp" />
     <ClInclude Include="include\LMCollisionWorld.hpp" />
@@ -143,6 +145,7 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameOverState.cpp" />
     <ClCompile Include="src\LMAlienController.cpp" />
+    <ClCompile Include="src\LMAsteroidController.cpp" />
     <ClCompile Include="src\LMBulletController.cpp" />
     <ClCompile Include="src\LMCollisionComponent.cpp" />
     <ClCompile Include="src\LMCollisionWorld.cpp" />

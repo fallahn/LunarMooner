@@ -155,23 +155,26 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
             break;
         case buttonStart:
             //m_inputFlags |= LMInputFlags::Start;
-            requestStackPush(States::ID::Pause);
+            //requestStackPush(States::ID::Pause);
             break;
+        default: break;
         }
         break;
     case sf::Event::JoystickButtonReleased:
         if (evt.joystickButton.joystickId != 0) break;
         switch (evt.joystickButton.button)
         {
+        default: break;
         case buttonA:
             m_inputFlags &= ~LMInputFlags::Thrust;
             break;
         case buttonB:
             m_inputFlags &= ~LMInputFlags::Shoot;
             break;
-        //case buttonStart:
+        case buttonStart:
+            requestStackPush(States::ID::Pause);
         //    m_inputFlags &= ~LMInputFlags::Start;
-        //    break;
+            break;
         }
         break;
     default: break;
@@ -192,6 +195,17 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             requestStackPush(States::ID::GameOver);
             break;
         default:break;
+        }
+    }
+    else if (msg.id == xy::Message::UIMessage)
+    {
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::ResizedWindow:
+            m_scene.setView(getContext().defaultView);
+            break;
         }
     }
 }

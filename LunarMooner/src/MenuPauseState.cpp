@@ -68,6 +68,12 @@ void MenuPauseState::draw()
 
 bool MenuPauseState::handleEvent(const sf::Event& evt)
 {
+    const auto& rw = getContext().renderWindow;
+    auto mousePos = rw.mapPixelToCoords(sf::Mouse::getPosition(rw));
+
+    m_uiContainer.handleEvent(evt, mousePos);
+    m_cursorSprite.setPosition(mousePos);
+
     switch (evt.type)
     {
     default: break;
@@ -85,7 +91,8 @@ bool MenuPauseState::handleEvent(const sf::Event& evt)
         if (evt.joystickButton.joystickId != 0) break;
         switch (evt.joystickButton.button)
         {
-        case 7: //start on xbox controller
+        case 6: //back on xbox controller
+        //case 7: //start on xbox controller
             close();
             break;
         default:break;
@@ -93,11 +100,6 @@ bool MenuPauseState::handleEvent(const sf::Event& evt)
         break;
     }
     
-    const auto& rw = getContext().renderWindow;
-    auto mousePos = rw.mapPixelToCoords(sf::Mouse::getPosition(rw));
-
-    m_uiContainer.handleEvent(evt, mousePos);
-    m_cursorSprite.setPosition(mousePos);
     return false;
 }
 

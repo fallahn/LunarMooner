@@ -66,7 +66,7 @@ namespace lm
 
         sf::Uint8 m_inputFlags;
 
-        std::array<xy::ParticleSystem::Definition, 3u> m_playerParticles;
+        std::array<xy::ParticleSystem::Definition, 4u> m_particleDefs;
         bool m_spawnReady;
         PlayerController* m_player;
         void spawnPlayer();
@@ -106,6 +106,9 @@ namespace lm
 
         void moveToNextRound();
         void addDelayedRespawn();
+
+        void spawnAsteroid();
+        void addDelayedAsteroid();
     };
 }
 

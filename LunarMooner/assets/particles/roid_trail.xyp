@@ -1,0 +1,53 @@
+{
+  "Editor": {
+    "EmitterPosition": "0, 0",
+    "BackgroundColour": -2130706433,
+    "EnableMovement": true
+  },
+  "ReleaseCount": 1,
+  "Delay": 0.0,
+  "Duration": -1.0,
+  "Texture": "",
+  "Colour": -50471937,
+  "BlendMode": "Alpha",
+  "ParticleSize": "5, 5",
+  "ParticlePosition": "0, 0",
+  "FollowParent": false,
+  "Lifetime": 3.4,
+  "InitialVelocity": "0, -85",
+  "RandomInitialVelocities": [],
+  "EmitRate": 50.0,
+  "RandomInitialPositions": [
+    "1, 1",
+    "-1, 1",
+    "-1, -1",
+    "1, -1",
+    "3, 3",
+    "-3, 3",
+    "-3, -3",
+    "3, -3"
+  ],
+  "Affectors": [
+    {
+      "Type": "Colour",
+      "Data": [
+        -50471936.0,
+        7.074066E+08,
+        2.6
+      ]
+    },
+    {
+      "Type": "Scale",
+      "Data": [
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "Type": "Rotation",
+      "Data": [
+        90.0
+      ]
+    }
+  ]
+}

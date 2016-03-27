@@ -25,57 +25,38 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef COMMAND_IDS_HPP_
-#define COMMAND_IDS_HPP_
+#ifndef LM_ASTEROID_CONTROLLER_HPP_
+#define LM_ASTEROID_CONTROLLER_HPP_
 
-#include <xygine/MessageBus.hpp>
+#include <xygine/components/Component.hpp>
 
-enum LMCommandID
+namespace xy
 {
-    Mothership = 0x1,
-    GameController = 0x2,
-    Human = 0x4,
-    Player = 0x8,
-    Alien = 0x10
-};
+    class ParticleSystem;
+}
 
-enum LMInputFlags
+namespace lm
 {
-    SteerLeft = 0x1,
-    SteerRight = 0x2,
-    Thrust = 0x4,
-    Shoot = 0x8,
-    Start = 0x10
-};
-
-enum LMMessageId
-{
-    LMMessage = xy::Message::Count
-};
-
-struct LMEvent
-{
-    enum
+    class CollisionComponent;
+    class AsteroidController final : public xy::Component
     {
-        PlayerDied,
-        PlayerLanded,
-        HumanRescued,
-        HumanPickedUp,
-        AlienDied,
-        GameOver
-    }type;
-    float posX = 0.f;
-    float posY = 0.f;
-    sf::Int16 value = 0;
-};
+    public:
+        AsteroidController(xy::MessageBus&, const sf::FloatRect&);
+        ~AsteroidController() = default;
 
-enum LMParticleID
-{
-    Thruster = 0,
-    RcsLeft,
-    RcsRight,
-    RoidTrail,
-    SmallExplosion
-};
+        xy::Component::Type type() const override { return xy::Component::Type::Script; }
+        void entityUpdate(xy::Entity&, float) override;
 
-#endif //COMMAND_IDS_HPP_
+        void onStart(xy::Entity&) override;
+
+        //void collisionCallback(CollisionComponent*);
+
+    private:
+        sf::FloatRect m_bounds;
+        xy::ParticleSystem* m_trail;
+        xy::Entity* m_entity;
+        sf::Vector2f m_velocity;
+    };
+}
+
+#endif //LM_ASTEROID_CONTROLLER_HPP_
