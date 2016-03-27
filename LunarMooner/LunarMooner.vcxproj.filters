@@ -72,6 +72,9 @@
     <ClInclude Include="include\MenuPauseState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMAsteroidController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MenuPauseState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMAsteroidController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
