@@ -70,6 +70,7 @@ namespace lm
         bool m_spawnReady;
         PlayerController* m_player;
         void spawnPlayer();
+        bool m_timeRound;
 
         xy::Entity* m_mothership;
         void createMothership();
@@ -105,6 +106,7 @@ namespace lm
         void restorePlayerState();
 
         void moveToNextRound();
+        void restartRound();
         void addDelayedRespawn();
 
         void spawnAsteroid();
