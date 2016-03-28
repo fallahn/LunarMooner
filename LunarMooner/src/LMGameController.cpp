@@ -711,6 +711,11 @@ void GameController::moveToNextRound()
         + ", time: " + std::to_string(tempClock.restart().asSeconds()),
         xy::Logger::Type::Info, xy::Logger::Output::File);
         
+    //display a round summary
+    //do this first so player info is current
+    //when the summary board is constructed
+    showRoundSummary(true);
+    
     //remove player from scene
     xy::Command cmd;
     cmd.category = LMCommandID::Player;
@@ -740,9 +745,6 @@ void GameController::moveToNextRound()
 
     ps.level++;
     ps.startNewRound = true;
-
-    //display a round summary
-    showRoundSummary(true);
 }
 
 void GameController::restartRound()
@@ -822,7 +824,7 @@ void GameController::spawnAsteroid()
     collision->setScoreValue(100);
 
     auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
-    ps->setLifetimeVariance(0.7f);
+    ps->setLifetimeVariance(0.55f);
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
