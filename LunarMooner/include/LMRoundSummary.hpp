@@ -61,8 +61,23 @@ namespace lm
         PlayerState& m_playerState;
         bool m_summaryComplete;
 
-        sf::Text m_text;
+        std::string m_mainString;
 
+        sf::Uint16 m_livesBonus;
+        sf::Uint16 m_humanBonus;
+        sf::Uint16 m_timeBonus;
+
+        sf::Uint16 m_livesDisplayBonus;
+        sf::Uint16 m_humanDisplayBonus;
+        sf::Uint16 m_timeDisplayBonus;
+
+        sf::Uint32 m_initialScore;
+
+        sf::Text m_mainText;
+        sf::Text m_okText;
+
+        void updateMainString();
+        void checkExtraLife();
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }

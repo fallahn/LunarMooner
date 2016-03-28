@@ -32,6 +32,7 @@ source distribution.
 #include <xygine/App.hpp>
 #include <xygine/Assert.hpp>
 #include <xygine/Reports.hpp>
+#include <xygine/PostChromeAb.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -67,6 +68,9 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
+
+    auto pp = xy::PostProcess::create<xy::PostChromeAb>();
+    m_scene.addPostProcess(pp);
 
     auto gameController = xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld);
     for (auto i = 0; i < playerCount; ++i)  gameController->addPlayer();
