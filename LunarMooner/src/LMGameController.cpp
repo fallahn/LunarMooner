@@ -85,7 +85,7 @@ namespace
     //time limits per level
     const std::array<float, 10u> roundTimes =
     {
-        300.f, 300.f, 300.f, 300.f, 300.f,
+        130.f, 300.f, 300.f, 300.f, 300.f,
         300.f, 300.f, 300.f, 310.f, 320.f
     };
 
@@ -99,6 +99,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_inputFlags    (0),
     m_spawnReady    (true),
     m_player        (nullptr),
+    m_timeRound     (false),
     m_mothership    (nullptr),
     m_speedMeter    (nullptr),
     m_scoreDisplay  (nullptr),
@@ -263,7 +264,17 @@ void GameController::entityUpdate(xy::Entity&, float dt)
     }
 
     //count down round time
-    m_playerStates[m_currentPlayer].timeRemaining = std::max(0.f, m_playerStates[m_currentPlayer].timeRemaining - dt);
+    if (m_timeRound)
+    {
+        const float oldTime = m_playerStates[m_currentPlayer].timeRemaining;
+        m_playerStates[m_currentPlayer].timeRemaining = std::max(0.f, m_playerStates[m_currentPlayer].timeRemaining - dt);
+        if (oldTime > 0 &&
+            m_playerStates[m_currentPlayer].timeRemaining == 0)
+        {
+            //we timed out, end round
+            restartRound();
+        }
+    }
 }
 
 void GameController::setInput(sf::Uint8 input)
@@ -373,6 +384,7 @@ void GameController::spawnPlayer()
         m_scene.addEntity(entity, xy::Scene::BackFront);
 
         m_spawnReady = false;
+        m_timeRound = true;
     }
 }
 
@@ -675,13 +687,21 @@ void GameController::restorePlayerState()
     }
 
     //throw in some random roids at higher levels
-    if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)
+    auto& ps = m_playerStates[m_currentPlayer];
+    if (ps.level > minAsteroidLevel)
     {
         addDelayedAsteroid();
-        if (m_playerStates[m_currentPlayer].level > 6)
+        if (ps.level > 6)
         {
             addDelayedAsteroid(); //even moar!!
         }
+    }
+
+    //reset round time if new round - TODO adjust times once beyond level 10
+    //something like: times[9] - (level - 10 * 2)
+    if (ps.startNewRound)
+    {
+        ps.timeRemaining = roundTimes[std::min(static_cast<std::size_t>(ps.level - 1), roundTimes.size() - 1)];
     }
 }
 
@@ -690,9 +710,7 @@ void GameController::moveToNextRound()
     xy::Logger::log("Level: " + std::to_string(m_playerStates[m_currentPlayer].level) 
         + ", time: " + std::to_string(tempClock.restart().asSeconds()),
         xy::Logger::Type::Info, xy::Logger::Output::File);
-    
-    //m_scoreDisplay->showMessage("Round Complete!");
-    
+        
     //remove player from scene
     xy::Command cmd;
     cmd.category = LMCommandID::Player;
@@ -720,14 +738,47 @@ void GameController::moveToNextRound()
     //increase aliens
     ps.alienCount = alienCounts[std::min(ps.level, static_cast<sf::Uint8>(alienCounts.size() - 1))];
 
-    //set new time limit - TODO adjust times once beyond level 10
-    ps.timeRemaining = roundTimes[std::min(ps.level, static_cast<sf::Uint8>(roundTimes.size() - 1))];
-
     ps.level++;
     ps.startNewRound = true;
 
     //display a round summary
     showRoundSummary(true);
+}
+
+void GameController::restartRound()
+{
+    //remove player from scene
+    xy::Command cmd;
+    cmd.category = LMCommandID::Player;
+    cmd.action = [](xy::Entity& entity, float)
+    {
+        entity.destroy();
+    };
+    m_scene.sendCommand(cmd);
+    m_player = nullptr;
+
+    //update state with new round values
+    auto& ps = m_playerStates[m_currentPlayer];
+    ps.humansSaved = 0;
+
+    //new human count
+    auto& humans = ps.humansRemaining;
+    humans.clear();
+    for (auto i = 0; i < humanCounts[std::min(static_cast<std::size_t>(ps.level - 1), humanCounts.size() - 1)]; ++i)
+    {
+        humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
+    }
+
+    //TODO gen a new terrain?
+
+    //increase aliens
+    ps.alienCount = alienCounts[std::min(static_cast<std::size_t>(ps.level - 1), alienCounts.size() - 1)];
+
+    ps.lives--;
+    ps.startNewRound = true;
+
+    //display a round summary
+    showRoundSummary(false);
 }
 
 void GameController::addDelayedRespawn()
@@ -805,4 +856,6 @@ void GameController::showRoundSummary(bool doScores)
     entity->addCommandCategories(LMCommandID::UI);
     entity->addComponent(summary);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
+
+    m_timeRound = false;
 }
