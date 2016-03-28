@@ -54,7 +54,7 @@ MenuOptionState::MenuOptionState(xy::StateStack& stateStack, Context context, xy
     m_cursorSprite.setTexture(m_textureResource.get("assets/images/ui/cursor.png"));
     m_cursorSprite.setPosition(context.renderWindow.mapPixelToCoords(sf::Mouse::getPosition(context.renderWindow)));
     
-    const auto& font = m_fontResource.get("assets/fonts/N_E_B.ttf");
+    const auto& font = m_fontResource.get("option_menu_57");
     buildMenu(font);
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);

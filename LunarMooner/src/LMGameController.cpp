@@ -35,6 +35,7 @@ source distribution.
 #include <LMAsteroidController.hpp>
 #include <LMSpeedMeter.hpp>
 #include <LMPlayerInfoDisplay.hpp>
+#include <LMRoundSummary.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/components/SfDrawableComponent.hpp>
@@ -58,6 +59,7 @@ namespace
     const sf::Vector2f mothershipStart(386.f, 46.f);
 
     const sf::Uint32 rescueScore = 50u;
+    const sf::Uint8 minAsteroidLevel = 2;
 
     //humans to rescue per level
     std::array<sf::Uint8, 10u> humanCounts = 
@@ -83,9 +85,11 @@ namespace
     //time limits per level
     const std::array<float, 10u> roundTimes =
     {
-        30.f, 40.f, 50.f, 60.f, 70.f,
-        80.f, 90.f, 100.f, 110.f, 120.f
+        300.f, 300.f, 300.f, 300.f, 300.f,
+        300.f, 300.f, 300.f, 310.f, 320.f
     };
+
+    sf::Clock tempClock;
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw)
@@ -108,6 +112,9 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         switch (msgData.type)
         {
         default: break;
+        case LMEvent::SummaryFinished:
+            addDelayedRespawn();
+            break;
         case LMEvent::PlayerDied:
         {
             m_playerStates[m_currentPlayer].lives--;
@@ -129,10 +136,9 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             else
             {
                 storePlayerState();
+                showRoundSummary(false);
             }
             
-            addDelayedRespawn();
-
             m_player = nullptr;
         }
             break;
@@ -170,7 +176,6 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             if (m_humans.empty())
             {
                 moveToNextRound();
-                addDelayedRespawn();
             }
             break;
         case LMEvent::AlienDied:
@@ -218,7 +223,6 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
     m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_textureResource);
 
-    addDelayedAsteroid();
 }
 
 //public
@@ -263,15 +267,9 @@ void GameController::entityUpdate(xy::Entity&, float dt)
 }
 
 void GameController::setInput(sf::Uint8 input)
-{
-    
+{    
     bool shoot = ((input & LMInputFlags::Shoot) != 0
         && (m_inputFlags & LMInputFlags::Shoot) == 0);
-    if(shoot)
-    {
-        //shoot was released, try spawning
-        spawnPlayer();
-    }
 
     if (m_player)
     {
@@ -283,6 +281,23 @@ void GameController::setInput(sf::Uint8 input)
         if (shoot && m_player->carryingHuman())
         {
             spawnBullet();
+        }
+    }
+    else
+    {        
+        if (shoot)
+        {
+            //assume there's some UI which wants commanding
+            xy::Command cmd;
+            cmd.category = LMCommandID::UI;
+            cmd.action = [](xy::Entity& entity, float)
+            {
+                entity.getComponent<RoundSummary>()->completeSummary();
+            };
+            m_scene.sendCommand(cmd);
+
+            //try spawning
+            spawnPlayer();
         }
     }
 
@@ -657,12 +672,26 @@ void GameController::restorePlayerState()
     for (auto i = 0; i < m_playerStates[m_currentPlayer].humansSaved; ++i)
     {
         addRescuedHuman();
-    } 
+    }
+
+    //throw in some random roids at higher levels
+    if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)
+    {
+        addDelayedAsteroid();
+        if (m_playerStates[m_currentPlayer].level > 6)
+        {
+            addDelayedAsteroid(); //even moar!!
+        }
+    }
 }
 
 void GameController::moveToNextRound()
 {
-    m_scoreDisplay->showMessage("Round Complete!");
+    xy::Logger::log("Level: " + std::to_string(m_playerStates[m_currentPlayer].level) 
+        + ", time: " + std::to_string(tempClock.restart().asSeconds()),
+        xy::Logger::Type::Info, xy::Logger::Output::File);
+    
+    //m_scoreDisplay->showMessage("Round Complete!");
     
     //remove player from scene
     xy::Command cmd;
@@ -697,15 +726,15 @@ void GameController::moveToNextRound()
     ps.level++;
     ps.startNewRound = true;
 
-    //TODO display a round summary
-
+    //display a round summary
+    showRoundSummary(true);
 }
 
 void GameController::addDelayedRespawn()
 {
     m_delayedEvents.emplace_back();
     auto& de = m_delayedEvents.back();
-    de.time = 2.f;
+    de.time = 1.f;
     de.action = [this]()
     {
         swapPlayerState();
@@ -742,6 +771,7 @@ void GameController::spawnAsteroid()
     collision->setScoreValue(100);
 
     auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
+    ps->setLifetimeVariance(0.7f);
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
@@ -759,8 +789,20 @@ void GameController::addDelayedAsteroid()
     auto& de = m_delayedEvents.back();
     de.time = xy::Util::Random::value(18.f, 28.f);
     de.action = [this]()
-    {
-        spawnAsteroid();
-        addDelayedAsteroid();
+    {       
+        if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)
+        {
+            spawnAsteroid();
+            addDelayedAsteroid();
+        }
     };
+}
+
+void GameController::showRoundSummary(bool doScores)
+{
+    auto summary = xy::Component::create<RoundSummary>(getMessageBus(), m_playerStates[m_currentPlayer], m_textureResource, m_fontResource, doScores);
+    auto entity = xy::Entity::create(getMessageBus());
+    entity->addCommandCategories(LMCommandID::UI);
+    entity->addComponent(summary);
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }

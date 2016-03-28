@@ -36,7 +36,8 @@ enum LMCommandID
     GameController = 0x2,
     Human = 0x4,
     Player = 0x8,
-    Alien = 0x10
+    Alien = 0x10,
+    UI = 0x20
 };
 
 enum LMInputFlags
@@ -62,7 +63,8 @@ struct LMEvent
         HumanRescued,
         HumanPickedUp,
         AlienDied,
-        GameOver
+        GameOver,
+        SummaryFinished //TODO could move to smaller struct
     }type;
     float posX = 0.f;
     float posY = 0.f;

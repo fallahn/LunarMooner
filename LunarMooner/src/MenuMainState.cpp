@@ -87,7 +87,7 @@ void MenuMainState::handleMessage(const xy::Message& msg)
 //private
 void MenuMainState::buildMenu()
 {
-    const auto& font = m_fontResource.get("assets/fonts/VeraMono.ttf");
+    const auto& font = m_fontResource.get("main_menu_90");
     
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("One Player");

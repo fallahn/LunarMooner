@@ -109,6 +109,8 @@ namespace lm
 
         void spawnAsteroid();
         void addDelayedAsteroid();
+
+        void showRoundSummary(bool);
     };
 }
 
