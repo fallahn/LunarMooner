@@ -75,6 +75,9 @@
     <ClInclude Include="include\LMAsteroidController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMRoundSummary.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LMAsteroidController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMRoundSummary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

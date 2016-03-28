@@ -70,7 +70,7 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, xy::FontResource& fr, std::vector
     m_showMessage           (false),
     m_messageDisplayTime    (0.f)
 {
-    auto& font = fr.get("buns");
+    auto& font = fr.get("player_info_display_73");
 
     m_messageText.setFont(font);
     m_messageText.setCharacterSize(80u);
@@ -146,7 +146,7 @@ void ScoreDisplay::showScore(sf::Uint16 score, const sf::Vector2f& position, sf:
     m_scoreTags.emplace_back();
     auto& text = m_scoreTags.back().text;
 
-    text.setFont(m_fontResource.get("buns"));
+    text.setFont(m_fontResource.get("player_info_display_149"));
     text.setString(std::to_string(score));
     xy::Util::Position::centreOrigin(text);
     text.setFillColor(colour);

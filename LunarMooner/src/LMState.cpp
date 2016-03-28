@@ -78,7 +78,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
     xy::Stats::clear();
-    m_reportText.setFont(m_fontResource.get("buns"));
+    m_reportText.setFont(m_fontResource.get("game_state_81"));
 
     quitLoadingScreen();
 }
@@ -148,10 +148,10 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         switch (evt.joystickButton.button)
         {
         case buttonA:
-            m_inputFlags |= LMInputFlags::Thrust;
+            m_inputFlags |= LMInputFlags::Shoot;
             break;
         case buttonB:
-            m_inputFlags |= LMInputFlags::Shoot;
+            m_inputFlags |= LMInputFlags::Thrust;
             break;
         case buttonStart:
             //m_inputFlags |= LMInputFlags::Start;
@@ -166,10 +166,10 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         {
         default: break;
         case buttonA:
-            m_inputFlags &= ~LMInputFlags::Thrust;
+            m_inputFlags &= ~LMInputFlags::Shoot;
             break;
         case buttonB:
-            m_inputFlags &= ~LMInputFlags::Shoot;
+            m_inputFlags &= ~LMInputFlags::Thrust;
             break;
         case buttonStart:
             requestStackPush(States::ID::Pause);
