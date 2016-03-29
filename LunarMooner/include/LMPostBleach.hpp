@@ -47,7 +47,9 @@ namespace lm
         sf::Shader m_shader;
 
         bool m_running;
-        void start();
+        std::size_t m_speed;
+
+        void start(std::size_t = 1);
         void stop();
         void reset();
     };

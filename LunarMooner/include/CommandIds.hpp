@@ -61,6 +61,7 @@ struct LMGameEvent
     {
         PlayerDied,
         PlayerLanded,
+        PlayerSpawned,
         HumanRescued,
         HumanPickedUp,
         AlienDied
