@@ -59,6 +59,7 @@ namespace
     const sf::Vector2f mothershipStart(386.f, 46.f);
 
     const sf::Uint32 rescueScore = 50u;
+    const sf::Uint32 extraLifeScore = 5000u;
     const sf::Uint8 minAsteroidLevel = 2;
 
     //humans to rescue per level
@@ -85,7 +86,7 @@ namespace
     //time limits per level
     const std::array<float, 10u> roundTimes =
     {
-        130.f, 300.f, 300.f, 300.f, 300.f,
+        30.f, 300.f, 300.f, 300.f, 300.f,
         300.f, 300.f, 300.f, 310.f, 320.f
     };
 
@@ -134,7 +135,13 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             else
             {
                 storePlayerState();
-                showRoundSummary(false);
+                m_delayedEvents.emplace_back();
+                auto& de = m_delayedEvents.back();
+                de.time = 1.6f;
+                de.action = [this]() 
+                {
+                    showRoundSummary(false);
+                };
             }
             
             m_player = nullptr;
@@ -280,13 +287,30 @@ void GameController::entityUpdate(xy::Entity&, float dt)
     {
         const float oldTime = m_playerStates[m_currentPlayer].timeRemaining;
         m_playerStates[m_currentPlayer].timeRemaining = std::max(0.f, m_playerStates[m_currentPlayer].timeRemaining - dt);
-        if (oldTime > 0 &&
+        
+        if (oldTime > 10 &&
+            m_playerStates[m_currentPlayer].timeRemaining <= 10)
+        {
+            auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+            msg->type = LMStateEvent::CountDownStarted;
+        }
+
+        else if (oldTime > 0 &&
             m_playerStates[m_currentPlayer].timeRemaining == 0)
         {
             //we timed out, end round
             restartRound();
         }
     }
+
+    //check for extra lives
+    if ((m_playerStates[m_currentPlayer].previousScore / extraLifeScore) <
+        (m_playerStates[m_currentPlayer].score / extraLifeScore))
+    {
+        m_playerStates[m_currentPlayer].lives++;
+        m_scoreDisplay->showMessage("EXTRA LIFE!");
+    }
+    m_playerStates[m_currentPlayer].previousScore = m_playerStates[m_currentPlayer].score;
 }
 
 void GameController::setInput(sf::Uint8 input)
@@ -397,6 +421,16 @@ void GameController::spawnPlayer()
 
         m_spawnReady = false;
         m_timeRound = true;
+
+        auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+        msg->type = LMGameEvent::PlayerSpawned;
+        msg->posX = spawnPos.x;
+        msg->posY = spawnPos.y;
+        if (m_playerStates[m_currentPlayer].timeRemaining < 10.f)
+        {
+            sf::Uint32 speed = static_cast<sf::Uint32>(10.f / m_playerStates[m_currentPlayer].timeRemaining);
+            msg->value = speed;
+        }
     }
 }
 
@@ -725,7 +759,7 @@ void GameController::moveToNextRound()
         
     //display a round summary
     //do this first so player info is current
-    //when the summary board is constructed
+    //when the summary board is constructed - this means we can't delay it though :(
     showRoundSummary(true);
     
     //remove player from scene
@@ -771,11 +805,15 @@ void GameController::restartRound()
     m_scene.sendCommand(cmd);
     m_player = nullptr;
 
+    //poor colonists got nuked :(
+    for (auto h : m_humans) h->destroy();
+    m_humans.clear();
+
     //update state with new round values
     auto& ps = m_playerStates[m_currentPlayer];
     ps.humansSaved = 0;
 
-    //new human count
+    //reset human count
     auto& humans = ps.humansRemaining;
     humans.clear();
     for (auto i = 0; i < humanCounts[std::min(static_cast<std::size_t>(ps.level - 1), humanCounts.size() - 1)]; ++i)
@@ -792,7 +830,13 @@ void GameController::restartRound()
     ps.startNewRound = true;
 
     //display a round summary
-    showRoundSummary(false);
+    m_delayedEvents.emplace_back();
+    auto& de = m_delayedEvents.back();
+    de.time = 1.6f;
+    de.action = [this]() 
+    {
+        showRoundSummary(false);
+    };
 }
 
 void GameController::addDelayedRespawn()
@@ -804,6 +848,9 @@ void GameController::addDelayedRespawn()
     {
         swapPlayerState();
         m_spawnReady = true;
+
+        auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+        msg->type = LMStateEvent::RoundBegin;
 
         auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
         dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
@@ -872,4 +919,7 @@ void GameController::showRoundSummary(bool doScores)
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     m_timeRound = false;
+
+    auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+    msg->type = LMStateEvent::RoundEnd;
 }

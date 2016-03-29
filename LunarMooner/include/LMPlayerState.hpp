@@ -37,11 +37,12 @@ namespace lm
 {
     struct PlayerState final
     {
-        sf::Uint32 score = 0;
+        sf::Uint32 score = 0u;
+        sf::Uint32 previousScore = 0u;
         sf::Int8 lives = 3;
-        sf::Uint8 level = 1;
-        sf::Uint8 alienCount = 0;
-        sf::Uint8 humansSaved = 0;
+        sf::Uint8 level = 1u;
+        sf::Uint8 alienCount = 0u;
+        sf::Uint8 humansSaved = 0u;
         std::vector<sf::Vector2f> humansRemaining;
         bool startNewRound = false;
         float timeRemaining = 0.f;

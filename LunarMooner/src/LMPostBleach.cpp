@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMPostBleach.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/util/Wavetable.hpp>
 #include <xygine/util/Random.hpp>
@@ -36,7 +37,7 @@ using namespace lm;
 
 namespace
 {
-    const auto wavetable = xy::Util::Wavetable::sine(0.025f);
+    auto wavetable = xy::Util::Wavetable::sine(0.025f);
     std::vector<sf::Vector2f> offsets;
 
     const std::string fragShader =
@@ -59,17 +60,68 @@ namespace
 }
 
 PostBleach::PostBleach()
-    : m_index(0),
-    m_running(false)
+    : m_index   (0),
+    m_running   (false),
+    m_speed     (1)
 {
     m_shader.loadFromMemory(fragShader, sf::Shader::Fragment);
 
+    //adds a quick fade out to end of table
+    auto quarter = wavetable.size() / 4;
+    auto half = quarter * 2;
+    std::size_t size = 0;
+    for (auto i = quarter, j = quarter; j < half; ++i, j += 10)
+    {
+        wavetable[i] = wavetable[j];
+        size = i + 1;
+    }
+    wavetable.resize(size);
+
+    //screen shake offsets
     offsets.resize(wavetable.size());
     for (auto& o : offsets)
     {
         o.x = xy::Util::Random::value(-maxX, maxX);
         o.y = xy::Util::Random::value(-maxY, maxY);
     }
+
+    MessageHandler mh;
+    mh.id = LMMessageId::StateEvent;
+    mh.action = [this](const xy::Message& msg)
+    {
+        auto& msgData = msg.getData<LMStateEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMStateEvent::CountDownStarted:
+            start();
+            break;
+        case LMStateEvent::RoundBegin:
+            reset();
+            break;
+        case LMStateEvent::RoundEnd:
+            stop();
+            break;
+        }
+    };
+    addMessageHandler(mh);
+
+    mh.id = LMMessageId::GameEvent;
+    mh.action = [this](const xy::Message& msg)
+    {
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::PlayerSpawned:
+            if (msgData.value > 0)
+            {
+                start(msgData.value);
+            }
+            break;
+        }
+    };
+    addMessageHandler(mh);
 }
 
 //public
@@ -81,21 +133,35 @@ void PostBleach::apply(const sf::RenderTexture& src, sf::RenderTarget& dst)
 
 void PostBleach::update(float)
 {
-    if (!m_running) return;
+    if (m_running)
+    {
+        const float val = wavetable[m_index];
+        m_shader.setUniform("u_amount", val);
 
-    const float val = wavetable[m_index];
-    m_shader.setUniform("u_amount", val);
+        const auto offset = offsets[m_index];
+        m_shader.setUniform("u_offset", offset);
 
-    const auto offset = offsets[m_index];
-    m_shader.setUniform("u_offset", offset);
+        auto index = (m_index + m_speed) % wavetable.size();
 
-    m_index = (m_index + 1) % (wavetable.size() / 4);
+        if (index < m_index)
+        {
+            m_running = false;
+            m_shader.setUniform("u_amount", 0.f);
+            m_index = 0;
+        }
+        else
+        {
+            m_index = index;
+        }
+    }
 }
 
 //private
-void PostBleach::start()
+void PostBleach::start(std::size_t speed)
 {
+    reset();
     m_running = true;
+    m_speed = speed;
 }
 
 void PostBleach::stop()
@@ -106,4 +172,5 @@ void PostBleach::stop()
 void PostBleach::reset()
 {
     m_index = 0;
+    m_shader.setUniform("u_amount", 0.f);
 }
