@@ -41,12 +41,12 @@ namespace
 {
     const sf::Uint16 lifeBonus = 200;
     const sf::Uint16 humanBonus = 100;
-    const sf::Uint16 timeBonus = 20;
+    const sf::Uint16 timeBonus = 5; //TODO adjust this it might be a bit conservative with current times
 
     //all the bonus values must be divisible by this! :D
     const sf::Uint16 updateStep = 4; 
 
-    const sf::Uint32 extraLifeValue = 5000;
+    const sf::Uint32 extraLifeValue = 7500;
 }
 
 RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResource& tr, xy::FontResource& fr, bool doScores)
@@ -119,11 +119,6 @@ void RoundSummary::entityUpdate(xy::Entity&, float dt)
             m_summaryComplete = true;
         }
         updateMainString();
-
-        if (m_summaryComplete)
-        {
-            checkExtraLife();
-        }
     }
 }
 
@@ -149,7 +144,6 @@ void RoundSummary::completeSummary()
         m_humanBonus = m_livesBonus = m_timeBonus = 0;
 
         updateMainString();
-        checkExtraLife();
         m_summaryComplete = true;
     }
 }
@@ -164,18 +158,6 @@ void RoundSummary::updateMainString()
         + "\n\n"
         + "Time Remaining:        " + std::to_string(m_timeDisplayBonus - m_timeBonus);
     m_mainText.setString(m_mainString);
-}
-
-void RoundSummary::checkExtraLife()
-{
-    //TODO raise a message for this
-    if ((m_initialScore / extraLifeValue) < (m_playerState.score / extraLifeValue))
-    {
-        m_playerState.lives++;
-
-        m_mainString += "\n\n           EXTRA LIFE!"; //TODO this probably needs centring depending on font
-        m_mainText.setString(m_mainString);
-    }
 }
 
 void RoundSummary::draw(sf::RenderTarget& rt, sf::RenderStates states) const

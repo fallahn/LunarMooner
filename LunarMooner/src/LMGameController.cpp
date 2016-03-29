@@ -43,6 +43,7 @@ source distribution.
 #include <xygine/util/Position.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
+#include <xygine/util/Math.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -59,7 +60,7 @@ namespace
     const sf::Vector2f mothershipStart(386.f, 46.f);
 
     const sf::Uint32 rescueScore = 50u;
-    const sf::Uint32 extraLifeScore = 5000u;
+    const sf::Uint32 extraLifeScore = 7500u;
     const sf::Uint8 minAsteroidLevel = 2;
 
     //humans to rescue per level
@@ -86,7 +87,7 @@ namespace
     //time limits per level
     const std::array<float, 10u> roundTimes =
     {
-        30.f, 300.f, 300.f, 300.f, 300.f,
+        130.f, 300.f, 300.f, 300.f, 300.f,
         300.f, 300.f, 300.f, 310.f, 320.f
     };
 
@@ -309,6 +310,9 @@ void GameController::entityUpdate(xy::Entity&, float dt)
     {
         m_playerStates[m_currentPlayer].lives++;
         m_scoreDisplay->showMessage("EXTRA LIFE!");
+
+        auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+        msg->type = LMGameEvent::ExtraLife;
     }
     m_playerStates[m_currentPlayer].previousScore = m_playerStates[m_currentPlayer].score;
 }
@@ -428,7 +432,7 @@ void GameController::spawnPlayer()
         msg->posY = spawnPos.y;
         if (m_playerStates[m_currentPlayer].timeRemaining < 10.f)
         {
-            sf::Uint32 speed = static_cast<sf::Uint32>(10.f / m_playerStates[m_currentPlayer].timeRemaining);
+            sf::Uint32 speed = static_cast<sf::Uint32>(xy::Util::Math::round(10.f / m_playerStates[m_currentPlayer].timeRemaining));
             msg->value = speed;
         }
     }

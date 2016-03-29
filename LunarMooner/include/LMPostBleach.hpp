@@ -44,6 +44,7 @@ namespace lm
         void update(float) override;
     private:
         std::size_t m_index;
+        std::size_t m_fadeIndex;
         sf::Shader m_shader;
 
         bool m_running;

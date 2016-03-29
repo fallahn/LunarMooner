@@ -61,6 +61,7 @@ namespace
 
 PostBleach::PostBleach()
     : m_index   (0),
+    m_fadeIndex (0),
     m_running   (false),
     m_speed     (1)
 {
@@ -76,6 +77,7 @@ PostBleach::PostBleach()
         size = i + 1;
     }
     wavetable.resize(size);
+    m_fadeIndex = quarter; //so we can jump to fade out
 
     //screen shake offsets
     offsets.resize(wavetable.size());
@@ -118,6 +120,9 @@ PostBleach::PostBleach()
             {
                 start(msgData.value);
             }
+            break;
+        case LMGameEvent::PlayerDied:
+            stop();
             break;
         }
     };
@@ -166,7 +171,12 @@ void PostBleach::start(std::size_t speed)
 
 void PostBleach::stop()
 {
-    m_running = false;
+    //skip forward to fade
+    if (m_running && m_index < m_fadeIndex)
+    {
+        float current = wavetable[m_index];
+        while (wavetable[++m_index] > current) {}
+    }
 }
 
 void PostBleach::reset()
