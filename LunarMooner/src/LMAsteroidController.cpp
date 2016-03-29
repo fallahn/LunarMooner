@@ -59,7 +59,7 @@ void AsteroidController::entityUpdate(xy::Entity& entity, float dt)
 
     auto position = entity.getPosition();
 
-    if (position.x < m_bounds.left || position.y > 1080.f
+    if ((position.x < m_bounds.left || position.y > 1080.f)
         && m_trail->started())
     {
         m_trail->stop();
