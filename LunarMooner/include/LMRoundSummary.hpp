@@ -77,7 +77,7 @@ namespace lm
         sf::Text m_okText;
 
         void updateMainString();
-        void checkExtraLife();
+        //void checkExtraLife();
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
