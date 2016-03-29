@@ -72,8 +72,8 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
             {
                 //ladies and gentlemen, we have reached out destination
                 entity.destroy();
-                auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-                msg->type = LMEvent::HumanPickedUp;
+                auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+                msg->type = LMGameEvent::HumanPickedUp;
             }
         }
     }

@@ -91,8 +91,8 @@ void AlienController::collisionCallback(CollisionComponent* cc)
     case CollisionComponent::ID::Bullet:
     //case CollisionComponent::ID::Player:
     {
-        auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-        msg->type = LMEvent::AlienDied;
+        auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+        msg->type = LMGameEvent::AlienDied;
         msg->posX = m_entity->getPosition().x;
         msg->posY = m_entity->getPosition().y;
         msg->value = m_entity->getComponent<CollisionComponent>()->getScoreValue();

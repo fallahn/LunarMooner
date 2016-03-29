@@ -27,6 +27,7 @@ source distribution.
 
 #include <LMState.hpp>
 #include <LMGameController.hpp>
+#include <LMPostBleach.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/App.hpp>
@@ -69,7 +70,9 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
 
-    auto pp = xy::PostProcess::create<xy::PostChromeAb>();
+    auto pp = xy::PostProcess::create<lm::PostBleach>();
+    m_scene.addPostProcess(pp);
+    pp = xy::PostProcess::create<xy::PostChromeAb>();
     m_scene.addPostProcess(pp);
 
     auto gameController = xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld);
@@ -190,12 +193,12 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
 {
     m_scene.handleMessage(msg);
 
-    if (msg.id == LMMessageId::LMMessage)
+    if (msg.id == LMMessageId::StateEvent)
     {
-        auto& msgData = msg.getData<LMEvent>();
+        auto& msgData = msg.getData<LMStateEvent>();
         switch (msgData.type)
         {
-        case LMEvent::GameOver:
+        case LMStateEvent::GameOver:
             requestStackPush(States::ID::GameOver);
             break;
         default:break;

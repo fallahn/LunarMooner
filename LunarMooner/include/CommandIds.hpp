@@ -51,10 +51,11 @@ enum LMInputFlags
 
 enum LMMessageId
 {
-    LMMessage = xy::Message::Count
+    GameEvent = xy::Message::Count,
+    StateEvent
 };
 
-struct LMEvent
+struct LMGameEvent
 {
     enum
     {
@@ -62,13 +63,23 @@ struct LMEvent
         PlayerLanded,
         HumanRescued,
         HumanPickedUp,
-        AlienDied,
-        GameOver,
-        SummaryFinished //TODO could move to smaller struct
+        AlienDied
     }type;
     float posX = 0.f;
     float posY = 0.f;
     sf::Int16 value = 0;
+};
+
+struct LMStateEvent
+{
+    enum
+    {
+        GameOver,
+        SummaryFinished,
+        RoundBegin,
+        RoundEnd,
+        CountDownStarted
+    }type;
 };
 
 enum LMParticleID
