@@ -139,8 +139,8 @@ void RoundSummary::completeSummary()
         //close and message
         m_entity->destroy();
 
-        auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-        msg->type = LMEvent::SummaryFinished;
+        auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+        msg->type = LMStateEvent::SummaryFinished;
     }
     else
     {

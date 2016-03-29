@@ -106,17 +106,14 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_currentPlayer (0)
 {
     xy::Component::MessageHandler handler;
-    handler.id = LMMessageId::LMMessage;
+    handler.id = LMMessageId::GameEvent;
     handler.action = [this](xy::Component* c, const xy::Message& msg)
     {
-        auto& msgData = msg.getData<LMEvent>();
+        auto& msgData = msg.getData<LMGameEvent>();
         switch (msgData.type)
         {
         default: break;
-        case LMEvent::SummaryFinished:
-            addDelayedRespawn();
-            break;
-        case LMEvent::PlayerDied:
+        case LMGameEvent::PlayerDied:
         {
             m_playerStates[m_currentPlayer].lives--;
             
@@ -143,7 +140,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             m_player = nullptr;
         }
             break;
-        case LMEvent::PlayerLanded:
+        case LMGameEvent::PlayerLanded:
         {
             auto pos = m_player->getPosition();
 
@@ -168,7 +165,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             m_scoreDisplay->showScore(msgData.value, m_player->getPosition());
         }
             break;
-        case LMEvent::HumanRescued:
+        case LMGameEvent::HumanRescued:
             addRescuedHuman();
             m_playerStates[m_currentPlayer].humansSaved++;
             m_playerStates[m_currentPlayer].score += rescueScore;
@@ -179,7 +176,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 moveToNextRound();
             }
             break;
-        case LMEvent::AlienDied:
+        case LMGameEvent::AlienDied:
             m_playerStates[m_currentPlayer].alienCount--;
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
@@ -194,17 +191,32 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     };
     addMessageHandler(handler);
 
-    //particle spawner
-    auto particleManager = xy::Component::create<xy::ParticleController>(getMessageBus());
-    handler.action = [](xy::Component* c, const xy::Message& msg)
+    handler.id = LMMessageId::StateEvent;
+    handler.action = [this](xy::Component* c, const xy::Message& msg)
     {
-        auto component = dynamic_cast<xy::ParticleController*>(c);
-        auto& msgData = msg.getData<LMEvent>();
+        auto& msgData = msg.getData<LMStateEvent>();
         switch (msgData.type)
         {
         default: break;
-        case LMEvent::AlienDied:
-        case LMEvent::PlayerDied:
+        case LMStateEvent::SummaryFinished:
+            addDelayedRespawn();
+            break;
+        }
+    };
+    addMessageHandler(handler);
+
+    //particle spawner
+    auto particleManager = xy::Component::create<xy::ParticleController>(getMessageBus());
+    handler.id = LMMessageId::GameEvent;
+    handler.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        auto component = dynamic_cast<xy::ParticleController*>(c);
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::AlienDied:
+        case LMGameEvent::PlayerDied:
             component->fire(LMParticleID::SmallExplosion, { msgData.posX, msgData.posY });
             break;
         }
@@ -649,8 +661,8 @@ void GameController::swapPlayerState()
     if (count >= m_playerStates.size())
     {
         //everyone is dead! request end game
-        auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-        msg->type = LMEvent::GameOver;
+        auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+        msg->type = LMStateEvent::GameOver;
         return;
     }
 

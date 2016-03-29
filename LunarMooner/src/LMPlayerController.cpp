@@ -62,14 +62,14 @@ PlayerController::PlayerController(xy::MessageBus& mb)
     updateState = std::bind(&PlayerController::flyingState, this, _1, _2);
 
     xy::Component::MessageHandler handler;
-    handler.id = LMMessageId::LMMessage;
+    handler.id = LMMessageId::GameEvent;
     handler.action = [this](xy::Component* c, const xy::Message& msg)
     {
-        auto& msgData = msg.getData<LMEvent>();
+        auto& msgData = msg.getData<LMGameEvent>();
         switch (msgData.type)
         {
         default: break;
-        case LMEvent::HumanPickedUp:
+        case LMGameEvent::HumanPickedUp:
             m_velocity = { 0.f, -82.5f };
             updateState = std::bind(&PlayerController::flyingState, this, _1, _2);
             m_carrying = true;
@@ -152,8 +152,8 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             if (xy::Util::Rectangle::contains(cc->globalBounds(), m_entity->getComponent<CollisionComponent>()->globalBounds()))
             {
                 m_carrying = false;
-                auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-                msg->type = LMEvent::HumanRescued;
+                auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+                msg->type = LMGameEvent::HumanRescued;
                 LOG("human saved!", xy::Logger::Type::Info);
             }
         }
@@ -184,8 +184,8 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                 //m_carrying = true;
                 updateState = std::bind(&PlayerController::landedState, this, _1, _2);
 
-                auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-                msg->type = LMEvent::PlayerLanded;
+                auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+                msg->type = LMGameEvent::PlayerLanded;
                 msg->value = cc->getScoreValue();
             }
         }
@@ -262,8 +262,8 @@ void PlayerController::landedState(xy::Entity& entity, float dt)
 
 void PlayerController::broadcastDeath()
 {
-    auto msg = getMessageBus().post<LMEvent>(LMMessageId::LMMessage);
-    msg->type = LMEvent::PlayerDied;
+    auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+    msg->type = LMGameEvent::PlayerDied;
     //auto bounds = m_entity->globalBounds();
     msg->posX = m_entity->getPosition().x;// +(bounds.width / 2.f);
     msg->posY = m_entity->getPosition().y;// +(bounds.height / 2.f);

@@ -134,6 +134,7 @@
     <ClInclude Include="include\LMPlayerController.hpp" />
     <ClInclude Include="include\LMPlayerInfoDisplay.hpp" />
     <ClInclude Include="include\LMPlayerState.hpp" />
+    <ClInclude Include="include\LMPostBleach.hpp" />
     <ClInclude Include="include\LMRoundSummary.hpp" />
     <ClInclude Include="include\LMSpeedMeter.hpp" />
     <ClInclude Include="include\LMState.hpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="src\LMMothershipController.cpp" />
     <ClCompile Include="src\LMPlayerController.cpp" />
     <ClCompile Include="src\LMPlayerInfoDisplay.cpp" />
+    <ClCompile Include="src\LMPostBleach.cpp" />
     <ClCompile Include="src\LMRoundSummary.cpp" />
     <ClCompile Include="src\LMSpeedMeter.cpp" />
     <ClCompile Include="src\LMState.cpp" />
