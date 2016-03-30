@@ -27,6 +27,7 @@ source distribution.
 
 #include <LMPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
+#include <LMMothershipController.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
@@ -48,9 +49,11 @@ namespace
     const float maxLandingVelocity = 16000.f ;
 }
 
-PlayerController::PlayerController(xy::MessageBus& mb)
+PlayerController::PlayerController(xy::MessageBus& mb, const MothershipController* ms)
     : xy::Component (mb, this),
+    m_mothership    (ms),
     m_inputFlags    (0),
+    m_velocity      (ms->getVelocity()),
     m_entity        (nullptr),
     m_carrying      (false),
     m_thrust        (nullptr),
@@ -146,7 +149,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
         break;
     case CollisionComponent::ID::Mothership:
         //if carrying drop human, raise message
-        if (m_carrying && xy::Util::Vector::lengthSquared(m_velocity) < maxDockingVelocity)
+        if (m_carrying && xy::Util::Vector::lengthSquared(m_velocity - m_mothership->getVelocity()) < maxDockingVelocity)
         {
             //we want to be moving slowly enough, and fully contained in mothership area
             if (xy::Util::Rectangle::contains(cc->globalBounds(), m_entity->getComponent<CollisionComponent>()->globalBounds()))

@@ -41,7 +41,7 @@ namespace
 {
     const sf::Uint16 lifeBonus = 200;
     const sf::Uint16 humanBonus = 100;
-    const sf::Uint16 timeBonus = 5; //TODO adjust this it might be a bit conservative with current times
+    const sf::Uint16 timeBonus = 4; //TODO adjust this it might be a bit conservative with current times (also see below)
 
     //all the bonus values must be divisible by this! :D
     const sf::Uint16 updateStep = 4; 

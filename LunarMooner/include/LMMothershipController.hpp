@@ -41,6 +41,8 @@ namespace lm
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity&, float) override;
 
+        sf::Vector2f getVelocity() const { return m_velocity * m_speed; }
+
     private:
 
         sf::Vector2f m_bounds;
