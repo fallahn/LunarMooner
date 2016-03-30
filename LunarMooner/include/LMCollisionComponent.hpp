@@ -40,11 +40,13 @@ namespace lm
         enum class ID
         {
             Alien,
+            Ammo,
             Bounds,
             Bullet,            
             Mothership,
             Player,
-            Tower
+            Shield,
+            Tower            
         };
 
         CollisionComponent(xy::MessageBus&, sf::FloatRect, ID);

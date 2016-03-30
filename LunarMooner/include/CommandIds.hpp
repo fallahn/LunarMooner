@@ -37,7 +37,8 @@ enum LMCommandID
     Human = 0x4,
     Player = 0x8,
     Alien = 0x10,
-    UI = 0x20
+    UI = 0x20,
+    Item = 0x40
 };
 
 enum LMInputFlags
@@ -62,10 +63,13 @@ struct LMGameEvent
         PlayerDied,
         PlayerLanded,
         PlayerSpawned,
+        PlayerGotAmmo,
+        PlayerGotShield,
         HumanRescued,
         HumanPickedUp,
         AlienDied,
-        ExtraLife
+        ExtraLife,
+        ItemCollected
     }type;
     float posX = 0.f;
     float posY = 0.f;

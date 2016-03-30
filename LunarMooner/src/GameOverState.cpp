@@ -33,6 +33,7 @@ source distribution.
 
 #include <xygine/ui/Button.hpp>
 #include <xygine/ui/Label.hpp>
+#include <xygine/ui/TextBox.hpp>
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -95,6 +96,13 @@ void GameOverState::buildMenu(const sf::Font& font)
     label->setString("GAME OVER");
     m_uiContainer.addControl(label);
     
+    auto textbox = xy::UI::create<xy::UI::TextBox>(font);
+    textbox->setAlignment(xy::UI::Alignment::Centre);
+    textbox->setPosition(960.f, 540.f);
+    textbox->setLabelText("Enter your name:");
+    textbox->setText("Player");
+    m_uiContainer.addControl(textbox);
+
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("OK");
     button->setAlignment(xy::UI::Alignment::Centre);

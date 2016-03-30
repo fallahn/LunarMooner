@@ -30,6 +30,8 @@ source distribution.
 
 #include <xygine/components/Component.hpp>
 
+#include <SFML/System/Vector3.hpp>
+
 namespace lm
 {
     class CollisionComponent;
@@ -52,6 +54,8 @@ namespace lm
         float m_speed;
 
         xy::Entity* m_entity;
+
+        sf::Vector3f getManifold(const sf::FloatRect& worldRect);
     };
 }
 

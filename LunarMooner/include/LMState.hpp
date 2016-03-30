@@ -63,6 +63,8 @@ private:
 
     lm::CollisionWorld m_collisionWorld;
 
+    bool m_useController;
+
     void parseControllerInput();
 };
 
