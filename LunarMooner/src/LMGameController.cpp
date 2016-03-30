@@ -775,10 +775,14 @@ void GameController::restorePlayerState()
         }
     }
 
+    //clear floating items
     xy::Command cmd;
     cmd.category = LMCommandID::Item;
     cmd.action = [](xy::Entity& ent, float) { ent.destroy(); };
     m_scene.sendCommand(cmd);
+
+    //lose ammo - TODO should this be restored with state?
+    m_playerStates[m_currentPlayer].ammo = 0;
 
     //reset round time if new round - TODO adjust times once beyond level 10
     //something like: times[9] - (level - 10 * 2)
@@ -905,14 +909,15 @@ void GameController::addDelayedRespawn()
 void GameController::spawnAsteroid()
 {
     auto size = alienSizes[xy::Util::Random::value(0, alienSizes.size() - 1)];
-    sf::Vector2f position(xy::Util::Random::value(alienArea.left + (alienArea.width / 2.f), alienArea.left + alienArea.width), -size.height * 2);
+    sf::Vector2f position(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width), -size.height * 2);
 
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
     drawable->getDrawable().setFillColor(sf::Color(255, 127, 0));
     drawable->getDrawable().setSize({ size.width, size.height });
     drawable->getDrawable().setOrigin({ size.width / 2.f, size.height / 2.f });
 
-    auto controller = xy::Component::create<AsteroidController>(getMessageBus(), alienArea);
+    const float dir = (position.x < 960.f) ? 1.f : -1.f;
+    auto controller = xy::Component::create<AsteroidController>(getMessageBus(), alienArea, sf::Vector2f(dir, 1.f));
 
     auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);
     //lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);

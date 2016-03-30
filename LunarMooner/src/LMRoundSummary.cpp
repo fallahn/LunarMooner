@@ -78,17 +78,16 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResou
     {
         m_mainText.setPosition(600.f, 200.f);
         m_mainText.setCharacterSize(50u);
+
+        m_okText.setFillColor(sf::Color::Magenta);
+        m_okText.setOutlineThickness(2.f);
+        m_okText.setOutlineColor(sf::Color(255, 127, 0));
+        m_okText.setFont(fr.get("round_summary_72"));
+        m_okText.setCharacterSize(80u);
+        m_okText.setPosition(960.f, 660.f);
+        m_okText.setString("OK!");
+        xy::Util::Position::centreOrigin(m_okText);
     }
-
-    m_okText.setFillColor(sf::Color::Magenta);
-    m_okText.setOutlineThickness(2.f);
-    m_okText.setOutlineColor(sf::Color(255, 127, 0));
-    m_okText.setFont(fr.get("round_summary_72"));
-    m_okText.setCharacterSize(80u);
-    m_okText.setPosition(960.f, 660.f);
-    m_okText.setString("OK!");
-    xy::Util::Position::centreOrigin(m_okText);
-
 }
 
 //public
