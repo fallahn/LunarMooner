@@ -91,8 +91,8 @@ namespace
     //time limits per level
     const std::array<float, 10u> roundTimes =
     {
-        130.f, 300.f, 300.f, 300.f, 300.f,
-        300.f, 300.f, 300.f, 310.f, 320.f
+        75.f, 90.f, 100.f, 110.f, 120.f,
+        130.f, 135.f, 140.f, 145.f, 160.f
     };
 
     sf::Clock tempClock;
@@ -635,7 +635,7 @@ void GameController::createTerrain()
 
     collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ alienArea.width, 40.f } }, lm::CollisionComponent::ID::Alien);
 
-    auto terrain = xy::Component::create<Terrain>(getMessageBus(), positions);
+    auto terrain = xy::Component::create<Terrain>(getMessageBus(), positions, alienArea);
 
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
@@ -794,9 +794,9 @@ void GameController::restorePlayerState()
 
 void GameController::moveToNextRound()
 {
-    xy::Logger::log("Level: " + std::to_string(m_playerStates[m_currentPlayer].level) 
-        + ", time: " + std::to_string(tempClock.restart().asSeconds()),
-        xy::Logger::Type::Info, xy::Logger::Output::File);
+    //xy::Logger::log("Level: " + std::to_string(m_playerStates[m_currentPlayer].level) 
+    //    + ", time: " + std::to_string(tempClock.restart().asSeconds()),
+    //    xy::Logger::Type::Info, xy::Logger::Output::File);
         
     //display a round summary
     //do this first so player info is current
