@@ -63,6 +63,8 @@ namespace
     const sf::Uint32 extraLifeScore = 7500u;
     const sf::Uint8 minAsteroidLevel = 2;
 
+    const sf::Uint8 ammoPerHuman = 5u;
+
     //humans to rescue per level
     std::array<sf::Uint8, 10u> humanCounts = 
     {
@@ -173,6 +175,9 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             m_scoreDisplay->showScore(msgData.value, m_player->getPosition());
         }
             break;
+        case LMGameEvent::HumanPickedUp:
+            m_playerStates[m_currentPlayer].ammo += ammoPerHuman;
+            break;
         case LMGameEvent::HumanRescued:
             addRescuedHuman();
             m_playerStates[m_currentPlayer].humansSaved++;
@@ -188,8 +193,8 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             m_playerStates[m_currentPlayer].alienCount--;
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
-            //1/5 chance we spawn a new alien
-            if (xy::Util::Random::value(0, 5) == 3)
+            //50/50 chance we spawn a new alien
+            if (xy::Util::Random::value(0, 1) == 1)
             {
                 spawnAlien({ alienArea.left, xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height) });
                 m_playerStates[m_currentPlayer].alienCount++;
@@ -329,9 +334,10 @@ void GameController::setInput(sf::Uint8 input)
 
         //hook player shoot event here
         //as bullets are technically entities in their own right
-        if (shoot && m_player->carryingHuman())
+        if (shoot && m_playerStates[m_currentPlayer].ammo > 0)
         {
             spawnBullet();
+            m_playerStates[m_currentPlayer].ammo--;
         }
     }
     else
@@ -395,7 +401,7 @@ void GameController::spawnPlayer()
         dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
         dropshipDrawable->getDrawable().setSize(playerSize);
 
-        auto playerController = xy::Component::create<lm::PlayerController>(getMessageBus());
+        auto playerController = xy::Component::create<lm::PlayerController>(getMessageBus(), m_mothership->getComponent<MothershipController>());
 
         auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, playerSize }, CollisionComponent::ID::Player);
         CollisionComponent::Callback cb = std::bind(&PlayerController::collisionCallback, playerController.get(), _1);
@@ -792,7 +798,7 @@ void GameController::moveToNextRound()
 
     //increase aliens
     ps.alienCount = alienCounts[std::min(ps.level, static_cast<sf::Uint8>(alienCounts.size() - 1))];
-
+    ps.ammo = 0;
     ps.level++;
     ps.startNewRound = true;
 }
@@ -829,7 +835,7 @@ void GameController::restartRound()
 
     //increase aliens
     ps.alienCount = alienCounts[std::min(static_cast<std::size_t>(ps.level - 1), alienCounts.size() - 1)];
-
+    ps.ammo = 0;
     ps.lives--;
     ps.startNewRound = true;
 
@@ -906,7 +912,8 @@ void GameController::addDelayedAsteroid()
     de.time = xy::Util::Random::value(18.f, 28.f);
     de.action = [this]()
     {       
-        if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)
+        if ((m_playerStates[m_currentPlayer].level > minAsteroidLevel)
+            && (m_player->getPosition().y > 500.f))
         {
             spawnAsteroid();
             addDelayedAsteroid();

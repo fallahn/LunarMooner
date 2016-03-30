@@ -41,6 +41,7 @@ namespace lm
         sf::Uint32 previousScore = 0u;
         sf::Int8 lives = 3;
         sf::Uint8 level = 1u;
+        sf::Uint8 ammo = 0u;
         sf::Uint8 alienCount = 0u;
         sf::Uint8 humansSaved = 0u;
         std::vector<sf::Vector2f> humansRemaining;

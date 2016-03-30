@@ -40,10 +40,11 @@ namespace xy
 namespace lm
 {
     class CollisionComponent;
+    class MothershipController;
     class PlayerController final : public xy::Component
     {
     public:
-        explicit PlayerController(xy::MessageBus&);
+        explicit PlayerController(xy::MessageBus&, const MothershipController*);
         ~PlayerController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -59,6 +60,7 @@ namespace lm
         void collisionCallback(CollisionComponent*);
 
     private:
+        const MothershipController* m_mothership;
         sf::Uint8 m_inputFlags;
         sf::Vector2f m_velocity;
         xy::Entity* m_entity;
@@ -71,8 +73,8 @@ namespace lm
 
         sf::Vector3f getManifold(const sf::FloatRect&);
 
-        using PlayerState = std::function<void(xy::Entity&, float)>;
-        PlayerState updateState;
+        using UpdateState = std::function<void(xy::Entity&, float)>;
+        UpdateState updateState;
 
         void flyingState(xy::Entity&, float);
         void landedState(xy::Entity&, float);

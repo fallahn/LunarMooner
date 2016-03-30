@@ -28,6 +28,7 @@ source distribution.
 #include <LMAsteroidController.hpp>
 
 #include <xygine/util/Vector.hpp>
+#include <xygine/util/Random.hpp>
 #include <xygine/Entity.hpp>
 #include <xygine/components/ParticleSystem.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
@@ -48,6 +49,7 @@ AsteroidController::AsteroidController(xy::MessageBus& mb, const sf::FloatRect& 
     m_entity        (nullptr),
     m_velocity      (-1.f, 1.f)
 {
+    if (xy::Util::Random::value(0, 2) == 1) m_velocity.x *= -1.f;
     m_velocity = xy::Util::Vector::normalise(m_velocity);
 }
 
@@ -65,6 +67,7 @@ void AsteroidController::entityUpdate(xy::Entity& entity, float dt)
         m_trail->stop();
         entity.getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setFillColor(sf::Color::Transparent);
         m_velocity = sf::Vector2f();
+        entity.setPosition(position.x, 1078.f); //keep just about in bounds to prevent accidental culling of trail by renderer
     }
     if (!m_trail->started() && !m_trail->active())
     {

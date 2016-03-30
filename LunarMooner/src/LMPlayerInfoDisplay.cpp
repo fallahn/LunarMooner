@@ -116,6 +116,7 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
             "Player " + names[i] + "\n"
             "Score: " + std::to_string(m_playerStates[i].score) + "\n"
             "Level: " + std::to_string(m_playerStates[i].level) + "\n"
+            "Ammo: " + std::to_string(m_playerStates[i].ammo) + "\n"
             + lives + "\n"
             + remainingTime);
     }
