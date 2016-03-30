@@ -40,7 +40,7 @@ namespace lm
     class Terrain final : public sf::Drawable, public xy::Component
     {
     public:
-        Terrain(xy::MessageBus&, const std::array<std::pair<sf::Vector2f, sf::Vector2f>, 4u>&);
+        Terrain(xy::MessageBus&, const std::array<std::pair<sf::Vector2f, sf::Vector2f>, 4u>&, const sf::FloatRect&);
         ~Terrain() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
