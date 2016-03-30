@@ -36,6 +36,7 @@ source distribution.
 #include <LMSpeedMeter.hpp>
 #include <LMPlayerInfoDisplay.hpp>
 #include <LMRoundSummary.hpp>
+#include <LMTerrain.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/components/SfDrawableComponent.hpp>
@@ -577,24 +578,8 @@ void GameController::createTerrain()
 
     m_scene.addEntity(entity, xy::Scene::BackRear);
 
-
-    //death zone at bottom
-    auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    drawable->getDrawable().setFillColor(sf::Color::Red);
-    drawable->getDrawable().setSize({ alienArea.width, 40.f });
-
-    auto collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ alienArea.width, 40.f } }, lm::CollisionComponent::ID::Alien);
-
-    entity = xy::Entity::create(getMessageBus());
-    entity->addComponent(drawable);
-    entity->addComponent(collision);
-    entity->setPosition(alienArea.left, 1040.f);
-
-    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
-
-
     //walls
-    collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ 40.f, 1080.f } }, lm::CollisionComponent::ID::Bounds);
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ 40.f, 1080.f } }, lm::CollisionComponent::ID::Bounds);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
     entity->setPosition(alienArea.left - 40.f, 0.f);
@@ -613,33 +598,52 @@ void GameController::createTerrain()
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
 
-    //towers to land on
-    std::array<std::pair<sf::Vector2f, sf::Vector2f>, 3u> positions =
+    //towers to land on (position, size)
+    std::array<std::pair<sf::Vector2f, sf::Vector2f>, 4u> positions =
     {
-        std::make_pair(sf::Vector2f(180.f, 210.f), sf::Vector2f(20.f, 1080.f - 210.f)),
-        std::make_pair(sf::Vector2f(150.f, 290.f), sf::Vector2f(520.f, 1080.f - 290.f)),
-        std::make_pair(sf::Vector2f(220.f, 60.f), sf::Vector2f(900.f, 1080.f - 60.f))
+        std::make_pair(sf::Vector2f(alienArea.left + 20.f, 890.f), sf::Vector2f(180.f, 20.f)),
+        std::make_pair(sf::Vector2f(alienArea.left + 570.f, 790.f), sf::Vector2f(150.f, 10.f)),
+        std::make_pair(sf::Vector2f(alienArea.left + 920.f, 1020.f), sf::Vector2f(220.f, 20.f)),
+        std::make_pair(sf::Vector2f(alienArea.left + 1270.f, 740.f), sf::Vector2f(40.f, 10.f))
     };
     //hack in some scores for now until we decide a better way to generate terrain
-    std::array<sf::Uint16, 3u> scores = {30, 10, 50};
+    std::array<sf::Uint16, 4u> scores = {30, 10, 70, 40};
     int i = 0;
 
+    xy::SfDrawableComponent<sf::RectangleShape>::Ptr drawable;
     for (const auto& p : positions)
     {
         drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
         drawable->getDrawable().setFillColor(sf::Color::Green);
-        drawable->getDrawable().setSize(p.first);
+        drawable->getDrawable().setSize(p.second);
 
-        collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f }, p.first }, lm::CollisionComponent::ID::Tower);
+        collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f }, p.second }, lm::CollisionComponent::ID::Tower);
         collision->setScoreValue(scores[i++]);
 
         entity = xy::Entity::create(getMessageBus());
         entity->addComponent(drawable);
         entity->addComponent(collision);
-        entity->setPosition(alienArea.left + p.second.x, p.second.y);
+        entity->setPosition(p.first.x, p.first.y);
 
         m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
     }
+
+    //death zone at bottom - TODO replace with the chain testing
+    drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
+    drawable->getDrawable().setFillColor(sf::Color::Red);
+    drawable->getDrawable().setSize({ alienArea.width, 40.f });
+
+    collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ alienArea.width, 40.f } }, lm::CollisionComponent::ID::Alien);
+
+    auto terrain = xy::Component::create<Terrain>(getMessageBus(), positions);
+
+    entity = xy::Entity::create(getMessageBus());
+    entity->addComponent(drawable);
+    entity->addComponent(collision);
+    entity->addComponent(terrain);
+    entity->setPosition(alienArea.left, 1040.f);
+
+    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 }
 
 void GameController::addRescuedHuman()
@@ -932,7 +936,7 @@ void GameController::addDelayedAsteroid()
 {
     m_delayedEvents.emplace_back();
     auto& de = m_delayedEvents.back();
-    de.time = xy::Util::Random::value(18.f, 28.f);
+    de.time = xy::Util::Random::value(12.f, 22.f);
     de.action = [this]()
     {       
         if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)

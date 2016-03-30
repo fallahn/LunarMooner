@@ -15,6 +15,7 @@ SET(LM_SRC
   ${LM_DIR}/LMRoundSummary.cpp
   ${LM_DIR}/LMSpeedMeter.cpp
   ${LM_DIR}/LMState.cpp
+  ${LM_DIR}/LMTerrain.cpp
   ${LM_DIR}/main.cpp
   ${LM_DIR}/MenuMainState.cpp
   ${LM_DIR}/MenuOptionState.cpp
