@@ -112,6 +112,9 @@ namespace lm
         void spawnAsteroid();
         void addDelayedAsteroid();
 
+        sf::Uint8 m_itemCount;
+        void spawnCollectable(const sf::Vector2f&);
+
         void showRoundSummary(bool);
     };
 }

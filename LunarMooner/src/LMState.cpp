@@ -62,7 +62,8 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_scene             (context.appInstance.getMessageBus()),
     m_messageBus        (context.appInstance.getMessageBus()),
     m_inputFlags        (0),
-    m_prevInputFlags    (0)
+    m_prevInputFlags    (0),
+    m_useController     (false)
 {
     XY_ASSERT(playerCount > 0, "Need at least one player");
     launchLoadingScreen();
@@ -87,15 +88,23 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     xy::Stats::clear();
     m_reportText.setFont(m_fontResource.get("game_state_81"));
 
+    m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
+
     quitLoadingScreen();
 }
 
 //public
 bool LunarMoonerState::handleEvent(const sf::Event& evt)
 {
-    //TODO handle controller connect / disconnect events
     switch(evt.type)
     {
+    case sf::Event::JoystickConnected:
+        m_useController = (evt.joystickConnect.joystickId == 0 &&
+            getContext().appInstance.getGameSettings().controllerEnabled);
+        break;
+    case sf::Event::JoystickDisconnected:
+        if(evt.joystickConnect.joystickId == 0) m_useController = false;
+        break;
     case sf::Event::KeyReleased:
         switch (evt.key.code)
         {
@@ -150,40 +159,43 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
 
 
         //controller input (default for x360 layout)
-    case sf::Event::JoystickButtonPressed:
-        if (evt.joystickButton.joystickId != 0) break;
-        switch (evt.joystickButton.button)
+        if (m_useController)
         {
-        case buttonA:
-            m_inputFlags |= LMInputFlags::Shoot;
+        case sf::Event::JoystickButtonPressed:
+            if (evt.joystickButton.joystickId != 0) break;
+            switch (evt.joystickButton.button)
+            {
+            case buttonA:
+                m_inputFlags |= LMInputFlags::Shoot;
+                break;
+            case buttonB:
+                m_inputFlags |= LMInputFlags::Thrust;
+                break;
+            case buttonStart:
+                //m_inputFlags |= LMInputFlags::Start;
+                //requestStackPush(States::ID::Pause);
+                break;
+            default: break;
+            }
             break;
-        case buttonB:
-            m_inputFlags |= LMInputFlags::Thrust;
+        case sf::Event::JoystickButtonReleased:
+            if (evt.joystickButton.joystickId != 0) break;
+            switch (evt.joystickButton.button)
+            {
+            default: break;
+            case buttonA:
+                m_inputFlags &= ~LMInputFlags::Shoot;
+                break;
+            case buttonB:
+                m_inputFlags &= ~LMInputFlags::Thrust;
+                break;
+            case buttonStart:
+                requestStackPush(States::ID::Pause);
+                //    m_inputFlags &= ~LMInputFlags::Start;
+                break;
+            }
             break;
-        case buttonStart:
-            //m_inputFlags |= LMInputFlags::Start;
-            //requestStackPush(States::ID::Pause);
-            break;
-        default: break;
         }
-        break;
-    case sf::Event::JoystickButtonReleased:
-        if (evt.joystickButton.joystickId != 0) break;
-        switch (evt.joystickButton.button)
-        {
-        default: break;
-        case buttonA:
-            m_inputFlags &= ~LMInputFlags::Shoot;
-            break;
-        case buttonB:
-            m_inputFlags &= ~LMInputFlags::Thrust;
-            break;
-        case buttonStart:
-            requestStackPush(States::ID::Pause);
-        //    m_inputFlags &= ~LMInputFlags::Start;
-            break;
-        }
-        break;
     default: break;
     }
     return true;
@@ -219,7 +231,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
 
 bool LunarMoonerState::update(float dt)
 {
-    parseControllerInput();
+    if(m_useController) parseControllerInput();
     
     if (m_inputFlags != m_prevInputFlags)
     {

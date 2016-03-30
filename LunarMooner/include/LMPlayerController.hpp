@@ -66,6 +66,7 @@ namespace lm
         xy::Entity* m_entity;
 
         bool m_carrying;
+        bool m_shield;
 
         xy::ParticleSystem* m_thrust;
         xy::ParticleSystem* m_rcsLeft;

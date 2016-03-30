@@ -89,7 +89,7 @@ void AlienController::collisionCallback(CollisionComponent* cc)
     {
     default: break;
     case CollisionComponent::ID::Bullet:
-    //case CollisionComponent::ID::Player:
+    
     {
         auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
         msg->type = LMGameEvent::AlienDied;
@@ -99,7 +99,42 @@ void AlienController::collisionCallback(CollisionComponent* cc)
         m_entity->destroy();
     }
         break;
+    case CollisionComponent::ID::Player:
+    {
+        auto manifold = getManifold(cc->globalBounds());
+        sf::Vector2f normal(manifold.x, manifold.y);
+
+        m_entity->move(normal * manifold.z);
+        //TODO only reflect when velocity is toward normal
+        //m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+        //m_velocity *= 0.7f;
+    }
+        break;
     }
 }
 
 //private
+sf::Vector3f AlienController::getManifold(const sf::FloatRect& worldRect)
+{
+    sf::FloatRect overlap;
+    sf::FloatRect bounds = m_entity->getComponent<CollisionComponent>()->globalBounds();
+
+    //we know we intersect, but we want the overlap
+    worldRect.intersects(bounds, overlap);
+    auto collisionNormal = sf::Vector2f(worldRect.left + (worldRect.width / 2.f), worldRect.top + (worldRect.height / 2.f)) - m_entity->getPosition();
+
+    sf::Vector3f manifold;
+
+    if (overlap.width < overlap.height)
+    {
+        manifold.x = (collisionNormal.x < 0) ? 1.f : -1.f;
+        manifold.z = overlap.width;
+    }
+    else
+    {
+        manifold.y = (collisionNormal.y < 0) ? 1.f : -1.f;
+        manifold.z = overlap.height;
+    }
+
+    return manifold;
+}

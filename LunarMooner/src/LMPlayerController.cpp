@@ -35,6 +35,9 @@ source distribution.
 #include <xygine/util/Rectangle.hpp>
 #include <xygine/Reports.hpp>
 #include <xygine/components/ParticleSystem.hpp>
+#include <xygine/components/SfDrawableComponent.hpp>
+
+#include <SFML/Graphics/RectangleShape.hpp>
 
 using namespace lm;
 using namespace std::placeholders;
@@ -56,6 +59,7 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
     m_velocity      (ms->getVelocity()),
     m_entity        (nullptr),
     m_carrying      (false),
+    m_shield        (false),
     m_thrust        (nullptr),
     m_rcsLeft       (nullptr),
     m_rcsRight      (nullptr)
@@ -134,8 +138,34 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
     switch (cc->getID())
     {
     case CollisionComponent::ID::Alien:
-        m_entity->destroy();
-        broadcastDeath();
+        if (!m_shield)
+        {
+            m_entity->destroy();
+            broadcastDeath();
+        }
+        else
+        {
+            //deflect the player - TODO we want to reflect the other object too
+            auto manifold = getManifold(cc->globalBounds());
+            sf::Vector2f normal(manifold.x, manifold.y);
+
+            m_entity->move(normal * manifold.z);
+            m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+            m_velocity *= 0.65f; //some damping
+
+            m_shield = false;
+            m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+        }
+        break;
+    case CollisionComponent::ID::Ammo:
+    {
+        auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+        msg->type = LMGameEvent::PlayerGotAmmo;
+        auto position = m_entity->getPosition();
+        msg->posX = position.x;
+        msg->posY = position.y;
+        msg->value = cc->getScoreValue();
+    }
         break;
     case CollisionComponent::ID::Bounds:
     {
@@ -161,22 +191,49 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             }
         }
         break;
+    case CollisionComponent::ID::Shield:
+    {
+        auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+        msg->type = LMGameEvent::PlayerGotShield;
+        auto position = m_entity->getPosition();
+        msg->posX = position.x;
+        msg->posY = position.y;
+        msg->value = cc->getScoreValue();
+
+        m_shield = true;
+        m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(2.f);
+    }
+    break;
     case CollisionComponent::ID::Tower:
     {
         auto manifold = getManifold(cc->globalBounds());
+        auto normal = sf::Vector2f(manifold.x, manifold.y);
+
         if (manifold.y != 0)
         {
             //we're on top 
             //measure velocity and assplode if too fast
             if (xy::Util::Vector::lengthSquared(m_velocity) > maxLandingVelocity)
             {
-                //oh noes!
-                m_entity->destroy();
-                broadcastDeath();
+                if (!m_shield)
+                {
+                    //oh noes!
+                    m_entity->destroy();
+                    broadcastDeath();
+                }
+                else
+                {
+                    //BOOOIOIING!
+                    m_entity->move(normal * manifold.z);
+                    m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+                    m_velocity *= 0.7f;
+                    //broke the shield :(
+                    m_shield = false;
+                    m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+                }
                 break;
             }
-
-            auto normal = sf::Vector2f(manifold.x, manifold.y);
+           
             m_entity->move(normal * manifold.z);
             m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
             m_velocity.y = -0.1f; //anti-jiggle

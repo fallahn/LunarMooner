@@ -63,7 +63,8 @@ namespace
     const sf::Uint32 extraLifeScore = 7500u;
     const sf::Uint8 minAsteroidLevel = 2;
 
-    const sf::Uint8 ammoPerHuman = 5u;
+    const sf::Uint8 ammoPerHuman = 3u;
+    const sf::Uint8 maxItems = 4;
 
     //humans to rescue per level
     std::array<sf::Uint8, 10u> humanCounts = 
@@ -107,7 +108,8 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_mothership    (nullptr),
     m_speedMeter    (nullptr),
     m_scoreDisplay  (nullptr),
-    m_currentPlayer (0)
+    m_currentPlayer (0),
+    m_itemCount     (0u)
 {
     xy::Component::MessageHandler handler;
     handler.id = LMMessageId::GameEvent;
@@ -117,6 +119,14 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         switch (msgData.type)
         {
         default: break;
+        case LMGameEvent::PlayerGotAmmo:
+            m_playerStates[m_currentPlayer].ammo += ammoPerHuman;
+            m_playerStates[m_currentPlayer].score += msgData.value;
+            m_scoreDisplay->showScore(msgData.value, m_player->getPosition());
+            break;
+        case LMGameEvent::ItemCollected:
+            m_itemCount--;
+            break;
         case LMGameEvent::PlayerDied:
         {
             m_playerStates[m_currentPlayer].lives--;
@@ -194,10 +204,17 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
             //50/50 chance we spawn a new alien
-            if (xy::Util::Random::value(0, 1) == 1)
+            //if (xy::Util::Random::value(0, 1) == 1)
             {
                 spawnAlien({ alienArea.left, xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height) });
                 m_playerStates[m_currentPlayer].alienCount++;
+            }
+
+            //see if we can spawn a new item
+            if (m_itemCount < maxItems
+                && xy::Util::Random::value(0, 1) == 1)
+            {
+                spawnCollectable({ msgData.posX, msgData.posY });
             }
             break;
         }
@@ -400,6 +417,7 @@ void GameController::spawnPlayer()
         auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
         dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
         dropshipDrawable->getDrawable().setSize(playerSize);
+        dropshipDrawable->getDrawable().setOutlineColor(sf::Color::Cyan);
 
         auto playerController = xy::Component::create<lm::PlayerController>(getMessageBus(), m_mothership->getComponent<MothershipController>());
 
@@ -753,6 +771,11 @@ void GameController::restorePlayerState()
         }
     }
 
+    xy::Command cmd;
+    cmd.category = LMCommandID::Item;
+    cmd.action = [](xy::Entity& ent, float) { ent.destroy(); };
+    m_scene.sendCommand(cmd);
+
     //reset round time if new round - TODO adjust times once beyond level 10
     //something like: times[9] - (level - 10 * 2)
     if (ps.startNewRound)
@@ -912,13 +935,69 @@ void GameController::addDelayedAsteroid()
     de.time = xy::Util::Random::value(18.f, 28.f);
     de.action = [this]()
     {       
-        if ((m_playerStates[m_currentPlayer].level > minAsteroidLevel)
-            && (m_player->getPosition().y > 500.f))
+        if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)
         {
-            spawnAsteroid();
-            addDelayedAsteroid();
+            if (m_player && (m_player->getPosition().y > 250.f))
+            {
+                spawnAsteroid();
+                addDelayedAsteroid();
+            }
         }
     };
+}
+
+void GameController::spawnCollectable(const sf::Vector2f& position)
+{
+    CollisionComponent::ID type = 
+        (xy::Util::Random::value(0, 4) < 2) ? CollisionComponent::ID::Shield : CollisionComponent::ID::Ammo;
+
+    auto drawable = getHumanDrawable(getMessageBus());
+    if (type == CollisionComponent::ID::Shield)
+    {
+        drawable->getDrawable().setFillColor(sf::Color::Cyan);
+    }
+    else
+    {
+        drawable->getDrawable().setFillColor(sf::Color::Yellow);
+    }
+
+    auto bounds = drawable->getDrawable().getLocalBounds();
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), bounds, type);
+    collision->setScoreValue(20);
+
+    //for now we expect the same behaviour as aliens
+    auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
+
+    auto entity = xy::Entity::create(getMessageBus());
+    entity->setPosition(position);
+    entity->addComponent(drawable);
+    auto cc = entity->addComponent(collision);
+    entity->addComponent(controller);
+    entity->addCommandCategories(LMCommandID::Item);
+
+    auto ep = m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
+
+    //add our callback here :)
+    cc->setCallback([ep, this](CollisionComponent* col) 
+    {
+        switch (col->getID())
+        {
+        default: break;
+        //case CollisionComponent::ID::Bullet:
+        case CollisionComponent::ID::Player:
+        {
+            auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+            msg->type = LMGameEvent::ItemCollected;
+            msg->posX = ep->getPosition().x;
+            msg->posY = ep->getPosition().y;
+            msg->value = ep->getComponent<CollisionComponent>()->getScoreValue();
+            ep->destroy();
+        }
+        break;
+        }
+    });
+
+    m_itemCount++;
 }
 
 void GameController::showRoundSummary(bool doScores)
