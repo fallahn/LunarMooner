@@ -41,7 +41,7 @@ namespace lm
     class AsteroidController final : public xy::Component
     {
     public:
-        AsteroidController(xy::MessageBus&, const sf::FloatRect&);
+        AsteroidController(xy::MessageBus&, const sf::FloatRect&, const sf::Vector2f&);
         ~AsteroidController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }

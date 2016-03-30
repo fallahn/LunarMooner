@@ -158,44 +158,41 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         break;
 
 
-        //controller input (default for x360 layout)
-        if (m_useController)
+    //controller input (default for x360 layout)
+    case sf::Event::JoystickButtonPressed:
+        if (!m_useController || evt.joystickButton.joystickId != 0) break;
+        switch (evt.joystickButton.button)
         {
-        case sf::Event::JoystickButtonPressed:
-            if (evt.joystickButton.joystickId != 0) break;
-            switch (evt.joystickButton.button)
-            {
-            case buttonA:
-                m_inputFlags |= LMInputFlags::Shoot;
-                break;
-            case buttonB:
-                m_inputFlags |= LMInputFlags::Thrust;
-                break;
-            case buttonStart:
-                //m_inputFlags |= LMInputFlags::Start;
-                //requestStackPush(States::ID::Pause);
-                break;
-            default: break;
-            }
+        case buttonA:
+            m_inputFlags |= LMInputFlags::Shoot;
             break;
-        case sf::Event::JoystickButtonReleased:
-            if (evt.joystickButton.joystickId != 0) break;
-            switch (evt.joystickButton.button)
-            {
-            default: break;
-            case buttonA:
-                m_inputFlags &= ~LMInputFlags::Shoot;
-                break;
-            case buttonB:
-                m_inputFlags &= ~LMInputFlags::Thrust;
-                break;
-            case buttonStart:
-                requestStackPush(States::ID::Pause);
-                //    m_inputFlags &= ~LMInputFlags::Start;
-                break;
-            }
+        case buttonB:
+            m_inputFlags |= LMInputFlags::Thrust;
+            break;
+        case buttonStart:
+            //m_inputFlags |= LMInputFlags::Start;
+            //requestStackPush(States::ID::Pause);
+            break;
+        default: break;
+        }
+        break;
+    case sf::Event::JoystickButtonReleased:
+        if (!m_useController || evt.joystickButton.joystickId != 0) break;
+        switch (evt.joystickButton.button)
+        {
+        default: break;
+        case buttonA:
+            m_inputFlags &= ~LMInputFlags::Shoot;
+            break;
+        case buttonB:
+            m_inputFlags &= ~LMInputFlags::Thrust;
+            break;
+        case buttonStart:
+            requestStackPush(States::ID::Pause);
+            //    m_inputFlags &= ~LMInputFlags::Start;
             break;
         }
+        break;
     default: break;
     }
     return true;
@@ -224,6 +221,12 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
         default: break;
         case xy::Message::UIEvent::ResizedWindow:
             m_scene.setView(getContext().defaultView);
+            break;
+        case xy::Message::UIEvent::RequestControllerDisable:
+            m_useController = false;
+            break;
+        case xy::Message::UIEvent::RequestControllerEnable:
+            m_useController = true;
             break;
         }
     }

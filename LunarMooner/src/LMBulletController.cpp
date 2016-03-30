@@ -61,6 +61,8 @@ void BulletController::collisionCallback(CollisionComponent* cc)
     {    
     case CollisionComponent::ID::Player:
     case CollisionComponent::ID::Mothership:
+    case CollisionComponent::ID::Ammo:
+    case CollisionComponent::ID::Shield:
         //do nothing
         break;
     default: 

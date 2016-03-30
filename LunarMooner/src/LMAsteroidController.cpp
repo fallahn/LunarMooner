@@ -42,14 +42,13 @@ namespace
     const float speed = 1000.f;
 }
 
-AsteroidController::AsteroidController(xy::MessageBus& mb, const sf::FloatRect& bounds)
+AsteroidController::AsteroidController(xy::MessageBus& mb, const sf::FloatRect& bounds, const sf::Vector2f& vel)
     : xy::Component (mb, this),
     m_bounds        (bounds),
     m_trail         (nullptr),
     m_entity        (nullptr),
-    m_velocity      (-1.f, 1.f)
+    m_velocity      (vel)
 {
-    if (xy::Util::Random::value(0, 2) == 1) m_velocity.x *= -1.f;
     m_velocity = xy::Util::Vector::normalise(m_velocity);
 }
 
@@ -61,7 +60,7 @@ void AsteroidController::entityUpdate(xy::Entity& entity, float dt)
 
     auto position = entity.getPosition();
 
-    if ((position.x < m_bounds.left || position.y > 1080.f)
+    if ((position.x < m_bounds.left || position.x > m_bounds.left + m_bounds.width || position.y > 1080.f)
         && m_trail->started())
     {
         m_trail->stop();

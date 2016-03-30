@@ -226,7 +226,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                     //BOOOIOIING!
                     m_entity->move(normal * manifold.z);
                     m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
-                    m_velocity *= 0.7f;
+                    m_velocity *= 0.9f;
                     //broke the shield :(
                     m_shield = false;
                     m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
