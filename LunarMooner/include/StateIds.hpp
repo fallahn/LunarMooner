@@ -39,7 +39,8 @@ namespace States
         SinglePlayer,
         MultiPlayer,
         GameOver,
-        Pause
+        Pause,
+        HighScores
     };
 }
 

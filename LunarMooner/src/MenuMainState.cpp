@@ -123,9 +123,20 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Quit");
+    button->setText("High Scores");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(960.f, 675.f);
+    button->addCallback([this]()
+    {
+        close();
+        requestStackPush(States::ID::HighScores);
+    });
+    m_uiContainer.addControl(button);
+
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button->setText("Quit");
+    button->setAlignment(xy::UI::Alignment::Centre);
+    button->setPosition(960.f, 775.f);
     button->addCallback([this]()
     {
         getContext().renderWindow.close();

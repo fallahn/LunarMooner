@@ -53,7 +53,8 @@ enum LMInputFlags
 enum LMMessageId
 {
     GameEvent = xy::Message::Count,
-    StateEvent
+    StateEvent,
+    MenuEvent
 };
 
 struct LMGameEvent
@@ -87,6 +88,12 @@ struct LMStateEvent
         RoundEnd,
         CountDownStarted
     }type;
+};
+
+struct LMMenuEvent
+{
+    sf::Uint32 playerId = 0u;
+    sf::Uint32 score = 0u;
 };
 
 enum LMParticleID

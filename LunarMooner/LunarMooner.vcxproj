@@ -140,6 +140,7 @@
     <ClInclude Include="include\LMSpeedMeter.hpp" />
     <ClInclude Include="include\LMState.hpp" />
     <ClInclude Include="include\LMTerrain.hpp" />
+    <ClInclude Include="include\MenuHighScores.hpp" />
     <ClInclude Include="include\MenuMainState.hpp" />
     <ClInclude Include="include\MenuOptionState.hpp" />
     <ClInclude Include="include\MenuPauseState.hpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="src\LMState.cpp" />
     <ClCompile Include="src\LMTerrain.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MenuHighScores.cpp" />
     <ClCompile Include="src\MenuMainState.cpp" />
     <ClCompile Include="src\MenuOptionState.cpp" />
     <ClCompile Include="src\MenuPauseState.cpp" />
