@@ -37,6 +37,7 @@ source distribution.
 #include <LMPlayerInfoDisplay.hpp>
 #include <LMRoundSummary.hpp>
 #include <LMTerrain.hpp>
+#include <LMEarlyWarning.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/components/SfDrawableComponent.hpp>
@@ -917,10 +918,18 @@ void GameController::addDelayedRespawn()
     };
 }
 
-void GameController::spawnAsteroid()
+void GameController::spawnEarlyWarning(const sf::Vector2f& dest)
+{
+    auto ew = xy::Component::create<EarlyWarning>(getMessageBus(), dest);
+    auto ent = xy::Entity::create(getMessageBus());
+    ent->addComponent(ew);
+    ent->setPosition(960.f, 0.f);
+    m_scene.addEntity(ent, xy::Scene::Layer::UI);
+}
+
+void GameController::spawnAsteroid(const sf::Vector2f& position)
 {
     auto size = alienSizes[xy::Util::Random::value(0, alienSizes.size() - 1)];
-    sf::Vector2f position(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width), -size.height * 2);
 
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
     drawable->getDrawable().setFillColor(sf::Color(255, 127, 0));
@@ -950,19 +959,31 @@ void GameController::spawnAsteroid()
 
 void GameController::addDelayedAsteroid()
 {
+    sf::Vector2f position(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width), -30.f);
+    
     m_delayedEvents.emplace_back();
     auto& de = m_delayedEvents.back();
     de.time = xy::Util::Random::value(12.f, 22.f);
-    de.action = [this]()
+    de.action = [this, position]()
     {       
         if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)
         {
             if (m_player && (m_player->getPosition().y > 250.f))
             {
-                spawnAsteroid();               
+                spawnAsteroid(position);               
             }
             addDelayedAsteroid();
         }
+    };
+
+    //we know when and where it's coming from so let's
+    //tell it to the early warning system! :D
+    m_delayedEvents.emplace_back();
+    auto& de2 = m_delayedEvents.back();
+    de2.time = de.time - 2.f; //magic const here. need to relate it to ew system
+    de2.action = [this, position]()
+    {
+        spawnEarlyWarning(position);
     };
 }
 
