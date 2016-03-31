@@ -6,6 +6,7 @@ SET(LM_SRC
   ${LM_DIR}/LMBulletController.cpp
   ${LM_DIR}/LMCollisionComponent.cpp
   ${LM_DIR}/LMCollisionWorld.cpp
+  ${LM_DIR}/LMEarlyWarning.cpp
   ${LM_DIR}/LMGameController.cpp
   ${LM_DIR}/LMHumanController.cpp
   ${LM_DIR}/LMMothershipController.cpp

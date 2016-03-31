@@ -112,7 +112,8 @@ namespace lm
         void restartRound();
         void addDelayedRespawn();
 
-        void spawnAsteroid();
+        void spawnEarlyWarning(const sf::Vector2f&);
+        void spawnAsteroid(const sf::Vector2f&);
         void addDelayedAsteroid();
 
         sf::Uint8 m_itemCount;
