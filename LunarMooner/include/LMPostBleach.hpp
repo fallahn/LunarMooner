@@ -50,6 +50,9 @@ namespace lm
         bool m_running;
         std::size_t m_speed;
 
+        std::vector<float> m_wavetable;
+        std::vector<sf::Vector2f> m_offsets;
+
         void start(std::size_t = 1);
         void stop();
         void reset();
