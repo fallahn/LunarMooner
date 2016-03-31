@@ -63,7 +63,7 @@ namespace
     const sf::Vector2f mothershipStart(386.f, 46.f);
 
     const sf::Uint32 rescueScore = 50u;
-    const sf::Uint32 extraLifeScore = 7500u;
+    const sf::Uint32 extraLifeScore = 5000u;
     const sf::Uint8 minAsteroidLevel = 2;
 
     const sf::Uint8 ammoPerHuman = 3u;
@@ -125,6 +125,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         default: break;
         case LMGameEvent::PlayerGotAmmo:
             m_playerStates[m_currentPlayer].ammo += ammoPerHuman;
+        case LMGameEvent::PlayerGotShield:
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, m_player->getPosition());
             break;
@@ -630,7 +631,7 @@ void GameController::createTerrain()
         std::make_pair(sf::Vector2f(alienArea.left + 1270.f, 840.f), sf::Vector2f(40.f, 10.f))
     };
     //hack in some scores for now until we decide a better way to generate terrain
-    std::array<sf::Uint16, 4u> scores = {30, 10, 70, 40};
+    std::array<sf::Uint16, 4u> scores = {30, 10, 60, 70};
     int i = 0;
 
     xy::SfDrawableComponent<sf::RectangleShape>::Ptr drawable;
@@ -982,7 +983,7 @@ void GameController::addDelayedAsteroid()
     
     m_delayedEvents.emplace_back();
     auto& de = m_delayedEvents.back();
-    de.time = xy::Util::Random::value(12.f, 22.f);
+    de.time = xy::Util::Random::value(18.f, 28.f);
     de.action = [this, position]()
     {       
         if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)

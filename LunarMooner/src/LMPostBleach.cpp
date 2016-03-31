@@ -37,9 +37,6 @@ using namespace lm;
 
 namespace
 {
-    auto wavetable = xy::Util::Wavetable::sine(0.025f);
-    std::vector<sf::Vector2f> offsets;
-
     const std::string fragShader =
         "#version 120\n"
         "\n"
@@ -63,25 +60,26 @@ PostBleach::PostBleach()
     : m_index   (0),
     m_fadeIndex (0),
     m_running   (false),
-    m_speed     (1)
+    m_speed     (1),
+    m_wavetable (xy::Util::Wavetable::sine(0.025f))
 {
     m_shader.loadFromMemory(fragShader, sf::Shader::Fragment);
 
     //adds a quick fade out to end of table
-    auto quarter = wavetable.size() / 4;
+    auto quarter = m_wavetable.size() / 4;
     auto half = quarter * 2;
     std::size_t size = 0;
     for (auto i = quarter, j = quarter; j < half; ++i, j += 10)
     {
-        wavetable[i] = wavetable[j];
+        m_wavetable[i] = m_wavetable[j];
         size = i + 1;
     }
-    wavetable.resize(size);
+    m_wavetable.resize(size);
     m_fadeIndex = quarter; //so we can jump to fade out
 
     //screen shake offsets
-    offsets.resize(wavetable.size());
-    for (auto& o : offsets)
+    m_offsets.resize(m_wavetable.size());
+    for (auto& o : m_offsets)
     {
         o.x = xy::Util::Random::value(-maxX, maxX);
         o.y = xy::Util::Random::value(-maxY, maxY);
@@ -140,19 +138,20 @@ void PostBleach::update(float)
 {
     if (m_running)
     {
-        const float val = wavetable[m_index];
+        const float val = m_wavetable[m_index];
         m_shader.setUniform("u_amount", val);
 
-        const auto offset = offsets[m_index];
+        const auto offset = m_offsets[m_index];
         m_shader.setUniform("u_offset", offset);
 
-        auto index = (m_index + m_speed) % wavetable.size();
+        auto index = (m_index + m_speed) % m_wavetable.size();
 
         if (index < m_index)
         {
             m_running = false;
             m_shader.setUniform("u_amount", 0.f);
             m_index = 0;
+            m_speed = 1u;
         }
         else
         {
@@ -174,8 +173,8 @@ void PostBleach::stop()
     //skip forward to fade
     if (m_running && m_index < m_fadeIndex)
     {
-        float current = wavetable[m_index];
-        while (wavetable[++m_index] > current) {}
+        float current = m_wavetable[m_index];
+        while (m_wavetable[++m_index] > current) {}
     }
 }
 
@@ -183,4 +182,5 @@ void PostBleach::reset()
 {
     m_index = 0;
     m_shader.setUniform("u_amount", 0.f);
+    m_speed = 1;
 }

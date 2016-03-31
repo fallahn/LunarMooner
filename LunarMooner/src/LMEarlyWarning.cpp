@@ -53,6 +53,8 @@ EarlyWarning::EarlyWarning(xy::MessageBus& mb, const sf::Vector2f& destination)
     m_shape.setFillColor(sf::Color::Transparent);
     m_shape.setOrigin(radius, 0.f);
     m_shape.setScale(m_scale, m_scale);
+    m_shape.setOutlineColor(sf::Color::White);
+    m_shape.setOutlineThickness(2.f);
 }
 
 //public
@@ -66,8 +68,9 @@ void EarlyWarning::entityUpdate(xy::Entity& entity, float dt)
 
         //and fading in
         const float ratio = 1.f - (m_scale - 1.f) / (initialScale - 1.f);
-        const float alpha = 255.f * ratio;
-        m_shape.setFillColor({ 255, 0, 0, static_cast<sf::Uint8>(alpha) });
+        const sf::Uint8 alpha = static_cast<sf::Uint8>(255.f * ratio);
+        m_shape.setFillColor({ 255u, 0u, 0u, alpha });
+        m_shape.setOutlineColor({ 255u, 255u, 255u, alpha });
     }
     else if (m_speed != 0)
     {
@@ -88,7 +91,9 @@ void EarlyWarning::entityUpdate(xy::Entity& entity, float dt)
         alpha = std::max(0.f, alpha - (255.f * dt));
         if (alpha > 0)
         {
-            m_shape.setFillColor({ 255, 0, 0, static_cast<sf::Uint8>(alpha) });
+            sf::Uint8 a = static_cast<sf::Uint8>(alpha);
+            m_shape.setFillColor({ 255u, 0u, 0u,  a});
+            m_shape.setOutlineColor({ 255u, 255u, 255u, a });
         }
         else
         {

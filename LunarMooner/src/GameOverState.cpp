@@ -95,7 +95,10 @@ void GameOverState::handleMessage(const xy::Message& msg)
     {
         auto& msgData = msg.getData<LMMenuEvent>();
         m_scores[msgData.playerId] = msgData.score;
-        m_playerCount++;
+        if (msgData.playerId >= m_playerCount)
+        {
+            m_playerCount = msgData.playerId + 1;
+        }
     }
         break;
     }
@@ -110,11 +113,17 @@ void GameOverState::buildMenu(const sf::Font& font)
     label->setString("GAME OVER");
     m_uiContainer.addControl(label);
     
+    label = xy::UI::create<xy::UI::Label>(font);
+    label->setAlignment(xy::UI::Alignment::Centre);
+    label->setPosition(960.f, 460.f);
+    label->setString("Your Score:");
+
     auto textbox = xy::UI::create<xy::UI::TextBox>(font);
     textbox->setAlignment(xy::UI::Alignment::Centre);
     textbox->setPosition(960.f, 540.f);
     textbox->setLabelText("Enter your name:");
     textbox->setText("Player 1");
+    textbox->setMaxLength(18u);
     m_uiContainer.addControl(textbox);
 
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
@@ -125,7 +134,7 @@ void GameOverState::buildMenu(const sf::Font& font)
     {
         if (m_playerCount > 0 && m_currentPlayer < m_playerCount)
         {
-            getContext().appInstance.addScore(textbox->getText(), static_cast<float>(m_scores[m_currentPlayer++]));
+            getContext().appInstance.addScore(textbox->getText(), m_scores[m_currentPlayer++]);
             if (m_currentPlayer < m_playerCount)
             {
                 textbox->setText("Player " + std::to_string(m_currentPlayer + 1));
