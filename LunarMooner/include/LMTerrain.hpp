@@ -46,6 +46,8 @@ namespace lm
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
+        const std::vector<sf::Vector2f>& getChain() const { return m_chain; }
+
     private:
         
         std::vector<sf::Vector2f> m_chain;

@@ -44,7 +44,7 @@ namespace lm
     class PlayerController final : public xy::Component
     {
     public:
-        explicit PlayerController(xy::MessageBus&, const MothershipController*);
+        explicit PlayerController(xy::MessageBus&, const MothershipController*, const std::vector<sf::Vector2f>&);
         ~PlayerController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -59,6 +59,8 @@ namespace lm
 
         void collisionCallback(CollisionComponent*);
 
+        void setSize(const sf::Vector2f&);
+
     private:
         const MothershipController* m_mothership;
         sf::Uint8 m_inputFlags;
@@ -71,6 +73,11 @@ namespace lm
         xy::ParticleSystem* m_thrust;
         xy::ParticleSystem* m_rcsLeft;
         xy::ParticleSystem* m_rcsRight;
+
+        float m_highestTerrainPoint;
+        const std::vector<sf::Vector2f>& m_terrain;
+        std::vector<sf::Vector2f> m_collisionSegments;
+        bool collides(const sf::Vector2f&, const sf::Vector2f&, const sf::Vector2f&, const sf::Vector2f&) const; 
 
         sf::Vector3f getManifold(const sf::FloatRect&);
 
