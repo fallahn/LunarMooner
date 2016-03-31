@@ -73,6 +73,10 @@ private:
     xy::UI::Container m_uiContainer;
     sf::Sprite m_cursorSprite;
 
+    std::vector<sf::Uint32> m_scores;
+    std::size_t m_playerCount;
+    std::size_t m_currentPlayer;
+
     void buildMenu(const sf::Font&);
     void close();
 };

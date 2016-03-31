@@ -25,30 +25,54 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#include <LMMothershipController.hpp>
+#ifndef LM_HIGH_SCORE_STATE_HPP_
+#define LM_HIGH_SCORE_STATE_HPP_
 
-#include <xygine/Entity.hpp>
-#include <xygine/util/Random.hpp>
+#include <StateIds.hpp>
 
-using namespace lm;
+#include <xygine/State.hpp>
+#include <xygine/ui/Container.hpp>
 
-MothershipController::MothershipController(xy::MessageBus& mb, sf::Vector2f travelAmount)
-    : xy::Component (mb, this),
-    m_bounds        (travelAmount),
-    m_speed         (140.f)
+#include <SFML/Graphics/Sprite.hpp>
+
+namespace xy
 {
-    m_velocity.x = (xy::Util::Random::value(0, 1) == 0) ? 1.f : -1.f;
+    class TextureResource;
+    class FontResource;
+    class MessageBus;
 }
 
-//public
-void MothershipController::entityUpdate(xy::Entity& entity, float dt)
+namespace sf
 {
-    entity.move(m_velocity * m_speed * dt);
-        
-    auto bounds = entity.globalBounds();
-    if (bounds.left < m_bounds.x ||
-        bounds.left + bounds.width > m_bounds.y)
+    class Font;
+}
+
+class MenuHighScoreState final : public xy::State
+{
+public:
+    MenuHighScoreState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&);
+    ~MenuHighScoreState() = default;
+
+    bool update(float) override;
+    void draw() override;
+    bool handleEvent(const sf::Event&) override;
+    void handleMessage(const xy::Message&) override;
+
+    xy::StateId stateID() const override
     {
-        m_speed = -m_speed;
+        return States::ID::HighScores;
     }
-}
+
+private:
+
+    xy::TextureResource& m_textureResource;
+    xy::FontResource& m_fontResource;
+
+    xy::MessageBus& m_messageBus;
+    xy::UI::Container m_uiContainer;
+    sf::Sprite m_cursorSprite;
+
+    void buildMenu(const sf::Font&);
+};
+
+#endif //LM_HIGH_SCORE_STATE_HPP_

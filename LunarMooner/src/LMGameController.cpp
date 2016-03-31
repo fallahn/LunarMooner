@@ -39,6 +39,7 @@ source distribution.
 #include <LMTerrain.hpp>
 #include <LMEarlyWarning.hpp>
 #include <CommandIds.hpp>
+#include <StateIds.hpp>
 
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/ParticleController.hpp>
@@ -234,6 +235,24 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         case LMStateEvent::SummaryFinished:
             addDelayedRespawn();
             break;
+        }
+    };
+    addMessageHandler(handler);
+
+    handler.id = xy::Message::UIMessage;
+    handler.action = [this](xy::Component*, const xy::Message& msg)
+    {
+        //if game over screen opened broadcast scores for each player
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        if (msgData.type == xy::Message::UIEvent::MenuOpened
+            && msgData.stateId == States::ID::GameOver)
+        {
+            for (auto i = 0u; i < m_playerStates.size(); ++i)
+            {
+                auto message = getMessageBus().post<LMMenuEvent>(LMMessageId::MenuEvent);
+                message->playerId = i;
+                message->score = m_playerStates[i].score;
+            }
         }
     };
     addMessageHandler(handler);
@@ -483,7 +502,7 @@ void GameController::createMothership()
     entity->addComponent(drawable);
     entity->addComponent(controller);
     entity->addComponent(collision);
-    entity->setPosition(mothershipStart);
+    entity->setPosition(960.f - (bounds.width / 2.f), mothershipStart.y);
     entity->addCommandCategories(LMCommandID::Mothership);
 
     m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
