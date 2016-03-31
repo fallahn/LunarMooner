@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMAsteroidController.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/util/Vector.hpp>
 #include <xygine/util/Random.hpp>
@@ -40,6 +41,14 @@ using namespace lm;
 namespace
 {
     const float speed = 1000.f;
+
+    const float shieldRadius = 3000.f * 3000.f;
+    const sf::Vector2f shieldCentre(960.f, 3700.f);
+
+    bool collides(const sf::Vector2f& position)
+    {
+        return (xy::Util::Vector::lengthSquared(position - shieldCentre) < shieldRadius);
+    }
 }
 
 AsteroidController::AsteroidController(xy::MessageBus& mb, const sf::FloatRect& bounds, const sf::Vector2f& vel)
@@ -60,13 +69,21 @@ void AsteroidController::entityUpdate(xy::Entity& entity, float dt)
 
     auto position = entity.getPosition();
 
-    if ((position.x < m_bounds.left || position.x > m_bounds.left + m_bounds.width || position.y > 1080.f)
+    if ((position.x < m_bounds.left || position.x > m_bounds.left + m_bounds.width || /*position.y > 1080.f*/collides(position))
         && m_trail->started())
     {
+        //raise message
+        auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+        msg->type = LMGameEvent::MeteorExploded;
+        msg->posX = position.x;
+        msg->posY = position.y;
+        
         m_trail->stop();
         entity.getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setFillColor(sf::Color::Transparent);
         m_velocity = sf::Vector2f();
-        entity.setPosition(position.x, 1078.f); //keep just about in bounds to prevent accidental culling of trail by renderer
+        //keep just about in bounds to prevent accidental culling of trail by renderer
+        //but preventing accidental collision 
+        entity.setPosition(position.x, 1078.f); 
     }
     if (!m_trail->started() && !m_trail->active())
     {

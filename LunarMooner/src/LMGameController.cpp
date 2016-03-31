@@ -249,6 +249,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         default: break;
         case LMGameEvent::AlienDied:
         case LMGameEvent::PlayerDied:
+        case LMGameEvent::MeteorExploded:
             component->fire(LMParticleID::SmallExplosion, { msgData.posX, msgData.posY });
             break;
         }
@@ -267,7 +268,6 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_particleDefs[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_textureResource);
     m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
     m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_textureResource);
-
 }
 
 //public
@@ -604,10 +604,10 @@ void GameController::createTerrain()
     //towers to land on (position, size)
     std::array<std::pair<sf::Vector2f, sf::Vector2f>, 4u> positions =
     {
-        std::make_pair(sf::Vector2f(alienArea.left + 20.f, 890.f), sf::Vector2f(180.f, 20.f)),
-        std::make_pair(sf::Vector2f(alienArea.left + 570.f, 790.f), sf::Vector2f(150.f, 10.f)),
-        std::make_pair(sf::Vector2f(alienArea.left + 920.f, 1020.f), sf::Vector2f(220.f, 20.f)),
-        std::make_pair(sf::Vector2f(alienArea.left + 1270.f, 740.f), sf::Vector2f(40.f, 10.f))
+        std::make_pair(sf::Vector2f(alienArea.left + 20.f, 990.f), sf::Vector2f(180.f, 20.f)),
+        std::make_pair(sf::Vector2f(alienArea.left + 570.f, 890.f), sf::Vector2f(150.f, 10.f)),
+        std::make_pair(sf::Vector2f(alienArea.left + 980.f, 1020.f), sf::Vector2f(160.f, 20.f)),
+        std::make_pair(sf::Vector2f(alienArea.left + 1270.f, 840.f), sf::Vector2f(40.f, 10.f))
     };
     //hack in some scores for now until we decide a better way to generate terrain
     std::array<sf::Uint16, 4u> scores = {30, 10, 70, 40};
@@ -636,6 +636,17 @@ void GameController::createTerrain()
 
     entity = xy::Entity::create(getMessageBus());
     m_terrain = entity->addComponent(terrain);
+
+    //TEMP
+    auto shieldDrawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
+    auto& shield = shieldDrawable->getDrawable();
+    shield.setFillColor(sf::Color::Transparent);
+    shield.setOutlineColor(sf::Color(0, 255, 255, 120));
+    shield.setOutlineThickness(4.f);
+    shield.setRadius(3000.f);
+    shield.setOrigin(3000.f, 3000.f);
+    shield.setPosition(960.f, 3700.f);
+    entity->addComponent(shieldDrawable);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 }
@@ -778,11 +789,17 @@ void GameController::restorePlayerState()
     //lose ammo - TODO should this be restored with state?
     m_playerStates[m_currentPlayer].ammo = 0;
 
-    //reset round time if new round - TODO adjust times once beyond level 10
-    //something like: times[9] - (level - 10 * 2)
+    //reset round time if new round
     if (ps.startNewRound)
     {
-        ps.timeRemaining = roundTimes[std::min(static_cast<std::size_t>(ps.level - 1), roundTimes.size() - 1)];
+        if (ps.level <= roundTimes.size())
+        {
+            ps.timeRemaining = roundTimes[ps.level - 1];
+        }
+        else //2 seconds fewer for each level above 10
+        {
+            ps.timeRemaining = roundTimes.back() - ((ps.level - 10) * 2.f);
+        }
     }
 }
 
@@ -856,7 +873,7 @@ void GameController::restartRound()
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
 
-    //TODO gen a new terrain?
+    //TODO load a new terrain?
 
     //increase aliens
     ps.alienCount = alienCounts[std::min(static_cast<std::size_t>(ps.level - 1), alienCounts.size() - 1)];
@@ -942,9 +959,9 @@ void GameController::addDelayedAsteroid()
         {
             if (m_player && (m_player->getPosition().y > 250.f))
             {
-                spawnAsteroid();
-                addDelayedAsteroid();
+                spawnAsteroid();               
             }
+            addDelayedAsteroid();
         }
     };
 }

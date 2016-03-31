@@ -38,20 +38,20 @@ Terrain::Terrain(xy::MessageBus& mb, const std::array<std::pair<sf::Vector2f, sf
     //create chain
     m_chain = 
     {
-        {bounds.left, 750.f},
+        {bounds.left, 850.f},
         platforms[0].first + sf::Vector2f(2.f, 4.f),
         {platforms[0].first.x + platforms[0].second.x, platforms[0].first.y + 4.f},
         {513.f, 981.f},
-        {556.f, 1028.f},
-        {678.f, 1030.f},
-        {803.f, 951.f},
-        {868.f, 892.f},
-        {890.f, 850.f},
-        {884.f, 823.f},
+        {536.f, 828.f},
+        {628.f, 810.f},
+        {703.f, 821.f},
+        {768.f, 842.f},
+        {790.f, 850.f},
+        //{884.f, 823.f},
         platforms[1].first + sf::Vector2f(2.f, 4.f),
         { platforms[1].first.x + platforms[1].second.x, platforms[1].first.y + 4.f },
-        {1072.f, 765.f},
-        {1204.f, 767.f},
+        {1072.f, 815.f},
+        {1204.f, 787.f},
         {1278.f, 803.f},
         {1229.f, 850.f},
         {1207.f, 931.f},
@@ -59,12 +59,12 @@ Terrain::Terrain(xy::MessageBus& mb, const std::array<std::pair<sf::Vector2f, sf
         { platforms[2].first.x + platforms[2].second.x, platforms[2].first.y + 4.f },
         {1416.f, 970.f},
         {1462.f, 902.f},
-        {1541.f, 873.f},
-        {1566.f, 835.f},
-        {1573.f, 788.f},
+        //{1541.f, 873.f},
+        //{1566.f, 835.f},
+        //{1573.f, 788.f},
         platforms[3].first + sf::Vector2f(2.f, 4.f),
         { platforms[3].first.x + platforms[3].second.x, platforms[3].first.y + 4.f },
-        {bounds.left + bounds.width, 664.f}
+        {bounds.left + bounds.width, 764.f}
     };
 
     //use chain for drawable

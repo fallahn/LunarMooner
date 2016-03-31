@@ -69,7 +69,8 @@ struct LMGameEvent
         HumanPickedUp,
         AlienDied,
         ExtraLife,
-        ItemCollected
+        ItemCollected,
+        MeteorExploded
     }type;
     float posX = 0.f;
     float posY = 0.f;
