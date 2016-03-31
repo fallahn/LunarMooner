@@ -52,17 +52,19 @@ namespace
     const float maxLandingVelocity = 16000.f ;
 }
 
-PlayerController::PlayerController(xy::MessageBus& mb, const MothershipController* ms)
-    : xy::Component (mb, this),
-    m_mothership    (ms),
-    m_inputFlags    (0),
-    m_velocity      (ms->getVelocity()),
-    m_entity        (nullptr),
-    m_carrying      (false),
-    m_shield        (false),
-    m_thrust        (nullptr),
-    m_rcsLeft       (nullptr),
-    m_rcsRight      (nullptr)
+PlayerController::PlayerController(xy::MessageBus& mb, const MothershipController* ms, const std::vector<sf::Vector2f>& terrain)
+    : xy::Component         (mb, this),
+    m_mothership            (ms),
+    m_inputFlags            (0),
+    m_velocity              (ms->getVelocity()),
+    m_entity                (nullptr),
+    m_carrying              (false),
+    m_shield                (false),
+    m_thrust                (nullptr),
+    m_rcsLeft               (nullptr),
+    m_rcsRight              (nullptr),
+    m_highestTerrainPoint   (5000.f),
+    m_terrain               (terrain)
 {
     m_velocity.y = 2.f;
 
@@ -84,6 +86,16 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
         }
     };
     addMessageHandler(handler);
+
+    //get the highest point so we only test
+    //for collision past this
+    for (const auto& p : m_terrain)
+    {
+        if (p.y < m_highestTerrainPoint)
+        {
+            m_highestTerrainPoint = p.y;
+        }
+    }
 }
 
 //public
@@ -261,6 +273,56 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
     }
 }
 
+void PlayerController::setSize(const sf::Vector2f& size)
+{
+    m_collisionSegments = 
+    {
+        sf::Vector2f(),
+        {0.f, size.y},
+        size,
+        {size.x, 0.f}
+    };
+}
+
+//private
+bool PlayerController::collides(const sf::Vector2f& a1, const sf::Vector2f& a2, const sf::Vector2f& b1, const sf::Vector2f& b2) const
+{
+    std::function<float(const sf::Vector2f&, const sf::Vector2f&)> dot = [](const sf::Vector2f& a, const sf::Vector2f& b)
+    {
+        return ((a.y * b.x) - (a.x * b.y));
+    };
+
+    sf::Vector2f a(a2 - a1);
+    sf::Vector2f b(b2 - b1);
+
+    const float f = dot(a, b);
+    if (f == 0)
+    {
+        //lines are parallel
+        return false;
+    }
+
+    sf::Vector2f c(b2 - a2);
+    const float aa = dot(a, c);
+    const float bb = dot(b, c);
+
+    if (f < 0)
+    {
+        if (aa > 0) return false;
+        if (bb > 0) return false;
+        if (aa < f) return false;
+        if (bb < f) return false;
+    }
+    else
+    {
+        if (aa < 0) return false;
+        if (bb < 0) return false;
+        if (aa > f) return false;
+        if (bb > f) return false;
+    }
+    return true;
+}
+
 sf::Vector3f PlayerController::getManifold(const sf::FloatRect& worldRect)
 {
     sf::FloatRect overlap;
@@ -313,6 +375,31 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
 
     //move ship
     entity.move(m_velocity * dt);
+
+    //see if we're near the gound and do a collision check
+    auto position = entity.getPosition();
+    if (position.y > m_highestTerrainPoint)
+    {
+        //TODO we're transforming 2 of the points twice here
+        const auto& transform = entity.getTransform();
+        for (auto i = 1; i < m_collisionSegments.size(); ++i)
+        {
+            auto a1 = transform.transformPoint(m_collisionSegments[i - 1]);
+            auto a2 = transform.transformPoint(m_collisionSegments[i]);
+
+            //TODO we could improve this by partitioning segments
+            //and only testing nearest to player
+            for (auto j = 1u; j < m_terrain.size(); ++j)
+            {
+                if (collides(a1, a2, m_terrain[j - 1], m_terrain[j]))
+                {
+                    m_entity->destroy();
+                    broadcastDeath();
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void PlayerController::landedState(xy::Entity& entity, float dt)

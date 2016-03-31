@@ -64,7 +64,7 @@ Terrain::Terrain(xy::MessageBus& mb, const std::array<std::pair<sf::Vector2f, sf
         {1573.f, 788.f},
         platforms[3].first + sf::Vector2f(2.f, 4.f),
         { platforms[3].first.x + platforms[3].second.x, platforms[3].first.y + 4.f },
-        {bounds.left + bounds.width, 464.f}
+        {bounds.left + bounds.width, 664.f}
     };
 
     //use chain for drawable
@@ -83,5 +83,5 @@ void Terrain::entityUpdate(xy::Entity&, float)
 //private
 void Terrain::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
-    rt.draw(m_vertices.data(), m_vertices.size(), sf::LinesStrip/*, states*/);
+    rt.draw(m_vertices.data(), m_vertices.size(), sf::LinesStrip, states);
 }

@@ -44,6 +44,7 @@ namespace lm
     class CollisionWorld;
     class SpeedMeter;
     class ScoreDisplay;
+    class Terrain;
     class GameController final : public xy::Component
     {
     public:
@@ -74,6 +75,8 @@ namespace lm
 
         xy::Entity* m_mothership;
         void createMothership();
+
+        Terrain* m_terrain;
 
         std::vector<xy::Entity*> m_humans;
         void spawnHuman(const sf::Vector2f&);

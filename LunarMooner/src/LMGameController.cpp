@@ -107,6 +107,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_player        (nullptr),
     m_timeRound     (false),
     m_mothership    (nullptr),
+    m_terrain       (nullptr),
     m_speedMeter    (nullptr),
     m_scoreDisplay  (nullptr),
     m_currentPlayer (0),
@@ -420,7 +421,9 @@ void GameController::spawnPlayer()
         dropshipDrawable->getDrawable().setSize(playerSize);
         dropshipDrawable->getDrawable().setOutlineColor(sf::Color::Cyan);
 
-        auto playerController = xy::Component::create<lm::PlayerController>(getMessageBus(), m_mothership->getComponent<MothershipController>());
+        auto playerController = xy::Component::create<lm::PlayerController>(getMessageBus(),
+            m_mothership->getComponent<MothershipController>(), m_terrain->getChain());
+        playerController->setSize(playerSize);
 
         auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, playerSize }, CollisionComponent::ID::Player);
         CollisionComponent::Callback cb = std::bind(&PlayerController::collisionCallback, playerController.get(), _1);
@@ -628,20 +631,11 @@ void GameController::createTerrain()
         m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
     }
 
-    //death zone at bottom - TODO replace with the chain testing
-    drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    drawable->getDrawable().setFillColor(sf::Color::Red);
-    drawable->getDrawable().setSize({ alienArea.width, 40.f });
-
-    collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ alienArea.width, 40.f } }, lm::CollisionComponent::ID::Alien);
-
+    //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus(), positions, alienArea);
 
     entity = xy::Entity::create(getMessageBus());
-    entity->addComponent(drawable);
-    entity->addComponent(collision);
-    entity->addComponent(terrain);
-    entity->setPosition(alienArea.left, 1040.f);
+    m_terrain = entity->addComponent(terrain);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 }
