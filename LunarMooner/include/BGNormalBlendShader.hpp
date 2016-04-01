@@ -28,7 +28,15 @@ source distribution.
 #ifndef LM_BLEND_SHADER_HPP_
 #define LM_BLEND_SHADER_HPP_
 
+#include <xygine/shaders/Default.hpp>
+
 #include <string>
+
+enum LMShaderID
+{
+    NormalBlend = xy::Shader::Count,
+    NormalMapColoured
+};
 
 namespace lm
 {
@@ -37,9 +45,18 @@ namespace lm
         "uniform sampler2D u_baseTexture;\n"
         "uniform sampler2D u_detailTexture;\n"
 
+        "uniform vec2 u_detailOffset = vec2(0.0);\n"
+
         "void main()\n"
         "{\n"
-        "    gl_FragColor = texture2D(u_baseTexture, gl_TexCoord[0].xy);\n"
+        "    vec3 baseColour = texture2D(u_baseTexture, gl_TexCoord[0].xy).rgb * 2.0 + vec3(-1.0, -1.0, 0.0);\n"
+        "    vec2 textureOffset = u_detailOffset + (baseColour.rg * 0.35);\n"
+
+        "    vec3 detailColour = texture2D(u_detailTexture, gl_TexCoord[0].xy + textureOffset).rgb * vec3(-2.0, -2.0, 2.0) + vec3(1.0, 1.0, -1.0);\n"
+        "    vec3 blended = normalize(baseColour * dot(baseColour, detailColour) / baseColour.b - detailColour);\n"
+        "    blended = blended * 0.5 + 0.5;\n"
+
+        "    gl_FragColor = vec4(blended, 1.0);//texture2D(u_detailTexture, gl_TexCoord[0].xy + textureOffset);\n"
         "}\n";
 }
 

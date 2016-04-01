@@ -63,6 +63,8 @@ private:
     xy::TextureResource m_textureResource;
     xy::ShaderResource m_shaderResource;
 
+    sf::Shader* m_normalMapShader;
+
     void setup();
 };
 
