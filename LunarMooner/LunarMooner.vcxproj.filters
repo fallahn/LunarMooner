@@ -105,6 +105,12 @@
     <ClInclude Include="include\MenuBackgroundState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\BGPlanetDrawable.hpp">
+      <Filter>Header Files\background</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BGNormalBlendShader.hpp">
+      <Filter>Header Files\background</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -178,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="src\MenuBackgroundState.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BGPlanetDrawable.cpp">
+      <Filter>Source Files\background</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

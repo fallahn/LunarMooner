@@ -1,4 +1,5 @@
 SET(LM_SRC
+  ${LM_DIR}/BGPlanetDrawable.cpp
   ${LM_DIR}/Game.cpp
   ${LM_DIR}/GameOverState.cpp
   ${LM_DIR}/LMAlienController.cpp
