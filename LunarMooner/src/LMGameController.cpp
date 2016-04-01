@@ -435,7 +435,10 @@ void GameController::spawnPlayer()
     {
         const auto& children = m_mothership->getChildren();
         auto spawnPos = children.back()->getWorldPosition();
-        children.back()->destroy();
+        xy::Command cmd;
+        cmd.category = LMCommandID::DropShip;
+        cmd.action = [](xy::Entity& ent, float) {ent.destroy(); };
+        m_scene.sendCommand(cmd);
 
         auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
         dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
@@ -516,6 +519,7 @@ void GameController::createMothership()
     entity = xy::Entity::create(getMessageBus());    
     entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
     entity->addComponent(dropshipDrawable);
+    entity->addCommandCategories(LMCommandID::DropShip);
     m_mothership->addChild(entity);
 }
 
@@ -825,11 +829,7 @@ void GameController::restorePlayerState()
 }
 
 void GameController::moveToNextRound()
-{
-    //xy::Logger::log("Level: " + std::to_string(m_playerStates[m_currentPlayer].level) 
-    //    + ", time: " + std::to_string(tempClock.restart().asSeconds()),
-    //    xy::Logger::Type::Info, xy::Logger::Output::File);
-        
+{  
     //display a round summary
     //do this first so player info is current
     //when the summary board is constructed - this means we can't delay it though :(
@@ -934,6 +934,7 @@ void GameController::addDelayedRespawn()
         auto bounds = m_mothership->getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->getDrawable().getGlobalBounds();
         entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
         entity->addComponent(dropshipDrawable);
+        entity->addCommandCategories(LMCommandID::DropShip);
         m_mothership->addChild(entity);
     };
 }

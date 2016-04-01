@@ -32,6 +32,7 @@ source distribution.
 
 #include <xygine/State.hpp>
 #include <xygine/ui/Container.hpp>
+#include <xygine/ui/Label.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
 
@@ -76,6 +77,8 @@ private:
     std::vector<sf::Uint32> m_scores;
     std::size_t m_playerCount;
     std::size_t m_currentPlayer;
+
+    xy::UI::Label::Ptr m_scoreLabel;
 
     void buildMenu(const sf::Font&);
     void close();
