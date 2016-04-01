@@ -33,7 +33,6 @@ source distribution.
 #include <xygine/MessageBus.hpp>
 
 #include <xygine/ui/Button.hpp>
-#include <xygine/ui/Label.hpp>
 #include <xygine/ui/TextBox.hpp>
 
 #include <SFML/Window/Event.hpp>
@@ -99,6 +98,8 @@ void GameOverState::handleMessage(const xy::Message& msg)
         {
             m_playerCount = msgData.playerId + 1;
         }
+
+        m_scoreLabel->setString("Your Score: " + std::to_string(m_scores[0]));
     }
         break;
     }
@@ -113,10 +114,11 @@ void GameOverState::buildMenu(const sf::Font& font)
     label->setString("GAME OVER");
     m_uiContainer.addControl(label);
     
-    label = xy::UI::create<xy::UI::Label>(font);
-    label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(960.f, 460.f);
-    label->setString("Your Score:");
+    m_scoreLabel = xy::UI::create<xy::UI::Label>(font);
+    m_scoreLabel->setAlignment(xy::UI::Alignment::Centre);
+    m_scoreLabel->setPosition(960.f, 460.f);
+    m_scoreLabel->setString("Your Score:");
+    m_uiContainer.addControl(m_scoreLabel);
 
     auto textbox = xy::UI::create<xy::UI::TextBox>(font);
     textbox->setAlignment(xy::UI::Alignment::Centre);
@@ -138,6 +140,7 @@ void GameOverState::buildMenu(const sf::Font& font)
             if (m_currentPlayer < m_playerCount)
             {
                 textbox->setText("Player " + std::to_string(m_currentPlayer + 1));
+                m_scoreLabel->setString("Your Score: " + std::to_string(m_scores[m_currentPlayer]));
             }
         }
         else
