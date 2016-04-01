@@ -146,7 +146,7 @@ void GameOverState::buildMenu(const sf::Font& font)
         else
         {
             close();
-            requestStackPush(States::ID::HighScores);
+            requestStackPush(States::ID::HighScoresEnd);
         }
     });
     m_uiContainer.addControl(button);

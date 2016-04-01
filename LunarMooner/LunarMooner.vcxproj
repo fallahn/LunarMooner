@@ -120,6 +120,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\MenuBackgroundState.hpp" />
     <ClInclude Include="include\CommandIds.hpp" />
     <ClInclude Include="include\Game.hpp" />
     <ClInclude Include="include\GameOverState.hpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="include\StateIds.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\MenuBackgroundState.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameOverState.cpp" />
     <ClCompile Include="src\LMAlienController.cpp" />

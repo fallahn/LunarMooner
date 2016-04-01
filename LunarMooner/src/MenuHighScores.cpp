@@ -37,11 +37,12 @@ source distribution.
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Font.hpp>
 
-MenuHighScoreState::MenuHighScoreState(xy::StateStack& ss, Context context, xy::TextureResource& tr, xy::FontResource& fr)
+MenuHighScoreState::MenuHighScoreState(xy::StateStack& ss, Context context, xy::TextureResource& tr, xy::FontResource& fr, bool endGame)
     : xy::State         (ss, context),
     m_textureResource   (tr),
     m_fontResource      (fr),
-    m_messageBus        (context.appInstance.getMessageBus())
+    m_messageBus        (context.appInstance.getMessageBus()),
+    m_endGame           (endGame)
 {
     m_cursorSprite.setTexture(m_textureResource.get("assets/images/ui/cursor.png"));
     m_cursorSprite.setPosition(context.renderWindow.mapPixelToCoords(sf::Mouse::getPosition(context.renderWindow)));
@@ -51,7 +52,7 @@ MenuHighScoreState::MenuHighScoreState(xy::StateStack& ss, Context context, xy::
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId = States::ID::HighScores;
+    msg->stateId =(endGame) ?  States::ID::HighScoresEnd : States::ID::HighScoresMenu;
 }
 
 //public
@@ -122,14 +123,22 @@ void MenuHighScoreState::buildMenu(const sf::Font& font)
     button->setPosition(960.f, 875.f);
     button->addCallback([this]()
     {
-        requestStackClear();
-
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::MenuClosed;
         msg->value = 0.f;
-        msg->stateId = States::ID::HighScores;
+        msg->stateId = (m_endGame) ? States::ID::HighScoresEnd : States::ID::HighScoresMenu;
 
-        requestStackPush(States::ID::MenuMain);
+        if (m_endGame)
+        {
+            requestStackClear();
+            requestStackPush(States::ID::MenuBackground);
+        }
+        else
+        {
+            requestStackPop();
+            requestStackPush(States::ID::MenuMain);
+        }
+        
     });
     m_uiContainer.addControl(button);
 }

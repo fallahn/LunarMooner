@@ -146,7 +146,7 @@ void MenuPauseState::buildMenu(const sf::Font& font)
     {
         close();
         requestStackClear();
-        requestStackPush(States::ID::MenuMain);
+        requestStackPush(States::ID::MenuBackground);
     });
     m_uiContainer.addControl(button);
 }
