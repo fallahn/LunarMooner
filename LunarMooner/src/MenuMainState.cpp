@@ -56,7 +56,7 @@ MenuMainState::MenuMainState(xy::StateStack& stack, Context context, xy::Texture
 bool MenuMainState::update(float dt)
 {
     m_uiContainer.update(dt);
-    return false;
+    return true;
 }
 
 void MenuMainState::draw()
@@ -117,7 +117,7 @@ void MenuMainState::buildMenu()
     button->setPosition(960.f, 575.f);
     button->addCallback([this]()
     {
-        close();
+        close(false);
         requestStackPush(States::ID::MenuOptions);
     });
     m_uiContainer.addControl(button);
@@ -128,8 +128,8 @@ void MenuMainState::buildMenu()
     button->setPosition(960.f, 675.f);
     button->addCallback([this]()
     {
-        close();
-        requestStackPush(States::ID::HighScores);
+        close(false);
+        requestStackPush(States::ID::HighScoresMenu);
     });
     m_uiContainer.addControl(button);
 
@@ -144,9 +144,16 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 }
 
-void MenuMainState::close()
+void MenuMainState::close(bool clear)
 {
-    requestStackClear();
+    if (clear)
+    {
+        requestStackClear();
+    }
+    else
+    {
+        requestStackPop();
+    }
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuClosed;

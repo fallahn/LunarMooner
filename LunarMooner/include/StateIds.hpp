@@ -40,7 +40,9 @@ namespace States
         MultiPlayer,
         GameOver,
         Pause,
-        HighScores
+        HighScoresEnd,
+        HighScoresMenu,
+        MenuBackground
     };
 }
 

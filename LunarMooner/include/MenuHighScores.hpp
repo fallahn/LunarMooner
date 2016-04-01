@@ -50,7 +50,7 @@ namespace sf
 class MenuHighScoreState final : public xy::State
 {
 public:
-    MenuHighScoreState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&);
+    MenuHighScoreState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&, bool = false);
     ~MenuHighScoreState() = default;
 
     bool update(float) override;
@@ -60,7 +60,7 @@ public:
 
     xy::StateId stateID() const override
     {
-        return States::ID::HighScores;
+        return (m_endGame) ? States::ID::HighScoresEnd : States::ID::HighScoresMenu;
     }
 
 private:
@@ -71,6 +71,8 @@ private:
     xy::MessageBus& m_messageBus;
     xy::UI::Container m_uiContainer;
     sf::Sprite m_cursorSprite;
+
+    bool m_endGame;
 
     void buildMenu(const sf::Font&);
 };

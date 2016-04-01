@@ -25,49 +25,42 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-//main menu state
-
-#ifndef MENU_MAIN_STATE_HPP_
-#define MENU_MAIN_STATE_HPP_
+#ifndef LM_BACKGROUND_STATE_HPP_
+#define LM_BACKGROUND_STATE_HPP_
 
 #include <StateIds.hpp>
 
 #include <xygine/State.hpp>
-#include <xygine/ui/Container.hpp>
-
-#include <SFML/Graphics/Sprite.hpp>
-
-#include <iostream>
+#include <xygine/Resource.hpp>
+#include <xygine/Scene.hpp>
 
 namespace xy
 {
     class MessageBus;
-    class TextureResource;
-    class FontResource;
 }
-class MenuMainState final : public xy::State
+
+class MenuBackgroundState final : public xy::State
 {
 public:
-    MenuMainState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&);
-    ~MenuMainState() = default;
+    MenuBackgroundState(xy::StateStack&, Context);
+    ~MenuBackgroundState() = default;
 
     bool update(float) override;
     void draw() override;
     bool handleEvent(const sf::Event&) override;
     void handleMessage(const xy::Message&) override;
+
     xy::StateId stateID() const override
     {
-        return States::ID::MenuMain;
+        return States::ID::MenuBackground;
     }
+
 private:
-    xy::TextureResource& m_textureResource;
-    xy::FontResource& m_fontResource;
-
     xy::MessageBus& m_messageBus;
-    xy::UI::Container m_uiContainer;
-    sf::Sprite m_cursorSprite;
+    xy::TextureResource m_textureResource;
+    xy::Scene m_scene;
 
-    void buildMenu();
-    void close(bool = true);
+    void setup();
 };
-#endif //MENU_MAIN_STATE_HPP_
+
+#endif //LM_BACKGROUND_STATE_HPP_
