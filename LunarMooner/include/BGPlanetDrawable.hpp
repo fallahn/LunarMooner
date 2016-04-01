@@ -47,6 +47,7 @@ namespace lm
 
         void setBaseNormal(sf::Texture&);
         void setDetailNormal(sf::Texture&);
+        void setDiffuseTexture(sf::Texture&);
 
         void setBlendShader(sf::Shader&);
         void setNormalShader(sf::Shader&);
@@ -60,6 +61,9 @@ namespace lm
 
         sf::Shader* m_blendShader;
         sf::Shader* m_normalShader;
+
+        sf::Vector2f m_textureOffset;
+        sf::Vector2f m_textureVelocity;
 
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

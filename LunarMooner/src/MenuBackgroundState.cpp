@@ -26,21 +26,29 @@ source distribution.
 *********************************************************************/
 
 #include <MenuBackgroundState.hpp>
-#include <LMPostBleach.hpp>
+#include <BGNormalBlendShader.hpp>
+#include <BGPlanetDrawable.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/Entity.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/shaders/NormalMapped.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
 MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
-    : xy::State (ss, context),
-    m_messageBus(context.appInstance.getMessageBus()),
-    m_scene (m_messageBus)
+    : xy::State         (ss, context),
+    m_messageBus        (context.appInstance.getMessageBus()),
+    m_scene             (m_messageBus),
+    m_normalMapShader   (nullptr)
 {
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
+
+    m_shaderResource.preload(LMShaderID::NormalBlend, xy::Shader::Default::vertex, lm::normalBlendFrag);
+    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_SPECULAR);
+
+    m_normalMapShader = &m_shaderResource.get(LMShaderID::NormalMapColoured);
 
     setup();
 
@@ -78,11 +86,15 @@ void MenuBackgroundState::handleMessage(const xy::Message&)
 //private
 void MenuBackgroundState::setup()
 {
-    auto circle = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(m_messageBus);
-    circle->getDrawable().setRadius(200.f);
+    auto planet = xy::Component::create<lm::PlanetDrawable>(m_messageBus);
+    planet->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
+    planet->setDetailNormal(m_textureResource.get("assets/images/background/crater_normal.png"));
+    planet->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    planet->setBlendShader(m_shaderResource.get(LMShaderID::NormalBlend));
+    planet->setNormalShader(*m_normalMapShader);
 
     auto entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(circle);
+    entity->addComponent(planet);
 
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 }
