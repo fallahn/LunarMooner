@@ -25,45 +25,22 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_BACKGROUND_STATE_HPP_
-#define LM_BACKGROUND_STATE_HPP_
+#ifndef LM_BLEND_SHADER_HPP_
+#define LM_BLEND_SHADER_HPP_
 
-#include <StateIds.hpp>
+#include <string>
 
-#include <xygine/State.hpp>
-#include <xygine/Resource.hpp>
-#include <xygine/Scene.hpp>
-#include <xygine/ShaderResource.hpp>
-
-namespace xy
+namespace lm
 {
-    class MessageBus;
+    static const std::string normalBlendFrag =
+        "#version 120\n"
+        "uniform sampler2D u_baseTexture;\n"
+        "uniform sampler2D u_detailTexture;\n"
+
+        "void main()\n"
+        "{\n"
+        "    gl_FragColor = texture2D(u_baseTexture, gl_TexCoord[0].xy);\n"
+        "}\n";
 }
 
-class MenuBackgroundState final : public xy::State
-{
-public:
-    MenuBackgroundState(xy::StateStack&, Context);
-    ~MenuBackgroundState() = default;
-
-    bool update(float) override;
-    void draw() override;
-    bool handleEvent(const sf::Event&) override;
-    void handleMessage(const xy::Message&) override;
-
-    xy::StateId stateID() const override
-    {
-        return States::ID::MenuBackground;
-    }
-
-private:
-    xy::MessageBus& m_messageBus;
-    xy::Scene m_scene;
-
-    xy::TextureResource m_textureResource;
-    xy::ShaderResource m_shaderResource;
-
-    void setup();
-};
-
-#endif //LM_BACKGROUND_STATE_HPP_
+#endif //LM_BLEND_SHADER_HPP_
