@@ -28,12 +28,14 @@ source distribution.
 #include <LMState.hpp>
 #include <LMGameController.hpp>
 #include <LMPostBleach.hpp>
+#include <LMSoundPlayer.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/Assert.hpp>
 #include <xygine/Reports.hpp>
 #include <xygine/PostChromeAb.hpp>
+#include <xygine/util/Random.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -76,14 +78,9 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     pp = xy::PostProcess::create<xy::PostChromeAb>();
     m_scene.addPostProcess(pp);
 
-    auto gameController = xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld);
-    for (auto i = 0; i < playerCount; ++i)  gameController->addPlayer();
-    gameController->start();
-
-    auto entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(gameController);
-    entity->addCommandCategories(LMCommandID::GameController);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+    initGameController(playerCount);
+    initSounds();
+    initParticles();
 
     xy::Stats::clear();
     m_reportText.setFont(m_fontResource.get("game_state_81"));
@@ -317,4 +314,57 @@ void LunarMoonerState::parseControllerInput()
     //dpad
     xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
     parse(lastPovLeft, lastPovRight, xValue);
+}
+
+void LunarMoonerState::initGameController(sf::Uint8 playerCount)
+{
+    auto gameController = xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld);
+    for (auto i = 0; i < playerCount; ++i)  gameController->addPlayer();
+    gameController->start();
+
+    auto entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(gameController);
+    entity->addCommandCategories(LMCommandID::GameController);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+}
+
+void LunarMoonerState::initSounds()
+{
+    auto soundPlayer = xy::Component::create<lm::SoundPlayer>(m_messageBus, m_soundResource);
+    soundPlayer->preCache(LMSoundID::Laser, "assets/sound/fx/laser.wav");
+    soundPlayer->preCache(LMSoundID::Explosion01, "assets/sound/fx/explode01.wav");
+    soundPlayer->preCache(LMSoundID::Explosion02, "assets/sound/fx/explode02.wav");
+    soundPlayer->preCache(LMSoundID::Explosion03, "assets/sound/fx/explode03.wav");
+    soundPlayer->preCache(LMSoundID::Explosion04, "assets/sound/fx/explode04.wav");
+
+    xy::Component::MessageHandler mh;
+    mh.id = LMMessageId::GameEvent;
+    mh.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::LaserFired:
+            player->playSound(LMSoundID::Laser, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::AlienDied:
+        case LMGameEvent::PlayerDied:
+        case LMGameEvent::MeteorExploded:
+            player->playSound(xy::Util::Random::value(LMSoundID::Explosion01, LMSoundID::Explosion04), msgData.posX, msgData.posY);
+            break;
+        }
+    };
+    soundPlayer->addMessageHandler(mh);
+
+    auto entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(soundPlayer);
+
+    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+}
+
+void LunarMoonerState::initParticles()
+{
+
 }
