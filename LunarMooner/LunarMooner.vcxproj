@@ -122,6 +122,7 @@
   <ItemGroup>
     <ClInclude Include="include\BGNormalBlendShader.hpp" />
     <ClInclude Include="include\BGPlanetDrawable.hpp" />
+    <ClInclude Include="include\LMSoundPlayer.hpp" />
     <ClInclude Include="include\MenuBackgroundState.hpp" />
     <ClInclude Include="include\CommandIds.hpp" />
     <ClInclude Include="include\Game.hpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BGPlanetDrawable.cpp" />
+    <ClCompile Include="src\LMSoundPlayer.cpp" />
     <ClCompile Include="src\MenuBackgroundState.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameOverState.cpp" />

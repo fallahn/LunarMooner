@@ -703,14 +703,22 @@ void GameController::spawnBullet()
     CollisionComponent::Callback cb = std::bind(&BulletController::collisionCallback, controller.get(), _1);
     collision->setCallback(cb);
 
+    auto position = m_player->getPosition();
+
     auto entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(m_player->getPosition());
+    entity->setPosition(position);
     entity->setOrigin(bulletSize / 2.f);
     entity->addComponent(drawable);
     entity->addComponent(controller);
     entity->addComponent(collision);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+
+    //raise message
+    auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+    msg->type = LMGameEvent::LaserFired;
+    msg->posX = position.x;
+    msg->posY = position.y;
 }
 
 void GameController::createUI()

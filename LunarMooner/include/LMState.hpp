@@ -58,14 +58,18 @@ private:
     sf::Uint8 m_prevInputFlags;
 
     xy::FontResource m_fontResource;
+    xy::SoundResource m_soundResource;
 
     sf::Text m_reportText;
 
     lm::CollisionWorld m_collisionWorld;
 
     bool m_useController;
-
     void parseControllerInput();
+    
+    void initGameController(sf::Uint8);
+    void initSounds();
+    void initParticles();
 };
 
 #endif //LUNAR_MOONER_STATE_HPP_

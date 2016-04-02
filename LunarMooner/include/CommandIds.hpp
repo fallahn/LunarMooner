@@ -72,7 +72,8 @@ struct LMGameEvent
         AlienDied,
         ExtraLife,
         ItemCollected,
-        MeteorExploded
+        MeteorExploded,
+        LaserFired
     }type;
     float posX = 0.f;
     float posY = 0.f;
@@ -104,6 +105,19 @@ enum LMParticleID
     RcsRight,
     RoidTrail,
     SmallExplosion
+};
+
+enum LMSoundID
+{
+    Engine,
+    RCS,
+    Laser,
+    Explosion01,
+    Explosion02,
+    Explosion03,
+    Explosion04,
+    Nuke,
+    Warning
 };
 
 #endif //COMMAND_IDS_HPP_
