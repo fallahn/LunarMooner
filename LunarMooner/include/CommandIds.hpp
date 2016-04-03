@@ -73,7 +73,8 @@ struct LMGameEvent
         ExtraLife,
         ItemCollected,
         MeteorExploded,
-        LaserFired
+        LaserFired,
+        EarlyWarning
     }type;
     float posX = 0.f;
     float posY = 0.f;
@@ -88,7 +89,8 @@ struct LMStateEvent
         SummaryFinished,
         RoundBegin,
         RoundEnd,
-        CountDownStarted
+        CountDownStarted,
+        CountDownWarning
     }type;
 };
 
@@ -117,7 +119,9 @@ enum LMSoundID
     Explosion03,
     Explosion04,
     Nuke,
-    Warning
+    StrikeWarning,
+    NukeWarning,
+    NukeWarning30
 };
 
 #endif //COMMAND_IDS_HPP_

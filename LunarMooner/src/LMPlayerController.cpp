@@ -36,6 +36,7 @@ source distribution.
 #include <xygine/Reports.hpp>
 #include <xygine/components/ParticleSystem.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/components/AudioSource.hpp>
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
@@ -63,6 +64,9 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
     m_thrust                (nullptr),
     m_rcsLeft               (nullptr),
     m_rcsRight              (nullptr),
+    m_rcsEffectLeft         (nullptr),
+    m_rcsEffectRight        (nullptr),
+    m_thrustEffect          (nullptr),
     m_highestTerrainPoint   (5000.f),
     m_terrain               (terrain)
 {
@@ -120,6 +124,9 @@ void PlayerController::onDelayedStart(xy::Entity& entity)
     m_thrust = entity.getComponent<xy::ParticleSystem>("thrust");
     m_rcsLeft = entity.getComponent<xy::ParticleSystem>("rcsLeft");
     m_rcsRight = entity.getComponent<xy::ParticleSystem>("rcsRight");
+    m_rcsEffectLeft = entity.getComponent<xy::AudioSource>("rcsEffectLeft");
+    m_rcsEffectRight = entity.getComponent<xy::AudioSource>("rcsEffectRight");
+    m_thrustEffect = entity.getComponent<xy::AudioSource>("thrustEffect");
 }
 
 void PlayerController::setInput(sf::Uint8 input)
@@ -127,9 +134,38 @@ void PlayerController::setInput(sf::Uint8 input)
     //TODO this can be applied before particle systems are assigned!
     if (input != m_inputFlags && m_rcsRight)
     {
-        (input & LMInputFlags::SteerRight) ? m_rcsRight->start() : m_rcsRight->stop();
-        (input & LMInputFlags::SteerLeft) ? m_rcsLeft->start() : m_rcsLeft->stop();
-        (input & LMInputFlags::Thrust) ? m_thrust->start() : m_thrust->stop();
+        if (input & LMInputFlags::SteerRight)
+        {
+            m_rcsRight->start();
+            m_rcsEffectRight->play(true);
+        }
+        else
+        {
+            m_rcsRight->stop();
+            m_rcsEffectRight->stop();
+        }
+        ///////////////////////////////////
+        if (input & LMInputFlags::SteerLeft)
+        {
+            m_rcsLeft->start();
+            m_rcsEffectLeft->play(true);
+        }
+        else
+        {
+            m_rcsLeft->stop();
+            m_rcsEffectLeft->stop();
+        }
+        ///////////////////////////////////
+        if (input & LMInputFlags::Thrust)
+        {
+            m_thrust->start();
+            m_thrustEffect->play(true);
+        }
+        else
+        {
+            m_thrust->stop();
+            m_thrustEffect->stop();
+        }
     }
     
     m_inputFlags = input;
