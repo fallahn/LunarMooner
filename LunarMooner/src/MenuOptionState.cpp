@@ -159,10 +159,11 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     muteCheckbox->setPosition(622.f, 274.f);
     muteCheckbox->move(windowOffset);
     muteCheckbox->setText("Mute");
-    muteCheckbox->addCallback([this](const xy::UI::CheckBox* checkBox)
+    muteCheckbox->addCallback([soundSlider, this](const xy::UI::CheckBox* checkBox)
     {
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = (checkBox->checked()) ? xy::Message::UIEvent::RequestAudioMute : xy::Message::UIEvent::RequestAudioUnmute;
+        msg->value = soundSlider->getValue(); //so we know what to restore unmute levels to
     }, xy::UI::CheckBox::Event::CheckChanged);
     muteCheckbox->check(getContext().appInstance.getAudioSettings().muted);
     m_uiContainer.addControl(muteCheckbox);

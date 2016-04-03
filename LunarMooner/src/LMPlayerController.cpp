@@ -51,6 +51,8 @@ namespace
 
     const float maxDockingVelocity = 15000.f;
     const float maxLandingVelocity = 16000.f ;
+
+    const float maxVol = 100.f; //guh this should be system wide - 
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb, const MothershipController* ms, const std::vector<sf::Vector2f>& terrain)
@@ -87,6 +89,34 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
             updateState = std::bind(&PlayerController::flyingState, this, _1, _2);
             m_carrying = true;
             break;
+        }
+    };
+    addMessageHandler(handler);
+
+    //need to set volume when we receive UI events
+    handler.id = xy::Message::UIMessage;
+    handler.action = [this](xy::Component* c, const xy::Message& msg)
+    {
+        if (!m_rcsEffectLeft) return; //not been added yet
+
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::RequestAudioMute:
+            m_rcsEffectLeft->setVolume(0.f);
+            m_rcsEffectRight->setVolume(0.f);
+            m_thrustEffect->setVolume(0.f);
+            break;
+        case xy::Message::UIEvent::RequestAudioUnmute:
+        case xy::Message::UIEvent::RequestVolumeChange:
+        {
+            const float vol = std::min(msgData.value * maxVol, maxVol);
+            m_rcsEffectLeft->setVolume(vol);
+            m_rcsEffectRight->setVolume(vol);
+            m_thrustEffect->setVolume(vol);
+        }
+        break;
         }
     };
     addMessageHandler(handler);

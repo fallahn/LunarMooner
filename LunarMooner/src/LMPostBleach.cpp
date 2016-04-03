@@ -173,6 +173,7 @@ void PostBleach::stop()
     //skip forward to fade
     if (m_running && m_index < m_fadeIndex)
     {
+        //TODO in rare cases this goes out of bounds
         float current = m_wavetable[m_index];
         while (m_wavetable[++m_index] > current) {}
     }

@@ -340,6 +340,9 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::NukeWarning, "assets/sound/speech/meltdown.wav");
     soundPlayer->preCache(LMSoundID::NukeWarning30, "assets/sound/speech/meltdown30.wav");
 
+    const auto& audioSettings = getContext().appInstance.getAudioSettings();
+    soundPlayer->setVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
+
     xy::Component::MessageHandler mh;
     mh.id = LMMessageId::GameEvent;
     mh.action = [](xy::Component* c, const xy::Message& msg)
@@ -365,7 +368,7 @@ void LunarMoonerState::initSounds()
     soundPlayer->addMessageHandler(mh);
 
     mh.id = LMMessageId::StateEvent;
-    mh.action = [](xy::Component* c, const xy::Message& msg)
+    mh.action = [this](xy::Component* c, const xy::Message& msg)
     {
         lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
         auto& msgData = msg.getData<LMStateEvent>();
@@ -377,6 +380,40 @@ void LunarMoonerState::initSounds()
             break;
         case LMStateEvent::CountDownWarning:
             player->playSound(LMSoundID::NukeWarning30, 960.f, 540.f);
+            break;
+        case LMStateEvent::RoundEnd:
+            player->setVolume(0.f);
+            break;
+        case LMStateEvent::RoundBegin:
+        {
+            const auto& audioSettings = getContext().appInstance.getAudioSettings();
+            const float volume = (audioSettings.muted) ? 0.f : audioSettings.volume;
+
+            player->setVolume(volume);
+        }
+            break;
+        }
+    };
+    soundPlayer->addMessageHandler(mh);
+
+    //need a handler to react to UI events
+    mh.id = xy::Message::UIMessage;
+    mh.action = [this](xy::Component* c, const xy::Message& msg)
+    {
+        lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::RequestAudioMute:
+            player->setVolume(0.f);
+            break;
+        case xy::Message::UIEvent::RequestAudioUnmute:
+        case xy::Message::UIEvent::RequestVolumeChange:
+        {
+            const auto& audioSettings = getContext().appInstance.getAudioSettings();
+            player->setVolume(audioSettings.volume);
+        }
             break;
         }
     };

@@ -31,9 +31,16 @@ source distribution.
 
 using namespace lm;
 
+namespace
+{
+    //UI values are normalised so we multiply about this
+    const float maxVolume = 100.f;
+}
+
 SoundPlayer::SoundPlayer(xy::MessageBus& mb, xy::SoundResource& sr)
-    : xy::Component(mb, this),
-    m_soundResource(sr)
+    : xy::Component (mb, this),
+    m_soundResource (sr),
+    m_volume        (0.f)
 {
 
 }
@@ -55,7 +62,12 @@ void SoundPlayer::playSound(ResourceID id, float x, float y)
     auto& sound = m_sounds.back();
 
     sound.setPosition({ x, y, 0.f });
-    sound.setVolume(100.f); //TODO set this based on options
+    sound.setVolume(m_volume);
     sound.setAttenuation(0.f);
     sound.play();
+}
+
+void SoundPlayer::setVolume(float vol)
+{
+    m_volume = std::min(vol * maxVolume, maxVolume);
 }
