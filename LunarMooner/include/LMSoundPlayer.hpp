@@ -55,12 +55,12 @@ namespace lm
         using ResourceID = sf::Int32;
         void preCache(ResourceID, const std::string&);
         void playSound(ResourceID, float, float);
-
+        void setVolume(float);
     private:
         xy::SoundResource& m_soundResource;
         std::map<ResourceID, sf::SoundBuffer> m_buffers;
         std::list<sf::Sound> m_sounds;
-
+        float m_volume;
         
     };
 }

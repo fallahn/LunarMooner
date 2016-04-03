@@ -70,6 +70,8 @@ namespace
     const sf::Uint8 ammoPerHuman = 3u;
     const sf::Uint8 maxItems = 4;
 
+    const float meteorThreshold = 540.f; //player must be below this to spawn meteor
+
     //humans to rescue per level
     std::array<sf::Uint8, 10u> humanCounts = 
     {
@@ -97,8 +99,6 @@ namespace
         75.f, 90.f, 100.f, 110.f, 120.f,
         130.f, 135.f, 140.f, 145.f, 160.f
     };
-
-    sf::Clock tempClock;
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, xy::SoundResource& sr)
@@ -878,6 +878,8 @@ void GameController::restorePlayerState()
     }
 
     //throw in some random roids at higher levels
+    //TODO we only want to do this once as it's recursive
+    //TODO we need to stop them again if switching back to a player with a lower level
     auto& ps = m_playerStates[m_currentPlayer];
     if (ps.level > minAsteroidLevel)
     {
@@ -1066,32 +1068,39 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
 
 void GameController::addDelayedAsteroid()
 {
-    sf::Vector2f position(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width), -30.f);
-    
-    m_delayedEvents.emplace_back();
-    auto& de = m_delayedEvents.back();
-    de.time = xy::Util::Random::value(18.f, 28.f);
-    de.action = [this, position]()
-    {       
-        if (m_playerStates[m_currentPlayer].level > minAsteroidLevel)
-        {
-            if (m_player && (m_player->getPosition().y > 250.f))
-            {
-                spawnAsteroid(position);               
-            }
-            addDelayedAsteroid();
-        }
-    };
-
-    //we know when and where it's coming from so let's
-    //tell it to the early warning system! :D
-    m_delayedEvents.emplace_back();
-    auto& de2 = m_delayedEvents.back();
-    de2.time = de.time - 2.f; //magic const here. need to relate it to ew system
-    de2.action = [this, position]()
+    if (m_player && (m_player->getPosition().y > meteorThreshold))
     {
-        spawnEarlyWarning(position);
-    };
+        sf::Vector2f position(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width), -30.f);
+
+        m_delayedEvents.emplace_back();
+        auto& de = m_delayedEvents.back();
+        de.time = xy::Util::Random::value(18.f, 28.f);
+        de.action = [this, position]()
+        {
+            spawnAsteroid(position);
+            addDelayedAsteroid();
+        };
+
+        //we know when and where it's coming from so let's
+        //tell it to the early warning system! :D
+        m_delayedEvents.emplace_back();
+        auto& de2 = m_delayedEvents.back();
+        de2.time = de.time - 2.f; //magic const here. need to relate it to ew system
+        de2.action = [this, position]()
+        {
+            spawnEarlyWarning(position);
+        };
+    }
+    else
+    {
+        m_delayedEvents.emplace_back();
+        auto& de = m_delayedEvents.back();
+        de.time = m_playerStates[m_currentPlayer].level * 3.f;// xy::Util::Random::value(18.f, 28.f);
+        de.action = [this]()
+        {
+            addDelayedAsteroid();
+        };
+    }
 }
 
 void GameController::spawnCollectable(const sf::Vector2f& position)
