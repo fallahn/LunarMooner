@@ -48,7 +48,7 @@ namespace lm
     class GameController final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&);
+        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, xy::SoundResource&);
         ~GameController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -62,6 +62,7 @@ namespace lm
     private:
         xy::Scene& m_scene;
         CollisionWorld& m_collisionWorld;
+        xy::SoundResource& m_soundResource;
         xy::TextureResource m_textureResource;
         xy::FontResource m_fontResource;
 

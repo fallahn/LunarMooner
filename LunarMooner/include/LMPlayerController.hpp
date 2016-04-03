@@ -35,6 +35,7 @@ source distribution.
 namespace xy
 {
     class ParticleSystem;
+    class AudioSource;
 }
 
 namespace lm
@@ -73,6 +74,10 @@ namespace lm
         xy::ParticleSystem* m_thrust;
         xy::ParticleSystem* m_rcsLeft;
         xy::ParticleSystem* m_rcsRight;
+
+        xy::AudioSource* m_rcsEffectLeft;
+        xy::AudioSource* m_rcsEffectRight;
+        xy::AudioSource* m_thrustEffect;
 
         float m_highestTerrainPoint;
         const std::vector<sf::Vector2f>& m_terrain;

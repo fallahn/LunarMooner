@@ -78,9 +78,19 @@ bool MenuBackgroundState::handleEvent(const sf::Event&)
     return false;
 }
 
-void MenuBackgroundState::handleMessage(const xy::Message&)
+void MenuBackgroundState::handleMessage(const xy::Message& msg)
 {
-
+    if (msg.id == xy::Message::UIMessage)
+    {
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::ResizedWindow:
+            m_scene.setView(getContext().defaultView);
+            break;
+        }
+    }
 }
 
 //private

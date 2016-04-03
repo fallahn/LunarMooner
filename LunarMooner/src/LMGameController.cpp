@@ -43,6 +43,7 @@ source distribution.
 
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/ParticleController.hpp>
+#include <xygine/components/AudioSource.hpp>
 #include <xygine/util/Position.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
@@ -100,10 +101,11 @@ namespace
     sf::Clock tempClock;
 }
 
-GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw)
+GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, xy::SoundResource& sr)
     : xy::Component (mb, this),
     m_scene         (scene),
     m_collisionWorld(cw),
+    m_soundResource (sr),
     m_inputFlags    (0),
     m_spawnReady    (true),
     m_player        (nullptr),
@@ -328,19 +330,24 @@ void GameController::entityUpdate(xy::Entity&, float dt)
         m_speedMeter->setValue(m_player->getSpeed());
     }
 
-    //count down round time
+    //count down round time - TODO we can neaten this up a bit
     if (m_timeRound)
     {
         const float oldTime = m_playerStates[m_currentPlayer].timeRemaining;
         m_playerStates[m_currentPlayer].timeRemaining = std::max(0.f, m_playerStates[m_currentPlayer].timeRemaining - dt);
         
-        if (oldTime > 10 &&
+        if (oldTime > 30 &&
+            m_playerStates[m_currentPlayer].timeRemaining <= 30)
+        {
+            auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+            msg->type = LMStateEvent::CountDownWarning;
+        }
+        else if (oldTime > 10 &&
             m_playerStates[m_currentPlayer].timeRemaining <= 10)
         {
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownStarted;
         }
-
         else if (oldTime > 0 &&
             m_playerStates[m_currentPlayer].timeRemaining == 0)
         {
@@ -462,6 +469,25 @@ void GameController::spawnPlayer()
         auto rcsRight = m_particleDefs[LMParticleID::RcsRight].createSystem(getMessageBus());
         rcsRight->setName("rcsRight");
 
+        //TODO cache sound buffers
+        auto sfx1 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+        sfx1->setSound("assets/sound/fx/rcs.wav");
+        sfx1->setFadeInTime(0.1f);
+        sfx1->setFadeOutTime(0.3f);
+        sfx1->setName("rcsEffectLeft");
+
+        auto sfx2 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+        sfx2->setSound("assets/sound/fx/rcs.wav");
+        sfx2->setFadeInTime(0.1f);
+        sfx2->setFadeOutTime(0.3f);
+        sfx2->setName("rcsEffectRight");
+        
+        auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+        sfx3->setSound("assets/sound/fx/thrust.wav");
+        sfx3->setFadeInTime(0.1f);
+        sfx3->setFadeOutTime(0.3f);
+        sfx3->setName("thrustEffect");
+
         auto entity = xy::Entity::create(getMessageBus());
         entity->setPosition(spawnPos);
         entity->setOrigin(playerSize / 2.f);
@@ -471,6 +497,9 @@ void GameController::spawnPlayer()
         entity->addComponent(thrust);
         entity->addComponent(rcsLeft);
         entity->addComponent(rcsRight);
+        entity->addComponent(sfx1);
+        entity->addComponent(sfx2);
+        entity->addComponent(sfx3);
         entity->addCommandCategories(LMCommandID::Player);
 
         m_scene.addEntity(entity, xy::Scene::BackFront);
@@ -672,6 +701,52 @@ void GameController::createTerrain()
     shield.setOrigin(3000.f, 3000.f);
     shield.setPosition(960.f, 3700.f);
     entity->addComponent(shieldDrawable);
+
+    auto nukeAudio = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+    nukeAudio->setSound("assets/sound/fx/nuke.wav");
+    nukeAudio->setFadeInTime(5.f);
+    nukeAudio->setFadeOutTime(1.f);
+    xy::Component::MessageHandler mh;
+    mh.id = LMMessageId::GameEvent;
+    mh.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* audio = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::PlayerDied:
+            audio->stop();
+            break;
+        case LMGameEvent::PlayerSpawned:
+            if (msgData.value > 0)
+            {
+                audio->play(true);
+            }
+            break;
+        }
+    };
+    nukeAudio->addMessageHandler(mh);
+
+    mh.id = LMMessageId::StateEvent;
+    mh.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* audio = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<LMStateEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMStateEvent::CountDownStarted:
+            audio->play(true);
+            break;
+        case LMStateEvent::RoundEnd:
+            audio->stop();
+            break;
+        }
+    };
+    nukeAudio->addMessageHandler(mh);
+
+    entity->addComponent(nukeAudio);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 }
@@ -954,6 +1029,9 @@ void GameController::spawnEarlyWarning(const sf::Vector2f& dest)
     ent->addComponent(ew);
     ent->setPosition(960.f, 0.f);
     m_scene.addEntity(ent, xy::Scene::Layer::UI);
+
+    auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+    msg->type = LMGameEvent::EarlyWarning;
 }
 
 void GameController::spawnAsteroid(const sf::Vector2f& position)

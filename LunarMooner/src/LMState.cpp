@@ -318,7 +318,7 @@ void LunarMoonerState::parseControllerInput()
 
 void LunarMoonerState::initGameController(sf::Uint8 playerCount)
 {
-    auto gameController = xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld);
+    auto gameController = xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld, m_soundResource);
     for (auto i = 0; i < playerCount; ++i)  gameController->addPlayer();
     gameController->start();
 
@@ -336,6 +336,9 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::Explosion02, "assets/sound/fx/explode02.wav");
     soundPlayer->preCache(LMSoundID::Explosion03, "assets/sound/fx/explode03.wav");
     soundPlayer->preCache(LMSoundID::Explosion04, "assets/sound/fx/explode04.wav");
+    soundPlayer->preCache(LMSoundID::StrikeWarning, "assets/sound/speech/incoming.wav");
+    soundPlayer->preCache(LMSoundID::NukeWarning, "assets/sound/speech/meltdown.wav");
+    soundPlayer->preCache(LMSoundID::NukeWarning30, "assets/sound/speech/meltdown30.wav");
 
     xy::Component::MessageHandler mh;
     mh.id = LMMessageId::GameEvent;
@@ -353,6 +356,27 @@ void LunarMoonerState::initSounds()
         case LMGameEvent::PlayerDied:
         case LMGameEvent::MeteorExploded:
             player->playSound(xy::Util::Random::value(LMSoundID::Explosion01, LMSoundID::Explosion04), msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::EarlyWarning:
+            player->playSound(LMSoundID::StrikeWarning, 960.f, 540.f);
+            break;
+        }
+    };
+    soundPlayer->addMessageHandler(mh);
+
+    mh.id = LMMessageId::StateEvent;
+    mh.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
+        auto& msgData = msg.getData<LMStateEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMStateEvent::CountDownStarted:
+            player->playSound(LMSoundID::NukeWarning, 960.f, 540.f);
+            break;
+        case LMStateEvent::CountDownWarning:
+            player->playSound(LMSoundID::NukeWarning30, 960.f, 540.f);
             break;
         }
     };
