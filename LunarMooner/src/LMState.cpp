@@ -36,6 +36,7 @@ source distribution.
 #include <xygine/Reports.hpp>
 #include <xygine/PostChromeAb.hpp>
 #include <xygine/util/Random.hpp>
+#include <xygine/components/ParticleController.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -318,8 +319,14 @@ void LunarMoonerState::parseControllerInput()
 
 void LunarMoonerState::initGameController(sf::Uint8 playerCount)
 {
-    auto gameController = xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld, m_soundResource);
-    for (auto i = 0; i < playerCount; ++i)  gameController->addPlayer();
+    auto gameController =
+        xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld,
+            m_soundResource, m_textureResource, m_fontResource);
+
+    for (auto i = 0; i < playerCount; ++i)
+    {
+        gameController->addPlayer();
+    }
     gameController->start();
 
     auto entity = xy::Entity::create(m_messageBus);
@@ -427,5 +434,31 @@ void LunarMoonerState::initSounds()
 
 void LunarMoonerState::initParticles()
 {
+    //particle spawner
+    auto particleManager = xy::Component::create<xy::ParticleController>(m_messageBus);
+    xy::Component::MessageHandler handler;
+    handler.id = LMMessageId::GameEvent;
+    handler.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        auto component = dynamic_cast<xy::ParticleController*>(c);
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::AlienDied:
+        case LMGameEvent::PlayerDied:
+        case LMGameEvent::MeteorExploded:
+            component->fire(LMParticleID::SmallExplosion, { msgData.posX, msgData.posY });
+            break;
+        }
+    };
+    particleManager->addMessageHandler(handler);
 
+    auto entity = xy::Entity::create(m_messageBus);
+    auto pc = entity->addComponent(particleManager);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
+    xy::ParticleSystem::Definition pd;
+    pd.loadFromFile("assets/particles/small_explosion.xyp", m_textureResource);
+    pc->addDefinition(LMParticleID::SmallExplosion, pd);
 }
