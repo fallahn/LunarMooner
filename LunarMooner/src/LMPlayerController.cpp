@@ -29,6 +29,7 @@ source distribution.
 #include <LMCollisionComponent.hpp>
 #include <LMMothershipController.hpp>
 #include <CommandIds.hpp>
+#include <Game.hpp>
 
 #include <xygine/Entity.hpp>
 #include <xygine/util/Vector.hpp>
@@ -51,8 +52,6 @@ namespace
 
     const float maxDockingVelocity = 8000.f;
     const float maxLandingVelocity = 18000.f ;
-
-    const float maxVol = 100.f; //guh this should be system wide - 
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb, const MothershipController* ms, const std::vector<sf::Vector2f>& terrain)
@@ -111,7 +110,7 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
         case xy::Message::UIEvent::RequestAudioUnmute:
         case xy::Message::UIEvent::RequestVolumeChange:
         {
-            const float vol = std::min(msgData.value * maxVol, maxVol);
+            const float vol = std::min(msgData.value * Game::MaxVolume, Game::MaxVolume);
             m_rcsEffectLeft->setVolume(vol);
             m_rcsEffectRight->setVolume(vol);
             m_thrustEffect->setVolume(vol);
