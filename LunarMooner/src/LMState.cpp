@@ -413,10 +413,12 @@ void LunarMoonerState::initSounds()
         {
         default: break;
         case xy::Message::UIEvent::RequestAudioMute:
+        case xy::Message::UIEvent::MenuOpened:
             player->setVolume(0.f);
             break;
         case xy::Message::UIEvent::RequestAudioUnmute:
         case xy::Message::UIEvent::RequestVolumeChange:
+        case xy::Message::UIEvent::MenuClosed:
         {
             const auto& audioSettings = getContext().appInstance.getAudioSettings();
             player->setVolume(audioSettings.volume);

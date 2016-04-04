@@ -39,6 +39,8 @@ public:
     Game(const Game&) = delete;
     Game& operator = (const Game&) = delete;
 
+    static const float MaxVolume;
+
 private:
 
     xy::StateStack m_stateStack;

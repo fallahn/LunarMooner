@@ -39,8 +39,8 @@ namespace lm
     {
         sf::Uint32 score = 0u;
         sf::Uint32 previousScore = 0u;
-        sf::Int8 lives = 30;
-        sf::Uint8 level = 3u;
+        sf::Int8 lives = 3;
+        sf::Uint8 level = 1u;
         sf::Uint8 ammo = 0u;
         sf::Uint8 alienCount = 0u;
         sf::Uint8 humansSaved = 0u;

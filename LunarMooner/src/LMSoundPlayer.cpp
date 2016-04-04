@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMSoundPlayer.hpp>
+#include <Game.hpp>
 
 #include <xygine/Resource.hpp>
 
@@ -33,8 +34,7 @@ using namespace lm;
 
 namespace
 {
-    //UI values are normalised so we multiply about this
-    const float maxVolume = 100.f;
+
 }
 
 SoundPlayer::SoundPlayer(xy::MessageBus& mb, xy::SoundResource& sr)
@@ -69,5 +69,5 @@ void SoundPlayer::playSound(ResourceID id, float x, float y)
 
 void SoundPlayer::setVolume(float vol)
 {
-    m_volume = std::min(vol * maxVolume, maxVolume);
+    m_volume = std::min(vol * Game::MaxVolume, Game::MaxVolume);
 }

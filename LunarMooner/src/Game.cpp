@@ -45,6 +45,8 @@ namespace
     const sf::Uint8 twoPlayer = 2;
 }
 
+const float Game::MaxVolume = 100.f;
+
 Game::Game()
     : m_stateStack({ getRenderWindow(), *this })
 {
