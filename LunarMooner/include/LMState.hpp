@@ -59,6 +59,7 @@ private:
 
     xy::FontResource m_fontResource;
     xy::SoundResource m_soundResource;
+    xy::TextureResource m_textureResource;
 
     sf::Text m_reportText;
 

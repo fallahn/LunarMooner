@@ -33,10 +33,19 @@ source distribution.
 #include <xygine/components/Component.hpp>
 #include <xygine/components/ParticleSystem.hpp>
 #include <xygine/Scene.hpp>
-#include <xygine/Resource.hpp>
+
+#include <SFML/Audio/SoundBuffer.hpp>
 
 #include <list>
 #include <array>
+#include <map>
+
+namespace xy
+{
+    class SoundResource;
+    class TextureResource;
+    class FontResource;
+}
 
 namespace lm
 {
@@ -48,7 +57,7 @@ namespace lm
     class GameController final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, xy::SoundResource&);
+        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, xy::SoundResource&, xy::TextureResource&, xy::FontResource&);
         ~GameController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -63,10 +72,12 @@ namespace lm
         xy::Scene& m_scene;
         CollisionWorld& m_collisionWorld;
         xy::SoundResource& m_soundResource;
-        xy::TextureResource m_textureResource;
-        xy::FontResource m_fontResource;
+        xy::TextureResource& m_textureResource;
+        xy::FontResource& m_fontResource;
 
         sf::Uint8 m_inputFlags;
+
+        std::map<sf::Int32, sf::SoundBuffer> m_playerSounds;
 
         std::array<xy::ParticleSystem::Definition, 4u> m_particleDefs;
         bool m_spawnReady;
@@ -83,10 +94,16 @@ namespace lm
         void spawnHuman(const sf::Vector2f&);
         void spawnHumans();
 
+        enum EventID
+        {
+            SpawnRoid = 1,
+            SpawnPlayer = 2
+        };
         struct DelayedEvent
         {
             float time = 0.f;
             std::function<void()> action;
+            sf::Int32 id = 0;
         };
         std::list<DelayedEvent> m_delayedEvents;
 

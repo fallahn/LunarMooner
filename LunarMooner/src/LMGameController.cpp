@@ -42,12 +42,12 @@ source distribution.
 #include <StateIds.hpp>
 
 #include <xygine/components/SfDrawableComponent.hpp>
-#include <xygine/components/ParticleController.hpp>
 #include <xygine/components/AudioSource.hpp>
 #include <xygine/util/Position.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
 #include <xygine/util/Math.hpp>
+#include <xygine/Resource.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -96,26 +96,28 @@ namespace
     //time limits per level
     const std::array<float, 10u> roundTimes =
     {
-        75.f, 90.f, 100.f, 110.f, 120.f,
+        175.f, 90.f, 100.f, 110.f, 120.f,
         130.f, 135.f, 140.f, 145.f, 160.f
     };
 }
 
-GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, xy::SoundResource& sr)
-    : xy::Component (mb, this),
-    m_scene         (scene),
-    m_collisionWorld(cw),
-    m_soundResource (sr),
-    m_inputFlags    (0),
-    m_spawnReady    (true),
-    m_player        (nullptr),
-    m_timeRound     (false),
-    m_mothership    (nullptr),
-    m_terrain       (nullptr),
-    m_speedMeter    (nullptr),
-    m_scoreDisplay  (nullptr),
-    m_currentPlayer (0),
-    m_itemCount     (0u)
+GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, xy::SoundResource& sr, xy::TextureResource& tr, xy::FontResource& fr)
+    : xy::Component     (mb, this),
+    m_scene             (scene),
+    m_collisionWorld    (cw),
+    m_soundResource     (sr),
+    m_textureResource   (tr),
+    m_fontResource      (fr),
+    m_inputFlags        (0),
+    m_spawnReady        (true),
+    m_player            (nullptr),
+    m_timeRound         (false),
+    m_mothership        (nullptr),
+    m_terrain           (nullptr),
+    m_speedMeter        (nullptr),
+    m_scoreDisplay      (nullptr),
+    m_currentPlayer     (0),
+    m_itemCount         (0u)
 {
     xy::Component::MessageHandler handler;
     handler.id = LMMessageId::GameEvent;
@@ -260,37 +262,14 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     };
     addMessageHandler(handler);
 
-    //particle spawner
-    auto particleManager = xy::Component::create<xy::ParticleController>(getMessageBus());
-    handler.id = LMMessageId::GameEvent;
-    handler.action = [](xy::Component* c, const xy::Message& msg)
-    {
-        auto component = dynamic_cast<xy::ParticleController*>(c);
-        auto& msgData = msg.getData<LMGameEvent>();
-        switch (msgData.type)
-        {
-        default: break;
-        case LMGameEvent::AlienDied:
-        case LMGameEvent::PlayerDied:
-        case LMGameEvent::MeteorExploded:
-            component->fire(LMParticleID::SmallExplosion, { msgData.posX, msgData.posY });
-            break;
-        }
-    };
-    particleManager->addMessageHandler(handler);
-
-    auto entity = xy::Entity::create(getMessageBus());
-    auto pc = entity->addComponent(particleManager);
-    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
-
-    xy::ParticleSystem::Definition pd;
-    pd.loadFromFile("assets/particles/small_explosion.xyp", m_textureResource);
-    pc->addDefinition(LMParticleID::SmallExplosion, pd);
-
+    //precache player effects
     m_particleDefs[LMParticleID::Thruster].loadFromFile("assets/particles/thrust.xyp", m_textureResource);
     m_particleDefs[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_textureResource);
     m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
     m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_textureResource);
+
+    m_playerSounds.insert(std::make_pair(LMSoundID::Engine, m_soundResource.get("assets/sound/fx/thrust.wav")));
+    m_playerSounds.insert(std::make_pair(LMSoundID::RCS, m_soundResource.get("assets/sound/fx/rcs.wav")));
 }
 
 //public
@@ -469,21 +448,20 @@ void GameController::spawnPlayer()
         auto rcsRight = m_particleDefs[LMParticleID::RcsRight].createSystem(getMessageBus());
         rcsRight->setName("rcsRight");
 
-        //TODO cache sound buffers
         auto sfx1 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
-        sfx1->setSound("assets/sound/fx/rcs.wav");
+        sfx1->setSoundBuffer(m_playerSounds[LMSoundID::RCS]);
         sfx1->setFadeInTime(0.1f);
         sfx1->setFadeOutTime(0.3f);
         sfx1->setName("rcsEffectLeft");
 
         auto sfx2 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
-        sfx2->setSound("assets/sound/fx/rcs.wav");
+        sfx2->setSoundBuffer(m_playerSounds[LMSoundID::RCS]);
         sfx2->setFadeInTime(0.1f);
         sfx2->setFadeOutTime(0.3f);
         sfx2->setName("rcsEffectRight");
         
         auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
-        sfx3->setSound("assets/sound/fx/thrust.wav");
+        sfx3->setSoundBuffer(m_playerSounds[LMSoundID::Engine]);
         sfx3->setFadeInTime(0.1f);
         sfx3->setFadeOutTime(0.3f);
         sfx3->setName("thrustEffect");
@@ -877,16 +855,26 @@ void GameController::restorePlayerState()
         addRescuedHuman();
     }
 
-    //throw in some random roids at higher levels
-    //TODO we only want to do this once as it's recursive
-    //TODO we need to stop them again if switching back to a player with a lower level
+    //throw in some random roids at higher levels.
+    //as roid events are recursive we need to clear any pending
+    //events else we get a cascade of them very quickly...
+    m_delayedEvents.erase(std::remove_if(m_delayedEvents.begin(), m_delayedEvents.end(),
+        [](const DelayedEvent& de)
+    {
+        return de.id == EventID::SpawnRoid;
+    }), m_delayedEvents.end());
+
     auto& ps = m_playerStates[m_currentPlayer];
     if (ps.level > minAsteroidLevel)
     {
         addDelayedAsteroid();
-        if (ps.level > 6)
+        if (ps.level > (minAsteroidLevel * 2))
         {
             addDelayedAsteroid(); //even moar!!
+            if (ps.level > (minAsteroidLevel * 3))
+            {
+                addDelayedAsteroid(); //MOOOOAAAR!! :P
+            }
         }
     }
 
@@ -1001,6 +989,7 @@ void GameController::addDelayedRespawn()
 {
     m_delayedEvents.emplace_back();
     auto& de = m_delayedEvents.back();
+    de.id = EventID::SpawnPlayer;
     de.time = 1.f;
     de.action = [this]()
     {
@@ -1074,7 +1063,8 @@ void GameController::addDelayedAsteroid()
 
         m_delayedEvents.emplace_back();
         auto& de = m_delayedEvents.back();
-        de.time = xy::Util::Random::value(18.f, 28.f);
+        de.id = EventID::SpawnRoid;
+        de.time = xy::Util::Random::value(10.f, 20.f);
         de.action = [this, position]()
         {
             spawnAsteroid(position);
@@ -1085,7 +1075,8 @@ void GameController::addDelayedAsteroid()
         //tell it to the early warning system! :D
         m_delayedEvents.emplace_back();
         auto& de2 = m_delayedEvents.back();
-        de2.time = de.time - 2.f; //magic const here. need to relate it to ew system
+        de2.id = EventID::SpawnRoid;
+        de2.time = de.time - 2.f; //magic const here. need to relate it to early warning system
         de2.action = [this, position]()
         {
             spawnEarlyWarning(position);
@@ -1095,7 +1086,8 @@ void GameController::addDelayedAsteroid()
     {
         m_delayedEvents.emplace_back();
         auto& de = m_delayedEvents.back();
-        de.time = m_playerStates[m_currentPlayer].level * 3.f;// xy::Util::Random::value(18.f, 28.f);
+        de.id = EventID::SpawnRoid;
+        de.time = 5.f;
         de.action = [this]()
         {
             addDelayedAsteroid();

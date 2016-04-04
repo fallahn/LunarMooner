@@ -49,8 +49,8 @@ namespace
     const sf::Vector2f thrustX(3.6f, 0.f);
     const sf::Vector2f thrustUp(0.f, -3.8f);
 
-    const float maxDockingVelocity = 15000.f;
-    const float maxLandingVelocity = 16000.f ;
+    const float maxDockingVelocity = 8000.f;
+    const float maxLandingVelocity = 18000.f ;
 
     const float maxVol = 100.f; //guh this should be system wide - 
 }
