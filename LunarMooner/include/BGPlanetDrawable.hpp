@@ -29,41 +29,56 @@ source distribution.
 #define LM_PLANET_HPP_
 
 #include <xygine/components/Component.hpp>
+#include <xygine/MultiRenderTexture.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+
+#include <vector>
 
 namespace lm
 {
     class PlanetDrawable final : public sf::Drawable, public xy::Component
     {
     public:
-        explicit PlanetDrawable(xy::MessageBus&);
+        PlanetDrawable(xy::MessageBus&, float);
         ~PlanetDrawable() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
+        sf::FloatRect globalBounds() const override
+        {
+            return m_globalBounds;
+        }
+
         void setBaseNormal(sf::Texture&);
         void setDetailNormal(sf::Texture&);
         void setDiffuseTexture(sf::Texture&);
+        void setMaskTexture(sf::Texture&);
 
-        void setBlendShader(sf::Shader&);
+        void setPrepassShader(sf::Shader&);
         void setNormalShader(sf::Shader&);
 
     private:
 
-        sf::CircleShape m_shape;
         sf::Texture* m_baseNormal;
         sf::Texture* m_detailNormal;
-        sf::RenderTexture m_renderTexture;
+        sf::Texture* m_diffuseTexture;
+        sf::Texture* m_maskTexture;
 
-        sf::Shader* m_blendShader;
+        xy::MultiRenderTexture m_renderTexture;
+
+        sf::Shader* m_prepassShader;
         sf::Shader* m_normalShader;
 
         sf::Vector2f m_textureOffset;
         sf::Vector2f m_textureVelocity;
+
+        std::vector<sf::Vertex> m_vertices;
+        float m_radius;
+        sf::FloatRect m_localBounds;
+        sf::FloatRect m_globalBounds;
 
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

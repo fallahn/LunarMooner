@@ -34,7 +34,7 @@ source distribution.
 
 enum LMShaderID
 {
-    NormalBlend = xy::Shader::Count,
+    Prepass = xy::Shader::Count,
     NormalMapColoured
 };
 
@@ -56,7 +56,35 @@ namespace lm
         "    vec3 blended = normalize(baseColour * dot(baseColour, detailColour) / baseColour.b - detailColour);\n"
         "    blended = blended * 0.5 + 0.5;\n"
 
-        "    gl_FragColor = vec4(blended, 1.0);//texture2D(u_detailTexture, gl_TexCoord[0].xy + textureOffset);\n"
+        "    gl_FragColor = vec4(blended, 1.0);\n"
+        "}\n";
+
+    static const std::string materialPrepassFrag =
+        "#version 120\n"
+        "uniform sampler2D u_distortionTexture;\n"
+        "uniform sampler2D u_normalTexture;\n"
+        "uniform sampler2D u_diffuseTexture;\n"
+        "uniform sampler2D u_maskTexture;\n"
+
+        "uniform vec2 u_detailOffset = vec2(0.0);\n"
+
+        "void main()\n"
+        "{\n"
+        /*"    float dist = distance(vec2(0.5), gl_TexCoord[0].xy);\n"
+        
+        "    if(dist > 0.49) discard;"*/
+        
+        "    vec3 distortionVector = texture2D(u_distortionTexture, gl_TexCoord[0].xy).rgb * 2.0 + vec3(-1.0, -1.0, 0.0);\n"
+        "    vec2 textureOffset = u_detailOffset + (distortionVector.rg * 0.35);\n"
+
+        "    vec3 normalColour = texture2D(u_normalTexture, gl_TexCoord[0].xy + textureOffset).rgb * vec3(-2.0, -2.0, 2.0) + vec3(1.0, 1.0, -1.0);\n"
+        "    vec3 blendedNormal = normalize(distortionVector * dot(distortionVector, normalColour) / distortionVector.b - normalColour);\n"
+        "    blendedNormal = blendedNormal * 0.5 + 0.5;\n"
+
+        "    gl_FragData[0] = vec4(blendedNormal, 1.0);\n"
+        "    gl_FragData[1] = texture2D(u_diffuseTexture, gl_TexCoord[0].xy + textureOffset);\n"
+        "    gl_FragData[2] = texture2D(u_maskTexture, gl_TexCoord[0].xy + textureOffset);\n"
+        
         "}\n";
 }
 

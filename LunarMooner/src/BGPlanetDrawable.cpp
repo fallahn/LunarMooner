@@ -28,24 +28,38 @@ source distribution.
 #include <BGPlanetDrawable.hpp>
 
 #include <xygine/Entity.hpp>
+#include <xygine/Scene.hpp>
+#include <xygine/util/Vector.hpp>
 
-#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Shader.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 using namespace lm;
 
-PlanetDrawable::PlanetDrawable(xy::MessageBus& mb)
+PlanetDrawable::PlanetDrawable(xy::MessageBus& mb, float radius)
     : xy::Component (mb, this),
     m_baseNormal    (nullptr),
     m_detailNormal  (nullptr),
-    m_blendShader   (nullptr),
-    m_normalShader  (nullptr)
+    m_diffuseTexture(nullptr),
+    m_maskTexture   (nullptr),
+    m_prepassShader (nullptr),
+    m_normalShader  (nullptr),
+    m_radius        (radius)
 {
-    m_renderTexture.create(1024, 1024);
-    m_renderTexture.setSmooth(true);
+    m_renderTexture.create(1024, 1024, 3);
 
-    m_shape.setRadius(500.f);
-    m_shape.setPointCount(60);
+    sf::Vector2f centre(radius, radius);
+    m_vertices.emplace_back(centre);
+    const float pointCount = 40.f;
+    const float step = xy::Util::Const::TAU / pointCount;
+    for (auto i = 0.f; i <= pointCount; ++i)
+    {
+        const float theta = i * step;
+        m_vertices.emplace_back((sf::Vector2f(std::cos(theta), std::sin(theta)) * radius) + centre);
+    }
+
+    m_localBounds.width = radius * 2.f;
+    m_localBounds.height = m_localBounds.width;
 
     m_textureVelocity.x = 0.01f;
     m_textureVelocity.y = 0.005f;
@@ -55,27 +69,29 @@ PlanetDrawable::PlanetDrawable(xy::MessageBus& mb)
 void PlanetDrawable::entityUpdate(xy::Entity& entity, float dt)
 {
     //entity.move(m_textureVelocity);
+    m_globalBounds = entity.getWorldTransform().transformRect(m_localBounds);
+
+    XY_ASSERT(m_baseNormal, "Base texture missing from planet drawable!");
+    XY_ASSERT(m_detailNormal, "Detail texture missing from planet drawable!");
+    XY_ASSERT(m_diffuseTexture, "Diffuse texture missing from planet drawable!");
+    XY_ASSERT(m_maskTexture, "Mask texture missing from planet drawable!");
+    XY_ASSERT(m_prepassShader, "Prepass shader missing from planet drawable");
 
     //update texture position
     m_textureOffset += m_textureVelocity * dt;
-    m_blendShader->setUniform("u_detailOffset", sf::Glsl::Vec2(m_textureOffset));
+    m_prepassShader->setUniform("u_detailOffset", sf::Glsl::Vec2(m_textureOffset));
 
     //update blend shader parameter
-    m_blendShader->setUniform("u_baseTexture", *m_baseNormal);
-    m_blendShader->setUniform("u_detailTexture", *m_detailNormal);
+    m_prepassShader->setUniform("u_distortionTexture", *m_baseNormal);
+    m_prepassShader->setUniform("u_normalTexture", *m_detailNormal);
+    m_prepassShader->setUniform("u_diffuseTexture", *m_diffuseTexture);
+    m_prepassShader->setUniform("u_maskTexture", *m_maskTexture);
 
     //update render texture
-    XY_ASSERT(m_baseNormal, "Base texture missing from planet drawable!");
-    XY_ASSERT(m_detailNormal, "Detail texture missing from planet drawable!");
-    XY_ASSERT(m_blendShader, "Blend shader missing from planet drawable");
-
     m_renderTexture.clear();
-    m_renderTexture.draw(sf::Sprite(*m_baseNormal), m_blendShader);
+    //TODO use the sprite to make sure texture is scaled to 1024
+    m_renderTexture.draw(sf::Sprite(*m_baseNormal), m_prepassShader);
     m_renderTexture.display();
-
-    //update normal map shader
-    m_normalShader->setUniform("u_inverseWorldViewMatrix", sf::Glsl::Mat4(entity.getWorldTransform().getInverse()));
-    m_normalShader->setUniform("u_normalMap", m_renderTexture.getTexture());
 }
 
 void PlanetDrawable::setBaseNormal(sf::Texture& t)
@@ -92,12 +108,32 @@ void PlanetDrawable::setDetailNormal(sf::Texture& t)
 
 void PlanetDrawable::setDiffuseTexture(sf::Texture& t)
 {
-    m_shape.setTexture(&t);
+    sf::Vector2f size(t.getSize());
+
+    const float diameter = m_radius * 2.f;
+    sf::Vector2f vertSize(diameter, diameter);
+
+    for (auto& v : m_vertices)
+    {
+        const float x = v.position.x / vertSize.x;
+        const float y = v.position.y / vertSize.y;
+        v.texCoords.x = size.x * x;
+        v.texCoords.y = size.y * y;
+    }
+
+    m_diffuseTexture = &t;
+    m_diffuseTexture->setRepeated(true);
 }
 
-void PlanetDrawable::setBlendShader(sf::Shader& s)
+void PlanetDrawable::setMaskTexture(sf::Texture& t)
 {
-    m_blendShader = &s;
+    m_maskTexture = &t;
+    m_maskTexture->setRepeated(true);
+}
+
+void PlanetDrawable::setPrepassShader(sf::Shader& s)
+{
+    m_prepassShader = &s;
 }
 
 void PlanetDrawable::setNormalShader(sf::Shader& s)
@@ -108,7 +144,16 @@ void PlanetDrawable::setNormalShader(sf::Shader& s)
 //private
 void PlanetDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
-    //XY_ASSERT(m_normalShader, "Shader not set in planet drawable!");
+    XY_ASSERT(m_normalShader, "Shader not set in planet drawable!");
+    //update normal map shader
+    auto wvm = xy::Scene::getViewMatrix() * states.transform;
+    m_normalShader->setUniform("u_inverseWorldViewMatrix", sf::Glsl::Mat4(wvm.getInverse()));
+    m_normalShader->setUniform("u_normalMap", m_renderTexture.getTexture(0)/**m_baseNormal*/);
+    m_normalShader->setUniform("u_diffuseMap", m_renderTexture.getTexture(1));
+    m_normalShader->setUniform("u_maskMap", m_renderTexture.getTexture(2));
+    
+    //states.blendMode = sf::BlendAlpha;
+    states.texture = &m_renderTexture.getTexture(1);
     states.shader = m_normalShader;
-    rt.draw(m_shape, states);
+    rt.draw(m_vertices.data(), m_vertices.size(), sf::TrianglesFan, states);
 }
