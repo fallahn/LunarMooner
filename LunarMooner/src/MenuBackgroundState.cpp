@@ -56,7 +56,7 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_SPECULAR_ILLUM);
 
     m_normalMapShader = &m_shaderResource.get(LMShaderID::NormalMapColoured);
-    m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+    //m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
 
     setup();
 
