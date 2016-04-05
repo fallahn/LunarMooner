@@ -58,6 +58,14 @@ PlanetDrawable::PlanetDrawable(xy::MessageBus& mb, float radius)
         m_vertices.emplace_back((sf::Vector2f(std::cos(theta), std::sin(theta)) * radius) + centre);
     }
 
+    //m_vertices =
+    //{
+    //    sf::Vector2f(),
+    //    sf::Vector2f(radius * 2.f, 0.f),
+    //    sf::Vector2f(radius * 2.f, radius * 2.f),
+    //    sf::Vector2f(0.f, radius * 2.f)
+    //};
+
     m_localBounds.width = radius * 2.f;
     m_localBounds.height = m_localBounds.width;
 
@@ -120,6 +128,10 @@ void PlanetDrawable::setDiffuseTexture(sf::Texture& t)
         v.texCoords.x = size.x * x;
         v.texCoords.y = size.y * y;
     }
+
+    //m_vertices[1].texCoords.x = size.x;
+    //m_vertices[2].texCoords = size;
+    //m_vertices[3].texCoords.y = size.y;
 
     m_diffuseTexture = &t;
     m_diffuseTexture->setRepeated(true);
