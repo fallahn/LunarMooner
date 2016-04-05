@@ -32,23 +32,31 @@ source distribution.
 #include <xygine/App.hpp>
 #include <xygine/Entity.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/components/AnimatedDrawable.hpp>
+#include <xygine/components/PointLight.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
+#include <xygine/PostBloom.hpp>
 
-#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Window/Mouse.hpp>
 
 MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     : xy::State         (ss, context),
     m_messageBus        (context.appInstance.getMessageBus()),
     m_scene             (m_messageBus),
-    m_normalMapShader   (nullptr)
+    m_normalMapShader   (nullptr),
+    m_lightEntity       (nullptr)
 {
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
+    //auto pp = xy::PostProcess::create<xy::PostBloom>();
+    //m_scene.addPostProcess(pp);
 
-    m_shaderResource.preload(LMShaderID::NormalBlend, xy::Shader::Default::vertex, lm::normalBlendFrag);
-    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_SPECULAR);
+    m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
+    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_SPECULAR_ILLUM);
 
     m_normalMapShader = &m_shaderResource.get(LMShaderID::NormalMapColoured);
+    m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
 
     setup();
 
@@ -62,6 +70,18 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 //public
 bool MenuBackgroundState::update(float dt)
 {
+    //update lighting
+    auto mousePos = getContext().appInstance.getMouseWorldPosition();
+    m_lightEntity->setPosition(mousePos);
+    auto light = m_lightEntity->getComponent<xy::PointLight>();
+
+    m_normalMapShader->setUniform("u_pointLightPositions[0]", light->getWorldPosition());
+    m_normalMapShader->setUniform("u_pointLights[0].intensity", light->getIntensity());
+    m_normalMapShader->setUniform("u_pointLights[0].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
+    m_normalMapShader->setUniform("u_pointLights[0].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
+    m_normalMapShader->setUniform("u_pointLights[0].inverseRange", light->getInverseRange());
+
+
     m_scene.update(dt);
     return true;
 }
@@ -96,15 +116,49 @@ void MenuBackgroundState::handleMessage(const xy::Message& msg)
 //private
 void MenuBackgroundState::setup()
 {
-    auto planet = xy::Component::create<lm::PlanetDrawable>(m_messageBus);
+    auto background = xy::Component::create<xy::SfDrawableComponent<sf::Sprite>>(m_messageBus);
+    background->getDrawable().setTexture(m_textureResource.get("assets/images/background/background.png"));
+    m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
+    
+    auto planet = xy::Component::create<lm::PlanetDrawable>(m_messageBus, 200.f);
     planet->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
-    planet->setDetailNormal(m_textureResource.get("assets/images/background/crater_normal.png"));
-    planet->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
-    planet->setBlendShader(m_shaderResource.get(LMShaderID::NormalBlend));
+    planet->setDetailNormal(m_textureResource.get("assets/images/background/lava_normal.png"));
+    planet->setDiffuseTexture(m_textureResource.get("assets/images/background/lava_diffuse.png"));
+    planet->setMaskTexture(m_textureResource.get("assets/images/background/lava_mask.png"));
+    planet->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
     planet->setNormalShader(*m_normalMapShader);
 
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(planet);
+    entity->setPosition({ 1400.f, 100.f });
 
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
+    auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, 500.f);
+    moon->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
+    moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal.png"));
+    moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    moon->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
+    moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
+    moon->setNormalShader(*m_normalMapShader);
+
+    /*auto moon = xy::Component::create<xy::AnimatedDrawable>(m_messageBus);
+    moon->setShader(*m_normalMapShader);
+    moon->setNormalMap(m_textureResource.get("assets/images/background/sphere_normal.png"));
+    moon->setTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    */
+
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(moon);
+    entity->setPosition({ -100.f, 340.f });
+
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
+    auto light = xy::Component::create<xy::PointLight>(m_messageBus, 600.f);
+    light->setDepth(200.f);
+    light->setDiffuseColour({ 240u, 255u, 255u });
+    
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(light);
+    m_lightEntity = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }
