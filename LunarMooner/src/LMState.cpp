@@ -31,14 +31,22 @@ source distribution.
 #include <LMSoundPlayer.hpp>
 #include <CommandIds.hpp>
 
+#include <BGScoreboardMask.hpp>
+#include <BGPlanetDrawable.hpp>
+#include <BGNormalBlendShader.hpp>
+#include <BGStarfield.hpp>
+
 #include <xygine/App.hpp>
 #include <xygine/Assert.hpp>
 #include <xygine/Reports.hpp>
 #include <xygine/PostChromeAb.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/components/ParticleController.hpp>
+#include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/shaders/NormalMapped.hpp>
 
 #include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 namespace
 {
@@ -82,6 +90,8 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     initGameController(playerCount);
     initSounds();
     initParticles();
+
+    buildBackground();
 
     xy::Stats::clear();
     m_reportText.setFont(m_fontResource.get("game_state_81"));
@@ -274,6 +284,9 @@ namespace
     bool lastJoyRight = false;
     bool lastPovLeft = false;
     bool lastPovRight = false;
+
+    //ewwww we've copied this from game controller
+    const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
 }
 
 void LunarMoonerState::parseControllerInput()
@@ -463,4 +476,30 @@ void LunarMoonerState::initParticles()
     xy::ParticleSystem::Definition pd;
     pd.loadFromFile("assets/particles/small_explosion.xyp", m_textureResource);
     pc->addDefinition(LMParticleID::SmallExplosion, pd);
+}
+
+void LunarMoonerState::buildBackground()
+{
+    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_SPECULAR);
+    m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
+    
+    //background
+    auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_textureResource);   
+    auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea);
+
+    m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
+    m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(scoreMask);
+
+    auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, alienArea.width);
+    moon->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
+    moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal.png"));
+    moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    moon->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
+    moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
+    moon->setNormalShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
+
+    auto entity = xy::Entity::create(m_messageBus);
+    entity->setPosition(960.f - (alienArea.width / 2.f), 700.f);
+    entity->addComponent(moon);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 }

@@ -34,6 +34,7 @@ source distribution.
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
 #include <xygine/Resource.hpp>
+#include <xygine/ShaderResource.hpp>
 
 #include <SFML/Graphics/Text.hpp>
 
@@ -60,6 +61,7 @@ private:
     xy::FontResource m_fontResource;
     xy::SoundResource m_soundResource;
     xy::TextureResource m_textureResource;
+    xy::ShaderResource m_shaderResource;
 
     sf::Text m_reportText;
 
@@ -71,6 +73,8 @@ private:
     void initGameController(sf::Uint8);
     void initSounds();
     void initParticles();
+
+    void buildBackground();
 };
 
 #endif //LUNAR_MOONER_STATE_HPP_

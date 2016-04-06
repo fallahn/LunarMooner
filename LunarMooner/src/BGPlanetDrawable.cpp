@@ -48,23 +48,23 @@ PlanetDrawable::PlanetDrawable(xy::MessageBus& mb, float radius)
 {
     m_renderTexture.create(1024, 1024, 3);
 
-    sf::Vector2f centre(radius, radius);
-    m_vertices.emplace_back(centre);
-    const float pointCount = 40.f;
-    const float step = xy::Util::Const::TAU / pointCount;
-    for (auto i = 0.f; i <= pointCount; ++i)
-    {
-        const float theta = i * step;
-        m_vertices.emplace_back((sf::Vector2f(std::cos(theta), std::sin(theta)) * radius) + centre);
-    }
-
-    //m_vertices =
+    //sf::Vector2f centre(radius, radius);
+    //m_vertices.emplace_back(centre);
+    //const float pointCount = 40.f;
+    //const float step = xy::Util::Const::TAU / pointCount;
+    //for (auto i = 0.f; i <= pointCount; ++i)
     //{
-    //    sf::Vector2f(),
-    //    sf::Vector2f(radius * 2.f, 0.f),
-    //    sf::Vector2f(radius * 2.f, radius * 2.f),
-    //    sf::Vector2f(0.f, radius * 2.f)
-    //};
+    //    const float theta = i * step;
+    //    m_vertices.emplace_back((sf::Vector2f(std::cos(theta), std::sin(theta)) * radius) + centre);
+    //}
+
+    m_vertices =
+    {
+        sf::Vector2f(),
+        sf::Vector2f(radius * 2.f, 0.f),
+        sf::Vector2f(radius * 2.f, radius * 2.f),
+        sf::Vector2f(0.f, radius * 2.f)
+    };
 
     m_localBounds.width = radius * 2.f;
     m_localBounds.height = m_localBounds.width;
@@ -96,8 +96,10 @@ void PlanetDrawable::entityUpdate(xy::Entity& entity, float dt)
     m_prepassShader->setUniform("u_maskTexture", *m_maskTexture);
 
     //update render texture
-    m_renderTexture.clear();
-    //TODO use the sprite to make sure texture is scaled to 1024
+    m_renderTexture.clear(sf::Color::Transparent);
+    //TODO use the sprite to make sure texture is scaled to 1024?
+    //texture size should be irrelevant when using uniform samplers
+    sf::RenderStates states;
     m_renderTexture.draw(sf::Sprite(*m_baseNormal), m_prepassShader);
     m_renderTexture.display();
 }
@@ -118,20 +120,20 @@ void PlanetDrawable::setDiffuseTexture(sf::Texture& t)
 {
     sf::Vector2f size(t.getSize());
 
-    const float diameter = m_radius * 2.f;
-    sf::Vector2f vertSize(diameter, diameter);
+    //const float diameter = m_radius * 2.f;
+    //sf::Vector2f vertSize(diameter, diameter);
 
-    for (auto& v : m_vertices)
-    {
-        const float x = v.position.x / vertSize.x;
-        const float y = v.position.y / vertSize.y;
-        v.texCoords.x = size.x * x;
-        v.texCoords.y = size.y * y;
-    }
+    //for (auto& v : m_vertices)
+    //{
+    //    const float x = v.position.x / vertSize.x;
+    //    const float y = v.position.y / vertSize.y;
+    //    v.texCoords.x = size.x * x;
+    //    v.texCoords.y = size.y * y;
+    //}
 
-    //m_vertices[1].texCoords.x = size.x;
-    //m_vertices[2].texCoords = size;
-    //m_vertices[3].texCoords.y = size.y;
+    m_vertices[1].texCoords.x = size.x;
+    m_vertices[2].texCoords = size;
+    m_vertices[3].texCoords.y = size.y;
 
     m_diffuseTexture = &t;
     m_diffuseTexture->setRepeated(true);
@@ -153,6 +155,24 @@ void PlanetDrawable::setNormalShader(sf::Shader& s)
     m_normalShader = &s;
 }
 
+void PlanetDrawable::setColour(const sf::Color& c)
+{
+    for (auto& v : m_vertices)
+    {
+        v.color = c;
+    }
+}
+
+void PlanetDrawable::setRotationVelocity(const sf::Vector2f& vel)
+{
+    m_textureVelocity = vel;
+}
+
+void PlanetDrawable::setTextureOffset(const sf::Vector2f& offset)
+{
+    m_textureOffset = offset;
+}
+
 //private
 void PlanetDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
@@ -164,8 +184,7 @@ void PlanetDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
     m_normalShader->setUniform("u_diffuseMap", m_renderTexture.getTexture(1));
     m_normalShader->setUniform("u_maskMap", m_renderTexture.getTexture(2));
     
-    //states.blendMode = sf::BlendAlpha;
     states.texture = &m_renderTexture.getTexture(1);
     states.shader = m_normalShader;
-    rt.draw(m_vertices.data(), m_vertices.size(), sf::TrianglesFan, states);
+    rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 }

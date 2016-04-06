@@ -604,18 +604,9 @@ void GameController::spawnAliens()
 
 void GameController::createTerrain()
 {
-    auto backgroundDrawable = xy::Component::create<xy::SfDrawableComponent<sf::Sprite>>(getMessageBus());
-    backgroundDrawable->getDrawable().setTexture(m_textureResource.get("assets/images/background.png"));
-
-    auto entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(alienArea.left, 0.f);
-    entity->addComponent(backgroundDrawable);
-
-    m_scene.addEntity(entity, xy::Scene::BackRear);
-
     //walls
     auto collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ 40.f, 1080.f } }, lm::CollisionComponent::ID::Bounds);
-    entity = xy::Entity::create(getMessageBus());
+    auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
     entity->setPosition(alienArea.left - 40.f, 0.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);

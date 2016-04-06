@@ -447,7 +447,7 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
     {
         //TODO we're transforming 2 of the points twice here
         const auto& transform = entity.getTransform();
-        for (auto i = 1; i < m_collisionSegments.size(); ++i)
+        for (auto i = 1u; i < m_collisionSegments.size(); ++i)
         {
             auto a1 = transform.transformPoint(m_collisionSegments[i - 1]);
             auto a2 = transform.transformPoint(m_collisionSegments[i]);

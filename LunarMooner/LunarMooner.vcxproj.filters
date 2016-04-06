@@ -114,6 +114,12 @@
     <ClInclude Include="include\LMSoundPlayer.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\BGScoreboardMask.hpp">
+      <Filter>Header Files\background</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BGStarfield.hpp">
+      <Filter>Header Files\background</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -193,6 +199,12 @@
     </ClCompile>
     <ClCompile Include="src\LMSoundPlayer.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BGScoreMask.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BGStarField.cpp">
+      <Filter>Source Files\background</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
