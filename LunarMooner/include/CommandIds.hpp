@@ -90,6 +90,7 @@ struct LMStateEvent
         RoundBegin,
         RoundEnd,
         CountDownStarted,
+        CountDownInProgress,
         CountDownWarning
     }type;
 };
@@ -121,7 +122,8 @@ enum LMSoundID
     Nuke,
     StrikeWarning,
     NukeWarning,
-    NukeWarning30
+    NukeWarning30,
+    NukeWarning5
 };
 
 #endif //COMMAND_IDS_HPP_

@@ -327,6 +327,12 @@ void GameController::entityUpdate(xy::Entity&, float dt)
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownStarted;
         }
+        else if (oldTime > 5 &&
+            m_playerStates[m_currentPlayer].timeRemaining <= 5)
+        {
+            auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+            msg->type = LMStateEvent::CountDownInProgress;
+        }
         else if (oldTime > 0 &&
             m_playerStates[m_currentPlayer].timeRemaining == 0)
         {
@@ -659,6 +665,11 @@ void GameController::createTerrain()
 
     entity = xy::Entity::create(getMessageBus());
     m_terrain = entity->addComponent(terrain);
+
+    auto terrainSprite = xy::Component::create<xy::SfDrawableComponent<sf::Sprite>>(getMessageBus());
+    terrainSprite->getDrawable().setTexture(m_textureResource.get("assets/images/game/terrain.png"));
+    terrainSprite->getDrawable().setPosition(alienArea.left, 754.f); //bleh really need to tidy some shit
+    entity->addComponent(terrainSprite);
 
     //TEMP
     auto shieldDrawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());

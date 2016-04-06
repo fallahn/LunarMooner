@@ -46,8 +46,8 @@ PlanetDrawable::PlanetDrawable(xy::MessageBus& mb, float radius)
     m_normalShader  (nullptr),
     m_radius        (radius)
 {
-    m_renderTexture.create(1024, 1024, 3);
-
+    m_renderTexture.create(2048, 2048, 3);
+    
     //sf::Vector2f centre(radius, radius);
     //m_vertices.emplace_back(centre);
     //const float pointCount = 40.f;
@@ -100,7 +100,7 @@ void PlanetDrawable::entityUpdate(xy::Entity& entity, float dt)
     //TODO use the sprite to make sure texture is scaled to 1024?
     //texture size should be irrelevant when using uniform samplers
     sf::RenderStates states;
-    m_renderTexture.draw(sf::Sprite(*m_baseNormal), m_prepassShader);
+    m_renderTexture.draw(sf::Sprite(*m_detailNormal), m_prepassShader);
     m_renderTexture.display();
 }
 

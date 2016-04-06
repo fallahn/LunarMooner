@@ -75,15 +75,15 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 bool MenuBackgroundState::update(float dt)
 {
     //update lighting
-    /*auto mousePos = getContext().appInstance.getMouseWorldPosition();
-    m_lightEntity->setPosition(mousePos);
+    /*auto mousePos = getContext().appInstance.getMouseWorldPosition();*/
+    m_lightEntity->setPosition(/*mousePos*/960.f, 540.f);
     auto light = m_lightEntity->getComponent<xy::PointLight>();
 
     m_normalMapShader->setUniform("u_pointLightPositions[0]", light->getWorldPosition());
     m_normalMapShader->setUniform("u_pointLights[0].intensity", light->getIntensity());
     m_normalMapShader->setUniform("u_pointLights[0].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
     m_normalMapShader->setUniform("u_pointLights[0].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
-    m_normalMapShader->setUniform("u_pointLights[0].inverseRange", light->getInverseRange());*/
+    m_normalMapShader->setUniform("u_pointLights[0].inverseRange", light->getInverseRange());
 
 
     m_scene.update(dt);
@@ -160,12 +160,13 @@ void MenuBackgroundState::setup()
 
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
-    auto light = xy::Component::create<xy::PointLight>(m_messageBus, 600.f);
-    light->setDepth(200.f);
-    light->setDiffuseColour({ 240u, 255u, 255u });
+    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f);
+    lc->setDepth(700.f);
+    lc->setDiffuseColour({ 240u, 255u, 255u });
     
     entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(light);
+    entity->setPosition(1160.f, 340.f);
+    entity->addComponent(lc);
     m_lightEntity = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }
 
