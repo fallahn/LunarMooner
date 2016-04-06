@@ -35,6 +35,8 @@ source distribution.
 #include <xygine/Scene.hpp>
 #include <xygine/ShaderResource.hpp>
 
+#include <SFML/Graphics/Sprite.hpp>
+
 namespace xy
 {
     class MessageBus;
@@ -68,6 +70,9 @@ private:
     xy::Entity* m_lightEntity;
 
     void setup();
+
+    sf::Sprite m_loadingSprite;
+    void updateLoadingScreen(float, sf::RenderWindow&) override;
 };
 
 #endif //LM_BACKGROUND_STATE_HPP_

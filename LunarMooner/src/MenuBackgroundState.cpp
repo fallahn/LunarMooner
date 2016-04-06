@@ -38,7 +38,6 @@ source distribution.
 #include <xygine/shaders/NormalMapped.hpp>
 #include <xygine/PostBloom.hpp>
 
-#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Window/Mouse.hpp>
 
 MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
@@ -48,6 +47,10 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     m_normalMapShader   (nullptr),
     m_lightEntity       (nullptr)
 {
+    m_loadingSprite.setTexture(m_textureResource.get("assets/images/ui/loading.png"));
+    m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
+    m_loadingSprite.setPosition(m_loadingSprite.getOrigin());
+
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
     //auto pp = xy::PostProcess::create<xy::PostBloom>();
@@ -164,4 +167,10 @@ void MenuBackgroundState::setup()
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(light);
     m_lightEntity = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+}
+
+void MenuBackgroundState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
+{
+    m_loadingSprite.rotate(1440.f * dt);
+    rw.draw(m_loadingSprite);
 }

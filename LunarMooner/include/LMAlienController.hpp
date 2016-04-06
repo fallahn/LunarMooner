@@ -52,6 +52,7 @@ namespace lm
         sf::FloatRect m_playArea;
         sf::Vector2f m_velocity;
         float m_speed;
+        float m_rotation;
 
         xy::Entity* m_entity;
 
