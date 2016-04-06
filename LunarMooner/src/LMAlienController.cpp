@@ -44,6 +44,7 @@ AlienController::AlienController(xy::MessageBus& mb, const sf::FloatRect& playAr
     : xy::Component (mb, this),
     m_playArea      (playArea),
     m_speed         (xy::Util::Random::value(0.f, maxVelocity)),
+    m_rotation      (xy::Util::Random::value(-40.f, 40.f)),
     m_entity        (nullptr)
 {
     m_velocity.x = xy::Util::Random::value(-maxVelocity, maxVelocity);
@@ -55,6 +56,7 @@ AlienController::AlienController(xy::MessageBus& mb, const sf::FloatRect& playAr
 void AlienController::entityUpdate(xy::Entity& entity, float dt)
 {
     entity.move(m_velocity * m_speed * dt);
+    entity.rotate(m_rotation * dt);
 
     auto position = entity.getPosition();
     if (position.y < m_playArea.top)

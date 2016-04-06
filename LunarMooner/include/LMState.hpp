@@ -37,6 +37,7 @@ source distribution.
 #include <xygine/ShaderResource.hpp>
 
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 class LunarMoonerState final : public xy::State
 {
@@ -75,6 +76,9 @@ private:
     void initParticles();
 
     void buildBackground();
+
+    sf::Sprite m_loadingSprite;
+    void updateLoadingScreen(float, sf::RenderWindow&) override;
 };
 
 #endif //LUNAR_MOONER_STATE_HPP_

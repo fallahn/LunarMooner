@@ -46,7 +46,6 @@ source distribution.
 #include <xygine/shaders/NormalMapped.hpp>
 
 #include <SFML/Window/Event.hpp>
-#include <SFML/Graphics/Sprite.hpp>
 
 namespace
 {
@@ -77,6 +76,11 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_useController     (false)
 {
     XY_ASSERT(playerCount > 0, "Need at least one player");
+
+    m_loadingSprite.setTexture(m_textureResource.get("assets/images/ui/loading.png"));
+    m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
+    m_loadingSprite.setPosition(m_loadingSprite.getOrigin());
+
     launchLoadingScreen();
     
     m_scene.setView(context.defaultView);
@@ -502,4 +506,10 @@ void LunarMoonerState::buildBackground()
     entity->setPosition(960.f - (alienArea.width / 2.f), 700.f);
     entity->addComponent(moon);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+}
+
+void LunarMoonerState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
+{
+    m_loadingSprite.rotate(1440.f * dt);
+    rw.draw(m_loadingSprite);
 }
