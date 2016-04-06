@@ -35,7 +35,7 @@ using namespace lm;
 MothershipController::MothershipController(xy::MessageBus& mb, sf::Vector2f travelAmount)
     : xy::Component (mb, this),
     m_bounds        (travelAmount),
-    m_speed         (140.f)
+    m_speed         (110.f)
 {
     m_velocity.x = (xy::Util::Random::value(0, 1) == 0) ? 1.f : -1.f;
 }

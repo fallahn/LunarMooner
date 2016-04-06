@@ -29,6 +29,7 @@ source distribution.
 
 #include <xygine/util/Math.hpp>
 #include <xygine/util/Random.hpp>
+#include <xygine/util/Vector.hpp>
 #include <xygine/Resource.hpp>
 
 #include <SFML/Graphics/Texture.hpp>
@@ -42,22 +43,21 @@ namespace
     const std::string fragShader =
         "#version 120\n"
         "uniform sampler2D u_texture;\n"
-        "uniform float u_offset;\n"
+        "uniform vec2 u_offset;\n"
         
         "void main()\n"
         "{\n"
-        "    vec2 coord = gl_TexCoord[0].xy;\n"
-        "    coord.x += u_offset;\n"
-        "    gl_FragColor = texture2D(u_texture, coord);\n"
+        "    gl_FragColor = texture2D(u_texture, gl_TexCoord[0].xy + u_offset);\n"
         "}\n";
 
-    const float speed = 0.006f;
+    const float backgroundSpeed = 0.006f;
+    const float starSpeed = -6.5f;
     const sf::Uint8 maxStars = 40u;
 }
 
 Starfield::Starfield(xy::MessageBus& mb, xy::TextureResource& tr)
     : xy::Component     (mb, this),
-    m_position          (0.f),
+    m_velocity          (1.f, 0.f),
     m_starTexture       (&tr.get("assets/images/background/star.png"))
 {
     auto& texture = tr.get("assets/images/background/background.png");
@@ -82,16 +82,30 @@ Starfield::Starfield(xy::MessageBus& mb, xy::TextureResource& tr)
 //public
 void Starfield::entityUpdate(xy::Entity&, float dt)
 {
-    m_position += dt * speed;    
+    m_position += m_velocity * dt * backgroundSpeed;    
     
     m_vertices.clear();
     for (auto& s : m_stars)
     {
-        s.move(-6.5f * dt * s.depth, 0.f);
+        s.move(m_velocity * starSpeed * dt * s.depth);
 
-        if (s.getPosition().x < -10.f)
+        auto pos = s.getPosition();
+        if (pos.x < -10.f)
         {
             s.move(1940.f, 0.f);
+        }
+        else if (pos.x > 1930.f)
+        {
+            s.move(-1940.f, 0.f);
+        }
+
+        if (pos.y < -10.f)
+        {
+            s.move(0.f, 1100.f);
+        }
+        else if (pos.y > 1090.f)
+        {
+            s.move(0.f, -1000.f);
         }
 
         const auto& t = s.getTransform();
@@ -101,6 +115,11 @@ void Starfield::entityUpdate(xy::Entity&, float dt)
             m_vertices.push_back({ t.transformPoint(p), p * 8.f });
         }
     }
+}
+
+void Starfield::setVelocity(const sf::Vector2f& vel)
+{
+    m_velocity = xy::Util::Vector::normalise(vel);
 }
 
 //private

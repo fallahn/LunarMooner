@@ -49,7 +49,6 @@ namespace lm
         const std::vector<sf::Vector2f>& getChain() const { return m_chain; }
 
     private:
-        
         std::vector<sf::Vector2f> m_chain;
         std::vector<sf::Vertex> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;

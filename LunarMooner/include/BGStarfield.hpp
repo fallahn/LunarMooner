@@ -54,6 +54,8 @@ namespace lm
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
+        void setVelocity(const sf::Vector2f&);
+
     private:
 
         struct Star final : public sf::Transformable
@@ -69,7 +71,8 @@ namespace lm
         };
         std::vector<Star> m_stars;
 
-        float m_position;
+        sf::Vector2f m_position;
+        sf::Vector2f m_velocity;
         mutable sf::Shader m_shader;
         sf::Sprite m_backgroundSprite;
         sf::Texture* m_starTexture;

@@ -74,6 +74,9 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, xy::FontResource& fr, std::vector
 
     m_messageText.setFont(font);
     m_messageText.setCharacterSize(80u);
+    m_messageText.setFillColor(sf::Color::Yellow);
+    m_messageText.setOutlineColor(sf::Color::Red);
+    m_messageText.setOutlineThickness(2.f);
 
     XY_ASSERT(ps.size() <= 4, "Currently only supporting 4 player display");
     for (auto i = 0u; i < ps.size(); ++i)
