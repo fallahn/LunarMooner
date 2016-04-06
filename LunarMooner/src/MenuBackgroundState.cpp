@@ -28,6 +28,7 @@ source distribution.
 #include <MenuBackgroundState.hpp>
 #include <BGNormalBlendShader.hpp>
 #include <BGPlanetDrawable.hpp>
+#include <BGStarfield.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/Entity.hpp>
@@ -71,7 +72,7 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 bool MenuBackgroundState::update(float dt)
 {
     //update lighting
-    auto mousePos = getContext().appInstance.getMouseWorldPosition();
+    /*auto mousePos = getContext().appInstance.getMouseWorldPosition();
     m_lightEntity->setPosition(mousePos);
     auto light = m_lightEntity->getComponent<xy::PointLight>();
 
@@ -79,7 +80,7 @@ bool MenuBackgroundState::update(float dt)
     m_normalMapShader->setUniform("u_pointLights[0].intensity", light->getIntensity());
     m_normalMapShader->setUniform("u_pointLights[0].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
     m_normalMapShader->setUniform("u_pointLights[0].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
-    m_normalMapShader->setUniform("u_pointLights[0].inverseRange", light->getInverseRange());
+    m_normalMapShader->setUniform("u_pointLights[0].inverseRange", light->getInverseRange());*/
 
 
     m_scene.update(dt);
@@ -116,17 +117,19 @@ void MenuBackgroundState::handleMessage(const xy::Message& msg)
 //private
 void MenuBackgroundState::setup()
 {
-    auto background = xy::Component::create<xy::SfDrawableComponent<sf::Sprite>>(m_messageBus);
-    background->getDrawable().setTexture(m_textureResource.get("assets/images/background/background.png"));
+    auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_textureResource);
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
     
     auto planet = xy::Component::create<lm::PlanetDrawable>(m_messageBus, 200.f);
     planet->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
-    planet->setDetailNormal(m_textureResource.get("assets/images/background/lava_normal.png"));
-    planet->setDiffuseTexture(m_textureResource.get("assets/images/background/lava_diffuse.png"));
-    planet->setMaskTexture(m_textureResource.get("assets/images/background/lava_mask.png"));
+    planet->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal.png"));
+    planet->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    planet->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
     planet->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
     planet->setNormalShader(*m_normalMapShader);
+    planet->setRotationVelocity({ -0.005f, 0.006f });
+    planet->setTextureOffset({ 0.65f, 1.2f });
+    planet->setColour({ 83u, 94u, 52u });
 
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(planet);

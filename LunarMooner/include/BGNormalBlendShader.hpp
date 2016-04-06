@@ -68,12 +68,15 @@ namespace lm
 
         "uniform vec2 u_detailOffset = vec2(0.0);\n"
 
+        "const float maxDist = 0.49 * 0.49;\n"
+
         "void main()\n"
         "{\n"
-        /*"    float dist = distance(vec2(0.5), gl_TexCoord[0].xy);\n"
-        
-        "    if(dist > 0.49) discard;"*/
-        
+        "    vec2 dir = vec2(0.5) - gl_TexCoord[0].xy;\n"
+        "    float dist = dot(dir, dir);\n"
+        "    float alpha = 1.0;\n"
+        "    if(dist > maxDist) discard;\n"
+
         "    vec3 distortionVector = texture2D(u_distortionTexture, gl_TexCoord[0].xy).rgb * 2.0 + vec3(-1.0, -1.0, 0.0);\n"
         "    vec2 textureOffset = u_detailOffset + (distortionVector.rg * 0.35);\n"
 
@@ -84,7 +87,6 @@ namespace lm
         "    gl_FragData[0] = vec4(blendedNormal, 1.0);\n"
         "    gl_FragData[1] = texture2D(u_diffuseTexture, gl_TexCoord[0].xy + textureOffset);\n"
         "    gl_FragData[2] = texture2D(u_maskTexture, gl_TexCoord[0].xy + textureOffset);\n"
-        
         "}\n";
 }
 

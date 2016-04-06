@@ -25,67 +25,58 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_PLANET_HPP_
-#define LM_PLANET_HPP_
+#ifndef LM_STARFIELD_HPP_
+#define LM_STARFIELD_HPP_
 
 #include <xygine/components/Component.hpp>
-#include <xygine/MultiRenderTexture.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 #include <vector>
+#include <array>
+
+namespace xy
+{
+    class TextureResource;
+}
 
 namespace lm
 {
-    class PlanetDrawable final : public sf::Drawable, public xy::Component
+    class Starfield final : public xy::Component, public sf::Drawable
     {
     public:
-        PlanetDrawable(xy::MessageBus&, float);
-        ~PlanetDrawable() = default;
+        Starfield(xy::MessageBus&, xy::TextureResource&);
+        ~Starfield() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
-        sf::FloatRect globalBounds() const override
-        {
-            return m_globalBounds;
-        }
-
-        void setBaseNormal(sf::Texture&);
-        void setDetailNormal(sf::Texture&);
-        void setDiffuseTexture(sf::Texture&);
-        void setMaskTexture(sf::Texture&);
-
-        void setPrepassShader(sf::Shader&);
-        void setNormalShader(sf::Shader&);
-
-        void setColour(const sf::Color&);
-        void setRotationVelocity(const sf::Vector2f&);
-        void setTextureOffset(const sf::Vector2f&);
-
     private:
 
-        sf::Texture* m_baseNormal;
-        sf::Texture* m_detailNormal;
-        sf::Texture* m_diffuseTexture;
-        sf::Texture* m_maskTexture;
+        struct Star final : public sf::Transformable
+        {
+            std::array<sf::Vector2f, 4u> positions;
+            float depth = 1.f;
+            Star()
+            {
+                positions[1] = { 1.f, 0.f };
+                positions[2] = { 1.f, 1.f };
+                positions[3] = { 0.f, 1.f };
+            }
+        };
+        std::vector<Star> m_stars;
 
-        xy::MultiRenderTexture m_renderTexture;
+        float m_position;
+        mutable sf::Shader m_shader;
+        sf::Sprite m_backgroundSprite;
+        sf::Texture* m_starTexture;
 
-        sf::Shader* m_prepassShader;
-        sf::Shader* m_normalShader;
-
-        sf::Vector2f m_textureOffset;
-        sf::Vector2f m_textureVelocity;
-
-        std::vector<sf::Vertex> m_vertices;
-        float m_radius;
-        sf::FloatRect m_localBounds;
-        sf::FloatRect m_globalBounds;
-
+        std::vector<sf::Vertex> m_vertices;       
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
 
-#endif //LM_PLANET_HPP_
+#endif //LM_STARFIELD_HPP_
