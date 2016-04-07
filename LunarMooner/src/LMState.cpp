@@ -511,7 +511,7 @@ void LunarMoonerState::buildBackground()
     moon->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
     moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
     moon->setNormalShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
-    moon->setRotationVelocity({ 0.f, 0.008f });
+    moon->setRotationVelocity({ 0.f, 0.009f });
 
     auto entity = xy::Entity::create(m_messageBus);
     entity->setPosition(960.f - (moonWidth), 540.f);

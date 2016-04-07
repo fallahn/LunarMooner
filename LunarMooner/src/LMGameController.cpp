@@ -38,6 +38,7 @@ source distribution.
 #include <LMRoundSummary.hpp>
 #include <LMTerrain.hpp>
 #include <LMEarlyWarning.hpp>
+#include <LMShieldDrawable.hpp>
 #include <CommandIds.hpp>
 #include <StateIds.hpp>
 
@@ -672,14 +673,20 @@ void GameController::createTerrain()
     entity->addComponent(terrainSprite);
 
     //TEMP
-    auto shieldDrawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
-    auto& shield = shieldDrawable->getDrawable();
-    shield.setFillColor(sf::Color::Transparent);
-    shield.setOutlineColor(sf::Color(0, 255, 255, 120));
-    shield.setOutlineThickness(4.f);
-    shield.setRadius(3000.f);
-    shield.setOrigin(3000.f, 3000.f);
-    shield.setPosition(960.f, 3700.f);
+    //auto shieldDrawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
+    //auto& shield = shieldDrawable->getDrawable();
+    //shield.setFillColor(sf::Color::Transparent);
+    //shield.setOutlineColor(sf::Color(0, 255, 255, 120));
+    //shield.setOutlineThickness(4.f);
+    //shield.setRadius(3000.f);
+    //shield.setOrigin(3000.f, 3000.f);
+    //shield.setPosition(960.f, 3700.f);
+    //entity->addComponent(shieldDrawable);
+
+    auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);
+    shieldDrawable->setPosition(960.f, 3700.f);
+    shieldDrawable->rotate(-180.f);
+    //shieldDrawable->setScale(0.1f, 0.1f);
     entity->addComponent(shieldDrawable);
 
     auto nukeAudio = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
