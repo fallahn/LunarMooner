@@ -33,6 +33,7 @@ source distribution.
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 #include <array>
 
@@ -47,8 +48,16 @@ namespace lm
         xy::Component::Type type()const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
+        void setTexture(sf::Texture&);
+
     private:
 
+        sf::Shader m_shader; //TODO we ought to resource manage this
+        sf::Vector2f m_textureOffset;
+        std::size_t m_waveTableIndex;
+        std::vector<float> m_wavetable;
+
+        sf::Texture* m_texture;
         std::array<sf::Vertex, 22u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

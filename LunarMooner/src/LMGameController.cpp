@@ -672,20 +672,10 @@ void GameController::createTerrain()
     terrainSprite->getDrawable().setPosition(alienArea.left, 754.f); //bleh really need to tidy some shit
     entity->addComponent(terrainSprite);
 
-    //TEMP
-    //auto shieldDrawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
-    //auto& shield = shieldDrawable->getDrawable();
-    //shield.setFillColor(sf::Color::Transparent);
-    //shield.setOutlineColor(sf::Color(0, 255, 255, 120));
-    //shield.setOutlineThickness(4.f);
-    //shield.setRadius(3000.f);
-    //shield.setOrigin(3000.f, 3000.f);
-    //shield.setPosition(960.f, 3700.f);
-    //entity->addComponent(shieldDrawable);
-
     auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);
     shieldDrawable->setPosition(960.f, 3700.f);
     shieldDrawable->rotate(-180.f);
+    shieldDrawable->setTexture(m_textureResource.get("assets/images/game/shield_noise.png"));
     //shieldDrawable->setScale(0.1f, 0.1f);
     entity->addComponent(shieldDrawable);
 
