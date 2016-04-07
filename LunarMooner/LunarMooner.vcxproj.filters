@@ -120,6 +120,9 @@
     <ClInclude Include="include\BGStarfield.hpp">
       <Filter>Header Files\background</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMShieldDrawable.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -205,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="src\BGStarField.cpp">
       <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMShieldDrawable.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
