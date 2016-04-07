@@ -125,6 +125,7 @@
     <ClInclude Include="include\BGPlanetDrawable.hpp" />
     <ClInclude Include="include\BGScoreboardMask.hpp" />
     <ClInclude Include="include\BGStarfield.hpp" />
+    <ClInclude Include="include\LMLaserSight.hpp" />
     <ClInclude Include="include\LMShieldDrawable.hpp" />
     <ClInclude Include="include\LMSoundPlayer.hpp" />
     <ClInclude Include="include\MenuBackgroundState.hpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="src\BGPlanetDrawable.cpp" />
     <ClCompile Include="src\BGScoreMask.cpp" />
     <ClCompile Include="src\BGStarField.cpp" />
+    <ClCompile Include="src\LMLaserSight.cpp" />
     <ClCompile Include="src\LMShieldDrawable.cpp" />
     <ClCompile Include="src\LMSoundPlayer.cpp" />
     <ClCompile Include="src\MenuBackgroundState.cpp" />

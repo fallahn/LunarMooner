@@ -25,43 +25,31 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_SHIELD_DRAWABLE_HPP_
-#define LM_SHIELD_DRAWABLE_HPP_
+#ifndef LM_LASER_SIGHT_HPP_
+#define LM_LASER_SIGHT_HPP_
 
 #include <xygine/components/Component.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Transformable.hpp>
-#include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/Shader.hpp>
-
-#include <array>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 namespace lm
 {
-    class ShieldDrawable final : public xy::Component, public sf::Transformable, public sf::Drawable
+    class LaserSight final : public xy::Component, public sf::Drawable
     {
     public:
-        ShieldDrawable(xy::MessageBus&, float);
-        ~ShieldDrawable() = default;
+        LaserSight(xy::MessageBus&, float);
+        ~LaserSight() = default;
 
-        xy::Component::Type type()const override { return xy::Component::Type::Drawable; }
+        xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
-        void setTexture(sf::Texture&);
-
     private:
+        sf::RectangleShape m_shape;
+        float m_alpha;
 
-        sf::Shader m_shader; //TODO we ought to resource manage this
-        sf::Vector2f m_textureOffset;
-        std::size_t m_waveTableIndex;
-        std::vector<float> m_wavetable;
-
-        sf::Texture* m_texture;
-        std::array<sf::Vertex, 22u> m_vertices;
-        std::array<sf::Vertex, 11u> m_outline;
-        void draw(sf::RenderTarget&, sf::RenderStates) const override;
+        void draw(sf::RenderTarget&, sf::RenderStates) const;
     };
 }
 
-#endif //LM_SHIELD_DRAWABLE_HPP_
+#endif //LM_LASER_SIGHT_HPP_

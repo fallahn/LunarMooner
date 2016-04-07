@@ -72,7 +72,7 @@ ShieldDrawable::ShieldDrawable(xy::MessageBus& mb, float radius)
     const float endAngle = -startAngle;
     const float step = (startAngle - endAngle) / ((m_vertices.size() / 2) - 1);
 
-    for (auto i = 0u; i < m_vertices.size() - 1; i += 2)
+    for (auto i = 0u, j = 0u; i < m_vertices.size() - 1; i += 2, ++j)
     {
         const float theta = startAngle - ((i / 2) * step);
         const sf::Vector2f position(sin(theta), cos(theta));
@@ -84,6 +84,8 @@ ShieldDrawable::ShieldDrawable(xy::MessageBus& mb, float radius)
         m_vertices[i+1].position = position * radius;
         m_vertices[i+1].texCoords = m_vertices[i+1].position;
         m_vertices[i+1].color = shieldColour;
+
+        m_outline[j] = m_vertices[i+1];
     }
 
     m_shader.loadFromMemory(fragShader, sf::Shader::Fragment);
@@ -122,5 +124,7 @@ void ShieldDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
     states.transform *= getTransform();
     states.texture = m_texture;
     states.shader = &m_shader;
+
     rt.draw(m_vertices.data(), m_vertices.size(), sf::TrianglesStrip, states);
+    rt.draw(m_outline.data(), m_outline.size(), sf::LinesStrip, states);
 }
