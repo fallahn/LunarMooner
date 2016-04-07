@@ -12,6 +12,7 @@ SET(LM_SRC
   ${LM_DIR}/LMEarlyWarning.cpp
   ${LM_DIR}/LMGameController.cpp
   ${LM_DIR}/LMHumanController.cpp
+  ${LM_DIR}/LMLaserSight.cpp
   ${LM_DIR}/LMMothershipController.cpp
   ${LM_DIR}/LMPlayerController.cpp
   ${LM_DIR}/LMPlayerInfoDisplay.cpp

@@ -39,6 +39,7 @@ source distribution.
 #include <LMTerrain.hpp>
 #include <LMEarlyWarning.hpp>
 #include <LMShieldDrawable.hpp>
+#include <LMLaserSight.hpp>
 #include <CommandIds.hpp>
 #include <StateIds.hpp>
 
@@ -486,7 +487,6 @@ void GameController::spawnPlayer()
         entity->addComponent(sfx2);
         entity->addComponent(sfx3);
         entity->addCommandCategories(LMCommandID::Player);
-
         m_scene.addEntity(entity, xy::Scene::BackFront);
 
         m_spawnReady = false;
