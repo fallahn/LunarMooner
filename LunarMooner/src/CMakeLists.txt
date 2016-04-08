@@ -21,6 +21,7 @@ SET(LM_SRC
   ${LM_DIR}/LMShieldDrawable.cpp
   ${LM_DIR}/LMSoundPlayer.cpp
   ${LM_DIR}/LMSpeedMeter.cpp
+  ${LM_DIR}/LMSpriteBatch.cpp
   ${LM_DIR}/LMState.cpp
   ${LM_DIR}/LMTerrain.cpp
   ${LM_DIR}/main.cpp

@@ -128,6 +128,7 @@
     <ClInclude Include="include\LMLaserSight.hpp" />
     <ClInclude Include="include\LMShieldDrawable.hpp" />
     <ClInclude Include="include\LMSoundPlayer.hpp" />
+    <ClInclude Include="include\LMSpriteBatch.hpp" />
     <ClInclude Include="include\MenuBackgroundState.hpp" />
     <ClInclude Include="include\CommandIds.hpp" />
     <ClInclude Include="include\Game.hpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="src\LMLaserSight.cpp" />
     <ClCompile Include="src\LMShieldDrawable.cpp" />
     <ClCompile Include="src\LMSoundPlayer.cpp" />
+    <ClCompile Include="src\LMSpriteBatch.cpp" />
     <ClCompile Include="src\MenuBackgroundState.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameOverState.cpp" />
