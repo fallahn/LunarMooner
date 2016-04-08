@@ -318,12 +318,15 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             if (!m_carrying)
             {
                 //stop and pickup
-                //m_carrying = true;
                 updateState = std::bind(&PlayerController::landedState, this, _1, _2);
+
+                auto position = m_entity->getWorldPosition();
 
                 auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
                 msg->type = LMGameEvent::PlayerLanded;
                 msg->value = cc->getScoreValue();
+                msg->posX = position.x;
+                msg->posY = position.y;
             }
         }
         else

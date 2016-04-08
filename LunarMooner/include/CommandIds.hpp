@@ -123,7 +123,12 @@ enum LMSoundID
     StrikeWarning,
     NukeWarning,
     NukeWarning30,
-    NukeWarning5
+    NukeWarning5,
+    ShipLanded,
+    ShipLaunched,
+    ShieldCollected,
+    AmmoCollected,
+    LifeBonus
 };
 
 #endif //COMMAND_IDS_HPP_

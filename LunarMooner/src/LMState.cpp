@@ -366,6 +366,11 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::NukeWarning, "assets/sound/speech/meltdown.wav");
     soundPlayer->preCache(LMSoundID::NukeWarning30, "assets/sound/speech/meltdown30.wav");
     soundPlayer->preCache(LMSoundID::NukeWarning5, "assets/sound/speech/meltdown5.wav");
+    soundPlayer->preCache(LMSoundID::ShieldCollected, "assets/sound/fx/shield_collected.wav");
+    soundPlayer->preCache(LMSoundID::AmmoCollected, "assets/sound/fx/ammo_collected.wav");
+    soundPlayer->preCache(LMSoundID::ShipLanded, "assets/sound/fx/ship_landed.wav");
+    soundPlayer->preCache(LMSoundID::ShipLaunched, "assets/sound/fx/ship_launched.wav");
+    soundPlayer->preCache(LMSoundID::LifeBonus, "assets/sound/fx/extra_life.wav");
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
@@ -389,6 +394,21 @@ void LunarMoonerState::initSounds()
             break;
         case LMGameEvent::EarlyWarning:
             player->playSound(LMSoundID::StrikeWarning, 960.f, 540.f);
+            break;
+        case LMGameEvent::PlayerLanded:
+            player->playSound(LMSoundID::ShipLanded, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::PlayerSpawned:
+            player->playSound(LMSoundID::ShipLaunched, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::PlayerGotAmmo:
+            player->playSound(LMSoundID::AmmoCollected, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::PlayerGotShield:
+            player->playSound(LMSoundID::ShieldCollected, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::ExtraLife:
+            player->playSound(LMSoundID::LifeBonus, 960.f, 540.f);
             break;
         }
     };
