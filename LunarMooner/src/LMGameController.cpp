@@ -748,7 +748,7 @@ void GameController::addRescuedHuman()
     float width = m_mothership->globalBounds().width;
     width -= 8.f; //4 px padding each end
 
-    const float humanCount = static_cast<float>(humanCounts[std::min(m_playerStates[m_currentPlayer].level - 1u, humanCounts.size() - 1)]);
+    const float humanCount = static_cast<float>(humanCounts[std::min(static_cast<std::size_t>(m_playerStates[m_currentPlayer].level) - 1u, humanCounts.size() - 1)]);
     float offset = width / humanCount;
     const float pad = offset / 2.f;
     offset *= m_playerStates[m_currentPlayer].humansSaved;
@@ -870,7 +870,7 @@ void GameController::restorePlayerState()
     std::size_t count = m_playerStates[m_currentPlayer].humansSaved;
     //we count these out again so adding drawables to mship are spaced correctly
     m_playerStates[m_currentPlayer].humansSaved = 0;
-    for (auto i = 0; i < count; ++i, ++m_playerStates[m_currentPlayer].humansSaved)
+    for (auto i = 0u; i < count; ++i, ++m_playerStates[m_currentPlayer].humansSaved)
     {
         addRescuedHuman();
     }
