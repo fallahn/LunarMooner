@@ -39,10 +39,7 @@ SpriteBatch::SpriteBatch(xy::MessageBus& mb)
     : xy::Component (mb, this),
     m_texture       (nullptr)
 {
-    //temp set global bounds to something drawable
-    //TODO implement updateBounds()
-    m_globalBounds.width = 1920.f;
-    m_globalBounds.height = 1080.f;
+
 }
 
 //public
@@ -56,6 +53,8 @@ void SpriteBatch::entityUpdate(xy::Entity& entity, float)
     }), m_sprites.end());
 
     //rebuild varray
+    m_globalBounds = sf::FloatRect();
+
     m_vertices.clear();
     m_vertices.reserve(m_sprites.size() * 4u);
     for (const auto spr : m_sprites)
@@ -64,13 +63,28 @@ void SpriteBatch::entityUpdate(xy::Entity& entity, float)
         {
             auto vert = p;
             vert.position = spr->m_transform.transformPoint(vert.position);
+
+            //update global bounds
+            if (vert.position.x < m_globalBounds.left)
+            {
+                m_globalBounds.left = vert.position.x;
+            }
+            else if (vert.position.x > m_globalBounds.left + m_globalBounds.width)
+            {
+                m_globalBounds.width = vert.position.x - m_globalBounds.left;
+            }
+            if (vert.position.y < m_globalBounds.top)
+            {
+                m_globalBounds.top = vert.position.y;
+            }
+            else if (vert.position.y > m_globalBounds.top + m_globalBounds.height)
+            {
+                m_globalBounds.height = vert.position.y - m_globalBounds.top;
+            }
+
             m_vertices.push_back(vert);
         }
     }
-
-    //calc bounds
-    updateBounds(); //TODO implement this
-    //m_globalBounds = entity.getWorldTransform().transformRect(m_globalBounds);
 }
 
 std::unique_ptr<Sprite> SpriteBatch::addSprite(xy::MessageBus& mb)
@@ -104,11 +118,6 @@ void SpriteBatch::setTexture(const sf::Texture* t)
 }
 
 //private
-void SpriteBatch::updateBounds()
-{
-
-}
-
 void SpriteBatch::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.texture = m_texture;

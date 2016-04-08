@@ -61,7 +61,6 @@ namespace lm
 
         sf::FloatRect m_globalBounds;
 
-        void updateBounds();
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 

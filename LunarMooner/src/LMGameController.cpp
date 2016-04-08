@@ -557,6 +557,7 @@ namespace
         drawable->getDrawable().setRadius(10.f);
         drawable->getDrawable().setFillColor(sf::Color::Blue);
         drawable->getDrawable().setScale(1.f, 1.4f);
+        drawable->getDrawable().setOrigin(drawable->getDrawable().getGlobalBounds().width / 2.f, 0.f);
         return std::move(drawable);
     }
 }
@@ -743,14 +744,17 @@ void GameController::createTerrain()
 void GameController::addRescuedHuman()
 {
     auto drawable = getHumanDrawable(getMessageBus());
-
+    
     float width = m_mothership->globalBounds().width;
     width -= 8.f; //4 px padding each end
 
-    float offset = width / static_cast<float>(humanCounts[std::min(m_playerStates[m_currentPlayer].level, static_cast<sf::Uint8>(humanCounts.size() - 1))]);
+    const float humanCount = static_cast<float>(humanCounts[std::min(m_playerStates[m_currentPlayer].level, static_cast<sf::Uint8>(humanCounts.size() - 1))]);
+    float offset = width / humanCount;
+    const float pad = offset / 2.f;
+    
     offset *= m_playerStates[m_currentPlayer].humansSaved;
     auto entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(offset + 4.f, 24.f);
+    entity->setPosition(pad + offset + 4.f, 24.f);
     entity->addComponent(drawable);
     m_mothership->addChild(entity);
 }
@@ -863,7 +867,10 @@ void GameController::restorePlayerState()
     auto& children = m_mothership->getChildren();
     for (auto& c : children) c->destroy();
     //and restore from state
-    for (auto i = 0; i < m_playerStates[m_currentPlayer].humansSaved; ++i)
+    std::size_t count = m_playerStates[m_currentPlayer].humansSaved;
+    //we count these out again so adding drawables to mship are spaced correctly
+    m_playerStates[m_currentPlayer].humansSaved = 0;
+    for (auto i = 0; i < count; ++i, ++m_playerStates[m_currentPlayer].humansSaved)
     {
         addRescuedHuman();
     }

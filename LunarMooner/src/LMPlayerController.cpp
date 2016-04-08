@@ -454,15 +454,19 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
 
             //TODO we could improve this by partitioning segments
             //and only testing nearest to player
+            bool collided = false;
             for (auto j = 1u; j < m_terrain.size(); ++j)
             {
-                if (collides(a1, a2, m_terrain[j - 1], m_terrain[j]))
+                if (collided = collides(a1, a2, m_terrain[j - 1], m_terrain[j]))
                 {
                     m_entity->destroy();
                     broadcastDeath();
                     break;
                 }
             }
+            //don't test the rest of the player segments
+            //else we get more than one collision event
+            if (collided) break;
         }
     }
 }
