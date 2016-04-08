@@ -49,9 +49,10 @@ namespace lm
         ~ScoreDisplay() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
-        //TODO measure this and only update when values change if needs be
+        
         void entityUpdate(xy::Entity&, float) override; 
 
+        void setPlayerActive(std::size_t);
         void showMessage(const std::string&);
         void showScore(sf::Uint16, const sf::Vector2f&, sf::Color = sf::Color::Yellow);
 

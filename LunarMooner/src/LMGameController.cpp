@@ -173,6 +173,8 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             break;
         case LMGameEvent::PlayerLanded:
         {
+            if (!m_player) break;
+
             auto pos = m_player->getPosition();
 
             //get nearest human
@@ -791,6 +793,8 @@ void GameController::createUI()
     m_scoreDisplay = entity->addComponent(scores);
 
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
+
+    m_scoreDisplay->setPlayerActive(m_currentPlayer);
 }
 
 void GameController::storePlayerState()
@@ -898,6 +902,9 @@ void GameController::restorePlayerState()
             ps.timeRemaining = roundTimes.back() - ((ps.level - 10) * 2.f);
         }
     }
+
+    //update display
+    m_scoreDisplay->setPlayerActive(m_currentPlayer);
 }
 
 void GameController::moveToNextRound()
@@ -1014,11 +1021,17 @@ void GameController::addDelayedRespawn()
 
 void GameController::spawnEarlyWarning(const sf::Vector2f& dest)
 {
-    auto ew = xy::Component::create<EarlyWarning>(getMessageBus(), dest);
+    auto laser = xy::Component::create<LaserSight>(getMessageBus(), (dest.x < 960.f) ? 45.f : 135.f);
+    auto laserEnt = xy::Entity::create(getMessageBus());
+    laserEnt->addComponent(laser);
+    laserEnt->setWorldPosition(dest);
+    m_scene.addEntity(laserEnt, xy::Scene::Layer::BackFront);
+    
+    /*auto ew = xy::Component::create<EarlyWarning>(getMessageBus(), dest);
     auto ent = xy::Entity::create(getMessageBus());
     ent->addComponent(ew);
     ent->setPosition(960.f, 0.f);
-    m_scene.addEntity(ent, xy::Scene::Layer::UI);
+    m_scene.addEntity(ent, xy::Scene::Layer::UI);*/
 
     auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
     msg->type = LMGameEvent::EarlyWarning;

@@ -136,6 +136,19 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
     }), m_scoreTags.end());
 }
 
+void ScoreDisplay::setPlayerActive(std::size_t idx)
+{
+    XY_ASSERT(idx < m_playerTexts.size(), "Index out of range");
+    for (auto & p : m_playerTexts)
+    {
+        p.setFillColor(sf::Color::Yellow);
+        p.setOutlineThickness(1.f);
+        p.setOutlineColor(sf::Color::Red);
+    }
+    m_playerTexts[idx].setFillColor(sf::Color::White);    
+    m_playerTexts[idx].setOutlineThickness(0.f);
+}
+
 void ScoreDisplay::showMessage(const std::string& msg)
 {
     m_messageText.setString(msg);
