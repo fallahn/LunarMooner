@@ -54,6 +54,7 @@ namespace lm
     class SpeedMeter;
     class ScoreDisplay;
     class Terrain;
+    class SpriteBatch;
     class GameController final : public xy::Component
     {
     public:
@@ -108,6 +109,7 @@ namespace lm
         std::list<DelayedEvent> m_delayedEvents;
 
         std::vector<xy::Entity*> m_aliens;
+        SpriteBatch* m_alienBatch;
         void spawnAlien(const sf::Vector2f&);
         void spawnAliens();
 

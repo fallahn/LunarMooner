@@ -40,6 +40,7 @@ source distribution.
 #include <LMEarlyWarning.hpp>
 #include <LMShieldDrawable.hpp>
 #include <LMLaserSight.hpp>
+#include <LMSpriteBatch.hpp>
 #include <CommandIds.hpp>
 #include <StateIds.hpp>
 
@@ -116,6 +117,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_timeRound         (false),
     m_mothership        (nullptr),
     m_terrain           (nullptr),
+    m_alienBatch        (nullptr),
     m_speedMeter        (nullptr),
     m_scoreDisplay      (nullptr),
     m_currentPlayer     (0),
@@ -274,6 +276,12 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
 
     m_playerSounds.insert(std::make_pair(LMSoundID::Engine, m_soundResource.get("assets/sound/fx/thrust.wav")));
     m_playerSounds.insert(std::make_pair(LMSoundID::RCS, m_soundResource.get("assets/sound/fx/rcs.wav")));
+
+    //create sprite batch for aliens
+    auto sprBatch = xy::Component::create<SpriteBatch>(getMessageBus());
+    auto ent = xy::Entity::create(getMessageBus());
+    m_alienBatch = ent->addComponent(sprBatch);
+    m_scene.addEntity(ent, xy::Scene::Layer::BackMiddle);
 }
 
 //public
@@ -415,6 +423,8 @@ void GameController::addPlayer()
 
 void GameController::start()
 {
+    
+    
     createTerrain();
     createMothership();
     spawnAliens();
@@ -578,9 +588,9 @@ void GameController::spawnAlien(const sf::Vector2f& position)
 {
     auto size = alienSizes[xy::Util::Random::value(0, alienSizes.size() - 1)];
 
-    auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    drawable->getDrawable().setFillColor(sf::Color::Red);
-    drawable->getDrawable().setSize({ size.width, size.height });
+    auto drawable = m_alienBatch->addSprite(getMessageBus());
+    drawable->setTextureRect(size);
+    drawable->setColour(sf::Color::Red);
 
     auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
 
