@@ -748,11 +748,11 @@ void GameController::addRescuedHuman()
     float width = m_mothership->globalBounds().width;
     width -= 8.f; //4 px padding each end
 
-    const float humanCount = static_cast<float>(humanCounts[std::min(m_playerStates[m_currentPlayer].level, static_cast<sf::Uint8>(humanCounts.size() - 1))]);
+    const float humanCount = static_cast<float>(humanCounts[std::min(m_playerStates[m_currentPlayer].level - 1u, humanCounts.size() - 1)]);
     float offset = width / humanCount;
     const float pad = offset / 2.f;
-    
     offset *= m_playerStates[m_currentPlayer].humansSaved;
+
     auto entity = xy::Entity::create(getMessageBus());
     entity->setPosition(pad + offset + 4.f, 24.f);
     entity->addComponent(drawable);

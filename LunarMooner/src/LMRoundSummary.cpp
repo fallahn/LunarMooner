@@ -44,9 +44,7 @@ namespace
     const sf::Uint16 timeBonus = 12; //TODO adjust this it might be a bit conservative with current times (also see below)
 
     //all the bonus values must be divisible by this! :D
-    const sf::Uint16 updateStep = 4; 
-
-    const sf::Uint32 extraLifeValue = 7500;
+    const sf::Uint16 updateStep = 4;
 }
 
 RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResource& tr, xy::FontResource& fr, bool doScores)
@@ -79,9 +77,9 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResou
         m_mainText.setPosition(600.f, 200.f);
         m_mainText.setCharacterSize(50u);
 
-        m_okText.setFillColor(sf::Color::Magenta);
+        m_okText.setFillColor(sf::Color::Yellow);
         m_okText.setOutlineThickness(2.f);
-        m_okText.setOutlineColor(sf::Color(255, 127, 0));
+        m_okText.setOutlineColor(sf::Color::Red);
         m_okText.setFont(fr.get("round_summary_72"));
         m_okText.setCharacterSize(80u);
         m_okText.setPosition(960.f, 660.f);
@@ -94,7 +92,6 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResou
 void RoundSummary::entityUpdate(xy::Entity&, float dt)
 {
     //animate round summary
-    //we get a bonus for each human saved, and an extra life every 5000 points
     if (!m_summaryComplete)
     {
         
