@@ -44,11 +44,11 @@ LaserSight::LaserSight(xy::MessageBus& mb, float rotation)
     :xy::Component  (mb, this),
     m_alpha         (1.f)
 {
-    m_shape.setFillColor({ 255u, 10u, 10u, initialAlphaFill });
-    m_shape.setOutlineColor({ 105u, 0u, 0u, initialAlphaOutline });
-    m_shape.setOutlineThickness(1.f);
-    m_shape.setSize({ 1600.f, 2.f });
-    m_shape.setOrigin(0.f, 1.f);
+    m_shape.setFillColor({ 255u, 20u, 20u, initialAlphaFill });
+    m_shape.setOutlineColor({ 125u, 0u, 0u, initialAlphaOutline });
+    m_shape.setOutlineThickness(2.f);
+    m_shape.setSize({ 1600.f, 3.f });
+    m_shape.setOrigin(0.f, 1.5f);
     m_shape.setRotation(rotation);
 }
 

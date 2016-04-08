@@ -44,6 +44,8 @@ namespace lm
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
+        sf::FloatRect globalBounds() const { return m_shape.getGlobalBounds(); }
+
     private:
         sf::RectangleShape m_shape;
         float m_alpha;
