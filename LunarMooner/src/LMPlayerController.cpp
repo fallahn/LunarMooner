@@ -472,7 +472,7 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
             bool collided = false;
             for (auto j = 1u; j < m_terrain.size(); ++j)
             {
-                if (collided = collides(a1, a2, m_terrain[j - 1], m_terrain[j]))
+                if ((collided = collides(a1, a2, m_terrain[j - 1], m_terrain[j])))
                 {
                     m_entity->destroy();
                     broadcastDeath();

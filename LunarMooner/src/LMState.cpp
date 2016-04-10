@@ -43,7 +43,7 @@ source distribution.
 #include <xygine/util/Random.hpp>
 #include <xygine/components/ParticleController.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
-#include <xygine/Components/AudioSource.hpp>
+#include <xygine/components/AudioSource.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 
 #include <SFML/Window/Event.hpp>
