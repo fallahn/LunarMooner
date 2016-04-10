@@ -29,6 +29,7 @@ source distribution.
 #include <Game.hpp>
 
 #include <xygine/Resource.hpp>
+#include <xygine/util/Math.hpp>
 
 using namespace lm;
 
@@ -42,7 +43,7 @@ SoundPlayer::SoundPlayer(xy::MessageBus& mb, xy::SoundResource& sr)
     m_soundResource (sr),
     m_volume        (0.f)
 {
-
+    for (auto& v : m_channelVolumes) v = 1.f;
 }
 
 //public
@@ -51,23 +52,29 @@ void SoundPlayer::entityUpdate(xy::Entity&, float)
     m_sounds.remove_if([](const sf::Sound& s) {return (s.getStatus() == sf::Sound::Stopped); });
 }
 
-void SoundPlayer::preCache(ResourceID id, const std::string& path)
+void SoundPlayer::preCache(ResourceID id, const std::string& path, sf::Uint8 channel)
 {
     m_buffers.insert(std::make_pair(id, m_soundResource.get(path)));
+    m_buffers[id].channel = channel;
 }
 
 void SoundPlayer::playSound(ResourceID id, float x, float y)
 {
-    m_sounds.emplace_back(m_buffers[id]);
+    m_sounds.emplace_back(m_buffers[id].buffer);
     auto& sound = m_sounds.back();
 
     sound.setPosition({ x, y, 0.f });
-    sound.setVolume(m_volume);
+    sound.setVolume(m_volume * m_channelVolumes[m_buffers[id].channel]);
     sound.setAttenuation(0.f);
     sound.play();
 }
 
-void SoundPlayer::setVolume(float vol)
+void SoundPlayer::setMasterVolume(float vol)
 {
     m_volume = std::min(vol * Game::MaxVolume, Game::MaxVolume);
+}
+
+void SoundPlayer::setChannelVolume(sf::Uint8 channel, float vol)
+{
+    m_channelVolumes[channel] = xy::Util::Math::clamp(vol, 0.f, 1.f);
 }

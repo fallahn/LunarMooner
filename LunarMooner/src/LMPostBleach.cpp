@@ -171,7 +171,7 @@ void PostBleach::start(std::size_t speed)
 void PostBleach::stop()
 {
     //skip forward to fade
-    if (m_running && m_index < m_fadeIndex && m_index < m_wavetable.size() - 1)
+    if (m_running && m_index < m_fadeIndex && m_index < m_wavetable.size() - 2)
     {
         float current = m_wavetable[m_index];
         while (m_wavetable[++m_index] > current) {}

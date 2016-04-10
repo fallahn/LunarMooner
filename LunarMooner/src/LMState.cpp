@@ -43,6 +43,7 @@ source distribution.
 #include <xygine/util/Random.hpp>
 #include <xygine/components/ParticleController.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/Components/AudioSource.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 
 #include <SFML/Window/Event.hpp>
@@ -293,6 +294,7 @@ namespace
     const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
 
     const float moonWidth = 570.f;
+    const float gameMusicVolume = 30.f;
 }
 
 void LunarMoonerState::parseControllerInput()
@@ -340,7 +342,7 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount)
 {
     auto gameController =
         xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld,
-            m_soundResource, m_textureResource, m_fontResource);
+            getContext().appInstance.getAudioSettings(), m_soundResource, m_textureResource, m_fontResource);
 
     for (auto i = 0; i < playerCount; ++i)
     {
@@ -362,18 +364,19 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::Explosion02, "assets/sound/fx/explode02.wav");
     soundPlayer->preCache(LMSoundID::Explosion03, "assets/sound/fx/explode03.wav");
     soundPlayer->preCache(LMSoundID::Explosion04, "assets/sound/fx/explode04.wav");
-    soundPlayer->preCache(LMSoundID::StrikeWarning, "assets/sound/speech/incoming.wav");
-    soundPlayer->preCache(LMSoundID::NukeWarning, "assets/sound/speech/meltdown.wav");
-    soundPlayer->preCache(LMSoundID::NukeWarning30, "assets/sound/speech/meltdown30.wav");
-    soundPlayer->preCache(LMSoundID::NukeWarning5, "assets/sound/speech/meltdown5.wav");
+    soundPlayer->preCache(LMSoundID::StrikeWarning, "assets/sound/speech/incoming.wav", 1);
+    soundPlayer->preCache(LMSoundID::NukeWarning, "assets/sound/speech/meltdown.wav", 1);
+    soundPlayer->preCache(LMSoundID::NukeWarning30, "assets/sound/speech/meltdown30.wav", 1);
+    soundPlayer->preCache(LMSoundID::NukeWarning5, "assets/sound/speech/meltdown5.wav", 1);
     soundPlayer->preCache(LMSoundID::ShieldCollected, "assets/sound/fx/shield_collected.wav");
     soundPlayer->preCache(LMSoundID::AmmoCollected, "assets/sound/fx/ammo_collected.wav");
     soundPlayer->preCache(LMSoundID::ShipLanded, "assets/sound/fx/ship_landed.wav");
     soundPlayer->preCache(LMSoundID::ShipLaunched, "assets/sound/fx/ship_launched.wav");
     soundPlayer->preCache(LMSoundID::LifeBonus, "assets/sound/fx/extra_life.wav");
+    soundPlayer->preCache(LMSoundID::ShieldLost, "assets/sound/fx/shield_lost.wav");
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
-    soundPlayer->setVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
+    soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
 
     xy::Component::MessageHandler mh;
     mh.id = LMMessageId::GameEvent;
@@ -407,6 +410,9 @@ void LunarMoonerState::initSounds()
         case LMGameEvent::PlayerGotShield:
             player->playSound(LMSoundID::ShieldCollected, msgData.posX, msgData.posY);
             break;
+        case LMGameEvent::PlayerLostShield:
+            player->playSound(LMSoundID::ShieldLost, msgData.posX, msgData.posY);
+            break;
         case LMGameEvent::ExtraLife:
             player->playSound(LMSoundID::LifeBonus, 960.f, 540.f);
             break;
@@ -432,14 +438,14 @@ void LunarMoonerState::initSounds()
             player->playSound(LMSoundID::NukeWarning5, 960.f, 540.f);
             break;
         case LMStateEvent::RoundEnd:
-            player->setVolume(0.f);
+            player->setChannelVolume(1, 0.f);
             break;
         case LMStateEvent::RoundBegin:
         {
             const auto& audioSettings = getContext().appInstance.getAudioSettings();
             const float volume = (audioSettings.muted) ? 0.f : audioSettings.volume;
 
-            player->setVolume(volume);
+            player->setChannelVolume(1, volume);
         }
             break;
         }
@@ -457,22 +463,77 @@ void LunarMoonerState::initSounds()
         default: break;
         case xy::Message::UIEvent::RequestAudioMute:
         case xy::Message::UIEvent::MenuOpened:
-            player->setVolume(0.f);
+            player->setMasterVolume(0.f);
             break;
         case xy::Message::UIEvent::RequestAudioUnmute:
         case xy::Message::UIEvent::RequestVolumeChange:
         case xy::Message::UIEvent::MenuClosed:
         {
             const auto& audioSettings = getContext().appInstance.getAudioSettings();
-            player->setVolume(audioSettings.volume);
+            player->setMasterVolume(audioSettings.volume);
         }
             break;
         }
     };
     soundPlayer->addMessageHandler(mh);
 
+
+    //game music
+    auto gameMusic = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+    gameMusic->setSound("assets/sound/music/game.ogg", xy::AudioSource::Mode::Stream);
+    gameMusic->setFadeOutTime(1.f);
+    gameMusic->setFadeInTime(1.f);
+    //gameMusic->setVolume(20.f);
+    
+    const auto& settings = getContext().appInstance.getAudioSettings();
+
+    mh.id = LMMessageId::StateEvent;
+    mh.action = [&settings](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* as = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<LMStateEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMStateEvent::RoundBegin:
+            as->setVolume(settings.muted ? 0.f : settings.volume * gameMusicVolume);
+            as->play(true);
+            break;
+        case LMStateEvent::RoundEnd:
+            as->stop();
+            break;
+        }
+    };
+    gameMusic->addMessageHandler(mh);
+
+    mh.id = xy::Message::UIMessage;
+    mh.action = [&settings](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* as = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::MenuOpened:
+            as->pause();
+            break;
+        case xy::Message::UIEvent::MenuClosed:
+            as->play(true);
+            break;
+        case xy::Message::UIEvent::RequestAudioMute:
+            as->setVolume(0.f);
+            break;
+        case xy::Message::UIEvent::RequestAudioUnmute:
+        case xy::Message::UIEvent::RequestVolumeChange:
+            as->setVolume(settings.volume * gameMusicVolume);
+            break;
+        }
+    };
+    gameMusic->addMessageHandler(mh);
+
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(soundPlayer);
+    entity->addComponent(gameMusic);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 }

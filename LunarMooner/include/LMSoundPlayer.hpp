@@ -35,6 +35,7 @@ source distribution.
 
 #include <map>
 #include <list>
+#include <array>
 
 namespace xy
 {
@@ -50,18 +51,27 @@ namespace lm
         ~SoundPlayer() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
-        void entityUpdate(xy::Entity&, float);
+        void entityUpdate(xy::Entity&, float) override;
 
         using ResourceID = sf::Int32;
-        void preCache(ResourceID, const std::string&);
+        void preCache(ResourceID, const std::string&, sf::Uint8 = 0);
         void playSound(ResourceID, float, float);
-        void setVolume(float);
+        void setMasterVolume(float);
+        void setChannelVolume(sf::Uint8, float);
     private:
         xy::SoundResource& m_soundResource;
-        std::map<ResourceID, sf::SoundBuffer> m_buffers;
+        struct Buffer final
+        {
+            Buffer() = default;
+            Buffer(sf::SoundBuffer& b) : buffer(b) {}
+            sf::SoundBuffer buffer;
+            sf::Uint8 channel = 0;
+        };
+        std::map<ResourceID, Buffer> m_buffers;
         std::list<sf::Sound> m_sounds;
         float m_volume;
-        
+
+        std::array<float, 4u> m_channelVolumes;
     };
 }
 

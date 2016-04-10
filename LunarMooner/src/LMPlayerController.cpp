@@ -232,6 +232,12 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
 
             m_shield = false;
             m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+
+            auto position = m_entity->getPosition();
+            auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+            shieldMsg->type = LMGameEvent::PlayerLostShield;
+            shieldMsg->posX = position.x;
+            shieldMsg->posY = position.y;
         }
         break;
     case CollisionComponent::ID::Ammo:
@@ -307,6 +313,12 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                     //broke the shield :(
                     m_shield = false;
                     m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+
+                    auto position = m_entity->getPosition();
+                    auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+                    shieldMsg->type = LMGameEvent::PlayerLostShield;
+                    shieldMsg->posX = position.x;
+                    shieldMsg->posY = position.y;
                 }
                 break;
             }

@@ -139,23 +139,25 @@ void MenuOptionState::buildMenu(const sf::Font& font)
 {
     static const sf::Vector2f windowOffset(448.f, 156.f);
 
+    auto muteCheckbox = xy::UI::create<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
     auto soundSlider = xy::UI::create<xy::UI::Slider>(font, m_textureResource.get("assets/images/ui/slider_handle.png"), 375.f);
     soundSlider->setPosition(152.f, 314.f);
     soundSlider->move(windowOffset);
     soundSlider->setText("Volume");
     soundSlider->setMaxValue(1.f);
-    soundSlider->addCallback([this](const xy::UI::Slider* slider)
+    soundSlider->addCallback([this, muteCheckbox](const xy::UI::Slider* slider)
     {
         //send volume setting command
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::RequestVolumeChange;
         msg->value = slider->getValue();
 
+        muteCheckbox->check(false);
+
     }, xy::UI::Slider::Event::ValueChanged);
     soundSlider->setValue(getContext().appInstance.getAudioSettings().volume); //set this *after* callback is set
     m_uiContainer.addControl(soundSlider);
-
-    auto muteCheckbox = xy::UI::create<xy::UI::CheckBox>(font, m_textureResource.get("assets/images/ui/checkbox.png"));
+   
     muteCheckbox->setPosition(622.f, 274.f);
     muteCheckbox->move(windowOffset);
     muteCheckbox->setText("Mute");
