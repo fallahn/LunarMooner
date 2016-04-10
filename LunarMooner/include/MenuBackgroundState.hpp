@@ -64,6 +64,8 @@ private:
 
     xy::TextureResource m_textureResource;
     xy::ShaderResource m_shaderResource;
+    xy::SoundResource m_soundResource;
+    std::vector<std::string> m_musicFiles;
 
     sf::Shader* m_normalMapShader;
 

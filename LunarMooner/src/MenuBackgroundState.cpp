@@ -29,16 +29,24 @@ source distribution.
 #include <BGNormalBlendShader.hpp>
 #include <BGPlanetDrawable.hpp>
 #include <BGStarfield.hpp>
+#include <Game.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/Entity.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/AnimatedDrawable.hpp>
 #include <xygine/components/PointLight.hpp>
+#include <xygine/components/AudioSource.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
-#include <xygine/PostBloom.hpp>
+#include <xygine/util/Random.hpp>
+#include <xygine/PostChromeAb.hpp>
 
 #include <SFML/Window/Mouse.hpp>
+
+namespace
+{
+    const float maxMusicVol = 35.f;
+}
 
 MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     : xy::State         (ss, context),
@@ -53,8 +61,8 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
-    //auto pp = xy::PostProcess::create<xy::PostBloom>();
-    //m_scene.addPostProcess(pp);
+    auto pp = xy::PostProcess::create<xy::PostChromeAb>();
+    m_scene.addPostProcess(pp);
 
     m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
     m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_SPECULAR_ILLUM);
@@ -115,6 +123,7 @@ void MenuBackgroundState::handleMessage(const xy::Message& msg)
             break;
         }
     }
+    m_scene.handleMessage(msg);
 }
 
 //private
@@ -148,12 +157,6 @@ void MenuBackgroundState::setup()
     moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
     moon->setNormalShader(*m_normalMapShader);
 
-    /*auto moon = xy::Component::create<xy::AnimatedDrawable>(m_messageBus);
-    moon->setShader(*m_normalMapShader);
-    moon->setNormalMap(m_textureResource.get("assets/images/background/sphere_normal.png"));
-    moon->setTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
-    */
-
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(moon);
     entity->setPosition({ -100.f, 340.f });
@@ -168,6 +171,52 @@ void MenuBackgroundState::setup()
     entity->setPosition(1160.f, 340.f);
     entity->addComponent(lc);
     m_lightEntity = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+
+    //music
+    m_musicFiles = xy::FileSystem::listFiles("assets/sound/music");
+    if (!m_musicFiles.empty())
+    {
+        m_musicFiles.erase(std::remove_if(m_musicFiles.begin(), m_musicFiles.end(),
+            [](const std::string& str) 
+        {
+            return (xy::FileSystem::getFileExtension(str) != ".ogg"
+                || str.substr(0, 4) != "menu");
+        }), m_musicFiles.end());
+
+        
+        auto as = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+        as->setSound("assets/sound/music/" + m_musicFiles[xy::Util::Random::value(0, m_musicFiles.size() - 1)], xy::AudioSource::Mode::Stream);
+        const auto& settings = getContext().appInstance.getAudioSettings();
+        const float volume = (settings.muted) ? 0.f : maxMusicVol * getContext().appInstance.getAudioSettings().volume;
+        as->setVolume(volume);
+        as->play(true);
+
+
+        entity = xy::Entity::create(m_messageBus);
+        auto music =  entity->addComponent(as);
+        m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+
+        //TODO add audio events to xygine so we can pick a new track at random instead of looping
+        //when the music has finished playing
+        xy::Component::MessageHandler mh;
+        mh.id = xy::Message::UIMessage;
+        mh.action = [music](xy::Component* c, const xy::Message& msg)
+        {
+            auto& msgData = msg.getData<xy::Message::UIEvent>();
+            switch (msgData.type)
+            {
+            default: break;
+            case xy::Message::UIEvent::RequestAudioMute:
+                music->setVolume(0.f);
+                break;
+            case xy::Message::UIEvent::RequestAudioUnmute:
+            case xy::Message::UIEvent::RequestVolumeChange:
+                music->setVolume(msgData.value * maxMusicVol);
+                break;
+            }
+        };
+        music->addMessageHandler(mh);
+    }
 }
 
 void MenuBackgroundState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
