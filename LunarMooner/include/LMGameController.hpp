@@ -80,7 +80,7 @@ namespace lm
 
         sf::Uint8 m_inputFlags;
 
-        std::map<sf::Int32, sf::SoundBuffer> m_playerSounds;
+        std::map<sf::Int32, sf::SoundBuffer> m_soundCache;
 
         std::array<xy::ParticleSystem::Definition, 4u> m_particleDefs;
         bool m_spawnReady;

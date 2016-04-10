@@ -130,7 +130,10 @@ enum LMSoundID
     ShieldCollected,
     AmmoCollected,
     ShieldLost,
-    LifeBonus
+    LifeBonus,
+    RoundEnded,
+    RoundCountLoop,
+    RoundCountEnd
 };
 
 #endif //COMMAND_IDS_HPP_

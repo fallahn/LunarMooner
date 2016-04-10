@@ -374,6 +374,7 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::ShipLaunched, "assets/sound/fx/ship_launched.wav");
     soundPlayer->preCache(LMSoundID::LifeBonus, "assets/sound/fx/extra_life.wav");
     soundPlayer->preCache(LMSoundID::ShieldLost, "assets/sound/fx/shield_lost.wav");
+    soundPlayer->preCache(LMSoundID::RoundEnded, "assets/sound/fx/end_of_round.wav");
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
@@ -428,6 +429,7 @@ void LunarMoonerState::initSounds()
         switch (msgData.type)
         {
         default: break;
+            //lots of magic numbers here...
         case LMStateEvent::CountDownStarted:
             player->playSound(LMSoundID::NukeWarning, 960.f, 540.f);
             break;
@@ -438,7 +440,8 @@ void LunarMoonerState::initSounds()
             player->playSound(LMSoundID::NukeWarning5, 960.f, 540.f);
             break;
         case LMStateEvent::RoundEnd:
-            player->setChannelVolume(1, 0.f);
+            player->setChannelVolume(1, 0.f); //mutes voice over
+            player->playSound(LMSoundID::RoundEnded, 960.f, 540.f);
             break;
         case LMStateEvent::RoundBegin:
         {

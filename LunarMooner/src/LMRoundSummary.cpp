@@ -27,6 +27,7 @@ source distribution.
 
 #include <LMRoundSummary.hpp>
 #include <CommandIds.hpp>
+#include <Game.hpp>
 
 #include <xygine/Resource.hpp>
 #include <xygine/Entity.hpp>
@@ -85,6 +86,35 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResou
         m_okText.setPosition(960.f, 660.f);
         m_okText.setString("OK!");
         xy::Util::Position::centreOrigin(m_okText);
+
+        xy::Component::MessageHandler mh;
+        mh.id = xy::Message::UIMessage;
+        mh.action = [this](xy::Component* c, const xy::Message& msg)
+        {
+            auto& msgData = msg.getData<xy::Message::UIEvent>();
+            switch (msgData.type)
+            {
+            default: break;
+            case xy::Message::UIEvent::RequestAudioMute:
+            case xy::Message::UIEvent::MenuOpened:
+                m_countLoop.pause();
+                //m_countEnd.setVolume(0.f);
+                break;
+            case xy::Message::UIEvent::RequestAudioUnmute:
+            case xy::Message::UIEvent::RequestVolumeChange:
+            {
+                const float vol = msgData.value * Game::MaxVolume;
+                m_countLoop.setVolume(vol);
+                m_countEnd.setVolume(vol);
+            }
+                break;
+            case xy::Message::UIEvent::MenuClosed:
+            {
+                m_countLoop.play();
+            }
+            break;
+            }
+        };
     }
 }
 
@@ -113,6 +143,9 @@ void RoundSummary::entityUpdate(xy::Entity&, float dt)
         else
         {            
             m_summaryComplete = true;
+
+            m_countLoop.stop();
+            m_countEnd.play();
         }
         updateMainString();
     }
@@ -141,6 +174,32 @@ void RoundSummary::completeSummary()
 
         updateMainString();
         m_summaryComplete = true;
+
+        m_countLoop.stop();
+        m_countEnd.play();
+    }
+}
+
+void RoundSummary::setSoundBuffer(sf::Int32 id, sf::SoundBuffer& buffer, float volume)
+{
+    if (id == LMSoundID::RoundCountEnd)
+    {
+        m_countEnd.setBuffer(buffer);
+        m_countEnd.setVolume(volume);
+        m_countEnd.setPosition(960.f, 540.f, 0.f);
+        m_countEnd.setAttenuation(0.f);
+    }
+    else if (id == LMSoundID::RoundCountLoop)
+    {
+        m_countLoop.setBuffer(buffer);
+        m_countLoop.setVolume(volume);
+        m_countLoop.setPosition(960.f, 540.f, 0.f);
+        m_countLoop.setAttenuation(0.f);
+        m_countLoop.setLoop(true);
+        if (!m_summaryComplete)
+        {
+            m_countLoop.play();
+        }
     }
 }
 
