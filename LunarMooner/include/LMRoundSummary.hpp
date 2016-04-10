@@ -35,6 +35,8 @@ source distribution.
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Text.hpp>
 
+#include <SFML/Audio/Sound.hpp>
+
 namespace xy
 {
     class TextureResource;
@@ -54,6 +56,8 @@ namespace lm
         void onStart(xy::Entity&) override;
 
         void completeSummary();
+
+        void setSoundBuffer(sf::Int32, sf::SoundBuffer&, float);
 
     private:
         
@@ -76,8 +80,10 @@ namespace lm
         sf::Text m_mainText;
         sf::Text m_okText;
 
+        sf::Sound m_countLoop;
+        sf::Sound m_countEnd;
+
         void updateMainString();
-        //void checkExtraLife();
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }

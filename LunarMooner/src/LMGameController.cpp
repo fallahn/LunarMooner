@@ -277,8 +277,10 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
     m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_textureResource);
 
-    m_playerSounds.insert(std::make_pair(LMSoundID::Engine, m_soundResource.get("assets/sound/fx/thrust.wav")));
-    m_playerSounds.insert(std::make_pair(LMSoundID::RCS, m_soundResource.get("assets/sound/fx/rcs.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::Engine, m_soundResource.get("assets/sound/fx/thrust.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::RCS, m_soundResource.get("assets/sound/fx/rcs.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::RoundCountEnd, m_soundResource.get("assets/sound/fx/score_count_end.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::RoundCountLoop, m_soundResource.get("assets/sound/fx/score_count_loop.wav")));
 
     //create sprite batch for aliens
     auto sprBatch = xy::Component::create<SpriteBatch>(getMessageBus());
@@ -473,21 +475,21 @@ void GameController::spawnPlayer()
         rcsRight->setName("rcsRight");
 
         auto sfx1 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
-        sfx1->setSoundBuffer(m_playerSounds[LMSoundID::RCS]);
+        sfx1->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx1->setFadeInTime(0.1f);
         sfx1->setFadeOutTime(0.3f);
         sfx1->setName("rcsEffectLeft");
         sfx1->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
         auto sfx2 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
-        sfx2->setSoundBuffer(m_playerSounds[LMSoundID::RCS]);
+        sfx2->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx2->setFadeInTime(0.1f);
         sfx2->setFadeOutTime(0.3f);
         sfx2->setName("rcsEffectRight");
         sfx2->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
         auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
-        sfx3->setSoundBuffer(m_playerSounds[LMSoundID::Engine]);
+        sfx3->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
         sfx3->setFadeInTime(0.1f);
         sfx3->setFadeOutTime(0.3f);
         sfx3->setName("thrustEffect");
@@ -1188,6 +1190,9 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
 void GameController::showRoundSummary(bool doScores)
 {
     auto summary = xy::Component::create<RoundSummary>(getMessageBus(), m_playerStates[m_currentPlayer], m_textureResource, m_fontResource, doScores);
+    summary->setSoundBuffer(LMSoundID::RoundCountEnd, m_soundCache[LMSoundID::RoundCountEnd], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+    summary->setSoundBuffer(LMSoundID::RoundCountLoop, m_soundCache[LMSoundID::RoundCountLoop], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+    
     auto entity = xy::Entity::create(getMessageBus());
     entity->addCommandCategories(LMCommandID::UI);
     entity->addComponent(summary);
