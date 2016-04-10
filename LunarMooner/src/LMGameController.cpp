@@ -43,6 +43,7 @@ source distribution.
 #include <LMSpriteBatch.hpp>
 #include <CommandIds.hpp>
 #include <StateIds.hpp>
+#include <Game.hpp>
 
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/AudioSource.hpp>
@@ -100,14 +101,16 @@ namespace
     const std::array<float, 10u> roundTimes =
     {
         75.f, 90.f, 100.f, 110.f, 120.f,
-        130.f, 135.f, 140.f, 145.f, 160.f
+        130.f, 145.f, 150.f, 155.f, 160.f
     };
 }
 
-GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, xy::SoundResource& sr, xy::TextureResource& tr, xy::FontResource& fr)
+GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as,
+    xy::SoundResource& sr, xy::TextureResource& tr, xy::FontResource& fr)
     : xy::Component     (mb, this),
     m_scene             (scene),
     m_collisionWorld    (cw),
+    m_audioSettings     (as),
     m_soundResource     (sr),
     m_textureResource   (tr),
     m_fontResource      (fr),
@@ -423,8 +426,6 @@ void GameController::addPlayer()
 
 void GameController::start()
 {
-    
-    
     createTerrain();
     createMothership();
     spawnAliens();
@@ -432,6 +433,9 @@ void GameController::start()
     createUI();
 
     m_scoreDisplay->showMessage("Start!");
+
+    auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
+    msg->type = LMStateEvent::RoundBegin;
 }
 
 //private
@@ -473,18 +477,21 @@ void GameController::spawnPlayer()
         sfx1->setFadeInTime(0.1f);
         sfx1->setFadeOutTime(0.3f);
         sfx1->setName("rcsEffectLeft");
+        sfx1->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
         auto sfx2 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
         sfx2->setSoundBuffer(m_playerSounds[LMSoundID::RCS]);
         sfx2->setFadeInTime(0.1f);
         sfx2->setFadeOutTime(0.3f);
         sfx2->setName("rcsEffectRight");
-        
+        sfx2->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+
         auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
         sfx3->setSoundBuffer(m_playerSounds[LMSoundID::Engine]);
         sfx3->setFadeInTime(0.1f);
         sfx3->setFadeOutTime(0.3f);
         sfx3->setName("thrustEffect");
+        sfx3->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
         auto entity = xy::Entity::create(getMessageBus());
         entity->setPosition(spawnPos);

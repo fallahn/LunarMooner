@@ -67,6 +67,7 @@ struct LMGameEvent
         PlayerSpawned,
         PlayerGotAmmo,
         PlayerGotShield,
+        PlayerLostShield,
         HumanRescued,
         HumanPickedUp,
         AlienDied,
@@ -128,6 +129,7 @@ enum LMSoundID
     ShipLaunched,
     ShieldCollected,
     AmmoCollected,
+    ShieldLost,
     LifeBonus
 };
 
