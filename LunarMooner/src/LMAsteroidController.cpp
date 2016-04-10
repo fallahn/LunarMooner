@@ -33,6 +33,7 @@ source distribution.
 #include <xygine/Entity.hpp>
 #include <xygine/components/ParticleSystem.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/components/AudioSource.hpp>
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
@@ -79,6 +80,8 @@ void AsteroidController::entityUpdate(xy::Entity& entity, float dt)
         msg->posY = position.y;
         
         m_trail->stop();
+        entity.getComponent<xy::AudioSource>()->stop();
+
         entity.getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setFillColor(sf::Color::Transparent);
         m_velocity = sf::Vector2f();
         //keep just about in bounds to prevent accidental culling of trail by renderer

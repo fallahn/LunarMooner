@@ -1083,11 +1083,21 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
     ps->setLifetimeVariance(0.55f);
 
+    auto as = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+    as->setPitch(0.7f);
+    as->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+    as->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
+    as->setFadeInTime(1.5f);
+    as->play(true);
+
+    //TODO gui setting callback
+
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
     entity->addComponent(ps);
     entity->addComponent(controller);
     entity->addComponent(collision);
+    entity->addComponent(as);
     entity->setPosition(position);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
