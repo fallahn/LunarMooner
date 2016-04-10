@@ -54,7 +54,7 @@ void SoundPlayer::entityUpdate(xy::Entity&, float)
 
 void SoundPlayer::preCache(ResourceID id, const std::string& path, sf::Uint8 channel)
 {
-    m_buffers.insert(std::make_pair(id, m_soundResource.get(path)));
+    m_buffers.insert(std::make_pair(id, Buffer(m_soundResource.get(path))));
     m_buffers[id].channel = channel;
 }
 
