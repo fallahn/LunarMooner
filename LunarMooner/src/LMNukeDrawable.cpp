@@ -43,7 +43,7 @@ namespace
     const std::size_t offsetCount = 30u;
     const sf::Vector2f basePosition(960.f, 540.f);
 
-    const float maxAlpha = 0.9f;
+    const float maxAlpha = 0.96f;
     const float maxTime = 10.f;
     const float fadeOutMultiplier = 12.f;
     const sf::Color baseColour(255u, 255u, 240u, 0u);

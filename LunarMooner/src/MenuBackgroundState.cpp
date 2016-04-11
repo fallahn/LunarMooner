@@ -189,15 +189,13 @@ void MenuBackgroundState::setup()
         const auto& settings = getContext().appInstance.getAudioSettings();
         const float volume = (settings.muted) ? 0.f : maxMusicVol * getContext().appInstance.getAudioSettings().volume;
         as->setVolume(volume);
-        as->play(true);
-
+        as->setFadeOutTime(1.f);
+        as->play();
 
         entity = xy::Entity::create(m_messageBus);
         auto music =  entity->addComponent(as);
         m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-        //TODO add audio events to xygine so we can pick a new track at random instead of looping
-        //when the music has finished playing
         xy::Component::MessageHandler mh;
         mh.id = xy::Message::UIMessage;
         mh.action = [music](xy::Component* c, const xy::Message& msg)
@@ -213,6 +211,20 @@ void MenuBackgroundState::setup()
             case xy::Message::UIEvent::RequestVolumeChange:
                 music->setVolume(msgData.value * maxMusicVol);
                 break;
+            }
+        };
+        music->addMessageHandler(mh);
+
+        mh.id = xy::Message::AudioMessage;
+        mh.action = [this, music](xy::Component* c, const xy::Message& msg)
+        {
+            std::cout << "rx audio event" << std::endl;
+            auto& msgData = msg.getData<xy::Message::AudioEvent>();
+            if (msgData.action == xy::Message::AudioEvent::Stop)
+            {
+                music->setSound("assets/sound/music/" + m_musicFiles[xy::Util::Random::value(0, m_musicFiles.size() - 1)], xy::AudioSource::Mode::Stream);
+                music->play();
+                std::cout << "played a new track!" << std::endl;
             }
         };
         music->addMessageHandler(mh);
