@@ -25,64 +25,50 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_STARFIELD_HPP_
-#define LM_STARFIELD_HPP_
+#ifndef LM_NUKE_DRAWABLE_HPP_
+#define LM_NUKE_DRAWABLE_HPP_
 
 #include <xygine/components/Component.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Shader.hpp>
 
-#include <vector>
 #include <array>
-
-namespace xy
-{
-    class TextureResource;
-}
+#include <vector>
 
 namespace lm
 {
-    class Starfield final : public xy::Component, public sf::Drawable
+    class NukeEffect final : public sf::Drawable, public xy::Component
     {
     public:
-        Starfield(xy::MessageBus&, xy::TextureResource&);
-        ~Starfield() = default;
+        NukeEffect(xy::MessageBus&, const sf::Vector2f&);
+        ~NukeEffect() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
-        sf::FloatRect globalBounds() const override { return m_bounds; }
-
-        void setVelocity(const sf::Vector2f&);
 
     private:
 
-        sf::FloatRect m_bounds;
-
-        struct Star final : public sf::Transformable
+        enum class Fade
         {
-            std::array<sf::Vector2f, 4u> positions;
-            float depth = 1.f;
-            Star()
-            {
-                positions[1] = { 1.f, 0.f };
-                positions[2] = { 1.f, 1.f };
-                positions[3] = { 0.f, 1.f };
-            }
-        };
-        std::vector<Star> m_stars;
+            In,
+            Out
+        }m_fade;
 
-        sf::Vector2f m_position;
-        sf::Vector2f m_velocity;
-        mutable sf::Shader m_shader;
-        sf::Sprite m_backgroundSprite;
-        sf::Texture* m_starTexture;
+        float m_currentAlpha;
+        float m_currentStep;
+        bool m_running;
 
-        std::vector<sf::Vertex> m_vertices;       
+        std::vector<sf::Vector2f> m_offsets;
+        std::size_t m_offsetIndex;
+
+        void start(std::size_t = 1u);
+        void stop();
+        void reset();
+
+        std::array<sf::Vertex, 4u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
 
-#endif //LM_STARFIELD_HPP_
+#endif //LM_NUKE_DRAWABLE_HPP_

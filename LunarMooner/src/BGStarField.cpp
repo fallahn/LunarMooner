@@ -66,16 +66,20 @@ Starfield::Starfield(xy::MessageBus& mb, xy::TextureResource& tr)
     
     m_shader.loadFromMemory(fragShader, sf::Shader::Fragment);
 
+    m_bounds.width = 1920.f;
+    m_bounds.height = 1080.f;
+
     //create stars
     for (auto i = 0u; i < maxStars; ++i)
     {
         m_stars.emplace_back();
 
         auto& star = m_stars.back();
-        star.setPosition(xy::Util::Random::value(0.f, 1920.f), xy::Util::Random::value(0.f, 1080.f));
+        star.setPosition(xy::Util::Random::value(0.f, m_bounds.width), xy::Util::Random::value(0.f, m_bounds.height));
         star.depth = xy::Util::Random::value(1.f, 6.f);
         star.setScale(star.depth, star.depth);
     }
+
 
 }
 

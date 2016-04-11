@@ -82,7 +82,7 @@ namespace lm
         float m_highestTerrainPoint;
         const std::vector<sf::Vector2f>& m_terrain;
         std::vector<sf::Vector2f> m_collisionSegments;
-        bool collides(const sf::Vector2f&, const sf::Vector2f&, const sf::Vector2f&, const sf::Vector2f&) const; 
+        bool collides(const sf::Vector2f&, const sf::Vector2f&, const sf::Vector2f&, const sf::Vector2f&, sf::Vector3f&) const; 
 
         sf::Vector3f getManifold(const sf::FloatRect&);
 

@@ -27,8 +27,9 @@ source distribution.
 
 #include <LMState.hpp>
 #include <LMGameController.hpp>
-#include <LMPostBleach.hpp>
+//#include <LMPostBleach.hpp>
 #include <LMSoundPlayer.hpp>
+#include <LMNukeDrawable.hpp>
 #include <CommandIds.hpp>
 
 #include <BGScoreboardMask.hpp>
@@ -44,6 +45,7 @@ source distribution.
 #include <xygine/components/ParticleController.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/AudioSource.hpp>
+#include <xygine/components/Camera.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 
 #include <SFML/Window/Event.hpp>
@@ -87,9 +89,9 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
 
-    auto pp = xy::PostProcess::create<lm::PostBleach>();
-    m_scene.addPostProcess(pp);
-    pp = xy::PostProcess::create<xy::PostChromeAb>();
+    /*auto pp = xy::PostProcess::create<lm::PostBleach>();
+    m_scene.addPostProcess(pp);*/
+    auto pp = xy::PostProcess::create<xy::PostChromeAb>();
     m_scene.addPostProcess(pp);
 
     initGameController(playerCount);
@@ -577,7 +579,15 @@ void LunarMoonerState::buildBackground()
     m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
     m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
     
-
+    //nuke effect
+    auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, 1080.f));
+    auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
+    
+    auto entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(ne);
+    entity->setPosition(960.f, 540.f);
+    m_scene.setActiveCamera(entity->addComponent(camera));
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
 
     //background
@@ -597,7 +607,7 @@ void LunarMoonerState::buildBackground()
     moon->setNormalShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
     moon->setRotationVelocity({ 0.f, 0.009f });
 
-    auto entity = xy::Entity::create(m_messageBus);
+    entity = xy::Entity::create(m_messageBus);
     entity->setPosition(960.f - (moonWidth), 540.f);
     entity->addComponent(moon);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);

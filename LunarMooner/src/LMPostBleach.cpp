@@ -116,6 +116,7 @@ PostBleach::PostBleach()
         case LMGameEvent::PlayerSpawned:
             if (msgData.value > 0)
             {
+                //value is multiplier of default speed
                 start(msgData.value);
             }
             break;
