@@ -665,6 +665,7 @@ void GameController::createTerrain()
     std::array<sf::Uint16, 4u> scores = {30, 10, 60, 70};
     int i = 0;
 
+    //TODO we can get rid of these eventually
     xy::SfDrawableComponent<sf::RectangleShape>::Ptr drawable;
     for (const auto& p : positions)
     {
@@ -682,6 +683,19 @@ void GameController::createTerrain()
 
         m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
     }
+
+    //flame effects
+    xy::ParticleSystem::Definition pd;
+    pd.loadFromFile("assets/particles/fire.xyp", m_textureResource);
+    
+    auto ps = pd.createSystem(getMessageBus());
+    ps->setLifetimeVariance(0.3f);
+    ps->start(pd.releaseCount);
+
+    entity = xy::Entity::create(getMessageBus());
+    entity->setPosition(550.f, 860.f);
+    entity->addComponent(ps);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
     //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus(), positions, alienArea);
@@ -701,6 +715,7 @@ void GameController::createTerrain()
     //shieldDrawable->setScale(0.1f, 0.1f);
     entity->addComponent(shieldDrawable);
 
+    //TODO move this to the nuke effect entity
     auto nukeAudio = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
     nukeAudio->setSound("assets/sound/fx/nuke.wav");
     nukeAudio->setFadeInTime(5.f);
