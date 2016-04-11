@@ -332,26 +332,26 @@ void GameController::entityUpdate(xy::Entity&, float dt)
         const float oldTime = m_playerStates[m_currentPlayer].timeRemaining;
         m_playerStates[m_currentPlayer].timeRemaining = std::max(0.f, m_playerStates[m_currentPlayer].timeRemaining - dt);
         
-        if (oldTime > 30 &&
-            m_playerStates[m_currentPlayer].timeRemaining <= 30)
+        if (oldTime > 31 &&
+            m_playerStates[m_currentPlayer].timeRemaining <= 31)
         {
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownWarning;
         }
-        else if (oldTime > 10 &&
-            m_playerStates[m_currentPlayer].timeRemaining <= 10)
+        else if (oldTime > 11 &&
+            m_playerStates[m_currentPlayer].timeRemaining <= 11)
         {
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownStarted;
         }
-        else if (oldTime > 5 &&
-            m_playerStates[m_currentPlayer].timeRemaining <= 5)
+        else if (oldTime > 6 &&
+            m_playerStates[m_currentPlayer].timeRemaining <= 6)
         {
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownInProgress;
         }
-        else if (oldTime > 0 &&
-            m_playerStates[m_currentPlayer].timeRemaining == 0)
+        else if (oldTime > 1 &&
+            m_playerStates[m_currentPlayer].timeRemaining <= 1)
         {
             //we timed out, end round
             restartRound();
@@ -714,53 +714,6 @@ void GameController::createTerrain()
     shieldDrawable->setTexture(m_textureResource.get("assets/images/game/shield_noise.png"));
     //shieldDrawable->setScale(0.1f, 0.1f);
     entity->addComponent(shieldDrawable);
-
-    //TODO move this to the nuke effect entity
-    auto nukeAudio = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
-    nukeAudio->setSound("assets/sound/fx/nuke.wav");
-    nukeAudio->setFadeInTime(5.f);
-    nukeAudio->setFadeOutTime(1.f);
-    xy::Component::MessageHandler mh;
-    mh.id = LMMessageId::GameEvent;
-    mh.action = [](xy::Component* c, const xy::Message& msg)
-    {
-        xy::AudioSource* audio = dynamic_cast<xy::AudioSource*>(c);
-        auto& msgData = msg.getData<LMGameEvent>();
-        switch (msgData.type)
-        {
-        default: break;
-        case LMGameEvent::PlayerDied:
-            audio->stop();
-            break;
-        case LMGameEvent::PlayerSpawned:
-            if (msgData.value > 0)
-            {
-                audio->play(true);
-            }
-            break;
-        }
-    };
-    nukeAudio->addMessageHandler(mh);
-
-    mh.id = LMMessageId::StateEvent;
-    mh.action = [](xy::Component* c, const xy::Message& msg)
-    {
-        xy::AudioSource* audio = dynamic_cast<xy::AudioSource*>(c);
-        auto& msgData = msg.getData<LMStateEvent>();
-        switch (msgData.type)
-        {
-        default: break;
-        case LMStateEvent::CountDownStarted:
-            audio->play(true);
-            break;
-        case LMStateEvent::RoundEnd:
-            audio->stop();
-            break;
-        }
-    };
-    nukeAudio->addMessageHandler(mh);
-
-    entity->addComponent(nukeAudio);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 }

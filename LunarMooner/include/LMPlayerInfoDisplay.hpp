@@ -48,15 +48,17 @@ namespace lm
         ScoreDisplay(xy::MessageBus&, xy::FontResource&, std::vector<PlayerState>&);
         ~ScoreDisplay() = default;
 
-        xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
-        
-        void entityUpdate(xy::Entity&, float) override; 
+        xy::Component::Type type() const override { return xy::Component::Type::Drawable; }        
+        void entityUpdate(xy::Entity&, float) override;
+        sf::FloatRect globalBounds() const override { return m_bounds; }
 
         void setPlayerActive(std::size_t);
         void showMessage(const std::string&);
         void showScore(sf::Uint16, const sf::Vector2f&, sf::Color = sf::Color::Yellow);
 
     private:
+        sf::FloatRect m_bounds;
+
         xy::FontResource& m_fontResource;
         std::vector<PlayerState>& m_playerStates;
 

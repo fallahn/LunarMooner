@@ -583,11 +583,58 @@ void LunarMoonerState::buildBackground()
     auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, 1080.f));
     auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
     
+    //TODO move this to the nuke effect entity
+    auto nukeAudio = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+    nukeAudio->setSound("assets/sound/fx/nuke.wav");
+    nukeAudio->setFadeInTime(5.f);
+    nukeAudio->setFadeOutTime(1.f);
+    xy::Component::MessageHandler mh;
+    mh.id = LMMessageId::GameEvent;
+    mh.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* audio = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::PlayerDied:
+            audio->stop();
+            break;
+        case LMGameEvent::PlayerSpawned:
+            if (msgData.value > 0)
+            {
+                audio->play(true);
+            }
+            break;
+        }
+    };
+    nukeAudio->addMessageHandler(mh);
+
+    mh.id = LMMessageId::StateEvent;
+    mh.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* audio = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<LMStateEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMStateEvent::CountDownStarted:
+            audio->play(true);
+            break;
+        case LMStateEvent::RoundEnd:
+            audio->stop();
+            break;
+        }
+    };
+    nukeAudio->addMessageHandler(mh);
+
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(ne);
+    entity->addComponent(nukeAudio);
     entity->setPosition(960.f, 540.f);
     m_scene.setActiveCamera(entity->addComponent(camera));
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+  
 
 
     //background

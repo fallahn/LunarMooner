@@ -84,6 +84,9 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, xy::FontResource& fr, std::vector
         m_playerTexts.emplace_back("",font, 24u);
         m_playerTexts.back().setPosition(textPositions[i]);
     }
+
+    m_bounds.width = 1920.f;
+    m_bounds.height = 1080.f;
 }
 
 //public
