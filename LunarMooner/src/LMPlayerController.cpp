@@ -52,6 +52,9 @@ namespace
 
     const float maxDockingVelocity = 8000.f;
     const float maxLandingVelocity = 18000.f ;
+
+    //applied with shielded collisions
+    const float damping = 0.65f;
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb, const MothershipController* ms, const std::vector<sf::Vector2f>& terrain)
@@ -160,7 +163,6 @@ void PlayerController::onDelayedStart(xy::Entity& entity)
 
 void PlayerController::setInput(sf::Uint8 input)
 {
-    //TODO this can be applied before particle systems are assigned!
     if (input != m_inputFlags && m_rcsRight)
     {
         if (input & LMInputFlags::SteerRight)
@@ -228,7 +230,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
 
             m_entity->move(normal * manifold.z);
             m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
-            m_velocity *= 0.65f; //some damping
+            m_velocity *= damping;
 
             m_shield = false;
             m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
@@ -257,7 +259,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
 
         m_entity->move(normal * manifold.z);
         m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
-        m_velocity *= 0.65f; //some damping
+        m_velocity *= damping;
     }
         break;
     case CollisionComponent::ID::Mothership:
@@ -365,9 +367,9 @@ void PlayerController::setSize(const sf::Vector2f& size)
 }
 
 //private
-bool PlayerController::collides(const sf::Vector2f& a1, const sf::Vector2f& a2, const sf::Vector2f& b1, const sf::Vector2f& b2) const
+bool PlayerController::collides(const sf::Vector2f& a1, const sf::Vector2f& a2, const sf::Vector2f& b1, const sf::Vector2f& b2, sf::Vector3f& manifold) const
 {
-    std::function<float(const sf::Vector2f&, const sf::Vector2f&)> dot = [](const sf::Vector2f& a, const sf::Vector2f& b)
+    std::function<float(const sf::Vector2f&, const sf::Vector2f&)> det = [](const sf::Vector2f& a, const sf::Vector2f& b)
     {
         return ((a.y * b.x) - (a.x * b.y));
     };
@@ -375,7 +377,7 @@ bool PlayerController::collides(const sf::Vector2f& a1, const sf::Vector2f& a2, 
     sf::Vector2f a(a2 - a1);
     sf::Vector2f b(b2 - b1);
 
-    const float f = dot(a, b);
+    const float f = det(a, b);
     if (f == 0)
     {
         //lines are parallel
@@ -383,8 +385,8 @@ bool PlayerController::collides(const sf::Vector2f& a1, const sf::Vector2f& a2, 
     }
 
     sf::Vector2f c(b2 - a2);
-    const float aa = dot(a, c);
-    const float bb = dot(b, c);
+    const float aa = det(a, c);
+    const float bb = det(b, c);
 
     if (f < 0)
     {
@@ -400,6 +402,27 @@ bool PlayerController::collides(const sf::Vector2f& a1, const sf::Vector2f& a2, 
         if (aa > f) return false;
         if (bb > f) return false;
     }
+
+    //calc the normal / penetration
+    sf::Vector2f normal;
+    float distance = bb / f; //normalised distance from A2 towards A1
+    if (distance > 0.5)
+    {
+        distance = 1.f - distance;
+        normal = xy::Util::Vector::normalise({ -b.y, b.x });
+    }
+    else
+    {
+        normal = xy::Util::Vector::normalise({ b.y, -b.x });
+    }
+    manifold.x = normal.x;
+    manifold.y = normal.y;
+
+    const float hyp = xy::Util::Vector::length(a * distance);
+    const float dot = xy::Util::Vector::dot(a, b);
+    const float theta = std::atan2(f, dot);
+    manifold.z = std::sin(theta) * hyp; //penetration
+
     return true;
 }
 
@@ -470,12 +493,33 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
             //TODO we could improve this by partitioning segments
             //and only testing nearest to player
             bool collided = false;
+            sf::Vector3f manifold;
             for (auto j = 1u; j < m_terrain.size(); ++j)
             {
-                if ((collided = collides(a1, a2, m_terrain[j - 1], m_terrain[j])))
+                if ((collided = collides(a1, a2, m_terrain[j - 1], m_terrain[j], manifold)))
                 {
-                    m_entity->destroy();
-                    broadcastDeath();
+                    if (m_shield)
+                    {
+                        //bounce off
+                        sf::Vector2f normal(manifold.x, manifold.y);
+                        m_entity->move(normal * manifold.z);
+                        m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+                        m_velocity *= damping;
+
+                        m_shield = false;
+                        m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+
+                        auto position = m_entity->getPosition();
+                        auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+                        shieldMsg->type = LMGameEvent::PlayerLostShield;
+                        shieldMsg->posX = position.x;
+                        shieldMsg->posY = position.y;
+                    }
+                    else
+                    {
+                        m_entity->destroy();
+                        broadcastDeath();
+                    }
                     break;
                 }
             }

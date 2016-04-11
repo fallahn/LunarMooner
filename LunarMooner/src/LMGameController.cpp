@@ -100,7 +100,7 @@ namespace
     //time limits per level
     const std::array<float, 10u> roundTimes =
     {
-        75.f, 90.f, 100.f, 110.f, 120.f,
+        75.f, 90.f, 100.f, 110.f, 120.f, 
         130.f, 145.f, 150.f, 155.f, 160.f
     };
 }
