@@ -31,6 +31,7 @@ source distribution.
 #include <LMSoundPlayer.hpp>
 #include <LMNukeDrawable.hpp>
 #include <CommandIds.hpp>
+#include <Game.hpp>
 
 #include <BGScoreboardMask.hpp>
 #include <BGPlanetDrawable.hpp>
@@ -369,7 +370,6 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::StrikeWarning, "assets/sound/speech/incoming.wav", 1);
     soundPlayer->preCache(LMSoundID::NukeWarning, "assets/sound/speech/meltdown.wav", 1);
     soundPlayer->preCache(LMSoundID::NukeWarning30, "assets/sound/speech/meltdown30.wav", 1);
-    soundPlayer->preCache(LMSoundID::NukeWarning5, "assets/sound/speech/meltdown5.wav", 1);
     soundPlayer->preCache(LMSoundID::ShieldCollected, "assets/sound/fx/shield_collected.wav");
     soundPlayer->preCache(LMSoundID::AmmoCollected, "assets/sound/fx/ammo_collected.wav");
     soundPlayer->preCache(LMSoundID::ShipLanded, "assets/sound/fx/ship_landed.wav");
@@ -437,9 +437,6 @@ void LunarMoonerState::initSounds()
             break;
         case LMStateEvent::CountDownWarning:
             player->playSound(LMSoundID::NukeWarning30, 960.f, 540.f);
-            break;
-        case LMStateEvent::CountDownInProgress:
-            player->playSound(LMSoundID::NukeWarning5, 960.f, 540.f);
             break;
         case LMStateEvent::RoundEnd:
             player->setChannelVolume(1, 0.f); //mutes voice over
@@ -583,11 +580,12 @@ void LunarMoonerState::buildBackground()
     auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, 1080.f));
     auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
     
-    //TODO move this to the nuke effect entity
+    const auto& audioSettings = getContext().appInstance.getAudioSettings();
     auto nukeAudio = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
     nukeAudio->setSound("assets/sound/fx/nuke.wav");
     nukeAudio->setFadeInTime(5.f);
     nukeAudio->setFadeOutTime(1.f);
+    nukeAudio->setVolume(audioSettings.muted ? 0.f : audioSettings.volume * Game::MaxVolume);
     xy::Component::MessageHandler mh;
     mh.id = LMMessageId::GameEvent;
     mh.action = [](xy::Component* c, const xy::Message& msg)
@@ -627,10 +625,124 @@ void LunarMoonerState::buildBackground()
         }
     };
     nukeAudio->addMessageHandler(mh);
+    
+    mh.id = xy::Message::UIMessage;
+    mh.action = [&audioSettings](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* as = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::MenuOpened:
+            if (as->getStatus() == xy::AudioSource::Status::Playing)
+            {
+                as->pause();
+            }
+            break;
+        case xy::Message::UIEvent::MenuClosed:
+            if (as->getStatus() == xy::AudioSource::Status::Paused)
+            {
+                as->play(true);
+            }
+            break;
+        case xy::Message::UIEvent::RequestAudioMute:
+            as->setVolume(0.f);
+            break;
+        case xy::Message::UIEvent::RequestAudioUnmute:
+        case xy::Message::UIEvent::RequestVolumeChange:
+            as->setVolume(audioSettings.volume * Game::MaxVolume);
+            break;
+        }
+    };
+    nukeAudio->addMessageHandler(mh);
+
+    auto finalWarning = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+    finalWarning->setSound("assets/sound/speech/meltdown5.wav");
+    finalWarning->setFadeOutTime(1.f);
+    finalWarning->setVolume(audioSettings.muted ? 0.f : audioSettings.volume * Game::MaxVolume);
+    auto fw = finalWarning.get();
+    mh.id = LMMessageId::GameEvent;
+    mh.action = [fw](xy::Component*, const xy::Message& msg)
+    {
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::PlayerDied:
+            if (fw->getStatus() == xy::AudioSource::Status::Playing)
+            {
+                fw->pause();
+            }
+            break;
+        case LMGameEvent::PlayerSpawned:
+            if (msgData.value > 0)
+            {
+                fw->play();
+            }
+            break;
+        }
+    };
+    fw->addMessageHandler(mh);
+
+    mh.id = LMMessageId::StateEvent;
+    mh.action = [fw](xy::Component*, const xy::Message& msg)
+    {
+        auto& msgData = msg.getData<LMStateEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMStateEvent::CountDownStarted:
+            fw->stop(); //rewinds the sound if needs be
+            break;
+        case LMStateEvent::CountDownInProgress:
+            fw->play();
+            break;
+        case LMStateEvent::RoundEnd:
+            if (fw->getStatus() == xy::AudioSource::Status::Playing)
+            {
+                fw->stop();
+            }
+            break;
+        }
+    };
+    fw->addMessageHandler(mh);
+
+    mh.id = xy::Message::UIMessage;
+    mh.action = [&audioSettings](xy::Component* c, const xy::Message& msg)
+    {
+        xy::AudioSource* as = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::MenuOpened:
+            if (as->getStatus() == xy::AudioSource::Status::Playing)
+            {
+                as->pause();
+            }
+            break;
+        case xy::Message::UIEvent::MenuClosed:
+            if (as->getStatus() == xy::AudioSource::Status::Paused)
+            {
+                as->play();
+            }
+            break;
+        case xy::Message::UIEvent::RequestAudioMute:
+            as->setVolume(0.f);
+            break;
+        case xy::Message::UIEvent::RequestAudioUnmute:
+        case xy::Message::UIEvent::RequestVolumeChange:
+            as->setVolume(audioSettings.volume * Game::MaxVolume);
+            break;
+        }
+    };
+    fw->addMessageHandler(mh);
 
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(ne);
     entity->addComponent(nukeAudio);
+    entity->addComponent(finalWarning);
     entity->setPosition(960.f, 540.f);
     m_scene.setActiveCamera(entity->addComponent(camera));
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
