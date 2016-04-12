@@ -89,6 +89,8 @@ PostBlur::PostBlur()
         }*/
     };
     addMessageHandler(mh);
+
+    initTextures({ 1920, 1080 });
 }
 
 //public
@@ -111,8 +113,7 @@ void PostBlur::apply(const sf::RenderTexture& src, sf::RenderTarget& dst)
         dst.draw(sf::Sprite(src.getTexture()));
     }
     else
-    {
-        initTextures(src.getSize());
+    {        
         downSample(src, m_firstPassTextures[0]);
         blurMultipass(m_firstPassTextures);
         downSample(m_firstPassTextures[0], m_secondPassTextures[0]);
