@@ -27,52 +27,25 @@ source distribution.
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-
 namespace MapEditor
 {
+    /// <summary>
+    /// Contains functions for drawing the lines in the editor
+    /// </summary>
     public partial class MainWindow : Form
     {
-        private SfmlControl m_sfmlControl = new SfmlControl();
-        private SFML.Window.Vector2f m_maxTextureSize = new SFML.Window.Vector2f(1362, 320);
-        private SFML.Graphics.RectangleShape m_backgroundShape = new SFML.Graphics.RectangleShape();
 
-        public MainWindow()
+
+
+
+        public void DrawLines(SFML.Graphics.RenderWindow window)
         {
-            InitializeComponent();
-            splitContainer1.Panel1.Controls.Add(m_sfmlControl);
 
-            m_sfmlControl.DrawDelegates.Add(this.Draw);
-            m_sfmlControl.DrawDelegates.Add(this.DrawSprites);
-            m_sfmlControl.DrawDelegates.Add(this.DrawLines);
-
-            m_sfmlControl.Dock = DockStyle.Fill;
-            m_sfmlControl.BackgroundColour = SFML.Graphics.Color.White;
-            m_sfmlControl.ViewCentre = m_maxTextureSize / 2;
-
-            m_backgroundShape.FillColor = SFML.Graphics.Color.Black;
-            m_backgroundShape.Size = m_maxTextureSize;
-
-            this.StartPosition = FormStartPosition.CenterScreen;
         }
-
-        public void DispatchDrawingEvents()
-        {
-            m_sfmlControl.HandleEvents();
-            m_sfmlControl.Draw();
-        }
-
-        private void Draw(SFML.Graphics.RenderWindow window)
-        {
-            window.Draw(m_backgroundShape);
-        }
-
     }
 }

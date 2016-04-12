@@ -51,6 +51,17 @@ namespace MapEditor
             set { m_clearColour = value; }
         }
 
+        private Vector2f m_viewCentre;
+        public Vector2f ViewCentre
+        {
+            get { return m_viewCentre; }
+            set
+            {
+                m_viewCentre = value;
+                SfmlControl_Resize(this, EventArgs.Empty);
+            }
+        }
+
         //delegates for custom drawing
         private List<DrawDelegate> m_drawDelegates = new List<DrawDelegate>();
         public List<DrawDelegate> DrawDelegates
@@ -78,7 +89,7 @@ namespace MapEditor
         void SfmlControl_Resize(object sender, EventArgs e)
         {
             Vector2f size = new Vector2f(this.Size.Width, this.Size.Height);
-            SFML.Graphics.View v = new SFML.Graphics.View(new Vector2f(), size);
+            SFML.Graphics.View v = new SFML.Graphics.View(m_viewCentre, size);
             m_renderWindow.SetView(v);
         }
 
@@ -101,6 +112,14 @@ namespace MapEditor
             foreach (DrawDelegate d in m_drawDelegates)
                 d(m_renderWindow);
             m_renderWindow.Display();
+        }
+
+        public Vector2f MouseWorldPosition
+        {
+            get
+            {
+                return m_renderWindow.MapPixelToCoords(Mouse.GetPosition(m_renderWindow));
+            }
         }
 
         //----control overrides-----//
