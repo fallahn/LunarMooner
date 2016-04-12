@@ -44,8 +44,10 @@ namespace lm
         ~PostBlur() = default;
 
         void apply(const sf::RenderTexture&, sf::RenderTarget&) override;
-        
+
     private:
+
+        float m_amount;
 
         bool m_enabled;
         sf::Shader m_blurShader;

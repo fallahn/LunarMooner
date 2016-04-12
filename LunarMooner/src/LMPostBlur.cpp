@@ -54,10 +54,14 @@ namespace
         "    gl_FragColor = colour;\n"*/
         "    gl_FragColor = texture2D(u_srcTexture, gl_TexCoord[0].xy);\n"
         "}\n";
+
+    sf::Clock clock;
+    const float fadeSpeed = 5.f;
 }
 
 PostBlur::PostBlur()
-    : m_enabled (false)
+    : m_amount(0.f),
+    m_enabled (false)
 {
     m_blurShader.loadFromMemory(xy::Shader::Default::vertex, xy::Shader::PostGaussianBlur::fragment);
     m_downsampleShader.loadFromMemory(xy::Shader::Default::vertex, xy::Shader::PostDownSample::fragment);
@@ -90,7 +94,19 @@ PostBlur::PostBlur()
 //public
 void PostBlur::apply(const sf::RenderTexture& src, sf::RenderTarget& dst)
 {
-    if (!m_enabled)
+    //fade in / out for 1 sec
+    if (m_enabled)
+    {
+        m_amount = std::min(1.f, m_amount + (clock.restart().asSeconds() * fadeSpeed));
+    }
+    else
+    {
+        m_amount = std::max(0.f, m_amount - (clock.restart().asSeconds() * fadeSpeed));
+    }
+    
+
+    //and draw....
+    if (m_amount == 0)
     {
         dst.draw(sf::Sprite(src.getTexture()));
     }
@@ -140,7 +156,7 @@ void PostBlur::blurMultipass(TexturePair& textures)
 void PostBlur::blur(const sf::RenderTexture& src, sf::RenderTexture& dst, const sf::Vector2f& offset)
 {
     m_blurShader.setUniform("u_sourceTexture", src.getTexture());
-    m_blurShader.setUniform("u_offset", offset);
+    m_blurShader.setUniform("u_offset", offset * m_amount);
 
     applyShader(m_blurShader, dst);
     dst.display();
