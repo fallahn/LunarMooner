@@ -32,6 +32,7 @@ source distribution.
 
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/System/Clock.hpp>
 
 #include <array>
 
@@ -48,6 +49,7 @@ namespace lm
     private:
 
         float m_amount;
+        sf::Clock m_clock;
 
         bool m_enabled;
         sf::Shader m_blurShader;

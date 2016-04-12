@@ -55,7 +55,6 @@ namespace
         "    gl_FragColor = texture2D(u_srcTexture, gl_TexCoord[0].xy);\n"
         "}\n";
 
-    sf::Clock clock;
     const float fadeSpeed = 5.f;
 }
 
@@ -99,11 +98,11 @@ void PostBlur::apply(const sf::RenderTexture& src, sf::RenderTarget& dst)
     //fade in / out for 1 sec
     if (m_enabled)
     {
-        m_amount = std::min(1.f, m_amount + (clock.restart().asSeconds() * fadeSpeed));
+        m_amount = std::min(1.f, m_amount + (m_clock.restart().asSeconds() * fadeSpeed));
     }
     else
     {
-        m_amount = std::max(0.f, m_amount - (clock.restart().asSeconds() * fadeSpeed));
+        m_amount = std::max(0.f, m_amount - (m_clock.restart().asSeconds() * fadeSpeed));
     }
     
 

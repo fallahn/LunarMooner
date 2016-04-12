@@ -248,6 +248,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         default: break;
         case LMStateEvent::SummaryFinished:
             addDelayedRespawn();
+            LOG("Summary finished", xy::Logger::Type::Info);
             break;
         }
     };
@@ -291,21 +292,19 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
 
 //public
 void GameController::entityUpdate(xy::Entity&, float dt)
-{
-    for (auto& de : m_delayedEvents) de.time -= dt;
-    
+{   
     //execute then remove expired events
     m_delayedEvents.erase(std::remove_if(m_delayedEvents.begin(), m_delayedEvents.end(),
-        [](const DelayedEvent& de)
+        [dt](DelayedEvent& de)
     {
+        de.time -= dt;
         if (de.time <= 0)
         {
             de.action();
             return true;
         }
         return false;
-    }),
-        m_delayedEvents.end());
+    }), m_delayedEvents.end());
 
     //remove humans which have reached the ship
     m_humans.erase(std::remove_if(m_humans.begin(), m_humans.end(),
@@ -809,6 +808,8 @@ void GameController::swapPlayerState()
         m_currentPlayer = (m_currentPlayer + 1) % m_playerStates.size();
     } while (m_playerStates[m_currentPlayer].lives < 0 && ++count < m_playerStates.size());
 
+    LOG("Switched to player " + std::to_string(m_currentPlayer + 1), xy::Logger::Type::Info);
+
     if (count >= m_playerStates.size())
     {
         //everyone is dead! request end game
@@ -855,25 +856,27 @@ void GameController::restorePlayerState()
     //throw in some random roids at higher levels.
     //as roid events are recursive we need to clear any pending
     //events else we get a cascade of them very quickly...
-    m_delayedEvents.erase(std::remove_if(m_delayedEvents.begin(), m_delayedEvents.end(),
-        [](const DelayedEvent& de)
-    {
-        return de.id == EventID::SpawnRoid;
-    }), m_delayedEvents.end());
+
+    //-----we CAN'T do this here as we're already inside a lambda called by a delayed event!!-----//
+    //m_delayedEvents.erase(std::remove_if(m_delayedEvents.begin(), m_delayedEvents.end(),
+    //    [](const DelayedEvent& de)
+    //{
+    //    return de.id == EventID::SpawnRoid;
+    //}), m_delayedEvents.end());
 
     auto& ps = m_playerStates[m_currentPlayer];
-    if (ps.level > minAsteroidLevel)
-    {
-        addDelayedAsteroid();
-        if (ps.level > (minAsteroidLevel * 2))
-        {
-            addDelayedAsteroid(); //even moar!!
-            if (ps.level > (minAsteroidLevel * 3))
-            {
-                addDelayedAsteroid(); //MOOOOAAAR!! :P
-            }
-        }
-    }
+    //if (ps.level > minAsteroidLevel)
+    //{
+    //    addDelayedAsteroid();
+    //    if (ps.level > (minAsteroidLevel * 2))
+    //    {
+    //        addDelayedAsteroid(); //even moar!!
+    //        if (ps.level > (minAsteroidLevel * 3))
+    //        {
+    //            addDelayedAsteroid(); //MOOOOAAAR!! :P
+    //        }
+    //    }
+    //}
 
     //clear floating items
     xy::Command cmd;
@@ -1083,6 +1086,8 @@ void GameController::addDelayedAsteroid()
         de.time = xy::Util::Random::value(10.f, 20.f);
         de.action = [this, position]()
         {
+            //umm should we be modifying delaye devents from within
+            //a lambda in a delayed event??
             spawnAsteroid(position);
             addDelayedAsteroid();
         };
