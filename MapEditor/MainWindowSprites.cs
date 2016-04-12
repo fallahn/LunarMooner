@@ -27,52 +27,50 @@ source distribution.
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-
 namespace MapEditor
 {
+    /// <summary>
+    /// Contains functions for drawing and manipulating sprites
+    /// </summary>
+
     public partial class MainWindow : Form
     {
-        private SfmlControl m_sfmlControl = new SfmlControl();
-        private SFML.Window.Vector2f m_maxTextureSize = new SFML.Window.Vector2f(1362, 320);
-        private SFML.Graphics.RectangleShape m_backgroundShape = new SFML.Graphics.RectangleShape();
-
-        public MainWindow()
+        private struct TexName
         {
-            InitializeComponent();
-            splitContainer1.Panel1.Controls.Add(m_sfmlControl);
+            public string Name;
+            public SFML.Graphics.Texture Texture;
+        }
+        private List<SFML.Graphics.Sprite> m_sprites = new List<SFML.Graphics.Sprite>();
 
-            m_sfmlControl.DrawDelegates.Add(this.Draw);
-            m_sfmlControl.DrawDelegates.Add(this.DrawSprites);
-            m_sfmlControl.DrawDelegates.Add(this.DrawLines);
+        private void buttonAddTexture_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog od = new OpenFileDialog();
+            od.Filter = "Portable Network Graphic|*.png|JPEG files|*.jpg|Bitmap|*.bmp";
+            if(od.ShowDialog() == DialogResult.OK)
+            {
+                TexName tn = new TexName();
+                tn.Texture = new SFML.Graphics.Texture(od.FileName);
+                tn.Name = Path.GetFileName(od.FileName);
+                listBoxTextures.Items.Add(tn);
+                //listBoxTextures.Items[listBoxTextures.Items.Count - 1];
 
-            m_sfmlControl.Dock = DockStyle.Fill;
-            m_sfmlControl.BackgroundColour = SFML.Graphics.Color.White;
-            m_sfmlControl.ViewCentre = m_maxTextureSize / 2;
-
-            m_backgroundShape.FillColor = SFML.Graphics.Color.Black;
-            m_backgroundShape.Size = m_maxTextureSize;
-
-            this.StartPosition = FormStartPosition.CenterScreen;
+                SFML.Graphics.Sprite spr = new SFML.Graphics.Sprite(tn.Texture);
+                m_sprites.Add(spr);
+            }
         }
 
-        public void DispatchDrawingEvents()
+        public void DrawSprites(SFML.Graphics.RenderWindow window)
         {
-            m_sfmlControl.HandleEvents();
-            m_sfmlControl.Draw();
+            foreach(var spr in m_sprites)
+            {
+                window.Draw(spr);
+            }
         }
-
-        private void Draw(SFML.Graphics.RenderWindow window)
-        {
-            window.Draw(m_backgroundShape);
-        }
-
     }
 }
