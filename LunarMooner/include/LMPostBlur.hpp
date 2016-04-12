@@ -31,31 +31,35 @@ source distribution.
 #include <xygine/PostProcess.hpp>
 
 #include <SFML/Graphics/Shader.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+
+#include <array>
 
 namespace lm
 {
-    class PostBleach final : public xy::PostProcess
+    class PostBlur final : public xy::PostProcess
     {
     public:
-        PostBleach();
-        ~PostBleach() = default;
+        PostBlur();
+        ~PostBlur() = default;
 
         void apply(const sf::RenderTexture&, sf::RenderTarget&) override;
-        void update(float) override;
+        
     private:
-        std::size_t m_index;
-        std::size_t m_fadeIndex;
-        sf::Shader m_shader;
 
-        bool m_running;
-        std::size_t m_speed;
+        bool m_enabled;
+        sf::Shader m_blurShader;
+        sf::Shader m_downsampleShader;
+        sf::Shader m_outShader;
 
-        std::vector<float> m_wavetable;
-        std::vector<sf::Vector2f> m_offsets;
+        using TexturePair = std::array<sf::RenderTexture, 2u>;
+        TexturePair m_firstPassTextures;
+        TexturePair m_secondPassTextures;
 
-        void start(std::size_t = 1);
-        void stop();
-        void reset();
+        void initTextures(sf::Vector2u);
+        void blurMultipass(TexturePair&);
+        void blur(const sf::RenderTexture&, sf::RenderTexture&, const sf::Vector2f&);
+        void downSample(const sf::RenderTexture&, sf::RenderTexture&);
     };
 }
 

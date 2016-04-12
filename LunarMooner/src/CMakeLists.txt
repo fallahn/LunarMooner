@@ -17,7 +17,7 @@ SET(LM_SRC
   ${LM_DIR}/LMNukeDrawable.cpp
   ${LM_DIR}/LMPlayerController.cpp
   ${LM_DIR}/LMPlayerInfoDisplay.cpp
-  ${LM_DIR}/LMPostBleach.cpp
+  ${LM_DIR}/LMPostBlur.cpp
   ${LM_DIR}/LMRoundSummary.cpp
   ${LM_DIR}/LMShieldDrawable.cpp
   ${LM_DIR}/LMSoundPlayer.cpp

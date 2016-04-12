@@ -27,7 +27,7 @@ source distribution.
 
 #include <LMState.hpp>
 #include <LMGameController.hpp>
-//#include <LMPostBleach.hpp>
+#include <LMPostBlur.hpp>
 #include <LMSoundPlayer.hpp>
 #include <LMNukeDrawable.hpp>
 #include <CommandIds.hpp>
@@ -89,9 +89,9 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
 
-    /*auto pp = xy::PostProcess::create<lm::PostBleach>();
-    m_scene.addPostProcess(pp);*/
-    auto pp = xy::PostProcess::create<xy::PostChromeAb>();
+    auto pp = xy::PostProcess::create<lm::PostBlur>();
+    m_scene.addPostProcess(pp);
+    pp = xy::PostProcess::create<xy::PostChromeAb>();
     m_scene.addPostProcess(pp);
 
     initGameController(playerCount);

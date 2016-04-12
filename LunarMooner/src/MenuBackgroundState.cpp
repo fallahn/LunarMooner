@@ -29,6 +29,7 @@ source distribution.
 #include <BGNormalBlendShader.hpp>
 #include <BGPlanetDrawable.hpp>
 #include <BGStarfield.hpp>
+
 #include <Game.hpp>
 
 #include <xygine/App.hpp>
