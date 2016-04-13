@@ -58,7 +58,6 @@ namespace MapEditor
             if(radioButtonAddBox.Checked)
             {
                 m_boxInputState = BoxInputState.Add;
-                this.Cursor = Cursors.Cross;
             }
         }
 
@@ -68,7 +67,6 @@ namespace MapEditor
             if(radioButtonMoveBox.Checked)
             {
                 m_boxInputState = BoxInputState.Move;
-                this.Cursor = Cursors.SizeAll;
             }
         }
 
@@ -78,7 +76,6 @@ namespace MapEditor
             if(radioButtonDeleteBox.Checked)
             {
                 m_boxInputState = BoxInputState.Remove;
-                this.Cursor = new Cursor(GetType(), "Eraser.cur");
             }
         }
 
@@ -102,11 +99,20 @@ namespace MapEditor
             }
         }
 
+        private void numericUpDownBoxVal_ValueChanged(object sender, EventArgs e)
+        {
+            if (m_selectedBox > -1 && m_selectedBox < m_screenBoxes.Count)
+            {
+                m_screenBoxes[m_selectedBox].Value = (int)numericUpDownBoxVal.Value;
+            }
+        }
+
         private BoxInputState m_boxInputState = BoxInputState.None;
 
         public class ScreenBox
         {
             public SFML.Graphics.RectangleShape Box { get; set; }
+            public int Value { get; set; }
             public ScreenBox(SFML.Window.Vector2f position)
             {
                 Box = new SFML.Graphics.RectangleShape(new SFML.Window.Vector2f(20, 20));

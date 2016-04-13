@@ -57,7 +57,6 @@ namespace MapEditor
             if(radioButtonAddPoint.Checked)
             {
                 m_lineInputState = LineInputState.Add;
-                this.Cursor = Cursors.Cross;
                 m_boxInputState = BoxInputState.None;
             }
         }
@@ -67,7 +66,6 @@ namespace MapEditor
             if(radioButtonMovePoint.Checked)
             {
                 m_lineInputState = LineInputState.Move;
-                this.Cursor = Cursors.SizeAll;
                 m_boxInputState = BoxInputState.None;
             }
         }
@@ -77,7 +75,6 @@ namespace MapEditor
             if(radioButtonDeletePoint.Checked)
             {
                 m_lineInputState = LineInputState.Remove;
-                this.Cursor = new Cursor(GetType(), "Eraser.cur");
                 m_boxInputState = BoxInputState.None;
             }
         }
@@ -126,6 +123,7 @@ namespace MapEditor
                         case BoxInputState.Add:
                             var box = new ScreenBox(sfPosition);
                             box.Box.Size = new SFML.Window.Vector2f((float)numericUpDownWidth.Value, (float)numericUpDownHeight.Value);
+                            box.Value = (int)numericUpDownBoxVal.Value;
                             m_screenBoxes.Add(box);
                             break;
                         case BoxInputState.Move:
@@ -183,6 +181,7 @@ namespace MapEditor
                             var size = m_screenBoxes[i].Box.Size;
                             numericUpDownWidth.Value = (decimal)size.X;
                             numericUpDownHeight.Value = (decimal)size.Y;
+                            numericUpDownBoxVal.Value = m_screenBoxes[i].Value;
                         }
                         else
                         {
