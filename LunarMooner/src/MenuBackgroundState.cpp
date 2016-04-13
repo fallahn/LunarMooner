@@ -219,13 +219,11 @@ void MenuBackgroundState::setup()
         mh.id = xy::Message::AudioMessage;
         mh.action = [this, music](xy::Component* c, const xy::Message& msg)
         {
-            std::cout << "rx audio event" << std::endl;
             auto& msgData = msg.getData<xy::Message::AudioEvent>();
             if (msgData.action == xy::Message::AudioEvent::Stop)
             {
                 music->setSound("assets/sound/music/" + m_musicFiles[xy::Util::Random::value(0, m_musicFiles.size() - 1)], xy::AudioSource::Mode::Stream);
                 music->play();
-                std::cout << "played a new track!" << std::endl;
             }
         };
         music->addMessageHandler(mh);

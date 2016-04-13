@@ -109,6 +109,7 @@ namespace lm
             sf::Int32 id = 0;
         };
         std::list<DelayedEvent> m_delayedEvents;
+        std::list<DelayedEvent> m_pendingDelayedEvents;
 
         std::vector<xy::Entity*> m_aliens;
         SpriteBatch* m_alienBatch;
@@ -137,6 +138,7 @@ namespace lm
         void spawnEarlyWarning(const sf::Vector2f&);
         void spawnAsteroid(const sf::Vector2f&);
         void addDelayedAsteroid();
+        bool m_flushRoidEvents;
 
         sf::Uint8 m_itemCount;
         void spawnCollectable(const sf::Vector2f&);

@@ -62,7 +62,7 @@ using namespace std::placeholders;
 namespace
 {
     const sf::Vector2f playerSize(32.f, 42.f);
-    const sf::Vector2f bulletSize(6.f, 10.f);
+    const sf::Vector2f bulletSize(2.f, 24.f);
 
     const sf::Vector2f mothershipBounds(386.f, 1534.f);
     const sf::Vector2f mothershipStart(386.f, 46.f);
@@ -124,6 +124,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_speedMeter        (nullptr),
     m_scoreDisplay      (nullptr),
     m_currentPlayer     (0),
+    m_flushRoidEvents   (false),
     m_itemCount         (0u)
 {
     xy::Component::MessageHandler handler;
@@ -164,8 +165,8 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             else
             {
                 storePlayerState();
-                m_delayedEvents.emplace_back();
-                auto& de = m_delayedEvents.back();
+                m_pendingDelayedEvents.emplace_back();
+                auto& de = m_pendingDelayedEvents.back();
                 de.time = 1.6f;
                 de.action = [this]() 
                 {
@@ -293,9 +294,12 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
 //public
 void GameController::entityUpdate(xy::Entity&, float dt)
 {   
+    //append any waiting events
+    m_delayedEvents.splice(m_delayedEvents.end(), m_pendingDelayedEvents);
+
     //execute then remove expired events
     m_delayedEvents.erase(std::remove_if(m_delayedEvents.begin(), m_delayedEvents.end(),
-        [dt](DelayedEvent& de)
+        [this, dt](DelayedEvent& de)
     {
         de.time -= dt;
         if (de.time <= 0)
@@ -303,8 +307,19 @@ void GameController::entityUpdate(xy::Entity&, float dt)
             de.action();
             return true;
         }
+
         return false;
     }), m_delayedEvents.end());
+
+    if (m_flushRoidEvents)
+    {
+        m_flushRoidEvents = false;
+        m_delayedEvents.erase(std::remove_if(m_delayedEvents.begin(), m_delayedEvents.end(),
+            [](const DelayedEvent& de)
+        {
+            return de.id == EventID::SpawnRoid;
+        }), m_delayedEvents.end());
+    }
 
     //remove humans which have reached the ship
     m_humans.erase(std::remove_if(m_humans.begin(), m_humans.end(),
@@ -739,8 +754,11 @@ void GameController::spawnBullet()
 {
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
     drawable->getDrawable().setSize(bulletSize);
-    drawable->getDrawable().setFillColor(sf::Color::Cyan);
-
+    drawable->getDrawable().setFillColor(sf::Color(90u, 255u, 120u, 190u));
+    drawable->getDrawable().setOutlineColor(sf::Color(0u, 185u, 0u, 100u));
+    drawable->getDrawable().setOutlineThickness(2.f);
+    drawable->setBlendMode(sf::BlendAdd);
+    
     auto controller = xy::Component::create<BulletController>(getMessageBus());
 
     auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, bulletSize }, CollisionComponent::ID::Bullet);
@@ -856,33 +874,28 @@ void GameController::restorePlayerState()
     //throw in some random roids at higher levels.
     //as roid events are recursive we need to clear any pending
     //events else we get a cascade of them very quickly...
-
-    //-----we CAN'T do this here as we're already inside a lambda called by a delayed event!!-----//
-    //m_delayedEvents.erase(std::remove_if(m_delayedEvents.begin(), m_delayedEvents.end(),
-    //    [](const DelayedEvent& de)
-    //{
-    //    return de.id == EventID::SpawnRoid;
-    //}), m_delayedEvents.end());
+    m_flushRoidEvents = true;
 
     auto& ps = m_playerStates[m_currentPlayer];
-    //if (ps.level > minAsteroidLevel)
-    //{
-    //    addDelayedAsteroid();
-    //    if (ps.level > (minAsteroidLevel * 2))
-    //    {
-    //        addDelayedAsteroid(); //even moar!!
-    //        if (ps.level > (minAsteroidLevel * 3))
-    //        {
-    //            addDelayedAsteroid(); //MOOOOAAAR!! :P
-    //        }
-    //    }
-    //}
+    if (ps.level > minAsteroidLevel)
+    {
+        addDelayedAsteroid();
+        if (ps.level > (minAsteroidLevel * 2))
+        {
+            addDelayedAsteroid(); //even moar!!
+            if (ps.level > (minAsteroidLevel * 3))
+            {
+                addDelayedAsteroid(); //MOOOOAAAR!! :P
+            }
+        }
+    }
 
     //clear floating items
     xy::Command cmd;
     cmd.category = LMCommandID::Item;
     cmd.action = [](xy::Entity& ent, float) { ent.destroy(); };
     m_scene.sendCommand(cmd);
+    m_itemCount = 0;
 
     //lose ammo - TODO should this be restored with state?
     m_playerStates[m_currentPlayer].ammo = 0;
@@ -979,8 +992,8 @@ void GameController::restartRound()
     ps.startNewRound = true;
 
     //display a round summary
-    m_delayedEvents.emplace_back();
-    auto& de = m_delayedEvents.back();
+    m_pendingDelayedEvents.emplace_back();
+    auto& de = m_pendingDelayedEvents.back();
     de.time = 1.6f;
     de.action = [this]() 
     {
@@ -990,8 +1003,8 @@ void GameController::restartRound()
 
 void GameController::addDelayedRespawn()
 {
-    m_delayedEvents.emplace_back();
-    auto& de = m_delayedEvents.back();
+    m_pendingDelayedEvents.emplace_back();
+    auto& de = m_pendingDelayedEvents.back();
     de.id = EventID::SpawnPlayer;
     de.time = 1.f;
     de.action = [this]()
@@ -1080,22 +1093,20 @@ void GameController::addDelayedAsteroid()
     {
         sf::Vector2f position(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width), -30.f);
 
-        m_delayedEvents.emplace_back();
-        auto& de = m_delayedEvents.back();
+        m_pendingDelayedEvents.emplace_back();
+        auto& de = m_pendingDelayedEvents.back();
         de.id = EventID::SpawnRoid;
         de.time = xy::Util::Random::value(10.f, 20.f);
         de.action = [this, position]()
         {
-            //umm should we be modifying delaye devents from within
-            //a lambda in a delayed event??
             spawnAsteroid(position);
             addDelayedAsteroid();
         };
 
         //we know when and where it's coming from so let's
         //tell it to the early warning system! :D
-        m_delayedEvents.emplace_back();
-        auto& de2 = m_delayedEvents.back();
+        m_pendingDelayedEvents.emplace_back();
+        auto& de2 = m_pendingDelayedEvents.back();
         de2.id = EventID::SpawnRoid;
         de2.time = de.time - 2.f; //magic const here. need to relate it to early warning system
         de2.action = [this, position]()
@@ -1105,8 +1116,8 @@ void GameController::addDelayedAsteroid()
     }
     else
     {
-        m_delayedEvents.emplace_back();
-        auto& de = m_delayedEvents.back();
+        m_pendingDelayedEvents.emplace_back();
+        auto& de = m_pendingDelayedEvents.back();
         de.id = EventID::SpawnRoid;
         de.time = 5.f;
         de.action = [this]()
