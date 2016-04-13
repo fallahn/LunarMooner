@@ -53,14 +53,23 @@ namespace MapEditor
             m_sfmlControl.DrawDelegates.Add(this.DrawSprites);
             m_sfmlControl.DrawDelegates.Add(this.DrawLines);
 
+            m_sfmlControl.UpdateDelegates.Add(this.UpdateLines);
+
             m_sfmlControl.Dock = DockStyle.Fill;
             m_sfmlControl.BackgroundColour = SFML.Graphics.Color.White;
             m_sfmlControl.ViewCentre = m_maxTextureSize / 2;
 
+            m_sfmlControl.MouseUp += sfmlControl_MouseUp;
+            m_sfmlControl.MouseDown += sfmlControl_MouseDown;
+            m_sfmlControl.MouseMove += sfmlControl_MouseMove;
+
             m_backgroundShape.FillColor = SFML.Graphics.Color.Black;
             m_backgroundShape.Size = m_maxTextureSize;
 
+            listBoxTextures.DisplayMember = "Name";
+
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.WindowState = FormWindowState.Maximized;
         }
 
         public void DispatchDrawingEvents()
@@ -73,6 +82,7 @@ namespace MapEditor
         {
             window.Draw(m_backgroundShape);
         }
+
 
     }
 }
