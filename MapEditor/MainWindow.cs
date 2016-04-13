@@ -51,6 +51,7 @@ namespace MapEditor
 
             m_sfmlControl.DrawDelegates.Add(this.Draw);
             m_sfmlControl.DrawDelegates.Add(this.DrawSprites);
+            m_sfmlControl.DrawDelegates.Add(this.DrawBoxes);
             m_sfmlControl.DrawDelegates.Add(this.DrawLines);
 
             m_sfmlControl.UpdateDelegates.Add(this.UpdateLines);
@@ -82,7 +83,6 @@ namespace MapEditor
         {
             window.Draw(m_backgroundShape);
         }
-
 
     }
 }
