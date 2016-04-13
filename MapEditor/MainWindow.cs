@@ -63,6 +63,8 @@ namespace MapEditor
             m_sfmlControl.MouseUp += sfmlControl_MouseUp;
             m_sfmlControl.MouseDown += sfmlControl_MouseDown;
             m_sfmlControl.MouseMove += sfmlControl_MouseMove;
+            m_sfmlControl.MouseEnter += sfmlControl_MouseEnter;
+            m_sfmlControl.MouseLeave += sfmlControl_MouseLeave;
 
             m_backgroundShape.FillColor = SFML.Graphics.Color.Black;
             m_backgroundShape.Size = m_maxTextureSize;
@@ -71,6 +73,44 @@ namespace MapEditor
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.WindowState = FormWindowState.Maximized;
+        }
+
+        private void sfmlControl_MouseLeave(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Default;
+        }
+
+        private void sfmlControl_MouseEnter(object sender, EventArgs e)
+        {
+            switch(m_lineInputState)
+            {
+                case LineInputState.None:
+                default: break;
+                case LineInputState.Add:
+                    this.Cursor = Cursors.Cross;
+                    break;
+                case LineInputState.Move:
+                    this.Cursor = Cursors.SizeAll;
+                    break;
+                case LineInputState.Remove:
+                    this.Cursor = new Cursor(GetType(), "Eraser.cur");
+                    break;
+            }
+
+            switch(m_boxInputState)
+            {
+                case BoxInputState.None:
+                default: break;
+                case BoxInputState.Add:
+                    this.Cursor = Cursors.Cross;
+                    break;
+                case BoxInputState.Move:
+                    this.Cursor = Cursors.SizeAll;
+                    break;
+                case BoxInputState.Remove:
+                    this.Cursor = new Cursor(GetType(), "Eraser.cur");
+                    break;
+            }
         }
 
         public void DispatchDrawingEvents()
@@ -84,5 +124,14 @@ namespace MapEditor
             window.Draw(m_backgroundShape);
         }
 
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sd = new SaveFileDialog();
+            sd.Filter = "LM Maps|.*lmm";
+            if(sd.ShowDialog() == DialogResult.OK)
+            {
+                SaveFile(sd.FileName);
+            }
+        }
     }
 }

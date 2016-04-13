@@ -41,6 +41,8 @@
             this.buttonTextureUp = new System.Windows.Forms.Button();
             this.buttonAddTexture = new System.Windows.Forms.Button();
             this.listBoxTextures = new System.Windows.Forms.ListBox();
+            this.numericUpDownBoxVal = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
             this.numericUpDownHeight = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -60,6 +62,7 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownBoxVal)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWidth)).BeginInit();
             this.SuspendLayout();
@@ -132,6 +135,7 @@
             | System.Windows.Forms.Keys.S)));
             this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.saveAsToolStripMenuItem.Text = "Save As...";
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // quitToolStripMenuItem
             // 
@@ -155,6 +159,8 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.numericUpDownBoxVal);
+            this.splitContainer2.Panel2.Controls.Add(this.label3);
             this.splitContainer2.Panel2.Controls.Add(this.numericUpDownHeight);
             this.splitContainer2.Panel2.Controls.Add(this.label2);
             this.splitContainer2.Panel2.Controls.Add(this.label1);
@@ -204,6 +210,38 @@
             this.listBoxTextures.Name = "listBoxTextures";
             this.listBoxTextures.Size = new System.Drawing.Size(156, 147);
             this.listBoxTextures.TabIndex = 0;
+            // 
+            // numericUpDownBoxVal
+            // 
+            this.numericUpDownBoxVal.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownBoxVal.Location = new System.Drawing.Point(190, 130);
+            this.numericUpDownBoxVal.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownBoxVal.Name = "numericUpDownBoxVal";
+            this.numericUpDownBoxVal.Size = new System.Drawing.Size(53, 20);
+            this.numericUpDownBoxVal.TabIndex = 11;
+            this.numericUpDownBoxVal.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownBoxVal.ValueChanged += new System.EventHandler(this.numericUpDownBoxVal_ValueChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(163, 132);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(17, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "V:";
             // 
             // numericUpDownHeight
             // 
@@ -362,6 +400,7 @@
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownBoxVal)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHeight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWidth)).EndInit();
             this.ResumeLayout(false);
@@ -393,6 +432,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericUpDownWidth;
+        private System.Windows.Forms.NumericUpDown numericUpDownBoxVal;
+        private System.Windows.Forms.Label label3;
     }
 }
 
