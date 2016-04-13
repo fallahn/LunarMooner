@@ -41,10 +41,10 @@ namespace MapEditor
 
     public partial class MainWindow : Form
     {
-        private struct TexName
+        private class TexName
         {
-            public string Name;
-            public SFML.Graphics.Texture Texture;
+            public string Name { get; set; }
+            public SFML.Graphics.Texture Texture { get; set; }
         }
         private List<SFML.Graphics.Sprite> m_sprites = new List<SFML.Graphics.Sprite>();
 
@@ -58,7 +58,6 @@ namespace MapEditor
                 tn.Texture = new SFML.Graphics.Texture(od.FileName);
                 tn.Name = Path.GetFileName(od.FileName);
                 listBoxTextures.Items.Add(tn);
-                //listBoxTextures.Items[listBoxTextures.Items.Count - 1];
 
                 SFML.Graphics.Sprite spr = new SFML.Graphics.Sprite(tn.Texture);
                 m_sprites.Add(spr);

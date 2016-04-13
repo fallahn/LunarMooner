@@ -31,6 +31,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace MapEditor
 {
@@ -39,13 +40,169 @@ namespace MapEditor
     /// </summary>
     public partial class MainWindow : Form
     {
+        private bool m_mouseDown = false;
+        private int m_currentHandle = -1;
 
+        enum LineInputState
+        {
+            None,
+            Add,
+            Move,
+            Remove
+        }
+        private LineInputState m_lineInputState = LineInputState.None;
 
+        private void radioButtonAddPoint_CheckedChanged(object sender, EventArgs e)
+        {
+            if(radioButtonAddPoint.Checked)
+            {
+                m_lineInputState = LineInputState.Add;
+                this.Cursor = Cursors.Cross;
+            }
+        }
 
+        private void radioButtonMovePoint_CheckedChanged(object sender, EventArgs e)
+        {
+            if(radioButtonMovePoint.Checked)
+            {
+                m_lineInputState = LineInputState.Move;
+                this.Cursor = Cursors.SizeAll;
+            }
+        }
+
+        private void radioButtonDeletePoint_CheckedChanged(object sender, EventArgs e)
+        {
+            if(radioButtonDeletePoint.Checked)
+            {
+                m_lineInputState = LineInputState.Remove;
+                this.Cursor = new Cursor(GetType(), "Eraser.cur");
+            }
+        }
+
+        private void sfmlControl_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                m_mouseDown = false;
+
+                var sfPosition = m_sfmlControl.MouseWorldPosition;
+                if (sfPosition.X > 0 && sfPosition.X < m_maxTextureSize.X
+                    && sfPosition.Y > 0 && sfPosition.Y < m_maxTextureSize.Y)
+                {
+                    switch (m_lineInputState)
+                    {
+                        case LineInputState.None:
+                        default: break;
+                        case LineInputState.Add:
+                            m_screenPoints.Add(new ScreenPoint(sfPosition));
+                            break;
+                        case LineInputState.Move:
+                            m_currentHandle = -1;
+                            break;
+                        case LineInputState.Remove:
+                            int index = -1;
+                            for (var i = 0; i < m_screenPoints.Count; ++i)
+                            {
+                                if(m_screenPoints[i].Handle.GetGlobalBounds().Contains(sfPosition.X, sfPosition.Y))
+                                {
+                                    index = i;
+                                    break;
+                                }
+                            }
+                            if(index != -1)
+                            {
+                                m_screenPoints.RemoveAt(index);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void sfmlControl_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                m_mouseDown = true;
+                var mousePos = m_sfmlControl.MouseWorldPosition;
+                if(m_lineInputState == LineInputState.Move)
+                {
+                    for(var i = 0; i < m_screenPoints.Count; ++i)
+                    {
+                        if (m_screenPoints[i].Handle.GetGlobalBounds().Contains(mousePos.X, mousePos.Y))
+                        {
+                            m_currentHandle = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void sfmlControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (m_mouseDown)
+            {
+                if (m_lineInputState == LineInputState.Move
+                    && m_currentHandle < m_screenPoints.Count
+                    && m_currentHandle > -1)
+                {
+                    m_screenPoints[m_currentHandle].Position = m_sfmlControl.MouseWorldPosition;
+                }
+            }
+        }
+
+        public class ScreenPoint
+        {
+            private SFML.Window.Vector2f m_position = new SFML.Window.Vector2f();
+            public SFML.Window.Vector2f Position
+            {
+                get
+                {
+                    return m_position;
+                }
+
+                set
+                {
+                    m_position = value;
+                    Handle.Position = value;
+                }
+            }
+            public SFML.Graphics.RectangleShape Handle { get; set; }
+            public ScreenPoint(SFML.Window.Vector2f position)
+            {
+                Handle = new SFML.Graphics.RectangleShape(new SFML.Window.Vector2f(6, 6));
+                Handle.FillColor = SFML.Graphics.Color.Transparent;
+                Handle.OutlineColor = SFML.Graphics.Color.Yellow;
+                Handle.OutlineThickness = 1f;
+                Handle.Origin = new SFML.Window.Vector2f(3, 3);
+
+                Position = position;
+            }
+        }
+        private List<ScreenPoint> m_screenPoints = new List<ScreenPoint>();
+
+        private SFML.Graphics.Vertex[] m_vertices;
+        public void UpdateLines(float dt)
+        {
+            m_vertices = new SFML.Graphics.Vertex[m_screenPoints.Count];
+            for(var i = 0; i < m_vertices.Length; ++i)
+            {
+                m_vertices[i].Position = m_screenPoints[i].Position;
+                m_vertices[i].Color = SFML.Graphics.Color.Red;
+            }
+        }
 
         public void DrawLines(SFML.Graphics.RenderWindow window)
         {
+            //draw vertex array
+            window.Draw(m_vertices, SFML.Graphics.PrimitiveType.LinesStrip);
 
+            //draw points
+            foreach(var p in m_screenPoints)
+            {
+                window.Draw(p.Handle);
+            }
         }
     }
 }

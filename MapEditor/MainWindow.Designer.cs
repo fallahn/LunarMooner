@@ -34,13 +34,16 @@
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.listBoxTextures = new System.Windows.Forms.ListBox();
-            this.buttonAddTexture = new System.Windows.Forms.Button();
-            this.buttonTextureUp = new System.Windows.Forms.Button();
             this.buttonTextureDown = new System.Windows.Forms.Button();
+            this.buttonTextureUp = new System.Windows.Forms.Button();
+            this.buttonAddTexture = new System.Windows.Forms.Button();
+            this.listBoxTextures = new System.Windows.Forms.ListBox();
+            this.radioButtonAddPoint = new System.Windows.Forms.RadioButton();
+            this.radioButtonMovePoint = new System.Windows.Forms.RadioButton();
+            this.radioButtonDeletePoint = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -48,6 +51,7 @@
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -112,13 +116,6 @@
             this.saveToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
-            // quitToolStripMenuItem
-            // 
-            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.quitToolStripMenuItem.Text = "Quit";
-            // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
@@ -126,6 +123,13 @@
             | System.Windows.Forms.Keys.S)));
             this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.saveAsToolStripMenuItem.Text = "Save As...";
+            // 
+            // quitToolStripMenuItem
+            // 
+            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
+            this.quitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.quitToolStripMenuItem.Text = "Quit";
             // 
             // splitContainer2
             // 
@@ -139,17 +143,33 @@
             this.splitContainer2.Panel1.Controls.Add(this.buttonTextureUp);
             this.splitContainer2.Panel1.Controls.Add(this.buttonAddTexture);
             this.splitContainer2.Panel1.Controls.Add(this.listBoxTextures);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.radioButtonDeletePoint);
+            this.splitContainer2.Panel2.Controls.Add(this.radioButtonMovePoint);
+            this.splitContainer2.Panel2.Controls.Add(this.radioButtonAddPoint);
             this.splitContainer2.Size = new System.Drawing.Size(1156, 197);
             this.splitContainer2.SplitterDistance = 206;
             this.splitContainer2.TabIndex = 0;
             // 
-            // listBoxTextures
+            // buttonTextureDown
             // 
-            this.listBoxTextures.FormattingEnabled = true;
-            this.listBoxTextures.Location = new System.Drawing.Point(3, 3);
-            this.listBoxTextures.Name = "listBoxTextures";
-            this.listBoxTextures.Size = new System.Drawing.Size(156, 147);
-            this.listBoxTextures.TabIndex = 0;
+            this.buttonTextureDown.Location = new System.Drawing.Point(165, 32);
+            this.buttonTextureDown.Name = "buttonTextureDown";
+            this.buttonTextureDown.Size = new System.Drawing.Size(22, 23);
+            this.buttonTextureDown.TabIndex = 3;
+            this.buttonTextureDown.Text = "D";
+            this.buttonTextureDown.UseVisualStyleBackColor = true;
+            // 
+            // buttonTextureUp
+            // 
+            this.buttonTextureUp.Location = new System.Drawing.Point(165, 3);
+            this.buttonTextureUp.Name = "buttonTextureUp";
+            this.buttonTextureUp.Size = new System.Drawing.Size(22, 23);
+            this.buttonTextureUp.TabIndex = 2;
+            this.buttonTextureUp.Text = "U";
+            this.buttonTextureUp.UseVisualStyleBackColor = true;
             // 
             // buttonAddTexture
             // 
@@ -161,23 +181,49 @@
             this.buttonAddTexture.UseVisualStyleBackColor = true;
             this.buttonAddTexture.Click += new System.EventHandler(this.buttonAddTexture_Click);
             // 
-            // buttonTextureUp
+            // listBoxTextures
             // 
-            this.buttonTextureUp.Location = new System.Drawing.Point(165, 3);
-            this.buttonTextureUp.Name = "buttonTextureUp";
-            this.buttonTextureUp.Size = new System.Drawing.Size(22, 23);
-            this.buttonTextureUp.TabIndex = 2;
-            this.buttonTextureUp.Text = "U";
-            this.buttonTextureUp.UseVisualStyleBackColor = true;
+            this.listBoxTextures.FormattingEnabled = true;
+            this.listBoxTextures.Location = new System.Drawing.Point(3, 3);
+            this.listBoxTextures.Name = "listBoxTextures";
+            this.listBoxTextures.Size = new System.Drawing.Size(156, 147);
+            this.listBoxTextures.TabIndex = 0;
             // 
-            // buttonTextureDown
+            // radioButtonAddPoint
             // 
-            this.buttonTextureDown.Location = new System.Drawing.Point(165, 32);
-            this.buttonTextureDown.Name = "buttonTextureDown";
-            this.buttonTextureDown.Size = new System.Drawing.Size(22, 23);
-            this.buttonTextureDown.TabIndex = 3;
-            this.buttonTextureDown.Text = "D";
-            this.buttonTextureDown.UseVisualStyleBackColor = true;
+            this.radioButtonAddPoint.AutoSize = true;
+            this.radioButtonAddPoint.Location = new System.Drawing.Point(12, 9);
+            this.radioButtonAddPoint.Name = "radioButtonAddPoint";
+            this.radioButtonAddPoint.Size = new System.Drawing.Size(71, 17);
+            this.radioButtonAddPoint.TabIndex = 0;
+            this.radioButtonAddPoint.TabStop = true;
+            this.radioButtonAddPoint.Text = "Add Point";
+            this.radioButtonAddPoint.UseVisualStyleBackColor = true;
+            this.radioButtonAddPoint.CheckedChanged += new System.EventHandler(this.radioButtonAddPoint_CheckedChanged);
+            // 
+            // radioButtonMovePoint
+            // 
+            this.radioButtonMovePoint.AutoSize = true;
+            this.radioButtonMovePoint.Location = new System.Drawing.Point(12, 32);
+            this.radioButtonMovePoint.Name = "radioButtonMovePoint";
+            this.radioButtonMovePoint.Size = new System.Drawing.Size(79, 17);
+            this.radioButtonMovePoint.TabIndex = 1;
+            this.radioButtonMovePoint.TabStop = true;
+            this.radioButtonMovePoint.Text = "Move Point";
+            this.radioButtonMovePoint.UseVisualStyleBackColor = true;
+            this.radioButtonMovePoint.CheckedChanged += new System.EventHandler(this.radioButtonMovePoint_CheckedChanged);
+            // 
+            // radioButtonDeletePoint
+            // 
+            this.radioButtonDeletePoint.AutoSize = true;
+            this.radioButtonDeletePoint.Location = new System.Drawing.Point(12, 55);
+            this.radioButtonDeletePoint.Name = "radioButtonDeletePoint";
+            this.radioButtonDeletePoint.Size = new System.Drawing.Size(83, 17);
+            this.radioButtonDeletePoint.TabIndex = 2;
+            this.radioButtonDeletePoint.TabStop = true;
+            this.radioButtonDeletePoint.Text = "Delete Point";
+            this.radioButtonDeletePoint.UseVisualStyleBackColor = true;
+            this.radioButtonDeletePoint.CheckedChanged += new System.EventHandler(this.radioButtonDeletePoint_CheckedChanged);
             // 
             // MainWindow
             // 
@@ -196,6 +242,8 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -217,6 +265,9 @@
         private System.Windows.Forms.ListBox listBoxTextures;
         private System.Windows.Forms.Button buttonTextureDown;
         private System.Windows.Forms.Button buttonTextureUp;
+        private System.Windows.Forms.RadioButton radioButtonDeletePoint;
+        private System.Windows.Forms.RadioButton radioButtonMovePoint;
+        private System.Windows.Forms.RadioButton radioButtonAddPoint;
     }
 }
 
