@@ -58,6 +58,7 @@ namespace MapEditor
             {
                 m_lineInputState = LineInputState.Add;
                 this.Cursor = Cursors.Cross;
+                m_boxInputState = BoxInputState.None;
             }
         }
 
@@ -67,6 +68,7 @@ namespace MapEditor
             {
                 m_lineInputState = LineInputState.Move;
                 this.Cursor = Cursors.SizeAll;
+                m_boxInputState = BoxInputState.None;
             }
         }
 
@@ -76,6 +78,7 @@ namespace MapEditor
             {
                 m_lineInputState = LineInputState.Remove;
                 this.Cursor = new Cursor(GetType(), "Eraser.cur");
+                m_boxInputState = BoxInputState.None;
             }
         }
 
@@ -115,6 +118,35 @@ namespace MapEditor
                             }
                             break;
                     }
+
+                    switch(m_boxInputState)
+                    {
+                        case BoxInputState.None:
+                        default: break;
+                        case BoxInputState.Add:
+                            var box = new ScreenBox(sfPosition);
+                            box.Box.Size = new SFML.Window.Vector2f((float)numericUpDownWidth.Value, (float)numericUpDownHeight.Value);
+                            m_screenBoxes.Add(box);
+                            break;
+                        case BoxInputState.Move:
+                            m_currentBox = -1;
+                            break;
+                        case BoxInputState.Remove:
+                            int idx = -1;
+                            for (var i = 0; i < m_screenBoxes.Count; ++i)
+                            {
+                                if(m_screenBoxes[i].Box.GetGlobalBounds().Contains(sfPosition.X, sfPosition.Y))
+                                {
+                                    idx = i;
+                                    break;
+                                }
+                            }
+                            if(idx != -1)
+                            {
+                                m_screenBoxes.RemoveAt(idx);
+                            }
+                            break;
+                    }
                 }
             }
         }
@@ -136,6 +168,28 @@ namespace MapEditor
                         }
                     }
                 }
+                else if(m_boxInputState == BoxInputState.Move)
+                {
+                    m_selectedBox = -1;
+                    for(var i = 0; i < m_screenBoxes.Count; ++i)
+                    {
+                        if (m_screenBoxes[i].Box.GetGlobalBounds().Contains(mousePos.X, mousePos.Y))
+                        {
+                            m_currentBox = i;
+                            m_boxOffset = m_screenBoxes[i].Box.Position - mousePos;
+                            m_screenBoxes[i].Box.OutlineThickness = 2;
+                            m_selectedBox = i;
+
+                            var size = m_screenBoxes[i].Box.Size;
+                            numericUpDownWidth.Value = (decimal)size.X;
+                            numericUpDownHeight.Value = (decimal)size.Y;
+                        }
+                        else
+                        {
+                            m_screenBoxes[i].Box.OutlineThickness = 0;
+                        }
+                    }
+                }
             }
         }
 
@@ -148,6 +202,13 @@ namespace MapEditor
                     && m_currentHandle > -1)
                 {
                     m_screenPoints[m_currentHandle].Position = m_sfmlControl.MouseWorldPosition;
+                }
+                else if(m_boxInputState == BoxInputState.Move
+                    && m_currentBox < m_screenBoxes.Count
+                    && m_currentBox > -1)
+                {
+                    var mousePos = m_sfmlControl.MouseWorldPosition;
+                    m_screenBoxes[m_currentBox].Box.Position = mousePos + m_boxOffset;
                 }
             }
         }

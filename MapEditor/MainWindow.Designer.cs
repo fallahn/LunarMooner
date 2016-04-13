@@ -41,9 +41,16 @@
             this.buttonTextureUp = new System.Windows.Forms.Button();
             this.buttonAddTexture = new System.Windows.Forms.Button();
             this.listBoxTextures = new System.Windows.Forms.ListBox();
-            this.radioButtonAddPoint = new System.Windows.Forms.RadioButton();
-            this.radioButtonMovePoint = new System.Windows.Forms.RadioButton();
+            this.numericUpDownHeight = new System.Windows.Forms.NumericUpDown();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.numericUpDownWidth = new System.Windows.Forms.NumericUpDown();
+            this.radioButtonDeleteBox = new System.Windows.Forms.RadioButton();
+            this.radioButtonMoveBox = new System.Windows.Forms.RadioButton();
+            this.radioButtonAddBox = new System.Windows.Forms.RadioButton();
             this.radioButtonDeletePoint = new System.Windows.Forms.RadioButton();
+            this.radioButtonMovePoint = new System.Windows.Forms.RadioButton();
+            this.radioButtonAddPoint = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -53,6 +60,8 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHeight)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWidth)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -146,6 +155,13 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.numericUpDownHeight);
+            this.splitContainer2.Panel2.Controls.Add(this.label2);
+            this.splitContainer2.Panel2.Controls.Add(this.label1);
+            this.splitContainer2.Panel2.Controls.Add(this.numericUpDownWidth);
+            this.splitContainer2.Panel2.Controls.Add(this.radioButtonDeleteBox);
+            this.splitContainer2.Panel2.Controls.Add(this.radioButtonMoveBox);
+            this.splitContainer2.Panel2.Controls.Add(this.radioButtonAddBox);
             this.splitContainer2.Panel2.Controls.Add(this.radioButtonDeletePoint);
             this.splitContainer2.Panel2.Controls.Add(this.radioButtonMovePoint);
             this.splitContainer2.Panel2.Controls.Add(this.radioButtonAddPoint);
@@ -189,17 +205,117 @@
             this.listBoxTextures.Size = new System.Drawing.Size(156, 147);
             this.listBoxTextures.TabIndex = 0;
             // 
-            // radioButtonAddPoint
+            // numericUpDownHeight
             // 
-            this.radioButtonAddPoint.AutoSize = true;
-            this.radioButtonAddPoint.Location = new System.Drawing.Point(12, 9);
-            this.radioButtonAddPoint.Name = "radioButtonAddPoint";
-            this.radioButtonAddPoint.Size = new System.Drawing.Size(71, 17);
-            this.radioButtonAddPoint.TabIndex = 0;
-            this.radioButtonAddPoint.TabStop = true;
-            this.radioButtonAddPoint.Text = "Add Point";
-            this.radioButtonAddPoint.UseVisualStyleBackColor = true;
-            this.radioButtonAddPoint.CheckedChanged += new System.EventHandler(this.radioButtonAddPoint_CheckedChanged);
+            this.numericUpDownHeight.Location = new System.Drawing.Point(190, 104);
+            this.numericUpDownHeight.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDownHeight.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownHeight.Name = "numericUpDownHeight";
+            this.numericUpDownHeight.Size = new System.Drawing.Size(52, 20);
+            this.numericUpDownHeight.TabIndex = 9;
+            this.numericUpDownHeight.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.numericUpDownHeight.ValueChanged += new System.EventHandler(this.numericUpDownHeight_ValueChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(163, 106);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(18, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "H:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(163, 80);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(21, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "W:";
+            // 
+            // numericUpDownWidth
+            // 
+            this.numericUpDownWidth.Location = new System.Drawing.Point(190, 78);
+            this.numericUpDownWidth.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numericUpDownWidth.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownWidth.Name = "numericUpDownWidth";
+            this.numericUpDownWidth.Size = new System.Drawing.Size(52, 20);
+            this.numericUpDownWidth.TabIndex = 6;
+            this.numericUpDownWidth.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.numericUpDownWidth.ValueChanged += new System.EventHandler(this.numericUpDownWidth_ValueChanged);
+            // 
+            // radioButtonDeleteBox
+            // 
+            this.radioButtonDeleteBox.AutoSize = true;
+            this.radioButtonDeleteBox.Location = new System.Drawing.Point(166, 55);
+            this.radioButtonDeleteBox.Name = "radioButtonDeleteBox";
+            this.radioButtonDeleteBox.Size = new System.Drawing.Size(77, 17);
+            this.radioButtonDeleteBox.TabIndex = 5;
+            this.radioButtonDeleteBox.TabStop = true;
+            this.radioButtonDeleteBox.Text = "Delete Box";
+            this.radioButtonDeleteBox.UseVisualStyleBackColor = true;
+            this.radioButtonDeleteBox.CheckedChanged += new System.EventHandler(this.radioButtonDeleteBox_CheckedChanged);
+            // 
+            // radioButtonMoveBox
+            // 
+            this.radioButtonMoveBox.AutoSize = true;
+            this.radioButtonMoveBox.Location = new System.Drawing.Point(166, 32);
+            this.radioButtonMoveBox.Name = "radioButtonMoveBox";
+            this.radioButtonMoveBox.Size = new System.Drawing.Size(73, 17);
+            this.radioButtonMoveBox.TabIndex = 4;
+            this.radioButtonMoveBox.TabStop = true;
+            this.radioButtonMoveBox.Text = "Move Box";
+            this.radioButtonMoveBox.UseVisualStyleBackColor = true;
+            this.radioButtonMoveBox.CheckedChanged += new System.EventHandler(this.radioButtonMoveBox_CheckedChanged);
+            // 
+            // radioButtonAddBox
+            // 
+            this.radioButtonAddBox.AutoSize = true;
+            this.radioButtonAddBox.Location = new System.Drawing.Point(166, 8);
+            this.radioButtonAddBox.Name = "radioButtonAddBox";
+            this.radioButtonAddBox.Size = new System.Drawing.Size(65, 17);
+            this.radioButtonAddBox.TabIndex = 3;
+            this.radioButtonAddBox.TabStop = true;
+            this.radioButtonAddBox.Text = "Add Box";
+            this.radioButtonAddBox.UseVisualStyleBackColor = true;
+            this.radioButtonAddBox.CheckedChanged += new System.EventHandler(this.radioButtonAddBox_CheckedChanged);
+            // 
+            // radioButtonDeletePoint
+            // 
+            this.radioButtonDeletePoint.AutoSize = true;
+            this.radioButtonDeletePoint.Location = new System.Drawing.Point(12, 55);
+            this.radioButtonDeletePoint.Name = "radioButtonDeletePoint";
+            this.radioButtonDeletePoint.Size = new System.Drawing.Size(83, 17);
+            this.radioButtonDeletePoint.TabIndex = 2;
+            this.radioButtonDeletePoint.TabStop = true;
+            this.radioButtonDeletePoint.Text = "Delete Point";
+            this.radioButtonDeletePoint.UseVisualStyleBackColor = true;
+            this.radioButtonDeletePoint.CheckedChanged += new System.EventHandler(this.radioButtonDeletePoint_CheckedChanged);
             // 
             // radioButtonMovePoint
             // 
@@ -213,17 +329,17 @@
             this.radioButtonMovePoint.UseVisualStyleBackColor = true;
             this.radioButtonMovePoint.CheckedChanged += new System.EventHandler(this.radioButtonMovePoint_CheckedChanged);
             // 
-            // radioButtonDeletePoint
+            // radioButtonAddPoint
             // 
-            this.radioButtonDeletePoint.AutoSize = true;
-            this.radioButtonDeletePoint.Location = new System.Drawing.Point(12, 55);
-            this.radioButtonDeletePoint.Name = "radioButtonDeletePoint";
-            this.radioButtonDeletePoint.Size = new System.Drawing.Size(83, 17);
-            this.radioButtonDeletePoint.TabIndex = 2;
-            this.radioButtonDeletePoint.TabStop = true;
-            this.radioButtonDeletePoint.Text = "Delete Point";
-            this.radioButtonDeletePoint.UseVisualStyleBackColor = true;
-            this.radioButtonDeletePoint.CheckedChanged += new System.EventHandler(this.radioButtonDeletePoint_CheckedChanged);
+            this.radioButtonAddPoint.AutoSize = true;
+            this.radioButtonAddPoint.Location = new System.Drawing.Point(12, 9);
+            this.radioButtonAddPoint.Name = "radioButtonAddPoint";
+            this.radioButtonAddPoint.Size = new System.Drawing.Size(71, 17);
+            this.radioButtonAddPoint.TabIndex = 0;
+            this.radioButtonAddPoint.TabStop = true;
+            this.radioButtonAddPoint.Text = "Add Point";
+            this.radioButtonAddPoint.UseVisualStyleBackColor = true;
+            this.radioButtonAddPoint.CheckedChanged += new System.EventHandler(this.radioButtonAddPoint_CheckedChanged);
             // 
             // MainWindow
             // 
@@ -246,6 +362,8 @@
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHeight)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWidth)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -268,6 +386,13 @@
         private System.Windows.Forms.RadioButton radioButtonDeletePoint;
         private System.Windows.Forms.RadioButton radioButtonMovePoint;
         private System.Windows.Forms.RadioButton radioButtonAddPoint;
+        private System.Windows.Forms.RadioButton radioButtonDeleteBox;
+        private System.Windows.Forms.RadioButton radioButtonMoveBox;
+        private System.Windows.Forms.RadioButton radioButtonAddBox;
+        private System.Windows.Forms.NumericUpDown numericUpDownHeight;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown numericUpDownWidth;
     }
 }
 
