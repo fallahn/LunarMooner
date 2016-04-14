@@ -666,40 +666,14 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left, -40.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
+    collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ alienArea.width, 40.f } }, lm::CollisionComponent::ID::Bounds);
+    entity = xy::Entity::create(getMessageBus());
+    entity->addComponent(collision);
+    entity->setPosition(alienArea.left, 1080.f);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    //towers to land on (position, size)
-    std::array<std::pair<sf::Vector2f, sf::Vector2f>, 4u> positions =
-    {
-        std::make_pair(sf::Vector2f(alienArea.left + 20.f, 990.f), sf::Vector2f(180.f, 20.f)),
-        std::make_pair(sf::Vector2f(alienArea.left + 570.f, 890.f), sf::Vector2f(150.f, 10.f)),
-        std::make_pair(sf::Vector2f(alienArea.left + 980.f, 1020.f), sf::Vector2f(160.f, 20.f)),
-        std::make_pair(sf::Vector2f(alienArea.left + 1270.f, 840.f), sf::Vector2f(40.f, 10.f))
-    };
-    //hack in some scores for now until we decide a better way to generate terrain
-    std::array<sf::Uint16, 4u> scores = {30, 10, 60, 70};
-    int i = 0;
-
-    //TODO we can get rid of these eventually
-    xy::SfDrawableComponent<sf::RectangleShape>::Ptr drawable;
-    for (const auto& p : positions)
-    {
-        drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-        drawable->getDrawable().setFillColor(sf::Color::Green);
-        drawable->getDrawable().setSize(p.second);
-
-        collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f }, p.second }, lm::CollisionComponent::ID::Tower);
-        collision->setScoreValue(scores[i++]);
-
-        entity = xy::Entity::create(getMessageBus());
-        entity->addComponent(drawable);
-        entity->addComponent(collision);
-        entity->setPosition(p.first.x, p.first.y);
-
-        m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
-    }
-
-    //flame effects
-    xy::ParticleSystem::Definition pd;
+    //flame effects - we know these work so lets make part of the map file
+    /*xy::ParticleSystem::Definition pd;
     pd.loadFromFile("assets/particles/fire.xyp", m_textureResource);
     
     auto ps = pd.createSystem(getMessageBus());
@@ -709,19 +683,32 @@ void GameController::createTerrain()
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(550.f, 860.f);
     entity->addComponent(ps);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);*/
 
     //death zone at bottom
-    auto terrain = xy::Component::create<Terrain>(getMessageBus(), positions, alienArea);
+    auto terrain = xy::Component::create<Terrain>(getMessageBus());
+    terrain->load("assets/maps/01.lmm", m_textureResource);
 
     entity = xy::Entity::create(getMessageBus());
+    entity->setPosition(alienArea.left, 1080.f - 320.f); //TODO fix these numbers
     m_terrain = entity->addComponent(terrain);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 
-    auto terrainSprite = xy::Component::create<xy::SfDrawableComponent<sf::Sprite>>(getMessageBus());
-    terrainSprite->getDrawable().setTexture(m_textureResource.get("assets/images/game/terrain.png"));
-    terrainSprite->getDrawable().setPosition(alienArea.left, 754.f); //bleh really need to tidy some shit
-    entity->addComponent(terrainSprite);
+    //need to do this after adding to entity to get correct transforms
+    auto platforms = m_terrain->getPlatforms();
+    for (const auto& p : platforms)
+    {
+        collision = m_collisionWorld.addComponent(getMessageBus(), { {}, p.size }, lm::CollisionComponent::ID::Tower);
+        collision->setScoreValue(p.value);
 
+        entity = xy::Entity::create(getMessageBus());
+        entity->addComponent(collision);
+        entity->setPosition(p.position);
+
+        m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
+    }
+
+    entity = xy::Entity::create(getMessageBus());
     auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);
     shieldDrawable->setPosition(960.f, 3700.f);
     shieldDrawable->rotate(-180.f);
