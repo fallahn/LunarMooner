@@ -43,6 +43,8 @@ namespace MapEditor
     /// </summary>
     public partial class MainWindow : Form
     {
+        private string m_currentPath = "";
+
         public class Point
         {
             public float X;
@@ -96,7 +98,7 @@ namespace MapEditor
             MapDefinition mapDef = new MapDefinition();
             if (listBoxTextures.Items.Count > 0)
             {
-                mapDef.TextureName = listBoxTextures.Items[0].ToString();
+                mapDef.TextureName = listBoxTextures.GetItemText(listBoxTextures.Items[0]);
             }
 
             foreach(var p in m_screenPoints)
@@ -120,6 +122,8 @@ namespace MapEditor
                 {
                     srlz.Serialize(jw, mapDef);
                 }
+
+                m_currentPath = path;
             }
             catch (Exception ex)
             {
@@ -127,9 +131,54 @@ namespace MapEditor
             }
         }
 
-        private void LoadFile()
+        private void LoadFile(string path)
         {
+            try
+            {
+                MapDefinition md = new MapDefinition();
 
+                JsonSerializer srlz = new JsonSerializer();
+                srlz.NullValueHandling = NullValueHandling.Ignore;
+
+                using (StreamReader sr = new StreamReader(path))
+                using (JsonReader jr = new JsonTextReader(sr))
+                {
+                    md = srlz.Deserialize<MapDefinition>(jr);
+                }
+
+
+                ClearAll();
+
+                if(md.TextureName != string.Empty)
+                {
+                    try
+                    {
+                        LoadTexture(Path.GetDirectoryName(path) + Path.DirectorySeparatorChar + md.TextureName);
+                    }
+                    catch(Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Failed Loading Image");
+                    }
+                }
+
+                foreach(var p in md.Points)
+                {
+                    m_screenPoints.Add(new ScreenPoint(new SFML.Window.Vector2f(p.X, p.Y)));
+                }
+
+                foreach(var b in md.Platforms)
+                {
+                    m_screenBoxes.Add(new ScreenBox(new SFML.Window.Vector2f(b.Position.X, b.Position.Y)));
+                    m_screenBoxes.Last().Box.Size = new SFML.Window.Vector2f(b.Size.X, b.Size.Y);
+                    m_screenBoxes.Last().Value = b.Value;
+                }
+
+                m_currentPath = path;
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message, "Failed to open map file");
+            }
         }
     }
 }

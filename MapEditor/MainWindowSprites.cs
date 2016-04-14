@@ -54,14 +54,19 @@ namespace MapEditor
             od.Filter = "Portable Network Graphic|*.png|JPEG files|*.jpg|Bitmap|*.bmp";
             if(od.ShowDialog() == DialogResult.OK)
             {
-                TexName tn = new TexName();
-                tn.Texture = new SFML.Graphics.Texture(od.FileName);
-                tn.Name = Path.GetFileName(od.FileName);
-                listBoxTextures.Items.Add(tn);
-
-                SFML.Graphics.Sprite spr = new SFML.Graphics.Sprite(tn.Texture);
-                m_sprites.Add(spr);
+                LoadTexture(od.FileName);
             }
+        }
+
+        private void LoadTexture(string path)
+        {
+            TexName tn = new TexName();
+            tn.Texture = new SFML.Graphics.Texture(path);
+            tn.Name = Path.GetFileName(path);
+            listBoxTextures.Items.Add(tn);
+
+            SFML.Graphics.Sprite spr = new SFML.Graphics.Sprite(tn.Texture);
+            m_sprites.Add(spr);
         }
 
         public void DrawSprites(SFML.Graphics.RenderWindow window)

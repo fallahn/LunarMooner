@@ -117,7 +117,7 @@ namespace MapEditor
             {
                 Box = new SFML.Graphics.RectangleShape(new SFML.Window.Vector2f(20, 20));
                 Box.Position = position;
-                Box.FillColor = SFML.Graphics.Color.Green;
+                Box.FillColor = new SFML.Graphics.Color(0, 255, 0, 120);
                 Box.OutlineColor = SFML.Graphics.Color.Red;
             }
         }
