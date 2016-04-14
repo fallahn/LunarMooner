@@ -377,6 +377,9 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::LifeBonus, "assets/sound/fx/extra_life.wav");
     soundPlayer->preCache(LMSoundID::ShieldLost, "assets/sound/fx/shield_lost.wav");
     soundPlayer->preCache(LMSoundID::RoundEnded, "assets/sound/fx/end_of_round.wav");
+    soundPlayer->preCache(LMSoundID::PlayerDied, "assets/sound/speech/player_die.wav");
+    soundPlayer->preCache(LMSoundID::MissionTerminated, "assets/sound/speech/game_over.wav");
+    soundPlayer->preCache(LMSoundID::HumanRescued, "assets/sound/speech/alright.wav");
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
@@ -393,8 +396,9 @@ void LunarMoonerState::initSounds()
         case LMGameEvent::LaserFired:
             player->playSound(LMSoundID::Laser, msgData.posX, msgData.posY);
             break;
-        case LMGameEvent::AlienDied:
         case LMGameEvent::PlayerDied:
+            //player->playSound(LMSoundID::PlayerDied, 960.f, 540.f);
+        case LMGameEvent::AlienDied:        
         case LMGameEvent::MeteorExploded:
             player->playSound(xy::Util::Random::value(LMSoundID::Explosion01, LMSoundID::Explosion04), msgData.posX, msgData.posY);
             break;
@@ -418,6 +422,9 @@ void LunarMoonerState::initSounds()
             break;
         case LMGameEvent::ExtraLife:
             player->playSound(LMSoundID::LifeBonus, 960.f, 540.f);
+            break;
+        case LMGameEvent::HumanRescued:
+            player->playSound(LMSoundID::HumanRescued, msgData.posX, msgData.posY);
             break;
         }
     };
@@ -449,6 +456,9 @@ void LunarMoonerState::initSounds()
 
             player->setChannelVolume(1, volume);
         }
+            break;
+        case LMStateEvent::GameOver:
+            player->playSound(LMSoundID::MissionTerminated, 960.f, 540.f);
             break;
         }
     };
@@ -485,7 +495,6 @@ void LunarMoonerState::initSounds()
     gameMusic->setSound("assets/sound/music/game.ogg", xy::AudioSource::Mode::Stream);
     gameMusic->setFadeOutTime(1.f);
     gameMusic->setFadeInTime(1.f);
-    //gameMusic->setVolume(20.f);
     
     const auto& settings = getContext().appInstance.getAudioSettings();
 
@@ -503,6 +512,7 @@ void LunarMoonerState::initSounds()
             break;
         case LMStateEvent::RoundEnd:
             as->stop();
+            as->setVolume(0.f);
             break;
         }
     };

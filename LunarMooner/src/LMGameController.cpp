@@ -687,7 +687,7 @@ void GameController::createTerrain()
 
     //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus());
-    terrain->load("assets/maps/01.lmm", m_textureResource);
+    terrain->load("assets/maps/02.lmm", m_textureResource);
 
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(alienArea.left, 1080.f - 320.f); //TODO fix these numbers

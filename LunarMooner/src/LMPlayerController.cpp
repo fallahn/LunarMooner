@@ -272,7 +272,11 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                 m_carrying = false;
                 auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
                 msg->type = LMGameEvent::HumanRescued;
-                LOG("human saved!", xy::Logger::Type::Info);
+                auto position = m_entity->getPosition();
+                msg->posX = position.x;
+                msg->posY = position.y;
+                msg->value = cc->getScoreValue();
+                //LOG("human saved!", xy::Logger::Type::Info);
             }
         }
         break;
