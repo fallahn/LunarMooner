@@ -133,7 +133,10 @@ enum LMSoundID
     LifeBonus,
     RoundEnded,
     RoundCountLoop,
-    RoundCountEnd
+    RoundCountEnd,
+    MissionTerminated,
+    PlayerDied,
+    HumanRescued
 };
 
 #endif //COMMAND_IDS_HPP_
