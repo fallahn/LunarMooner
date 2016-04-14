@@ -127,11 +127,52 @@ namespace MapEditor
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog sd = new SaveFileDialog();
-            sd.Filter = "LM Maps|.*lmm";
+            sd.Filter = "LM Maps|*.lmm";
             if(sd.ShowDialog() == DialogResult.OK)
             {
                 SaveFile(sd.FileName);
             }
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("You Will Lose Any Unsaved Data", "Are You Sure?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                OpenFileDialog od = new OpenFileDialog();
+                od.Filter = "LM Map Files|*.lmm";
+                if (od.ShowDialog() == DialogResult.OK)
+                {
+                    LoadFile(od.FileName);
+                }
+            }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(m_currentPath != string.Empty)
+            {
+                SaveFile(m_currentPath);
+            }
+            else
+            {
+                saveAsToolStripMenuItem_Click(this, EventArgs.Empty);
+            }
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Clear All Data?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                ClearAll();
+            }
+        }
+
+        private void ClearAll()
+        {
+            listBoxTextures.Items.Clear();
+            m_sprites.Clear();
+            m_screenBoxes.Clear();
+            m_screenPoints.Clear();
         }
     }
 }

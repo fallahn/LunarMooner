@@ -175,7 +175,7 @@ namespace MapEditor
                         {
                             m_currentBox = i;
                             m_boxOffset = m_screenBoxes[i].Box.Position - mousePos;
-                            m_screenBoxes[i].Box.OutlineThickness = 2;
+                            m_screenBoxes[i].Box.OutlineThickness = -2;
                             m_selectedBox = i;
 
                             var size = m_screenBoxes[i].Box.Size;
