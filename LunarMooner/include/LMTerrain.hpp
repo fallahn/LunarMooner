@@ -32,25 +32,51 @@ source distribution.
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Transformable.hpp>
 
 #include <array>
+
+namespace xy
+{
+    class TextureResource;
+}
 
 namespace lm
 {
     class Terrain final : public sf::Drawable, public xy::Component
     {
     public:
-        Terrain(xy::MessageBus&, const std::array<std::pair<sf::Vector2f, sf::Vector2f>, 4u>&, const sf::FloatRect&);
+        struct Platform final
+        {
+            sf::Vector2f size;
+            sf::Vector2f position;
+            sf::Uint16 value = 0;
+        };
+
+        explicit Terrain(xy::MessageBus&);
         ~Terrain() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
+        void onStart(xy::Entity&) override;
+        sf::FloatRect globalBounds() const override { return m_bounds; }
 
-        const std::vector<sf::Vector2f>& getChain() const { return m_chain; }
+        bool load(const std::string&, xy::TextureResource&);
+
+        const std::vector<sf::Vector2f>& getChain() const;
+        std::vector<Platform> getPlatforms() const;
 
     private:
-        std::vector<sf::Vector2f> m_chain;
-        std::vector<sf::Vertex> m_vertices;
+        mutable bool m_transformed;
+        mutable std::vector<sf::Vector2f> m_chain;
+        std::vector<Platform> m_platforms;
+
+        sf::FloatRect m_bounds;
+        xy::Entity* m_entity;
+
+        std::array<sf::Vertex, 4u> m_vertices;
+        sf::Texture m_texture;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
