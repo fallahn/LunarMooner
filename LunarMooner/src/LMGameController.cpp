@@ -101,7 +101,7 @@ namespace
     const std::array<float, 10u> roundTimes =
     {
         75.f, 90.f, 100.f, 110.f, 120.f, 
-        130.f, 145.f, 150.f, 155.f, 160.f
+        130.f, 155.f, 160.f, 165.f, 170.f
     };
     //how much time to remove for current difficulty setting
     const float mediumPenalty = 5.f;
@@ -756,12 +756,13 @@ void GameController::createTerrain()
     //need to do this after adding to entity to get correct transforms
     updatePlatforms();
 
-    entity = xy::Entity::create(getMessageBus());
-    auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);
-    shieldDrawable->setPosition(960.f, 3700.f);
-    shieldDrawable->rotate(-180.f);
+    auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);   
     shieldDrawable->setTexture(m_textureResource.get("assets/images/game/shield_noise.png"));
-    //shieldDrawable->setScale(0.1f, 0.1f);
+    
+    entity = xy::Entity::create(getMessageBus());
+    entity->setPosition(960.f, 3700.f);//3700.f
+    //entity->setScale(0.1f, 0.1f);
+    entity->rotate(-180.f);
     entity->addComponent(shieldDrawable);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
@@ -975,6 +976,7 @@ void GameController::restorePlayerState()
 
     //set the terrain to the current level
     m_terrain->setLevel(ps.level);
+    updatePlatforms();
 
     //reset round time if new round
     if (ps.startNewRound)
@@ -1073,10 +1075,9 @@ void GameController::restartRound()
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
 
-    //increase aliens
     ps.alienCount = alienCounts[std::min(static_cast<std::size_t>(ps.level - 1), alienCounts.size() - 1)];
     ps.ammo = 0;
-    ps.lives--;
+    //ps.lives--;
     ps.startNewRound = true;
 
     //display a round summary

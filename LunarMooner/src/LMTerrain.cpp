@@ -114,6 +114,7 @@ const std::vector<Terrain::Platform>& Terrain::getPlatforms() const
         {
             p.position = tx.transformPoint(p.position);
         }
+        m_platforms[m_level].first = true;
     }
     return m_platforms[m_level].second;
 }

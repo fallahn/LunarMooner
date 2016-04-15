@@ -75,7 +75,7 @@ ShieldDrawable::ShieldDrawable(xy::MessageBus& mb, float radius)
     for (auto i = 0u, j = 0u; i < m_vertices.size() - 1; i += 2, ++j)
     {
         const float theta = startAngle - ((i / 2) * step);
-        const sf::Vector2f position(sin(theta), cos(theta));
+        sf::Vector2f position(sin(theta), cos(theta));
 
         m_vertices[i].position = position * (radius - thickness);
         m_vertices[i].texCoords = m_vertices[i].position;
@@ -86,6 +86,25 @@ ShieldDrawable::ShieldDrawable(xy::MessageBus& mb, float radius)
         m_vertices[i+1].color = shieldColour;
 
         m_outline[j] = m_vertices[i+1];
+
+        position *= radius;
+        if (position.x < m_bounds.left)
+        {
+            m_bounds.left = position.x;
+        }
+        else if (position.x - m_bounds.left > m_bounds.width)
+        {
+            m_bounds.width = position.x - m_bounds.left;
+        }
+
+        if (position.y < m_bounds.top)
+        {
+            m_bounds.top = position.y;
+        }
+        else if (position.y - m_bounds.top > m_bounds.height)
+        {
+            m_bounds.height = position.y - m_bounds.top;
+        }
     }
 
     m_shader.loadFromMemory(fragShader, sf::Shader::Fragment);
@@ -110,6 +129,11 @@ void ShieldDrawable::entityUpdate(xy::Entity&, float dt)
     m_shader.setUniform("u_intensity", m_wavetable[m_waveTableIndex]);
 }
 
+sf::FloatRect ShieldDrawable::globalBounds() const
+{
+    return m_bounds;
+}
+
 void ShieldDrawable::setTexture(sf::Texture& t)
 {
     t.setRepeated(true);
@@ -121,7 +145,6 @@ void ShieldDrawable::setTexture(sf::Texture& t)
 void ShieldDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.blendMode = sf::BlendAdd;
-    states.transform *= getTransform();
     states.texture = m_texture;
     states.shader = &m_shader;
 
