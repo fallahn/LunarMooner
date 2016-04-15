@@ -44,7 +44,7 @@ namespace
 
 Terrain::Terrain(xy::MessageBus& mb)
     :xy::Component  (mb, this),
-    m_transformed   (false),
+    m_level         (0u),
     m_entity        (nullptr)
 {
     m_vertices[1].position.x = size.x;
@@ -71,11 +71,72 @@ void Terrain::onStart(xy::Entity& entity)
     m_entity = &entity;
 }
 
+void Terrain::init(const std::string& mapDir, xy::TextureResource& tr)
+{
+    //list map files in dir and shuffle
+    auto files = xy::FileSystem::listFiles(mapDir);
+    files.erase(std::remove_if(files.begin(), files.end(),
+        [](const std::string& str)
+    {
+        return (xy::FileSystem::getFileExtension(str) != ".lmm");
+    }), files.end());
+
+    std::random_shuffle(files.begin(), files.end());
+
+    //load up to 10 of them
+    std::size_t max = std::min(10u, files.size());
+    for (auto i = 0u; i < max; ++i)
+    {
+        load(mapDir + "/" + files[i], tr);
+    }
+}
+
+const std::vector<sf::Vector2f>& Terrain::getChain() const
+{
+    if (!m_chains[m_level].first)
+    {
+        m_chains[m_level].first = true;
+        const auto& tx = m_entity->getTransform();
+        for (auto& c : m_chains[m_level].second)
+        {
+            c = tx.transformPoint(c);
+        }
+    }
+    return m_chains[m_level].second;
+}
+
+const std::vector<Terrain::Platform>& Terrain::getPlatforms() const
+{
+    if (!m_platforms[m_level].first)
+    {
+        const auto& tx = m_entity->getTransform();
+        for (auto& p : m_platforms[m_level].second)
+        {
+            p.position = tx.transformPoint(p.position);
+        }
+    }
+    return m_platforms[m_level].second;
+}
+
+void Terrain::setLevel(sf::Uint8 level)
+{
+    level -= 1;
+    if (!m_textures.empty())
+    {
+        m_level = level % m_textures.size();
+    }
+}
+
+//private
+void Terrain::draw(sf::RenderTarget& rt, sf::RenderStates states) const
+{
+    states.texture = &m_textures[m_level];
+    rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
+}
+
 bool Terrain::load(const std::string& path, xy::TextureResource& tr)
 {
-    m_platforms.clear();
-    m_chain.clear();
-    m_transformed = false;
+
 
     //load / parse json file
     std::ifstream file(path);
@@ -100,7 +161,7 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
         return false;
     }
     file.close();
-    
+
     //function for parsing vector values from objects
     std::function<sf::Vector2f(const picojson::object&)> getVecFromObject = []
         (const picojson::object& o)-> sf::Vector2f
@@ -122,6 +183,10 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
         return retVal;
     };
 
+    std::vector<sf::Vector2f> points;
+    std::vector<Platform> platforms;
+    sf::Texture texture;
+
     picojson::value pv;
     auto err = picojson::parse(pv, jsonString);
     if (err.empty())
@@ -132,16 +197,18 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
             if (!textureFile.empty())
             {
                 std::string mapDir = xy::FileSystem::getFilePath(path);
-                m_texture = tr.get(mapDir + textureFile);
+                texture = tr.get(mapDir + textureFile);
             }
             else
             {
                 xy::Logger::log("No texture name given in map file: " + path, xy::Logger::Type::Warning);
+                return false;
             }
         }
         else
         {
             xy::Logger::log("Missing texture property in map file: " + path, xy::Logger::Type::Warning);
+            return false;
         }
 
         if (pv.get("Platforms").is<picojson::array>())
@@ -153,8 +220,8 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
                 {
                     if (v.is<picojson::object>())
                     {
-                        m_platforms.emplace_back();
-                        Platform& platform = m_platforms.back();
+                        platforms.emplace_back();
+                        Platform& platform = platforms.back();
                         const auto& o = v.get<picojson::object>();
                         for (const auto& property : o)
                         {
@@ -192,7 +259,7 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
             {
                 if (v.is<picojson::object>())
                 {
-                    m_chain.push_back(getVecFromObject(v.get<picojson::object>()));
+                    points.push_back(getVecFromObject(v.get<picojson::object>()));
                 }
             }
         }
@@ -203,41 +270,13 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
         return false;
     }
 
+    if (points.empty() || platforms.empty())
+    {
+        return false;
+    }
+    m_chains.emplace_back(std::make_pair(false, points));
+    m_platforms.emplace_back(std::make_pair(false, platforms));
+    m_textures.push_back(texture);
+
     return true;
-}
-
-const std::vector<sf::Vector2f>& Terrain::getChain() const
-{
-    if (!m_transformed)
-    {
-        const auto& tx = m_entity->getTransform();
-        for (auto& p : m_chain)
-        {
-            p = tx.transformPoint(p);
-        }
-        m_transformed = true;
-    }
-    return m_chain;
-}
-
-std::vector<Terrain::Platform> Terrain::getPlatforms() const
-{
-    std::vector<Platform> platforms(m_platforms.size());
-
-    const auto& tx = m_entity->getTransform();
-    for (auto i = 0u; i < m_platforms.size(); ++i)
-    {
-        platforms[i].position = tx.transformPoint(m_platforms[i].position);
-        platforms[i].size = m_platforms[i].size;
-        platforms[i].value = m_platforms[i].value;
-    }
-
-    return std::move(platforms);
-}
-
-//private
-void Terrain::draw(sf::RenderTarget& rt, sf::RenderStates states) const
-{
-    states.texture = &m_texture;
-    rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 }

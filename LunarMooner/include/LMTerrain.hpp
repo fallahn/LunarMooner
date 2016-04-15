@@ -62,22 +62,28 @@ namespace lm
         void onStart(xy::Entity&) override;
         sf::FloatRect globalBounds() const override { return m_bounds; }
 
-        bool load(const std::string&, xy::TextureResource&);
-
+        void init(const std::string&, xy::TextureResource&);
+        
         const std::vector<sf::Vector2f>& getChain() const;
-        std::vector<Platform> getPlatforms() const;
+        const std::vector<Platform>& getPlatforms() const;
+
+        void setLevel(sf::Uint8);
+        bool valid() const { return !m_textures.empty(); }
 
     private:
-        mutable bool m_transformed;
-        mutable std::vector<sf::Vector2f> m_chain;
-        std::vector<Platform> m_platforms;
+        std::size_t m_level;
+        
+        mutable std::vector<std::pair<bool, std::vector<sf::Vector2f>>> m_chains;
+        mutable std::vector<std::pair<bool, std::vector<Platform>>> m_platforms;
 
         sf::FloatRect m_bounds;
         xy::Entity* m_entity;
 
         std::array<sf::Vertex, 4u> m_vertices;
-        sf::Texture m_texture;
+        std::vector<sf::Texture> m_textures;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
+
+        bool load(const std::string&, xy::TextureResource&);
     };
 }
 
