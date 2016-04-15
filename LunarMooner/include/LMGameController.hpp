@@ -121,6 +121,7 @@ namespace lm
         void spawnAliens();
 
         void createTerrain();
+        void updatePlatforms();
 
         void addRescuedHuman();
         void spawnBullet();

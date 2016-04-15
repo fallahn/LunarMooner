@@ -503,6 +503,8 @@ void GameController::spawnPlayer()
 {
     if (!m_player && m_spawnReady)
     {
+        if (!m_terrain->valid()) return;
+        
         const auto& children = m_mothership->getChildren();
         auto spawnPos = children.back()->getWorldPosition();
         xy::Command cmd;
@@ -744,7 +746,7 @@ void GameController::createTerrain()
 
     //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus());
-    terrain->load("assets/maps/02.lmm", m_textureResource);
+    terrain->init("assets/maps", m_textureResource);
 
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(alienArea.left, 1080.f - 320.f); //TODO fix these numbers
@@ -752,18 +754,7 @@ void GameController::createTerrain()
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 
     //need to do this after adding to entity to get correct transforms
-    auto platforms = m_terrain->getPlatforms();
-    for (const auto& p : platforms)
-    {
-        collision = m_collisionWorld.addComponent(getMessageBus(), { {}, p.size }, lm::CollisionComponent::ID::Tower);
-        collision->setScoreValue(p.value);
-
-        entity = xy::Entity::create(getMessageBus());
-        entity->addComponent(collision);
-        entity->setPosition(p.position);
-
-        m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
-    }
+    updatePlatforms();
 
     entity = xy::Entity::create(getMessageBus());
     auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);
@@ -774,6 +765,44 @@ void GameController::createTerrain()
     entity->addComponent(shieldDrawable);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
+}
+
+void GameController::updatePlatforms()
+{
+    if (!m_terrain->valid()) return;
+
+    //remove old platforms
+    xy::Command cmd;
+    cmd.category = LMCommandID::TerrainObject;
+    cmd.action = [](xy::Entity& ent, float) {ent.destroy(); };
+    m_scene.sendCommand(cmd);
+
+    //because the remove command is delayed one frame we need to 
+    //delay this too else the new platforms will be destroyed
+
+    m_delayedEvents.emplace_back();
+    auto& de = m_delayedEvents.back();
+    de.time = 0.1f;
+    de.action = [this]()
+    {
+        auto platforms = m_terrain->getPlatforms();
+        for (const auto& p : platforms)
+        {
+            auto collision = m_collisionWorld.addComponent(getMessageBus(), { {}, p.size }, lm::CollisionComponent::ID::Tower);
+            collision->setScoreValue(p.value);
+
+            auto temp = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
+            temp->getDrawable().setRadius(10.f);
+
+            auto entity = xy::Entity::create(getMessageBus());
+            entity->addComponent(collision);
+            entity->addCommandCategories(LMCommandID::TerrainObject);
+            entity->setPosition(p.position);
+            entity->addComponent(temp);
+
+            m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
+        }
+    };
 }
 
 void GameController::addRescuedHuman()
@@ -944,6 +973,9 @@ void GameController::restorePlayerState()
     //lose ammo - TODO should this be restored with state?
     m_playerStates[m_currentPlayer].ammo = 0;
 
+    //set the terrain to the current level
+    m_terrain->setLevel(ps.level);
+
     //reset round time if new round
     if (ps.startNewRound)
     {
@@ -1006,8 +1038,6 @@ void GameController::moveToNextRound()
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
 
-    //TODO gen a new terrain?
-
     //increase aliens
     ps.alienCount = alienCounts[std::min(ps.level, static_cast<sf::Uint8>(alienCounts.size() - 1))];
     ps.ammo = 0;
@@ -1042,8 +1072,6 @@ void GameController::restartRound()
     {
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
-
-    //TODO load a new terrain?
 
     //increase aliens
     ps.alienCount = alienCounts[std::min(static_cast<std::size_t>(ps.level - 1), alienCounts.size() - 1)];
