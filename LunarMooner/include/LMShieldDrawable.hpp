@@ -31,7 +31,6 @@ source distribution.
 #include <xygine/components/Component.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Shader.hpp>
 
@@ -39,7 +38,7 @@ source distribution.
 
 namespace lm
 {
-    class ShieldDrawable final : public xy::Component, public sf::Transformable, public sf::Drawable
+    class ShieldDrawable final : public xy::Component, public sf::Drawable
     {
     public:
         ShieldDrawable(xy::MessageBus&, float);
@@ -47,6 +46,7 @@ namespace lm
 
         xy::Component::Type type()const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
+        sf::FloatRect globalBounds() const override;
 
         void setTexture(sf::Texture&);
 
@@ -57,6 +57,7 @@ namespace lm
         std::size_t m_waveTableIndex;
         std::vector<float> m_wavetable;
 
+        sf::FloatRect m_bounds;
         sf::Texture* m_texture;
         std::array<sf::Vertex, 22u> m_vertices;
         std::array<sf::Vertex, 11u> m_outline;
