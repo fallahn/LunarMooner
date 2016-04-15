@@ -347,6 +347,8 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount)
         xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld,
             getContext().appInstance.getAudioSettings(), m_soundResource, m_textureResource, m_fontResource);
 
+    gameController->setDifficulty(getContext().appInstance.getGameSettings().difficulty);
+
     for (auto i = 0; i < playerCount; ++i)
     {
         gameController->addPlayer();
@@ -757,8 +759,6 @@ void LunarMoonerState::buildBackground()
     m_scene.setActiveCamera(entity->addComponent(camera));
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
   
-
-
     //background
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_textureResource);
     background->setVelocity({ 0.f, 1.f });

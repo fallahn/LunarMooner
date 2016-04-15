@@ -43,11 +43,14 @@ namespace lm
 
         sf::Vector2f getVelocity() const { return m_velocity * m_speed; }
 
+        void setSpeed(float speed) { m_speed = (m_speed < 0) ? -speed : speed; }
+
     private:
 
         sf::Vector2f m_bounds;
         sf::Vector2f m_velocity;
         float m_speed;
+        std::size_t m_index;
     };
 }
 

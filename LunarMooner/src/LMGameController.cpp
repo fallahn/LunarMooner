@@ -69,7 +69,7 @@ namespace
 
     const sf::Uint32 rescueScore = 50u;
     const sf::Uint32 extraLifeScore = 5000u;
-    const sf::Uint8 minAsteroidLevel = 2;
+    const sf::Uint8 minAsteroidLevel = 1;
 
     const sf::Uint8 ammoPerHuman = 3u;
     const sf::Uint8 maxItems = 4;
@@ -85,7 +85,7 @@ namespace
     //aliens per level
     const std::array<sf::Uint8, 10u> alienCounts =
     {
-        12, 14, 16, 18, 21, 24, 27, 31, 35, 38
+        12, 18, 18, 21, 21, 24, 27, 31, 35, 38
     };
 
     const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
@@ -103,11 +103,20 @@ namespace
         75.f, 90.f, 100.f, 110.f, 120.f, 
         130.f, 145.f, 150.f, 155.f, 160.f
     };
+    //how much time to remove for current difficulty setting
+    const float mediumPenalty = 5.f;
+    const float hardPenalty = mediumPenalty * 2.f;
+
+    //and ship speed for current difficulty
+    const float easySpeed = 110.f;
+    const float mediumSpeed = 180.f;
+    const float hardSpeed = 250.f;
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as,
     xy::SoundResource& sr, xy::TextureResource& tr, xy::FontResource& fr)
     : xy::Component     (mb, this),
+    m_difficulty        (xy::Difficulty::Easy),
     m_scene             (scene),
     m_collisionWorld    (cw),
     m_audioSettings     (as),
@@ -269,6 +278,32 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 message->playerId = i;
                 message->score = m_playerStates[i].score;
             }
+        }
+        else if (msgData.type == xy::Message::UIEvent::RequestDifficultyChange)
+        {
+            m_difficulty = msgData.difficulty;
+
+            if (m_mothership)
+            {
+                auto controller = m_mothership->getComponent<MothershipController>();
+                switch (m_difficulty)
+                {
+                default: break;
+                case xy::Difficulty::Easy:
+                    controller->setSpeed(easySpeed);
+                    break;
+                case xy::Difficulty::Medium:
+                    controller->setSpeed(mediumSpeed);
+                    break;
+                case xy::Difficulty::Hard:
+                    controller->setSpeed(hardSpeed);
+                    break;
+                }
+            }
+
+            //TODO check which we are switching from / to and update player times
+            //ideally we'd update the times, but this could be abused to give
+            //the player loads of extra time
         }
     };
     addMessageHandler(handler);
@@ -438,6 +473,15 @@ void GameController::addPlayer()
 
     state.alienCount = alienCounts[0];
     state.timeRemaining = roundTimes[0];
+    //adjust for game difficulty
+    if (m_difficulty == xy::Difficulty::Medium)
+    {
+        state.timeRemaining -= mediumPenalty;
+    }
+    else if (m_difficulty == xy::Difficulty::Hard)
+    {
+        state.timeRemaining -= hardPenalty;
+    }
 }
 
 void GameController::start()
@@ -547,6 +591,19 @@ void GameController::createMothership()
     drawable->getDrawable().setFillColor(sf::Color::Yellow);
 
     auto controller = xy::Component::create<lm::MothershipController>(getMessageBus(), mothershipBounds);
+    switch (m_difficulty)
+    {
+    default: break;
+    case xy::Difficulty::Easy:
+        controller->setSpeed(easySpeed);
+        break;
+    case xy::Difficulty::Medium:
+        controller->setSpeed(mediumSpeed);
+        break;
+    case xy::Difficulty::Hard:
+        controller->setSpeed(hardSpeed);
+        break;
+    }
 
     auto bounds = drawable->getDrawable().getGlobalBounds();
     auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, {bounds.width, bounds.height} }, CollisionComponent::ID::Mothership);
@@ -867,10 +924,10 @@ void GameController::restorePlayerState()
     if (ps.level > minAsteroidLevel)
     {
         addDelayedAsteroid();
-        if (ps.level > (minAsteroidLevel * 2))
+        if (ps.level > (minAsteroidLevel * 3))
         {
             addDelayedAsteroid(); //even moar!!
-            if (ps.level > (minAsteroidLevel * 3))
+            if (ps.level > (minAsteroidLevel * 6))
             {
                 addDelayedAsteroid(); //MOOOOAAAR!! :P
             }
@@ -893,10 +950,26 @@ void GameController::restorePlayerState()
         if (ps.level <= roundTimes.size())
         {
             ps.timeRemaining = roundTimes[ps.level - 1];
+            if (m_difficulty == xy::Difficulty::Medium)
+            {
+                ps.timeRemaining -= mediumPenalty;
+            }
+            else if (m_difficulty == xy::Difficulty::Hard)
+            {
+                ps.timeRemaining -= hardPenalty;
+            }
         }
         else //2 seconds fewer for each level above 10
         {
             ps.timeRemaining = roundTimes.back() - ((ps.level - 10) * 2.f);
+            if (m_difficulty == xy::Difficulty::Medium)
+            {
+                ps.timeRemaining -= mediumPenalty;
+            }
+            else if (m_difficulty == xy::Difficulty::Hard)
+            {
+                ps.timeRemaining -= hardPenalty;
+            }
         }
     }
 

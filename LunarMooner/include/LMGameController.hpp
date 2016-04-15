@@ -70,7 +70,11 @@ namespace lm
         void addPlayer();
         void start();
 
+        void setDifficulty(xy::Difficulty d) { m_difficulty = d; }
+
     private:
+        xy::Difficulty m_difficulty;
+
         xy::Scene& m_scene;
         CollisionWorld& m_collisionWorld;
         const xy::App::AudioSettings& m_audioSettings;
