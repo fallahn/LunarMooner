@@ -83,8 +83,8 @@ void Terrain::init(const std::string& mapDir, xy::TextureResource& tr)
 
     std::random_shuffle(files.begin(), files.end());
 
-    //load up to 10 of them
-    std::size_t max = std::min(10u, files.size());
+    //load up to 10 of them (g++ requires explicit type)
+    std::size_t max = std::min(std::size_t(10u), files.size());
     for (auto i = 0u; i < max; ++i)
     {
         load(mapDir + "/" + files[i], tr);
