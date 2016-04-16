@@ -564,11 +564,29 @@ void GameController::spawnPlayer()
         entity->addComponent(thrust);
         entity->addComponent(rcsLeft);
         entity->addComponent(rcsRight);
-        entity->addComponent(sfx1);
-        entity->addComponent(sfx2);
-        entity->addComponent(sfx3);
+        auto fx1 = entity->addComponent(sfx1);
+        auto fx2 = entity->addComponent(sfx2);
+        auto fx3 = entity->addComponent(sfx3);
         entity->addCommandCategories(LMCommandID::Player);
         m_scene.addEntity(entity, xy::Scene::BackFront);
+
+        xy::Component::MessageHandler mh;
+        mh.id = xy::Message::UIMessage;
+        mh.action = [fx1, fx2, fx3, this](xy::Component*, const xy::Message& msg)
+        {
+            auto& msgData = msg.getData<xy::Message::UIEvent>();
+            switch (msgData.type)
+            {
+            default: break;
+            case xy::Message::UIEvent::MenuOpened:
+                fx1->pause();
+                fx2->pause();
+                fx3->pause();
+                m_player->setInput(0);
+                break;
+            }
+        };
+        m_player->addMessageHandler(mh);
 
         m_spawnReady = false;
         m_timeRound = true;
@@ -1163,7 +1181,25 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     as->setFadeInTime(1.5f);
     as->play(true);
 
-    //TODO gui setting callback
+    //gui setting callback
+    xy::Component::MessageHandler mh;
+    mh.id = xy::Message::UIMessage;
+    mh.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        auto sound = dynamic_cast<xy::AudioSource*>(c);
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::MenuClosed:
+            sound->play(true);
+            break;
+        case xy::Message::UIEvent::MenuOpened:
+            sound->pause();
+            break;
+        }
+    };
+    as->addMessageHandler(mh);
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
