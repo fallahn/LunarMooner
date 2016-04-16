@@ -137,7 +137,8 @@ enum LMSoundID
     RoundCountEnd,
     MissionTerminated,
     PlayerDied,
-    HumanRescued
+    HumanRescued,
+    ShieldHit
 };
 
 #endif //COMMAND_IDS_HPP_
