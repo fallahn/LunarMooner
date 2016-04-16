@@ -849,8 +849,8 @@ void GameController::spawnBullet()
 {
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
     drawable->getDrawable().setSize(bulletSize);
-    drawable->getDrawable().setFillColor(sf::Color(90u, 255u, 120u, 190u));
-    drawable->getDrawable().setOutlineColor(sf::Color(0u, 185u, 0u, 100u));
+    drawable->getDrawable().setFillColor(sf::Color(90u, 255u, 220u, 190u));
+    drawable->getDrawable().setOutlineColor(sf::Color(0u, 185u, 140u, 100u));
     drawable->getDrawable().setOutlineThickness(2.f);
     drawable->setBlendMode(sf::BlendAdd);
     

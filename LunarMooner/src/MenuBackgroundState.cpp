@@ -238,6 +238,7 @@ void MenuBackgroundState::setup()
     menuSound->setVolume(volume);
 
     entity = xy::Entity::create(m_messageBus);
+    entity->setPosition(960.f, 540.f);
     auto ms = entity->addComponent(menuSound);
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
