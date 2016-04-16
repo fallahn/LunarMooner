@@ -49,7 +49,7 @@ namespace lm
 
         void onStart(xy::Entity&) override;
 
-        //void collisionCallback(CollisionComponent*);
+        void collisionCallback(CollisionComponent*);
 
     private:
         sf::FloatRect m_bounds;

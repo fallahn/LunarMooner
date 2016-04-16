@@ -245,6 +245,13 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 spawnCollectable({ msgData.posX, msgData.posY });
             }
             break;
+        case LMGameEvent::MeteorExploded:
+            if (msgData.value > 0)
+            {
+                m_playerStates[m_currentPlayer].score += msgData.value;
+                m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
+            }
+            break;
         }
     };
     addMessageHandler(handler);
@@ -810,14 +817,10 @@ void GameController::updatePlatforms()
             auto collision = m_collisionWorld.addComponent(getMessageBus(), { {}, p.size }, lm::CollisionComponent::ID::Tower);
             collision->setScoreValue(p.value);
 
-            auto temp = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
-            temp->getDrawable().setRadius(10.f);
-
             auto entity = xy::Entity::create(getMessageBus());
             entity->addComponent(collision);
             entity->addCommandCategories(LMCommandID::TerrainObject);
             entity->setPosition(p.position);
-            entity->addComponent(temp);
 
             m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
         }
@@ -1167,9 +1170,9 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     auto controller = xy::Component::create<AsteroidController>(getMessageBus(), alienArea, sf::Vector2f(dir, 1.f));
 
     auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);
-    //lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);
-    //collision->setCallback(cb);
-    collision->setScoreValue(100);
+    lm::CollisionComponent::Callback cb = std::bind(&AsteroidController::collisionCallback, controller.get(), std::placeholders::_1);
+    collision->setCallback(cb);
+    collision->setScoreValue(1000);
 
     auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
     ps->setLifetimeVariance(0.55f);

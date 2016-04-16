@@ -26,9 +26,11 @@ source distribution.
 *********************************************************************/
 
 #include <LMShieldDrawable.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/util/Const.hpp>
 #include <xygine/util/Wavetable.hpp>
+#include <xygine/Entity.hpp>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -53,19 +55,38 @@ namespace
         "uniform vec2 u_offset = vec2(0.0);\n"
         "uniform float u_intensity = 1.0;\n"
 
+        "uniform vec2 u_impactPoint = vec2(0.5);\n"
+        "uniform float u_impactRadius = 0.01;\n"
+        "uniform float u_impactIntensity = 1.0;\n"
+
         "void main()\n"
         "{\n"
-        "    vec2 stretch = vec2(0.9);\n"
-        "    stretch.y *= gl_TexCoord[0].y;\n"
-        "    gl_FragColor = gl_Color * texture2D(u_texture, gl_TexCoord[0].xy + (u_offset - stretch)) * u_intensity;\n"
+
+        /*"    else\n"*/
+        "    {\n"
+        "        vec2 stretch = vec2(0.9);\n"
+        "        stretch.y *= gl_TexCoord[0].y;\n"
+        "        gl_FragColor = gl_Color * texture2D(u_texture, gl_TexCoord[0].xy + (u_offset - stretch)) * u_intensity;\n"
+        "    }\n"
+
+        "    vec2 impactVec = gl_TexCoord[0].xy - u_impactPoint;\n"
+        "    float distance = dot(impactVec, impactVec);\n"
+        "    if(distance < u_impactRadius)\n"
+        "    {\n"
+        "        gl_FragColor += gl_Color * u_impactIntensity * (distance / u_impactRadius);\n"
+        "    }\n"
         "}\n";
 
     const float offsetSpeed = 0.125f;
+    const float maxImpactRadius = 0.15f;
 }
 
 ShieldDrawable::ShieldDrawable(xy::MessageBus& mb, float radius)
-    : xy::Component (mb, this),
-    m_texture       (nullptr)
+    : xy::Component     (mb, this),
+    m_entity            (nullptr),
+    m_impactRadius      (0.f),
+    m_impactIntensity   (1.f),
+    m_texture           (nullptr)
 {
     XY_ASSERT(radius > halfWidth, "Needs a bigger radius");
     const float startAngle = std::asin(halfWidth / radius);
@@ -116,6 +137,28 @@ ShieldDrawable::ShieldDrawable(xy::MessageBus& mb, float radius)
         w = (w + 1.f) * 0.5f; //to range 0.5 - 1.0
         w = (w + 1.f) * 0.5f; //to range 0.75 - 1.0
     }
+
+    //callback for handling impact effects
+    xy::Component::MessageHandler mh;
+    mh.id = LMMessageId::GameEvent;
+    mh.action = [this](xy::Component*, const xy::Message& msg)
+    {
+        auto& msgData = msg.getData<LMGameEvent>();
+        if (msgData.type == LMGameEvent::MeteorExploded && msgData.value == 0)
+        {
+            sf::Vector2f position(msgData.posX, msgData.posY);
+            position = m_entity->getInverseTransform().transformPoint(position);
+
+            auto texSize = m_texture->getSize();
+            position.x /= texSize.x;
+            position.y /= texSize.y;         
+
+            m_shader.setUniform("u_impactPoint", position);
+            m_impactRadius = 0.f;
+            m_impactIntensity = 1.f;
+        }
+    };
+    addMessageHandler(mh);
 }
 
 //public
@@ -127,6 +170,17 @@ void ShieldDrawable::entityUpdate(xy::Entity&, float dt)
 
     m_shader.setUniform("u_offset", m_textureOffset);
     m_shader.setUniform("u_intensity", m_wavetable[m_waveTableIndex]);
+
+    m_impactIntensity = std::max(0.f, m_impactIntensity - dt);
+    m_impactRadius = std::min(maxImpactRadius, m_impactRadius + dt * maxImpactRadius);
+
+    m_shader.setUniform("u_impactRadius", m_impactRadius * m_impactRadius);
+    m_shader.setUniform("u_impactIntensity", m_impactIntensity);
+}
+
+void ShieldDrawable::onStart(xy::Entity& entity)
+{
+    m_entity = &entity;
 }
 
 sf::FloatRect ShieldDrawable::globalBounds() const
