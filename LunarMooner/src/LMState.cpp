@@ -46,6 +46,8 @@ source distribution.
 #include <xygine/components/ParticleController.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/AudioSource.hpp>
+#include <xygine/components/PointLight.hpp>
+#include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/components/Camera.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 
@@ -250,6 +252,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
 
 bool LunarMoonerState::update(float dt)
 {
+    //get input
     if(m_useController) parseControllerInput();
     
     if (m_inputFlags != m_prevInputFlags)
@@ -265,6 +268,33 @@ bool LunarMoonerState::update(float dt)
         m_scene.sendCommand(cmd);
     }
     
+    //update lights
+    auto& normalMapShader = m_shaderResource.get(LMShaderID::NormalMapColoured);
+    auto ents = m_scene.queryQuadTree(m_scene.getVisibleArea());
+    auto i = 0u;
+    for (; i < ents.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
+    {
+        auto light = ents[i]->getEntity()->getComponent<xy::PointLight>();
+        if (light)
+        {
+            const std::string idx = std::to_string(i);
+
+            auto pos = light->getWorldPosition();
+            normalMapShader.setUniform("u_pointLightPositions[" + std::to_string(i) + "]", pos);
+            normalMapShader.setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
+            normalMapShader.setUniform("u_pointLights[" + idx + "].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
+            //normalMapShader.setUniform("u_pointLights[" + idx + "].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
+            normalMapShader.setUniform("u_pointLights[" + idx + "].inverseRange", light->getInverseRange());
+        }
+    }
+
+    //switch off inactive lights
+    for (; i < xy::Shader::NormalMapped::MaxPointLights; ++i)
+    {
+        normalMapShader.setUniform("u_pointLights[" + std::to_string(i) + "].intensity", 0.f);
+    }
+
+
     m_scene.update(dt);
     m_collisionWorld.update();
 
@@ -591,6 +621,8 @@ void LunarMoonerState::buildBackground()
     m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
     m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
     
+    m_shaderResource.get(LMShaderID::NormalMapColoured).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+
     //nuke effect
     auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, 1080.f));
     auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
@@ -772,8 +804,8 @@ void LunarMoonerState::buildBackground()
 
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
     moon->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
-    moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal.png"));
-    moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal_02.png"));
+    moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse_02.png"));
     moon->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
     moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
     moon->setNormalShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
@@ -783,6 +815,20 @@ void LunarMoonerState::buildBackground()
     entity->setPosition(960.f - (moonWidth), 540.f);
     entity->addComponent(moon);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+
+    //background lighting
+    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f);
+    lc->setDepth(400.f);
+    lc->setDiffuseColour({ 255u, 245u, 235u });
+    lc->setIntensity(1.2f);
+
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(sf::Vector2f(), { 500.f, 500.f }));
+
+    entity = xy::Entity::create(m_messageBus);
+    entity->setPosition(alienArea.left + alienArea.width, 540.f);
+    entity->addComponent(lc);
+    entity->addComponent(qtc);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }
 
 void LunarMoonerState::updateLoadingScreen(float dt, sf::RenderWindow& rw)

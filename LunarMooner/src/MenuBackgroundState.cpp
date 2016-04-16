@@ -38,6 +38,7 @@ source distribution.
 #include <xygine/components/AnimatedDrawable.hpp>
 #include <xygine/components/PointLight.hpp>
 #include <xygine/components/AudioSource.hpp>
+#include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/PostChromeAb.hpp>
@@ -66,10 +67,10 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     m_scene.addPostProcess(pp);
 
     m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
-    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_SPECULAR_ILLUM);
+    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
 
     m_normalMapShader = &m_shaderResource.get(LMShaderID::NormalMapColoured);
-    //m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+    m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
 
     setup();
 
@@ -84,16 +85,32 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 bool MenuBackgroundState::update(float dt)
 {
     //update lighting
-    /*auto mousePos = getContext().appInstance.getMouseWorldPosition();*/
-    m_lightEntity->setPosition(/*mousePos*/960.f, 540.f);
-    auto light = m_lightEntity->getComponent<xy::PointLight>();
+    auto mousePos = getContext().appInstance.getMouseWorldPosition();
+    m_lightEntity->setPosition(mousePos/*960.f, 540.f*/);
 
-    m_normalMapShader->setUniform("u_pointLightPositions[0]", light->getWorldPosition());
-    m_normalMapShader->setUniform("u_pointLights[0].intensity", light->getIntensity());
-    m_normalMapShader->setUniform("u_pointLights[0].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
-    m_normalMapShader->setUniform("u_pointLights[0].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
-    m_normalMapShader->setUniform("u_pointLights[0].inverseRange", light->getInverseRange());
+    auto ents = m_scene.queryQuadTree(m_scene.getVisibleArea());
+    auto i = 0u;
+    for (; i < ents.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
+    {
+        auto light = ents[i]->getEntity()->getComponent<xy::PointLight>();
+        if (light)
+        {
+            const std::string idx = std::to_string(i);
 
+            auto pos = light->getWorldPosition();
+            m_normalMapShader->setUniform("u_pointLightPositions[" + std::to_string(i) + "]", pos);
+            m_normalMapShader->setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
+            m_normalMapShader->setUniform("u_pointLights[" + idx + "].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
+            //m_normalMapShader->setUniform("u_pointLights[" + idx + "].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
+            m_normalMapShader->setUniform("u_pointLights[" + idx + "].inverseRange", light->getInverseRange());
+        }
+    }
+
+    //switch off inactive lights
+    for (; i < xy::Shader::NormalMapped::MaxPointLights; ++i)
+    {
+        m_normalMapShader->setUniform("u_pointLights[" + std::to_string(i) + "].intensity", 0.f);
+    }
 
     m_scene.update(dt);
     return true;
@@ -133,10 +150,11 @@ void MenuBackgroundState::setup()
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_textureResource);
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
     
+    //planets
     auto planet = xy::Component::create<lm::PlanetDrawable>(m_messageBus, 200.f);
     planet->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
-    planet->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal.png"));
-    planet->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    planet->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal_02.png"));
+    planet->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse_02.png"));
     planet->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
     planet->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
     planet->setNormalShader(*m_normalMapShader);
@@ -152,8 +170,8 @@ void MenuBackgroundState::setup()
 
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, 500.f);
     moon->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
-    moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal.png"));
-    moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse.png"));
+    moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal_02.png"));
+    moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse_02.png"));
     moon->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
     moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
     moon->setNormalShader(*m_normalMapShader);
@@ -164,14 +182,32 @@ void MenuBackgroundState::setup()
 
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
-    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f);
-    lc->setDepth(700.f);
-    lc->setDiffuseColour({ 240u, 255u, 255u });
+
+    //lights
+    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 200.f);
+    lc->setDepth(100.f);
+    lc->setDiffuseColour({ 255u, 235u, 185u });
+        
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(sf::Vector2f(), {100.f, 100.f}));
     
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(1160.f, 340.f);
     entity->addComponent(lc);
+    entity->addComponent(qtc);
     m_lightEntity = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+
+    lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f);
+    lc->setDepth(600.f);
+    lc->setDiffuseColour({ 255u, 245u, 235u });
+    lc->setIntensity(2.f);
+
+    qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(sf::Vector2f(), { 500.f, 500.f }));
+
+    entity = xy::Entity::create(m_messageBus);
+    entity->setPosition(1160.f, 340.f);
+    entity->addComponent(lc);
+    entity->addComponent(qtc);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
     //music
     const auto& settings = getContext().appInstance.getAudioSettings();
