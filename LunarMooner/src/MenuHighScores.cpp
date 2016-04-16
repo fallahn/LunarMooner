@@ -42,6 +42,7 @@ MenuHighScoreState::MenuHighScoreState(xy::StateStack& ss, Context context, xy::
     m_textureResource   (tr),
     m_fontResource      (fr),
     m_messageBus        (context.appInstance.getMessageBus()),
+    m_uiContainer       (m_messageBus),
     m_endGame           (endGame)
 {
     m_cursorSprite.setTexture(m_textureResource.get("assets/images/ui/cursor.png"));

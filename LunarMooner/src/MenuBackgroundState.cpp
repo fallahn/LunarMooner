@@ -174,6 +174,9 @@ void MenuBackgroundState::setup()
     m_lightEntity = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
     //music
+    const auto& settings = getContext().appInstance.getAudioSettings();
+    const float volume = (settings.muted) ? 0.f : maxMusicVol * getContext().appInstance.getAudioSettings().volume;
+    
     m_musicFiles = xy::FileSystem::listFiles("assets/sound/music");
     if (!m_musicFiles.empty())
     {
@@ -186,15 +189,14 @@ void MenuBackgroundState::setup()
 
         
         auto as = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
-        as->setSound("assets/sound/music/" + m_musicFiles[xy::Util::Random::value(0, m_musicFiles.size() - 1)], xy::AudioSource::Mode::Stream);
-        const auto& settings = getContext().appInstance.getAudioSettings();
-        const float volume = (settings.muted) ? 0.f : maxMusicVol * getContext().appInstance.getAudioSettings().volume;
+        as->setSound("assets/sound/music/" + m_musicFiles[xy::Util::Random::value(0, m_musicFiles.size() - 1)], xy::AudioSource::Mode::Stream);        
         as->setVolume(volume);
         as->setFadeOutTime(1.f);
         as->play();
 
         entity = xy::Entity::create(m_messageBus);
         auto music =  entity->addComponent(as);
+        auto entId = entity->getUID();
         m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
         xy::Component::MessageHandler mh;
@@ -217,10 +219,11 @@ void MenuBackgroundState::setup()
         music->addMessageHandler(mh);
 
         mh.id = xy::Message::AudioMessage;
-        mh.action = [this, music](xy::Component* c, const xy::Message& msg)
+        mh.action = [this, music, entId](xy::Component* c, const xy::Message& msg)
         {
             auto& msgData = msg.getData<xy::Message::AudioEvent>();
-            if (msgData.action == xy::Message::AudioEvent::Stop)
+            if (msgData.action == xy::Message::AudioEvent::Stop
+                && msgData.entityId == entId)
             {
                 music->setSound("assets/sound/music/" + m_musicFiles[xy::Util::Random::value(0, m_musicFiles.size() - 1)], xy::AudioSource::Mode::Stream);
                 music->play();
@@ -228,6 +231,38 @@ void MenuBackgroundState::setup()
         };
         music->addMessageHandler(mh);
     }
+
+    auto menuSound = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+    menuSound->setSound("assets/sound/fx/menu_select.wav");
+    //menuSound->setAttenuation(0.f);
+    menuSound->setVolume(volume);
+
+    entity = xy::Entity::create(m_messageBus);
+    auto ms = entity->addComponent(menuSound);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+
+    xy::Component::MessageHandler mh;
+    mh.id = xy::Message::UIMessage;
+    mh.action = [ms](xy::Component*, const xy::Message& msg)
+    {
+        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case xy::Message::UIEvent::SelectionChanged:
+            ms->stop();
+            ms->play();
+            break;
+        case xy::Message::UIEvent::RequestAudioMute:
+            ms->setVolume(0.f);
+            break;
+        case xy::Message::UIEvent::RequestAudioUnmute:
+        case xy::Message::UIEvent::RequestVolumeChange:
+            ms->setVolume(msgData.value * maxMusicVol);
+            break;
+        }
+    };
+    ms->addMessageHandler(mh);
 }
 
 void MenuBackgroundState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
