@@ -46,6 +46,7 @@ namespace lm
 
         xy::Component::Type type()const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
+        void onStart(xy::Entity&) override;
         sf::FloatRect globalBounds() const override;
 
         void setTexture(sf::Texture&);
@@ -57,11 +58,18 @@ namespace lm
         std::size_t m_waveTableIndex;
         std::vector<float> m_wavetable;
 
+        xy::Entity* m_entity;
+
+        float m_impactRadius;
+        float m_impactIntensity;
+
         sf::FloatRect m_bounds;
         sf::Texture* m_texture;
         std::array<sf::Vertex, 22u> m_vertices;
         std::array<sf::Vertex, 11u> m_outline;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
+
+
     };
 }
 

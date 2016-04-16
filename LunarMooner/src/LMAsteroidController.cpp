@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMAsteroidController.hpp>
+#include <LMCollisionComponent.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/util/Vector.hpp>
@@ -78,6 +79,7 @@ void AsteroidController::entityUpdate(xy::Entity& entity, float dt)
         msg->type = LMGameEvent::MeteorExploded;
         msg->posX = position.x;
         msg->posY = position.y;
+        msg->value = 0;
         
         m_trail->stop();
         entity.getComponent<xy::AudioSource>()->stop();
@@ -100,4 +102,17 @@ void AsteroidController::onStart(xy::Entity& entity)
     m_trail = m_entity->getComponent<xy::ParticleSystem>();
     XY_ASSERT(m_trail, "Asteroid trail nullptr");
     m_trail->start();
+}
+
+void  AsteroidController::collisionCallback(CollisionComponent* cc)
+{
+    if(cc->getID() == CollisionComponent::ID::Bullet)
+    {
+        auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+        msg->type = LMGameEvent::MeteorExploded;
+        msg->posX = m_entity->getPosition().x;
+        msg->posY = m_entity->getPosition().y;
+        msg->value = m_entity->getComponent<CollisionComponent>()->getScoreValue();
+        m_entity->destroy();
+    }
 }
