@@ -43,6 +43,7 @@ GameOverState::GameOverState(xy::StateStack& ss, Context context, xy::TextureRes
     m_textureResource   (tr),
     m_fontResource      (fr),
     m_messageBus        (context.appInstance.getMessageBus()),
+    m_uiContainer       (m_messageBus),
     m_scores            (4), //I doubt we'll want more than 4 players, but if we do, change this!!
     m_playerCount       (0u),
     m_currentPlayer     (0u)
