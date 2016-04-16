@@ -47,6 +47,8 @@ source distribution.
 
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/AudioSource.hpp>
+#include <xygine/components/PointLight.hpp>
+#include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/util/Position.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
@@ -1204,12 +1206,23 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     };
     as->addMessageHandler(mh);
 
+
+    //lights!
+    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f);
+    lc->setDepth(150.f);
+    lc->setDiffuseColour({ 255u, 185u, 135u });
+    lc->setIntensity(0.8f);
+
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(sf::Vector2f(), { 100.f, 100.f }));
+
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
     entity->addComponent(ps);
     entity->addComponent(controller);
     entity->addComponent(collision);
     entity->addComponent(as);
+    entity->addComponent(lc);
+    entity->addComponent(qtc);
     entity->setPosition(position);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
