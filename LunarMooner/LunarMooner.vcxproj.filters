@@ -132,6 +132,9 @@
     <ClInclude Include="include\LMPostBlur.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\BGRoidBelt.hpp">
+      <Filter>Header Files\background</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="src\LMPostBlur.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BGRoidBelt.cpp">
+      <Filter>Source Files\background</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

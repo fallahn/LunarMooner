@@ -29,6 +29,7 @@ source distribution.
 #include <BGNormalBlendShader.hpp>
 #include <BGPlanetDrawable.hpp>
 #include <BGStarfield.hpp>
+#include <BGRoidBelt.hpp>
 
 #include <Game.hpp>
 
@@ -64,6 +65,8 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     m_scene.setView(context.defaultView);
     auto pp = xy::PostProcess::create<xy::PostChromeAb>();
     m_scene.addPostProcess(pp);
+
+    //m_scene.drawDebug(true);
 
     m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
     m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
@@ -146,6 +149,16 @@ void MenuBackgroundState::setup()
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_textureResource);
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
     
+    auto rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1200.f,
+        m_textureResource.get("assets/images/background/roid.png"), m_textureResource.get("assets/images/background/sphere_normal.png"));
+    rb->flipDirection();
+    rb->setShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
+    auto entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(rb);
+    entity->setPosition(1000.f, 180.f);
+    entity->setScale(0.5f, 0.4f);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
     //planets
     auto planet = xy::Component::create<lm::PlanetDrawable>(m_messageBus, 200.f);
     planet->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
@@ -158,11 +171,22 @@ void MenuBackgroundState::setup()
     planet->setTextureOffset({ 0.65f, 1.2f });
     planet->setColour({ 83u, 94u, 52u });
 
-    auto entity = xy::Entity::create(m_messageBus);
+    entity = xy::Entity::create(m_messageBus);
     entity->addComponent(planet);
     entity->setPosition({ 1400.f, 100.f });
 
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
+    //roid belts - in between planets
+    rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1200.f,
+        m_textureResource.get("assets/images/background/roid.png"), m_textureResource.get("assets/images/background/sphere_normal.png"));
+    rb->setShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(rb);
+    entity->setPosition(800.f, 680.f);
+    entity->setScale(2.f, 2.f);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
 
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, 500.f);
     moon->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
@@ -178,13 +202,13 @@ void MenuBackgroundState::setup()
 
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
-
+    
     //lights
     auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 200.f);
     lc->setDepth(100.f);
     lc->setDiffuseColour({ 255u, 235u, 185u });
         
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(sf::Vector2f(), {100.f, 100.f}));
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect({ -50.f, -50.f }, { 100.f, 100.f }));
     
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(1160.f, 340.f);
@@ -197,7 +221,7 @@ void MenuBackgroundState::setup()
     lc->setDiffuseColour({ 255u, 245u, 235u });
     lc->setIntensity(2.f);
 
-    qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(sf::Vector2f(), { 500.f, 500.f }));
+    qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect({ -250.f, -250.f }, { 500.f, 500.f }));
 
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(1160.f, 340.f);
