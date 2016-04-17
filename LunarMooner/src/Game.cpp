@@ -43,6 +43,9 @@ namespace
     //these need to remain here...
     const sf::Uint8 onePlayer = 1;
     const sf::Uint8 twoPlayer = 2;
+    //this is rather bad design...
+    const bool imFalse = false;
+    const bool imTrue = true;
 }
 
 const float Game::MaxVolume = 100.f;
@@ -114,12 +117,12 @@ void Game::registerStates()
 {
     m_stateStack.registerState<MenuMainState>(States::ID::MenuMain, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuOptionState>(States::ID::MenuOptions, m_menuTextures, m_menuFonts);
-    m_stateStack.registerState<MenuOptionState>(States::ID::PausedOptions, m_menuTextures, m_menuFonts, true);
+    m_stateStack.registerState<MenuOptionState>(States::ID::PausedOptions, m_menuTextures, m_menuFonts, imTrue);
     m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, onePlayer);
     m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, twoPlayer);
     m_stateStack.registerState<GameOverState>(States::ID::GameOver, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuPauseState>(States::ID::Pause, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuHighScoreState>(States::ID::HighScoresMenu, m_menuTextures, m_menuFonts);
-    m_stateStack.registerState<MenuHighScoreState>(States::ID::HighScoresEnd, m_menuTextures, m_menuFonts, true);
+    m_stateStack.registerState<MenuHighScoreState>(States::ID::HighScoresEnd, m_menuTextures, m_menuFonts, imTrue);
     m_stateStack.registerState<MenuBackgroundState>(States::ID::MenuBackground);
 }

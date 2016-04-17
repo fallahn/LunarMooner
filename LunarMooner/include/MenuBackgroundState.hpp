@@ -69,8 +69,6 @@ private:
 
     sf::Shader* m_normalMapShader;
 
-    xy::Entity* m_lightEntity;
-
     void setup();
 
     sf::Sprite m_loadingSprite;
