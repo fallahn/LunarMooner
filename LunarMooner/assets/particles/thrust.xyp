@@ -7,10 +7,10 @@
   "ReleaseCount": 1,
   "Delay": 0.0,
   "Duration": -1.0,
-  "Texture": "",
+  "Texture": "assets/images/particles/puff01.png",
   "Colour": -25089,
   "BlendMode": "Add",
-  "ParticleSize": "4, 4",
+  "ParticleSize": "12, 12",
   "ParticlePosition": "0, 0",
   "FollowParent": false,
   "Lifetime": 1.8,
@@ -33,7 +33,7 @@
       "Type": "Colour",
       "Data": [
         -25089.0,
-        -261750528.0,
+        -261750272.0,
         2.7
       ]
     },

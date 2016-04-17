@@ -90,6 +90,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     launchLoadingScreen();
     
     m_scene.setView(context.defaultView);
+    m_scene.setSize({ -100.f, -100.f, 2120.f, 1280.f });
     //m_scene.drawDebug(true);
 
     auto pp = xy::PostProcess::create<lm::PostBlur>();
@@ -105,6 +106,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 
     xy::Stats::clear();
     m_reportText.setFont(m_fontResource.get("game_state_81"));
+    m_reportText.setPosition(20.f, 860.f);
 
     m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
 
@@ -293,12 +295,12 @@ bool LunarMoonerState::update(float dt)
     {
         normalMapShader.setUniform("u_pointLights[" + std::to_string(i) + "].intensity", 0.f);
     }
-
+    REPORT("Light Count", std::to_string(ents.size()));
 
     m_scene.update(dt);
     m_collisionWorld.update();
 
-    //m_reportText.setString(xy::Stats::getString());
+    m_reportText.setString(xy::Stats::getString());
 
     return true;
 }
@@ -310,7 +312,7 @@ void LunarMoonerState::draw()
     rw.draw(m_scene);
 
     rw.setView(getContext().defaultView);
-    //rw.draw(m_reportText);
+    rw.draw(m_reportText);
 }
 
 //private
@@ -413,6 +415,7 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::MissionTerminated, "assets/sound/speech/game_over.wav");
     soundPlayer->preCache(LMSoundID::HumanRescued, "assets/sound/speech/alright.wav");
     soundPlayer->preCache(LMSoundID::ShieldHit, "assets/sound/fx/shield_hit.wav");
+
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
@@ -822,7 +825,7 @@ void LunarMoonerState::buildBackground()
     lc->setDiffuseColour({ 255u, 245u, 235u });
     lc->setIntensity(1.2f);
 
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(sf::Vector2f(), { 500.f, 500.f }));
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(-250.f, -250.f, 500.f, 500.f));
 
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(alienArea.left + alienArea.width, 540.f);

@@ -1177,7 +1177,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     collision->setScoreValue(1000);
 
     auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
-    ps->setLifetimeVariance(0.55f);
+    ps->setLifetimeVariance(0.25f);
 
     auto as = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
     as->setPitch(0.7f);
@@ -1213,7 +1213,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     lc->setDiffuseColour({ 255u, 185u, 135u });
     lc->setIntensity(0.8f);
 
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(sf::Vector2f(), { 100.f, 100.f }));
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(-50.f, -50.f, 100.f, 100.f));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);

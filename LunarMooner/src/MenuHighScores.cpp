@@ -133,11 +133,13 @@ void MenuHighScoreState::buildMenu(const sf::Font& font)
         {
             requestStackClear();
             requestStackPush(States::ID::MenuBackground);
+            std::cout << "End Game!" << std::endl;
         }
         else
         {
             requestStackPop();
             requestStackPush(States::ID::MenuMain);
+            std::cout << "Not End Game!" << std::endl;
         }
         
     });

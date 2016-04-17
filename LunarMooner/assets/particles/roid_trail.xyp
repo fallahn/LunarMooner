@@ -1,16 +1,16 @@
 {
   "Editor": {
     "EmitterPosition": "0, 0",
-    "BackgroundColour": -2130706433,
+    "BackgroundColour": 33023,
     "EnableMovement": true
   },
   "ReleaseCount": 1,
   "Delay": 0.0,
   "Duration": -1.0,
-  "Texture": "",
-  "Colour": -50471937,
-  "BlendMode": "Alpha",
-  "ParticleSize": "5, 5",
+  "Texture": "assets/images/particles/puff01.png",
+  "Colour": -50471681,
+  "BlendMode": "Add",
+  "ParticleSize": "15, 15",
   "ParticlePosition": "0, 0",
   "FollowParent": false,
   "Lifetime": 3.4,
@@ -31,8 +31,8 @@
     {
       "Type": "Colour",
       "Data": [
-        -50471936.0,
-        7.074066E+08,
+        -5.047168E+07,
+        707406848.0,
         2.6
       ]
     },

@@ -54,8 +54,7 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     : xy::State         (ss, context),
     m_messageBus        (context.appInstance.getMessageBus()),
     m_scene             (m_messageBus),
-    m_normalMapShader   (nullptr),
-    m_lightEntity       (nullptr)
+    m_normalMapShader   (nullptr)
 {
     m_loadingSprite.setTexture(m_textureResource.get("assets/images/ui/loading.png"));
     m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
@@ -85,9 +84,6 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 bool MenuBackgroundState::update(float dt)
 {
     //update lighting
-    auto mousePos = getContext().appInstance.getMouseWorldPosition();
-    m_lightEntity->setPosition(mousePos/*960.f, 540.f*/);
-
     auto ents = m_scene.queryQuadTree(m_scene.getVisibleArea());
     auto i = 0u;
     for (; i < ents.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
@@ -194,7 +190,7 @@ void MenuBackgroundState::setup()
     entity->setPosition(1160.f, 340.f);
     entity->addComponent(lc);
     entity->addComponent(qtc);
-    m_lightEntity = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
     lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f);
     lc->setDepth(600.f);
