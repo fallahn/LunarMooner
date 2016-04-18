@@ -32,6 +32,7 @@ source distribution.
 #include <xygine/Log.hpp>
 
 #include <fstream>
+#include <cstring>
 
 namespace
 {
