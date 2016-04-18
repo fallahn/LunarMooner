@@ -42,7 +42,8 @@ namespace States
         Pause,
         HighScoresEnd,
         HighScoresMenu,
-        MenuBackground
+        MenuBackground,
+        MenuAchievement
     };
 }
 

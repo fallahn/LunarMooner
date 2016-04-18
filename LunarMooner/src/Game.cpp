@@ -32,6 +32,7 @@ source distribution.
 #include <GameOverState.hpp>
 #include <MenuPauseState.hpp>
 #include <MenuHighScores.hpp>
+#include <MenuAchievementState.hpp>
 #include <LMState.hpp>
 #include <MenuBackgroundState.hpp>
 
@@ -90,6 +91,7 @@ void Game::handleMessage(const xy::Message& msg)
     }
     
     m_stateStack.handleMessage(msg);
+    m_profile.handleMessage(msg);
 }
 
 void Game::updateApp(float dt)
@@ -134,4 +136,5 @@ void Game::registerStates()
     m_stateStack.registerState<MenuHighScoreState>(States::ID::HighScoresMenu, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuHighScoreState>(States::ID::HighScoresEnd, m_menuTextures, m_menuFonts, imTrue);
     m_stateStack.registerState<MenuBackgroundState>(States::ID::MenuBackground);
+    m_stateStack.registerState<MenuAchievementState>(States::ID::MenuAchievement, m_menuTextures, m_menuFonts, m_profile);
 }

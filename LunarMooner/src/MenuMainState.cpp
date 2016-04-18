@@ -93,7 +93,7 @@ void MenuMainState::buildMenu()
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("One Player");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 375.f);
+    button->setPosition(960.f, 325.f);
     button->addCallback([this]()
     {
         close();
@@ -104,7 +104,7 @@ void MenuMainState::buildMenu()
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Two Player");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 475.f);
+    button->setPosition(960.f, 425.f);
     button->addCallback([this]()
     {
         close();
@@ -115,7 +115,7 @@ void MenuMainState::buildMenu()
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Options");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 575.f);
+    button->setPosition(960.f, 525.f);
     button->addCallback([this]()
     {
         close(false);
@@ -126,7 +126,7 @@ void MenuMainState::buildMenu()
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("High Scores");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 675.f);
+    button->setPosition(960.f, 625.f);
     button->addCallback([this]()
     {
         close(false);
@@ -135,9 +135,20 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button->setText("Achievements");
+    button->setAlignment(xy::UI::Alignment::Centre);
+    button->setPosition(960.f, 725.f);
+    button->addCallback([this]()
+    {
+        close(false);
+        requestStackPush(States::ID::MenuAchievement);
+    });
+    m_uiContainer.addControl(button);
+
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Quit");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 775.f);
+    button->setPosition(960.f, 825.f);
     button->addCallback([this]()
     {
         getContext().renderWindow.close();
