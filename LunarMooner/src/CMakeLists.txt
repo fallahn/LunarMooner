@@ -27,6 +27,7 @@ SET(LM_SRC
   ${LM_DIR}/LMState.cpp
   ${LM_DIR}/LMTerrain.cpp
   ${LM_DIR}/main.cpp
+  ${LM_DIR}/MenuAchievementState.cpp
   ${LM_DIR}/MenuBackgroundState.cpp
   ${LM_DIR}/MenuHighScores.cpp
   ${LM_DIR}/MenuMainState.cpp

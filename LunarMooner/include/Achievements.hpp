@@ -47,7 +47,7 @@ enum AchievementID
     Count
 };
 
-static const std::array<std::string, AchievementID::Count> AchievementNames = 
+static const std::array<std::string, AchievementID::Count> achievementNames = 
 {
     "Long Haul - Get to Level 10",
     "Bullet Dodger - Survive An Asteroid Strike With A Shield",

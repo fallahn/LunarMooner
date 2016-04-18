@@ -25,54 +25,61 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#include <MenuHighScores.hpp>
+#include <MenuAchievementState.hpp>
+#include <PlayerProfile.hpp>
 
 #include <xygine/Resource.hpp>
 #include <xygine/App.hpp>
 #include <xygine/MessageBus.hpp>
 
 #include <xygine/ui/Button.hpp>
-#include <xygine/ui/ScoreList.hpp>
+#include <xygine/ui/Label.hpp>
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Font.hpp>
 
-MenuHighScoreState::MenuHighScoreState(xy::StateStack& ss, Context context, xy::TextureResource& tr, xy::FontResource& fr, bool endGame)
-    : xy::State         (ss, context),
-    m_textureResource   (tr),
-    m_fontResource      (fr),
-    m_messageBus        (context.appInstance.getMessageBus()),
-    m_uiContainer       (m_messageBus),
-    m_endGame           (endGame)
+MenuAchievementState::MenuAchievementState(xy::StateStack& ss, Context context, xy::TextureResource& tr, xy::FontResource& fr, const PlayerProfile& profile)
+    : xy::State(ss, context),
+    m_textureResource(tr),
+    m_fontResource(fr),
+    m_profile(profile),
+    m_messageBus(context.appInstance.getMessageBus()),
+    m_uiContainer(m_messageBus)
 {
     m_cursorSprite.setTexture(m_textureResource.get("assets/images/ui/cursor.png"));
     m_cursorSprite.setPosition(context.renderWindow.mapPixelToCoords(sf::Mouse::getPosition(context.renderWindow)));
 
-    const auto& font = fr.get("high_scores_49");
+    const auto& font = fr.get("achievements_52");
     buildMenu(font);
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId =(endGame) ?  States::ID::HighScoresEnd : States::ID::HighScoresMenu;
+    msg->stateId = States::ID::MenuAchievement;
 }
 
 //public
-bool MenuHighScoreState::update(float dt)
+bool MenuAchievementState::update(float dt)
 {
     m_uiContainer.update(dt);
     return true;
 }
 
-void MenuHighScoreState::draw()
+void MenuAchievementState::draw()
 {
     auto& rw = getContext().renderWindow;
     rw.setView(getContext().defaultView);
+
+    for (const auto& g : m_graphics)
+    {
+        rw.draw(g.c);
+        rw.draw(g.t);
+    }
 
     rw.draw(m_uiContainer);
     rw.draw(m_cursorSprite);
 }
 
-bool MenuHighScoreState::handleEvent(const sf::Event& evt)
+bool MenuAchievementState::handleEvent(const sf::Event& evt)
 {
     const auto& rw = getContext().renderWindow;
     auto mousePos = rw.mapPixelToCoords(sf::Mouse::getPosition(rw));
@@ -83,40 +90,40 @@ bool MenuHighScoreState::handleEvent(const sf::Event& evt)
     return false; //consume events
 }
 
-void MenuHighScoreState::handleMessage(const xy::Message& msg)
+void MenuAchievementState::handleMessage(const xy::Message& msg)
 {
 
 }
 
-//private
-void MenuHighScoreState::buildMenu(const sf::Font& font)
+namespace
 {
-    const auto& scores = getContext().appInstance.getScores();
-    auto list = xy::UI::create<xy::UI::ScoreList>(font);
-    list->setAlignment(xy::UI::Alignment::Centre);
-    list->setPosition(960.f, 590.f);
-    list->setList(scores);
-    list->setIndex(getContext().appInstance.getLastScoreIndex());
-    m_uiContainer.addControl(list);
+    const sf::Vector2f circlePos(460.f, 300.f);
+    const sf::Vector2f textPos(510.f, 300.f);
+    const float rowSpace = 40.f;
+}
 
-    auto upScroll = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/scroll_arrow_vertical.png"));
-    upScroll->setAlignment(xy::UI::Alignment::Centre);
-    upScroll->setPosition(1310, 470.f);
-    upScroll->addCallback([list]()
-    {
-        list->scroll(list->getVerticalSpacing());
-    });
-    m_uiContainer.addControl(upScroll);
+//private
+void MenuAchievementState::buildMenu(const sf::Font& font)
+{
+    auto label = xy::UI::create<xy::UI::Label>(font);
+    label->setString("Achievements");
+    label->setAlignment(xy::UI::Alignment::Centre);
+    label->setPosition(960.f, 160.f);
+    label->setCharacterSize(40u);
+    m_uiContainer.addControl(label);
 
-    auto downScroll = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/scroll_arrow_vertical.png"));
-    downScroll->setAlignment(xy::UI::Alignment::Centre);
-    downScroll->setRotation(180.f);
-    downScroll->setPosition(1310.f, 720.f);
-    downScroll->addCallback([list]()
+    for (auto i = 0; i < AchievementID::Count; ++i)
     {
-        list->scroll(-list->getVerticalSpacing());
-    });
-    m_uiContainer.addControl(downScroll);
+        auto& c = m_graphics[i].c;
+        c.setRadius(10.f);
+        c.setPosition(circlePos.x, circlePos.y + (i * rowSpace));
+        c.setFillColor((m_profile.hasAchievement(static_cast<AchievementID>(i))) ? sf::Color::Green : sf::Color::Red);
+
+        auto& t = m_graphics[i].t;
+        t.setFont(font);
+        t.setPosition(textPos.x, textPos.y + (i * rowSpace));
+        t.setString(achievementNames[i]);
+    }    
     
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("OK");
@@ -127,19 +134,10 @@ void MenuHighScoreState::buildMenu(const sf::Font& font)
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::MenuClosed;
         msg->value = 0.f;
-        msg->stateId = (m_endGame) ? States::ID::HighScoresEnd : States::ID::HighScoresMenu;
+        msg->stateId = States::ID::MenuAchievement;
 
-        if (m_endGame)
-        {
-            requestStackClear();
-            requestStackPush(States::ID::MenuBackground);
-        }
-        else
-        {
-            requestStackPop();
-            requestStackPush(States::ID::MenuMain);
-        }
-        
+        requestStackPop();
+        requestStackPush(States::ID::MenuMain);
     });
     m_uiContainer.addControl(button);
 }

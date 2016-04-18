@@ -97,6 +97,11 @@ struct LMStateEvent
     }type;
 };
 
+struct LMAchievementEvent
+{
+    sf::Int32 ID = -1;
+};
+
 struct LMMenuEvent
 {
     sf::Uint32 playerId = 0u;
