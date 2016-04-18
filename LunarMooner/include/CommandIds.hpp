@@ -56,7 +56,8 @@ enum LMMessageId
 {
     GameEvent = xy::Message::Count,
     StateEvent,
-    MenuEvent
+    MenuEvent,
+    AchievementEvent
 };
 
 struct LMGameEvent
