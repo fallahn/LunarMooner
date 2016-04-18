@@ -1164,9 +1164,10 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     auto size = alienSizes[xy::Util::Random::value(0, alienSizes.size() - 1)];
 
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    drawable->getDrawable().setFillColor(sf::Color(255, 127, 0));
+    //drawable->getDrawable().setFillColor(sf::Color(255, 127, 0));
     drawable->getDrawable().setSize({ size.width, size.height });
     drawable->getDrawable().setOrigin({ size.width / 2.f, size.height / 2.f });
+    drawable->getDrawable().setTexture(&m_textureResource.get("assets/images/game/meteor.png"));
 
     const float dir = (position.x < 960.f) ? 1.f : -1.f;
     auto controller = xy::Component::create<AsteroidController>(getMessageBus(), alienArea, sf::Vector2f(dir, 1.f));
@@ -1290,12 +1291,21 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     //for now we expect the same behaviour as aliens
     auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
 
+    //lights!
+    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f);
+    lc->setDepth(150.f);
+    lc->setDiffuseColour(drawable->getDrawable().getFillColor());
+    lc->setIntensity(0.9f);
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(-50.f, -50.f, 100.f, 100.f));
+
     auto entity = xy::Entity::create(getMessageBus());
     entity->setPosition(position);
     entity->addComponent(drawable);
     auto cc = entity->addComponent(collision);
     entity->addComponent(controller);
     entity->addCommandCategories(LMCommandID::Item);
+    entity->addComponent(lc);
+    entity->addComponent(qtc);
 
     auto ep = m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 

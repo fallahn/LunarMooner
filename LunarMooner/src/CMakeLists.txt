@@ -5,6 +5,7 @@ SET(LM_SRC
   ${LM_DIR}/BGStarField.cpp
   ${LM_DIR}/Game.cpp
   ${LM_DIR}/GameOverState.cpp
+  ${LM_DIR}/LMAchievementTag.cpp
   ${LM_DIR}/LMAlienController.cpp
   ${LM_DIR}/LMAsteroidController.cpp
   ${LM_DIR}/LMBulletController.cpp

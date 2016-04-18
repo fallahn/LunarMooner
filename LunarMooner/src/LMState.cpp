@@ -30,6 +30,7 @@ source distribution.
 #include <LMPostBlur.hpp>
 #include <LMSoundPlayer.hpp>
 #include <LMNukeDrawable.hpp>
+#include <LMAchievementTag.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
 
@@ -251,6 +252,16 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             m_useController = true;
             break;
         }
+    }
+    else if (msg.id == LMMessageId::AchievementEvent)
+    {
+        auto& msgData = msg.getData<LMAchievementEvent>();
+
+        auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_fontResource, msgData.ID);
+        auto ent = xy::Entity::create(m_messageBus);
+        ent->setPosition(960.f, 1080.f);
+        ent->addComponent(tag);
+        m_scene.addEntity(ent, xy::Scene::Layer::UI);
     }
 }
 

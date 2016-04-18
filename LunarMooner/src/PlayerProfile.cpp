@@ -149,7 +149,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                     raiseAchievementMessage(AchievementID::Hero);
                 }
             }
-            else if(!m_achievements[AchievementID::Hero].unlocked)
+            else if(!m_achievements[AchievementID::SuperHero].unlocked)
             {
                 m_achievements[AchievementID::SuperHero].value++;
                 if (m_achievements[AchievementID::SuperHero].value == superHeroLevel)
