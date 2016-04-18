@@ -149,13 +149,13 @@ void MenuBackgroundState::setup()
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_textureResource);
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
     
-    auto rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1200.f,
+    auto rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1400.f,
         m_textureResource.get("assets/images/background/roid.png"), m_textureResource.get("assets/images/background/sphere_normal.png"));
     rb->flipDirection();
     rb->setShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(rb);
-    entity->setPosition(1000.f, 180.f);
+    entity->setPosition(1280.f, 250.f);
     entity->setScale(0.5f, 0.4f);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
@@ -178,13 +178,13 @@ void MenuBackgroundState::setup()
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
     //roid belts - in between planets
-    rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1200.f,
+    rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1000.f,
         m_textureResource.get("assets/images/background/roid.png"), m_textureResource.get("assets/images/background/sphere_normal.png"));
     rb->setShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(rb);
-    entity->setPosition(800.f, 680.f);
-    entity->setScale(2.f, 2.f);
+    entity->setPosition(1270.f, 270.f);
+    //entity->setScale(2.f, 2.f);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
 

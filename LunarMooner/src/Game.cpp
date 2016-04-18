@@ -53,10 +53,7 @@ const float Game::MaxVolume = 100.f;
 Game::Game()
     : m_stateStack({ getRenderWindow(), *this })
 {
-    registerStates();
-    m_stateStack.pushState(States::ID::MenuBackground);
 
-    getRenderWindow().setKeyRepeatEnabled(false);
 }
 
 //private
@@ -107,10 +104,22 @@ void Game::draw()
     getRenderWindow().display();
 }
 
+void Game::initialise()
+{
+    registerStates();
+    m_stateStack.pushState(States::ID::MenuBackground);
+
+    getRenderWindow().setKeyRepeatEnabled(false);
+
+    m_profile.load();
+}
+
 void Game::finalise()
 {
     m_stateStack.clearStates();
     m_stateStack.applyPendingChanges();
+
+    m_profile.save();
 }
 
 void Game::registerStates()
@@ -118,8 +127,8 @@ void Game::registerStates()
     m_stateStack.registerState<MenuMainState>(States::ID::MenuMain, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuOptionState>(States::ID::MenuOptions, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuOptionState>(States::ID::PausedOptions, m_menuTextures, m_menuFonts, imTrue);
-    m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, onePlayer);
-    m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, twoPlayer);
+    m_stateStack.registerState<LunarMoonerState>(States::ID::SinglePlayer, onePlayer, m_profile);
+    m_stateStack.registerState<LunarMoonerState>(States::ID::MultiPlayer, twoPlayer, m_profile);
     m_stateStack.registerState<GameOverState>(States::ID::GameOver, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuPauseState>(States::ID::Pause, m_menuTextures, m_menuFonts);
     m_stateStack.registerState<MenuHighScoreState>(States::ID::HighScoresMenu, m_menuTextures, m_menuFonts);
