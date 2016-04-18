@@ -144,6 +144,9 @@
     <ClInclude Include="include\MenuAchievementState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMAchievementTag.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -250,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="src\MenuAchievementState.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMAchievementTag.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
