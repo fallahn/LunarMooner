@@ -35,12 +35,13 @@ source distribution.
 namespace xy
 {
     class Message;
+    class MessageBus;
 }
 
 class PlayerProfile final
 {
 public:
-    PlayerProfile();
+    explicit PlayerProfile(xy::MessageBus&);
     ~PlayerProfile() = default;
     PlayerProfile(const PlayerProfile&) = delete;
     PlayerProfile& operator = (const PlayerProfile&) = delete;
@@ -74,10 +75,13 @@ private:
         int value = 0;
     };
 
+    xy::MessageBus& m_messageBus;
     int m_XP;
     std::array<Achievement, AchievementID::Count> m_achievements;
 
     bool m_enabled;
+
+    void raiseAchievementMessage(AchievementID);
 };
 
 #endif //PLAYER_PROFILE_HPP_

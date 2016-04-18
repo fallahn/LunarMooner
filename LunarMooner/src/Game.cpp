@@ -52,7 +52,8 @@ namespace
 const float Game::MaxVolume = 100.f;
 
 Game::Game()
-    : m_stateStack({ getRenderWindow(), *this })
+    : m_stateStack  ({ getRenderWindow(), *this }),
+    m_profile       (getMessageBus())
 {
 
 }

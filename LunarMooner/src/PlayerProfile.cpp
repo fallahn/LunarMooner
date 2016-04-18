@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <PlayerProfile.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/MessageBus.hpp>
 #include <xygine/Log.hpp>
@@ -37,11 +38,16 @@ namespace
     const int IDENT = 0xCEFA1DBA;
     const int VERSION = 1;
     const std::string FILE_NAME = "player.pfl";
+
+    const int heroLevel = 50;
+    const int superHeroLevel = 100;
+    const int championLevel = 250;
 }
 
-PlayerProfile::PlayerProfile()
-    : m_XP      (0),
-    m_enabled   (false)
+PlayerProfile::PlayerProfile(xy::MessageBus& mb)
+    : m_messageBus  (mb),
+    m_XP            (0),
+    m_enabled       (false)
 {
 
 }
@@ -121,9 +127,61 @@ void PlayerProfile::save()
 void PlayerProfile::handleMessage(const xy::Message& msg)
 {
     if (!m_enabled) return;
+
+    switch (msg.id)
+    {
+    default: break;
+    case LMMessageId::GameEvent:
+    {
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::HumanRescued:
+            if (!m_achievements[AchievementID::Hero].unlocked)
+            {
+                m_achievements[AchievementID::Hero].value++;
+                if (m_achievements[AchievementID::Hero].value == heroLevel)
+                {
+                    m_achievements[AchievementID::Hero].unlocked = true;
+                    m_achievements[AchievementID::SuperHero].value = heroLevel;
+                    raiseAchievementMessage(AchievementID::Hero);
+                }
+            }
+            else if(!m_achievements[AchievementID::Hero].unlocked)
+            {
+                m_achievements[AchievementID::SuperHero].value++;
+                if (m_achievements[AchievementID::SuperHero].value == superHeroLevel)
+                {
+                    m_achievements[AchievementID::SuperHero].unlocked = true;
+                    m_achievements[AchievementID::Champion].value = superHeroLevel;
+                    raiseAchievementMessage(AchievementID::SuperHero);
+                }
+            }
+            else if (!m_achievements[AchievementID::Champion].unlocked)
+            {
+                m_achievements[AchievementID::Champion].value++;
+                if (m_achievements[AchievementID::Champion].value == championLevel)
+                {
+                    m_achievements[AchievementID::Champion].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Champion);
+                }
+            }
+            break;
+        }
+    }
+        break;
+    }
 }
 
 bool PlayerProfile::hasAchievement(AchievementID id) const
 {
     return m_achievements[id].unlocked;
+}
+
+//private
+void PlayerProfile::raiseAchievementMessage(AchievementID id)
+{
+    auto msg = m_messageBus.post<LMAchievementEvent>(LMMessageId::AchievementEvent);
+    msg->ID = id;
 }
