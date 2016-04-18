@@ -28,6 +28,8 @@ source distribution.
 #ifndef GAME_HPP_
 #define GAME_HPP_
 
+#include <PlayerProfile.hpp>
+
 #include <xygine/App.hpp>
 #include <xygine/Resource.hpp>
 
@@ -43,6 +45,7 @@ public:
 
 private:
 
+    PlayerProfile m_profile;
     xy::StateStack m_stateStack;
 
     //these are shared by menu states
@@ -57,6 +60,7 @@ private:
     void updateApp(float dt) override;
     void draw() override;
 
+    void initialise() override;
     void finalise() override;
 };
 

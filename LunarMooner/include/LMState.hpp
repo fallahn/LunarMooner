@@ -39,10 +39,11 @@ source distribution.
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+class PlayerProfile;
 class LunarMoonerState final : public xy::State
 {
 public:
-    LunarMoonerState(xy::StateStack&, Context, sf::Uint8);
+    LunarMoonerState(xy::StateStack&, Context, sf::Uint8, PlayerProfile&);
     ~LunarMoonerState() = default;
 
     bool handleEvent(const sf::Event&) override;

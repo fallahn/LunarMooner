@@ -31,4 +31,5 @@ SET(LM_SRC
   ${LM_DIR}/MenuHighScores.cpp
   ${LM_DIR}/MenuMainState.cpp
   ${LM_DIR}/MenuOptionState.cpp
-  ${LM_DIR}/MenuPauseState.cpp)
+  ${LM_DIR}/MenuPauseState.cpp
+  ${LM_DIR}/PlayerProfile.cpp)

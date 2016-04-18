@@ -40,7 +40,7 @@ using namespace lm;
 
 namespace
 {
-    const float height = 100.f;
+    const float height = 70.f;
     const std::size_t roidCount = 40u;
     const float baseSpeed = 20.f;
     const sf::Vector2f size(40.f, 40.f);

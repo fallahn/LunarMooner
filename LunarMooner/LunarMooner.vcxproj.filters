@@ -135,6 +135,12 @@
     <ClInclude Include="include\BGRoidBelt.hpp">
       <Filter>Header Files\background</Filter>
     </ClInclude>
+    <ClInclude Include="include\PlayerProfile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Achievements.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -235,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="src\BGRoidBelt.cpp">
       <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerProfile.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

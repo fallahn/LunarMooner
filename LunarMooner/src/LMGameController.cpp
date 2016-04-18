@@ -707,7 +707,7 @@ void GameController::spawnAlien(const sf::Vector2f& position)
     auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);
     lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);
     collision->setCallback(cb);
-    //smaller are worth more because they arew harder to hit
+    //smaller are worth more because they are harder to hit
     //this cludge assumes max size is 50 x 50
     collision->setScoreValue(100 - static_cast<sf::Uint16>(size.width + size.height));
 

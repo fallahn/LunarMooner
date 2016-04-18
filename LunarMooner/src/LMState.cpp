@@ -72,7 +72,7 @@ namespace
     const float joyDeadZone = 25.f;
 }
 
-LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::Uint8 playerCount)
+LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::Uint8 playerCount, PlayerProfile& profile)
     : xy::State         (stack, context),
     m_playerCount       (playerCount),
     m_scene             (context.appInstance.getMessageBus()),
@@ -103,6 +103,8 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     initParticles();
 
     buildBackground();
+
+    profile.enable(playerCount == 1);
 
     xy::Stats::clear();
     m_reportText.setFont(m_fontResource.get("game_state_81"));
