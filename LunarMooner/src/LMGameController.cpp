@@ -106,13 +106,13 @@ namespace
         130.f, 155.f, 160.f, 165.f, 170.f
     };
     //how much time to remove for current difficulty setting
-    const float mediumPenalty = 5.f;
-    const float hardPenalty = mediumPenalty * 2.f;
+    const float mediumPenalty = 4.f;
+    const float hardPenalty = mediumPenalty * 1.5f;
 
     //and ship speed for current difficulty
     const float easySpeed = 110.f;
-    const float mediumSpeed = 180.f;
-    const float hardSpeed = 250.f;
+    const float mediumSpeed = 160.f;
+    const float hardSpeed = 210.f;
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as,
@@ -1073,7 +1073,7 @@ void GameController::moveToNextRound()
     auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
     msg->value = ps.level;
     msg->posX = ps.timeRemaining;
-    msg->posY = static_cast<float>(m_difficulty);
+    msg->posY = static_cast<float>(m_difficulty); //hacky fantacky
     msg->type = LMGameEvent::LevelChanged;
 }
 

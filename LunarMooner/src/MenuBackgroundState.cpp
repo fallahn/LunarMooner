@@ -155,7 +155,7 @@ void MenuBackgroundState::setup()
     rb->setShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(rb);
-    entity->setPosition(1280.f, 250.f);
+    entity->setPosition(1280.f, 280.f);
     entity->setScale(0.5f, 0.4f);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
@@ -183,7 +183,7 @@ void MenuBackgroundState::setup()
     rb->setShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(rb);
-    entity->setPosition(1270.f, 270.f);
+    entity->setPosition(1300.f, 300.f);
     //entity->setScale(2.f, 2.f);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
