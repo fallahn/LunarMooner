@@ -113,6 +113,9 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 
     m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
 
+    auto msg = m_messageBus.post<LMStateEvent>(LMMessageId::StateEvent);
+    msg->type = LMStateEvent::GameStart;
+
     quitLoadingScreen();
 }
 

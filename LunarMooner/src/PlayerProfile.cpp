@@ -37,7 +37,7 @@ source distribution.
 namespace
 {
     const int IDENT = 0xCEFA1DBA;
-    const int VERSION = 1;
+    const int VERSION = 2;
     const std::string FILE_NAME = "player.pfl";
 
     const int heroLevel = 50;
@@ -45,8 +45,13 @@ namespace
     const int championLevel = 250;
 
     int bulletsFired = 0;
+    int livesLost = 0;
 
-
+    const int alienXP = 1;
+    const int collectXP = alienXP;
+    const int rescueXP = 2;
+    const int levelXP = 5;
+    const int extraLifeXP = levelXP;
 }
 
 /*
@@ -59,6 +64,7 @@ to prevent rage quitting
 PlayerProfile::PlayerProfile(xy::MessageBus& mb)
     : m_messageBus  (mb),
     m_XP            (0),
+    m_potentialXP   (0),
     m_enabled       (false)
 {
 
@@ -149,6 +155,20 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
         switch (msgData.type)
         {
         default: break;
+        case LMGameEvent::PlayerDied:
+            //count lives lost for Survivor
+            livesLost++;
+            break;
+        case LMGameEvent::AlienDied:
+            m_potentialXP += alienXP;
+            break;
+        case LMGameEvent::ExtraLife:
+            m_potentialXP += extraLifeXP;
+            break;
+        case LMGameEvent::PlayerGotAmmo:
+        case LMGameEvent::PlayerGotShield:
+            m_potentialXP += collectXP;
+            break;
         case LMGameEvent::HumanRescued:
             //Hero
             if (!m_achievements[AchievementID::Hero].unlocked)
@@ -182,6 +202,8 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                     raiseAchievementMessage(AchievementID::Champion);
                 }
             }
+
+            m_potentialXP += rescueXP;
             break;
         case LMGameEvent::LevelChanged:
             //Long Haul
@@ -207,14 +229,24 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
             {
                 int difficulty = static_cast<int>(msgData.posY);
                 m_achievements[AchievementID::AcrossTheBoard].value |= (1 << difficulty);
-                if ((m_achievements[AchievementID::AcrossTheBoard].value & ((1 << 0) | (1 << 1) | (1 << 2))))
+                if (m_achievements[AchievementID::AcrossTheBoard].value == ((1 << 0) | (1 << 1) | (1 << 2)))
                 {
                     m_achievements[AchievementID::AcrossTheBoard].unlocked = true;
                     raiseAchievementMessage(AchievementID::AcrossTheBoard);
-
-                    std::cout << "ATB val: " << m_achievements[AchievementID::AcrossTheBoard].value;
                 }
             }
+            //survivor
+            if (livesLost == 0 && !m_achievements[AchievementID::Survivor].unlocked)
+            {
+                int difficulty = static_cast<int>(msgData.posY);
+                m_achievements[AchievementID::Survivor].value |= (1 << difficulty);
+                if (m_achievements[AchievementID::Survivor].value == ((1 << 0) | (1 << 1) | (1 << 2)))
+                {
+                    m_achievements[AchievementID::Survivor].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Survivor);
+                }
+            }
+            livesLost = 0;
             //pacifist
             if (bulletsFired == 0 && !m_achievements[AchievementID::Pacifist].unlocked)
             {
@@ -222,6 +254,8 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                 raiseAchievementMessage(AchievementID::Pacifist);
             }
             bulletsFired = 0; //reset every round
+
+            m_potentialXP += levelXP;
             break;
         case LMGameEvent::MeteorExploded:
             if (msgData.value > 0) //shot by player
@@ -242,6 +276,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                         raiseAchievementMessage(AchievementID::Stamper);
                     }
                 }
+                m_potentialXP += levelXP;
             }
             break;
         case LMGameEvent::PlayerLostShield:
@@ -265,13 +300,50 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
             switch (msgData.type)
             {
             default:break;
-            case LMStateEvent::RoundBegin:
+            case LMStateEvent::GameStart:
                 //count bullets for pacifist
                 bulletsFired = 0;
+                //count lives for survivor
+                livesLost = 0;
+                //reset game XP
+                m_potentialXP = 0;
                 break;
+            case LMStateEvent::GameOver:
+                awardXP(); //only award XP earned if game played to end
+                m_potentialXP = 0;
+                break;                
             }
         }
         break;
+        case LMMessageId::RankEvent:
+        {
+            auto& msgData = msg.getData<LMRankEvent>();
+            switch (msgData.rank)
+            {
+            default: break;
+            case 10:
+                m_achievements[AchievementID::Rank10].unlocked = true;
+                raiseAchievementMessage(AchievementID::Rank10);
+                break;
+            case 20:
+                m_achievements[AchievementID::Rank20].unlocked = true;
+                raiseAchievementMessage(AchievementID::Rank20);
+                break;
+            case 30:
+                m_achievements[AchievementID::Rank30].unlocked = true;
+                raiseAchievementMessage(AchievementID::Rank30);
+                break;
+            case 40:
+                m_achievements[AchievementID::Rank40].unlocked = true;
+                raiseAchievementMessage(AchievementID::Rank40);
+                break;
+            case 50:
+                m_achievements[AchievementID::Rank50].unlocked = true;
+                raiseAchievementMessage(AchievementID::Rank50);
+                break;
+            }
+        }
+            break;
     }
 }
 
@@ -284,7 +356,7 @@ int PlayerProfile::getRank() const
 {
     int i = 0;
     while (i < rankXP.size() && rankXP[i++] < m_XP) {}
-    return i;
+    return std::max(1, i - 1);
 }
 
 //private
@@ -295,4 +367,22 @@ void PlayerProfile::raiseAchievementMessage(AchievementID id)
 
     //add XP
     m_XP += 100;
+}
+
+void PlayerProfile::awardXP()
+{
+    int currentRank = getRank();
+
+    const float multiplier = static_cast<float>(currentRank + 10.f) / 10.f;
+    const float award = static_cast<float>(m_potentialXP) * multiplier;
+
+    m_XP += static_cast<int>(award);
+
+    int rank = getRank();
+    if (rank > currentRank)
+    {
+        //raise an event
+        auto msg = m_messageBus.post<LMRankEvent>(LMMessageId::RankEvent);
+        msg->rank = rank;
+    }
 }
