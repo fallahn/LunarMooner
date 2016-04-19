@@ -43,7 +43,18 @@ namespace
     const int heroLevel = 50;
     const int superHeroLevel = 100;
     const int championLevel = 250;
+
+    int bulletsFired = 0;
+
+
 }
+
+/*
+XP Calc:
+Event value is multiplied by ((rank + 10) / 10);
+XP is summed but not added to the player unless the round ends
+to prevent rage quitting
+*/
 
 PlayerProfile::PlayerProfile(xy::MessageBus& mb)
     : m_messageBus  (mb),
@@ -139,6 +150,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
         {
         default: break;
         case LMGameEvent::HumanRescued:
+            //Hero
             if (!m_achievements[AchievementID::Hero].unlocked)
             {
                 m_achievements[AchievementID::Hero].value++;
@@ -149,6 +161,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                     raiseAchievementMessage(AchievementID::Hero);
                 }
             }
+            //SuperHero
             else if(!m_achievements[AchievementID::SuperHero].unlocked)
             {
                 m_achievements[AchievementID::SuperHero].value++;
@@ -159,6 +172,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                     raiseAchievementMessage(AchievementID::SuperHero);
                 }
             }
+            //Champion
             else if (!m_achievements[AchievementID::Champion].unlocked)
             {
                 m_achievements[AchievementID::Champion].value++;
@@ -169,8 +183,94 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                 }
             }
             break;
+        case LMGameEvent::LevelChanged:
+            //Long Haul
+            if (msgData.value == 10 && !m_achievements[AchievementID::LongHaul].unlocked)
+            {
+                m_achievements[AchievementID::LongHaul].unlocked = true;
+                raiseAchievementMessage(AchievementID::LongHaul);
+            }
+            //Skin of your teeth
+            if (msgData.posX < 2 && !m_achievements[AchievementID::SkinOfYourTeeth].unlocked)
+            {
+                m_achievements[AchievementID::SkinOfYourTeeth].unlocked = true;
+                raiseAchievementMessage(AchievementID::SkinOfYourTeeth);
+            }
+            //more haste less speed
+            if (msgData.posX >= 31 && !m_achievements[AchievementID::MoreHasteLessSpeed].unlocked)
+            {
+                m_achievements[AchievementID::MoreHasteLessSpeed].unlocked = true;
+                raiseAchievementMessage(AchievementID::MoreHasteLessSpeed);
+            }
+            //across the board
+            if (!m_achievements[AchievementID::AcrossTheBoard].unlocked)
+            {
+                int difficulty = static_cast<int>(msgData.posY);
+                m_achievements[AchievementID::AcrossTheBoard].value |= (1 << difficulty);
+                if ((m_achievements[AchievementID::AcrossTheBoard].value & ((1 << 0) | (1 << 1) | (1 << 2))))
+                {
+                    m_achievements[AchievementID::AcrossTheBoard].unlocked = true;
+                    raiseAchievementMessage(AchievementID::AcrossTheBoard);
+
+                    std::cout << "ATB val: " << m_achievements[AchievementID::AcrossTheBoard].value;
+                }
+            }
+            //pacifist
+            if (bulletsFired == 0 && !m_achievements[AchievementID::Pacifist].unlocked)
+            {
+                m_achievements[AchievementID::Pacifist].unlocked = true;
+                raiseAchievementMessage(AchievementID::Pacifist);
+            }
+            bulletsFired = 0; //reset every round
+            break;
+        case LMGameEvent::MeteorExploded:
+            if (msgData.value > 0) //shot by player
+            {
+                //dead eye
+                if (!m_achievements[AchievementID::DeadEye].unlocked)
+                {
+                    m_achievements[AchievementID::DeadEye].unlocked = true;
+                    raiseAchievementMessage(AchievementID::DeadEye);
+                }
+                //stamper
+                if (!m_achievements[AchievementID::Stamper].unlocked)
+                {
+                    m_achievements[AchievementID::Stamper].value++;
+                    if (m_achievements[AchievementID::Stamper].value == 10)
+                    {
+                        m_achievements[AchievementID::Stamper].unlocked = true;
+                        raiseAchievementMessage(AchievementID::Stamper);
+                    }
+                }
+            }
+            break;
+        case LMGameEvent::PlayerLostShield:
+            //back with a bump
+            if (msgData.value == LMGameEvent::HitGround && !m_achievements[AchievementID::BackWithABump].unlocked)
+            {
+                m_achievements[AchievementID::BackWithABump].unlocked = true;
+                raiseAchievementMessage(AchievementID::BackWithABump);
+            }
+            break;
+        case LMGameEvent::LaserFired:
+            //count bullets for pacifist achievement
+            bulletsFired++;
+            break;
         }
     }
+        break;
+        case LMMessageId::StateEvent:
+        {
+            auto& msgData = msg.getData<LMStateEvent>();
+            switch (msgData.type)
+            {
+            default:break;
+            case LMStateEvent::RoundBegin:
+                //count bullets for pacifist
+                bulletsFired = 0;
+                break;
+            }
+        }
         break;
     }
 }
@@ -192,4 +292,7 @@ void PlayerProfile::raiseAchievementMessage(AchievementID id)
 {
     auto msg = m_messageBus.post<LMAchievementEvent>(LMMessageId::AchievementEvent);
     msg->ID = id;
+
+    //add XP
+    m_XP += 100;
 }

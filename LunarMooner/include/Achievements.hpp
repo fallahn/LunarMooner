@@ -34,7 +34,6 @@ source distribution.
 enum AchievementID
 {
     LongHaul = 0,
-    BulletDodger,
     SkinOfYourTeeth,
     DeadEye,
     Stamper,
@@ -56,7 +55,6 @@ enum AchievementID
 static const std::array<std::string, AchievementID::Count> achievementNames = 
 {
     "Long Haul - Get to Level 10",
-    "Bullet Dodger - Survive An Asteroid Strike With A Shield",
     "Skin Of Your Teeth - Win With 1 Second Remaining",
     "Dead Eye - Shoot An Asteroid",
     "Stamper - Shoot 10 Asteroids",
