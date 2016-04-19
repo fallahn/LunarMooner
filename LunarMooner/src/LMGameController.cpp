@@ -1068,6 +1068,13 @@ void GameController::moveToNextRound()
     ps.ammo = 0;
     ps.level++;
     ps.startNewRound = true;
+
+    //broadcast event
+    auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+    msg->value = ps.level;
+    msg->posX = ps.timeRemaining;
+    msg->posY = static_cast<float>(m_difficulty);
+    msg->type = LMGameEvent::LevelChanged;
 }
 
 void GameController::restartRound()

@@ -240,6 +240,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             shieldMsg->type = LMGameEvent::PlayerLostShield;
             shieldMsg->posX = position.x;
             shieldMsg->posY = position.y;
+            shieldMsg->value = LMGameEvent::HitAlien;
         }
         break;
     case CollisionComponent::ID::Ammo:
@@ -325,6 +326,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                     shieldMsg->type = LMGameEvent::PlayerLostShield;
                     shieldMsg->posX = position.x;
                     shieldMsg->posY = position.y;
+                    shieldMsg->value = LMGameEvent::HitGround;
                 }
                 break;
             }
@@ -518,6 +520,7 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
                         shieldMsg->type = LMGameEvent::PlayerLostShield;
                         shieldMsg->posX = position.x;
                         shieldMsg->posY = position.y;
+                        shieldMsg->value = LMGameEvent::HitGround;
                     }
                     else
                     {

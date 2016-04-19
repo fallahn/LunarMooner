@@ -62,6 +62,13 @@ enum LMMessageId
 
 struct LMGameEvent
 {
+    enum ShieldReason
+    {
+        HitGround = 1,
+        HitAlien,
+        HitRoid
+    };
+
     enum
     {
         PlayerDied,
@@ -77,10 +84,11 @@ struct LMGameEvent
         ItemCollected,
         MeteorExploded,
         LaserFired,
-        EarlyWarning
+        EarlyWarning,
+        LevelChanged
     }type;
-    float posX = 0.f;
-    float posY = 0.f;
+    float posX = 0.f; //<holds time remaining on level change
+    float posY = 0.f; //<holds difficulty on level change
     sf::Int16 value = 0;
 };
 
