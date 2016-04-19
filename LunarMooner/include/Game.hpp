@@ -45,9 +45,9 @@ public:
 
 private:
 
-    PlayerProfile m_profile;
     xy::StateStack m_stateStack;
-
+    PlayerProfile m_profile;
+    
     //these are shared by menu states
     //to speed up times between switching menus
     xy::TextureResource m_menuTextures;
