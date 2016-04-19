@@ -224,13 +224,13 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
         }
         else
         {
-            //deflect the player - TODO we want to reflect the other object too
+            //deflect the player - TODO we really ought to be transferring velocities
             auto manifold = getManifold(cc->globalBounds());
             sf::Vector2f normal(manifold.x, manifold.y);
 
             m_entity->move(normal * manifold.z);
             m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
-            m_velocity *= damping;
+            m_velocity *= 0.3f;
 
             m_shield = false;
             m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);

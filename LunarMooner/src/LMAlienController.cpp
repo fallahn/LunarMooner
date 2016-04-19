@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMAlienController.hpp>
+#include <LMPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
 #include <CommandIds.hpp>
 
@@ -107,9 +108,12 @@ void AlienController::collisionCallback(CollisionComponent* cc)
         sf::Vector2f normal(manifold.x, manifold.y);
 
         m_entity->move(normal * manifold.z);
-        //TODO only reflect when velocity is toward normal
-        //m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
-        //m_velocity *= 0.7f;
+        auto playerVel = cc->getParentEntity().getComponent<PlayerController>()->getVelocity();
+        m_velocity += xy::Util::Vector::normalise(playerVel);
+        m_velocity /= 2.f;
+
+        m_speed += xy::Util::Vector::length(playerVel);
+        m_speed /= 2.f;
     }
         break;
     }

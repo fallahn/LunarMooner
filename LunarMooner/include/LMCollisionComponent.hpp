@@ -61,6 +61,7 @@ namespace lm
         sf::FloatRect globalBounds() const override;
 
         ID getID() const;
+        const xy::Entity& getParentEntity() const { return *m_entity; }
 
         void setScoreValue(sf::Uint16 v) { m_scoreValue = v; }
         sf::Uint16 getScoreValue() const { return m_scoreValue; }
