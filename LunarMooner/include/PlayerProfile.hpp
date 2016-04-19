@@ -51,6 +51,8 @@ public:
 
     void handleMessage(const xy::Message&);
     bool hasAchievement(AchievementID) const;
+    int getXP() const { return m_XP; }
+    int getRank() const;
 
     void enable(bool b) { m_enabled = b; }
 
