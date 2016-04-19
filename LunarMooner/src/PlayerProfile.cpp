@@ -180,6 +180,13 @@ bool PlayerProfile::hasAchievement(AchievementID id) const
     return m_achievements[id].unlocked;
 }
 
+int PlayerProfile::getRank() const
+{
+    int i = 0;
+    while (i < rankXP.size() && rankXP[i++] < m_XP) {}
+    return i;
+}
+
 //private
 void PlayerProfile::raiseAchievementMessage(AchievementID id)
 {
