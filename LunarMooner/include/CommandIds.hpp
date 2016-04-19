@@ -57,7 +57,8 @@ enum LMMessageId
     GameEvent = xy::Message::Count,
     StateEvent,
     MenuEvent,
-    AchievementEvent
+    AchievementEvent,
+    RankEvent
 };
 
 struct LMGameEvent
@@ -96,6 +97,7 @@ struct LMStateEvent
 {
     enum
     {
+        GameStart,
         GameOver,
         SummaryFinished,
         RoundBegin,
@@ -109,6 +111,11 @@ struct LMStateEvent
 struct LMAchievementEvent
 {
     sf::Int32 ID = -1;
+};
+
+struct LMRankEvent
+{
+    sf::Int32 rank = 0;
 };
 
 struct LMMenuEvent

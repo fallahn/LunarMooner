@@ -72,18 +72,19 @@ private:
 
     struct Achievement final
     {
-        int ID = -1;
         bool unlocked = false;
         int value = 0;
     };
 
     xy::MessageBus& m_messageBus;
     int m_XP;
+    int m_potentialXP;
     std::array<Achievement, AchievementID::Count> m_achievements;
 
     bool m_enabled;
 
     void raiseAchievementMessage(AchievementID);
+    void awardXP();
 };
 
 #endif //PLAYER_PROFILE_HPP_
