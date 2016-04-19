@@ -38,6 +38,7 @@ source distribution.
 
 #include <SFML/Window/Event.hpp>
 
+
 namespace
 {
     //as variadic template captures by ref

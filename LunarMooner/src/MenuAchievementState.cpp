@@ -97,8 +97,8 @@ void MenuAchievementState::handleMessage(const xy::Message& msg)
 
 namespace
 {
-    const sf::Vector2f circlePos(460.f, 180.f);
-    const sf::Vector2f textPos(510.f, 180.f);
+    const sf::Vector2f circlePos(460.f, 150.f);
+    const sf::Vector2f textPos(510.f, 150.f);
     const float rowSpace = 40.f;
 }
 
@@ -108,7 +108,7 @@ void MenuAchievementState::buildMenu(const sf::Font& font)
     auto label = xy::UI::create<xy::UI::Label>(font);
     label->setString("Achievements");
     label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(960.f, 100.f);
+    label->setPosition(960.f, 86.f);
     label->setCharacterSize(40u);
     m_uiContainer.addControl(label);
 

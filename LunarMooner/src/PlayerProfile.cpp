@@ -167,6 +167,16 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
             break;
         case LMGameEvent::PlayerGotAmmo:
         case LMGameEvent::PlayerGotShield:
+            if (!m_achievements[AchievementID::Hoarder].unlocked)
+            {
+                m_achievements[AchievementID::Hoarder].value++;
+                if (m_achievements[AchievementID::Hoarder].value == 50)
+                {
+                    m_achievements[AchievementID::Hoarder].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Hoarder);
+                }
+            }
+
             m_potentialXP += collectXP;
             break;
         case LMGameEvent::HumanRescued:
