@@ -35,6 +35,15 @@ source distribution.
 
 namespace lm
 {
+    enum class SpecialWeapon
+    {
+        None,
+        DualLaser,
+        SideLaser,
+        DownLaser,
+        EMP
+    };
+
     struct PlayerState final
     {
         sf::Uint32 score = 0u;
@@ -47,6 +56,8 @@ namespace lm
         std::vector<sf::Vector2f> humansRemaining;
         bool startNewRound = false;
         float timeRemaining = 0.f;
+        SpecialWeapon special = SpecialWeapon::None;
+        float cooldownTime = 0.f;
     };
 }
 

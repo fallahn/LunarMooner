@@ -61,14 +61,21 @@ namespace
     const sf::Keyboard::Key keyRight = sf::Keyboard::D;
     const sf::Keyboard::Key keyThrust = sf::Keyboard::W;
     const sf::Keyboard::Key keyFire = sf::Keyboard::Space;
+    const sf::Keyboard::Key keySpecial = sf::Keyboard::LControl;
 
     const sf::Keyboard::Key altKeyLeft = sf::Keyboard::Left;
     const sf::Keyboard::Key altKeyRight = sf::Keyboard::Right;
     const sf::Keyboard::Key altKeyThrust = sf::Keyboard::Up;
+    const sf::Keyboard::Key altKeySpecial = sf::Keyboard::RControl;
 
     //x360 controller mapping
     const sf::Uint32 buttonA = 0u;
     const sf::Uint32 buttonB = 1u;
+    const sf::Uint32 buttonX = 2u;
+    const sf::Uint32 buttonY = 3u;
+    const sf::Uint32 buttonLB = 4u;
+    const sf::Uint32 buttonRB = 5u;
+    const sf::Uint32 buttonBack = 6u;
     const sf::Uint32 buttonStart = 7u;
     const float joyDeadZone = 25.f;
 }
@@ -152,6 +159,10 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         case keyFire:
             m_inputFlags &= ~LMInputFlags::Shoot;
             break;
+        case keySpecial:
+        case altKeySpecial:
+            m_inputFlags &= ~LMInputFlags::Special;
+            break;
         default:break;
         }
         break;
@@ -176,6 +187,10 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         case keyFire:
             m_inputFlags |= LMInputFlags::Shoot;
             break;
+        case keySpecial:
+        case altKeySpecial:
+            m_inputFlags |= LMInputFlags::Special;
+            break;
         case sf::Keyboard::P:
             requestStackPush(States::ID::Pause);
             break;
@@ -190,10 +205,15 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         switch (evt.joystickButton.button)
         {
         case buttonA:
+        case buttonRB:
             m_inputFlags |= LMInputFlags::Shoot;
             break;
         case buttonB:
             m_inputFlags |= LMInputFlags::Thrust;
+            break;
+        case buttonX:
+        case buttonLB:
+            m_inputFlags |= LMInputFlags::Special;
             break;
         case buttonStart:
             //m_inputFlags |= LMInputFlags::Start;
@@ -208,10 +228,15 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         {
         default: break;
         case buttonA:
+        case buttonRB:
             m_inputFlags &= ~LMInputFlags::Shoot;
             break;
         case buttonB:
             m_inputFlags &= ~LMInputFlags::Thrust;
+            break;
+        case buttonX:
+        case buttonLB:
+            m_inputFlags &= ~LMInputFlags::Special;
             break;
         case buttonStart:
             requestStackPush(States::ID::Pause);

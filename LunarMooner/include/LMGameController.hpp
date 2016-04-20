@@ -124,7 +124,8 @@ namespace lm
         void updatePlatforms();
 
         void addRescuedHuman();
-        void spawnBullet();
+        void spawnBullet(const sf::Vector2f&);
+        void fireSpecial();
 
         SpeedMeter* m_speedMeter;
         ScoreDisplay* m_scoreDisplay;

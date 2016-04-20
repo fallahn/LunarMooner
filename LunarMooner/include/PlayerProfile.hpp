@@ -29,6 +29,7 @@ source distribution.
 #define PLAYER_PROFILE_HPP_
 
 #include <Achievements.hpp>
+#include <LMPlayerState.hpp>
 
 #include <array>
 
@@ -56,6 +57,9 @@ public:
 
     void enable(bool b) { m_enabled = b; }
 
+    void setSpecialWeapon(lm::SpecialWeapon w) { m_specialWeapon = w; };
+    lm::SpecialWeapon getSpecialWeapon() const { return m_specialWeapon; };
+
 private:
     /*
     Format:
@@ -82,6 +86,8 @@ private:
     std::array<Achievement, AchievementID::Count> m_achievements;
 
     bool m_enabled;
+
+    lm::SpecialWeapon m_specialWeapon;
 
     void raiseAchievementMessage(AchievementID);
     void awardXP();
