@@ -925,7 +925,17 @@ void GameController::fireSpecial()
             spawnBullet(position);
             position.x += playerSize.x;
             spawnBullet(position);
+            m_playerStates[m_currentPlayer].cooldownTime = 0.f;
         }
+            break;
+        case SpecialWeapon::SideLaser:
+
+            break;
+        case SpecialWeapon::DownLaser:
+
+            break;
+        case SpecialWeapon::EMP:
+
             break;
         }
     }
