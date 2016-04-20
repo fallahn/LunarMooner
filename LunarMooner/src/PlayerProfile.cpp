@@ -266,6 +266,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
             bulletsFired = 0; //reset every round
 
             m_potentialXP += levelXP;
+            m_potentialXP += static_cast<int>(msgData.posX); //XP for time remaining
             break;
         case LMGameEvent::MeteorExploded:
             if (msgData.value > 0) //shot by player

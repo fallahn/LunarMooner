@@ -28,6 +28,8 @@ source distribution.
 #include <LMPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
 #include <LMMothershipController.hpp>
+#include <LMAsteroidController.hpp>
+#include <LMAlienController.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
 
@@ -224,13 +226,28 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
         }
         else
         {
-            //deflect the player - TODO we really ought to be transferring velocities
+            //deflect the player
             auto manifold = getManifold(cc->globalBounds());
             sf::Vector2f normal(manifold.x, manifold.y);
-
             m_entity->move(normal * manifold.z);
             m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
-            m_velocity *= 0.3f;
+
+            auto alienController = cc->getParentEntity().getComponent<AlienController>();
+            if (alienController)
+            {                
+                m_velocity += alienController->getVelocity();
+                m_velocity *= 0.5f;
+            }
+            else
+            {
+                auto roidController = cc->getParentEntity().getComponent<AsteroidController>();
+                if (roidController)
+                {
+                    m_velocity += roidController->getVelocity();
+                    m_velocity *= 0.05f;
+                }
+            }
+            
 
             m_shield = false;
             m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);

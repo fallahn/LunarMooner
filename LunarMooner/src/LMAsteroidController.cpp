@@ -104,6 +104,11 @@ void AsteroidController::onStart(xy::Entity& entity)
     m_trail->start();
 }
 
+sf::Vector2f AsteroidController::getVelocity() const
+{
+    return m_velocity * speed;
+}
+
 void  AsteroidController::collisionCallback(CollisionComponent* cc)
 {
     if(cc->getID() == CollisionComponent::ID::Bullet)
