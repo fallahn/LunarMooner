@@ -44,7 +44,7 @@ namespace lm
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity&, float) override;
         void onStart(xy::Entity&) override;
-
+        sf::Vector2f getVelocity() const { return m_velocity * m_speed; }
         void collisionCallback(CollisionComponent*);
 
     private:

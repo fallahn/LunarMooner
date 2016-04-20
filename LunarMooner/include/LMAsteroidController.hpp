@@ -49,6 +49,7 @@ namespace lm
 
         void onStart(xy::Entity&) override;
 
+        sf::Vector2f getVelocity() const;
         void collisionCallback(CollisionComponent*);
 
     private:

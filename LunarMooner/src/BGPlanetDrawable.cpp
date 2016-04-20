@@ -46,8 +46,6 @@ PlanetDrawable::PlanetDrawable(xy::MessageBus& mb, float radius)
     m_normalShader  (nullptr),
     m_radius        (radius)
 {
-    m_renderTexture.create(2048, 2048, 3);
-    
     //sf::Vector2f centre(radius, radius);
     //m_vertices.emplace_back(centre);
     //const float pointCount = 40.f;
@@ -114,11 +112,18 @@ void PlanetDrawable::setDetailNormal(sf::Texture& t)
 {
     m_detailNormal = &t;
     m_detailNormal->setRepeated(true);
+
+    auto texSize = t.getSize();
+    if (m_renderTexture.getSize().x == 0)
+    {
+        m_renderTexture.create(texSize.x, texSize.y, 3);
+    }
 }
 
 void PlanetDrawable::setDiffuseTexture(sf::Texture& t)
 {
-    sf::Vector2f size(t.getSize());
+    auto texSize = t.getSize();
+    sf::Vector2f size(texSize);
 
     //const float diameter = m_radius * 2.f;
     //sf::Vector2f vertSize(diameter, diameter);
@@ -137,12 +142,23 @@ void PlanetDrawable::setDiffuseTexture(sf::Texture& t)
 
     m_diffuseTexture = &t;
     m_diffuseTexture->setRepeated(true);
+
+    if (m_renderTexture.getSize().x == 0)
+    {
+        m_renderTexture.create(texSize.x, texSize.y, 3);
+    }
 }
 
 void PlanetDrawable::setMaskTexture(sf::Texture& t)
 {
     m_maskTexture = &t;
     m_maskTexture->setRepeated(true);
+
+    auto texSize = t.getSize();
+    if (m_renderTexture.getSize().x == 0)
+    {
+        m_renderTexture.create(texSize.x, texSize.y, 3);
+    }
 }
 
 void PlanetDrawable::setPrepassShader(sf::Shader& s)
