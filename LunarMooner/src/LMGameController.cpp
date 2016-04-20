@@ -113,6 +113,11 @@ namespace
     const float easySpeed = 110.f;
     const float mediumSpeed = 160.f;
     const float hardSpeed = 210.f;
+
+    //special weapon cooldown time
+    const float easyCoolDown = 4.f;
+    const float mediumCoolDown = 7.f;
+    const float hardCoolDown = 12.f;
 }
 
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as,
@@ -427,6 +432,9 @@ void GameController::entityUpdate(xy::Entity&, float dt)
         msg->type = LMGameEvent::ExtraLife;
     }
     m_playerStates[m_currentPlayer].previousScore = m_playerStates[m_currentPlayer].score;
+
+    //update special weapon cool down time
+    m_playerStates[m_currentPlayer].cooldownTime += dt;
 }
 
 void GameController::setInput(sf::Uint8 input)
@@ -443,8 +451,17 @@ void GameController::setInput(sf::Uint8 input)
         //as bullets are technically entities in their own right
         if (shoot && m_playerStates[m_currentPlayer].ammo > 0)
         {
-            spawnBullet();
+            spawnBullet(m_player->getPosition());
             m_playerStates[m_currentPlayer].ammo--;
+        }
+
+        //check for special weapons
+        bool shootSpecial = ((input & LMInputFlags::Special) != 0
+            && (m_inputFlags & LMInputFlags::Special) == 0);
+
+        if (shootSpecial && m_playerStates[m_currentPlayer].special != SpecialWeapon::None)
+        {
+            fireSpecial();
         }
     }
     else
@@ -847,7 +864,7 @@ void GameController::addRescuedHuman()
     m_mothership->addChild(entity);
 }
 
-void GameController::spawnBullet()
+void GameController::spawnBullet(const sf::Vector2f& position)
 {
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
     drawable->getDrawable().setSize(bulletSize);
@@ -862,7 +879,7 @@ void GameController::spawnBullet()
     CollisionComponent::Callback cb = std::bind(&BulletController::collisionCallback, controller.get(), _1);
     collision->setCallback(cb);
 
-    auto position = m_player->getPosition();
+    //auto position = m_player->getPosition();
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->setPosition(position);
@@ -878,6 +895,40 @@ void GameController::spawnBullet()
     msg->type = LMGameEvent::LaserFired;
     msg->posX = position.x;
     msg->posY = position.y;
+}
+
+void GameController::fireSpecial()
+{
+    float coolDown;
+    if (m_difficulty == xy::Difficulty::Easy)
+    {
+        coolDown = easyCoolDown;
+    }
+    else if (m_difficulty == xy::Difficulty::Medium)
+    {
+        coolDown = mediumCoolDown;
+    }
+    else
+    {
+        coolDown = hardCoolDown;
+    }
+
+    if (m_playerStates[m_currentPlayer].cooldownTime > coolDown)
+    {
+        switch (m_playerStates[m_currentPlayer].special)
+        {
+        default: break;
+        case SpecialWeapon::DualLaser:
+        {
+            auto position = m_player->getPosition();
+            position.x -= playerSize.x / 2.f;
+            spawnBullet(position);
+            position.x += playerSize.x;
+            spawnBullet(position);
+        }
+            break;
+        }
+    }
 }
 
 void GameController::createUI()

@@ -49,7 +49,8 @@ enum LMInputFlags
     SteerRight = 0x2,
     Thrust = 0x4,
     Shoot = 0x8,
-    Start = 0x10
+    Start = 0x10,
+    Special = 0x20
 };
 
 enum LMMessageId

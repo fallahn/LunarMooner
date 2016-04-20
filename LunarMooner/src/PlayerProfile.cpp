@@ -65,7 +65,8 @@ PlayerProfile::PlayerProfile(xy::MessageBus& mb)
     : m_messageBus  (mb),
     m_XP            (0),
     m_potentialXP   (0),
-    m_enabled       (false)
+    m_enabled       (false),
+    m_specialWeapon (lm::SpecialWeapon::None)
 {
 
 }
