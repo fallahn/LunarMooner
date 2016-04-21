@@ -313,12 +313,12 @@ bool LunarMoonerState::update(float dt)
     
     //update lights
     auto& normalMapShader = m_shaderResource.get(LMShaderID::NormalMapColoured);
-    auto ents = m_scene.queryQuadTree(m_scene.getVisibleArea());
+    auto lights = m_scene.getVisibleLights(m_scene.getVisibleArea());
     auto i = 0u;
-    for (; i < ents.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
+    for (; i < lights.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
     {
-        auto light = ents[i]->getEntity()->getComponent<xy::PointLight>();
-        if (light)
+        auto light = lights[i];
+        //if (light)
         {
             const std::string idx = std::to_string(i);
 
@@ -336,7 +336,7 @@ bool LunarMoonerState::update(float dt)
     {
         normalMapShader.setUniform("u_pointLights[" + std::to_string(i) + "].intensity", 0.f);
     }
-    REPORT("Light Count", std::to_string(ents.size()));
+    REPORT("Light Count", std::to_string(lights.size()));
 
     m_scene.update(dt);
     m_collisionWorld.update();
@@ -861,17 +861,14 @@ void LunarMoonerState::buildBackground()
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
     //background lighting
-    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f);
+    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f, 250.f);
     lc->setDepth(400.f);
     lc->setDiffuseColour({ 255u, 245u, 235u });
     lc->setIntensity(1.2f);
 
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect(-250.f, -250.f, 500.f, 500.f));
-
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(alienArea.left + alienArea.width, 540.f);
     entity->addComponent(lc);
-    entity->addComponent(qtc);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }
 

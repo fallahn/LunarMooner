@@ -1283,12 +1283,10 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
 
 
     //lights!
-    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f);
+    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
     lc->setDepth(150.f);
     lc->setDiffuseColour({ 255u, 185u, 135u });
     lc->setIntensity(0.8f);
-
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(-50.f, -50.f, 100.f, 100.f));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
@@ -1297,7 +1295,6 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     entity->addComponent(collision);
     entity->addComponent(as);
     entity->addComponent(lc);
-    entity->addComponent(qtc);
     entity->setPosition(position);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
@@ -1366,11 +1363,10 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
 
     //lights!
-    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f);
+    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
     lc->setDepth(150.f);
     lc->setDiffuseColour(drawable->getDrawable().getFillColor());
     lc->setIntensity(0.9f);
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(-50.f, -50.f, 100.f, 100.f));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->setPosition(position);
@@ -1379,7 +1375,6 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     entity->addComponent(controller);
     entity->addCommandCategories(LMCommandID::Item);
     entity->addComponent(lc);
-    entity->addComponent(qtc);
 
     auto ep = m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 
