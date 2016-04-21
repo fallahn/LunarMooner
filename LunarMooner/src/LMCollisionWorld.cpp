@@ -27,9 +27,12 @@ source distribution.
 
 #include <LMCollisionWorld.hpp>
 
+#include <xygine/Scene.hpp>
+
 using namespace lm;
 
-CollisionWorld::CollisionWorld() {}
+CollisionWorld::CollisionWorld(xy::Scene& scene)
+: m_scene(scene){}
 
 //public
 CollisionComponent::Ptr CollisionWorld::addComponent(xy::MessageBus& mb, sf::FloatRect area, CollisionComponent::ID id)
@@ -39,10 +42,7 @@ CollisionComponent::Ptr CollisionWorld::addComponent(xy::MessageBus& mb, sf::Flo
     {
         m_colliders.push_back(cc.get());
     }
-    else
-    {
-        m_collidees.push_back(cc.get());
-    }
+
     return std::move(cc);
 }
 
@@ -54,26 +54,17 @@ void CollisionWorld::update()
         return cp->destroyed(); 
     }), m_colliders.end());
 
-    m_collidees.erase(std::remove_if(m_collidees.begin(), m_collidees.end(),
-        [](const CollisionComponent* cp)
-    {
-        return cp->destroyed();
-    }), m_collidees.end());
-
-
     for (auto ca : m_colliders)
     {
-        for (auto cb : m_collidees)
+        const auto collidees = m_scene.queryQuadTree(ca->globalBounds());
+        for (auto c : collidees)
         {
-            if (ca->globalBounds().intersects(cb->globalBounds()))
+            CollisionComponent* cb = nullptr;
+            if ((cb = c->getEntity()->getComponent<CollisionComponent>()) &&
+                ca->globalBounds().intersects(cb->globalBounds()))
             {
-                ca->addCollider(cb); //TODO sort this kludginess out boi
-                /*if (cb->getID() == CollisionComponent::ID::Alien ||
-                    cb->getID() == CollisionComponent::ID::Ammo ||
-                    cb->getID() == CollisionComponent::ID::Shield)*/
-                {
-                    cb->addCollider(ca);
-                }
+                ca->addCollider(cb);
+                cb->addCollider(ca);
                 break;
             }
         }
