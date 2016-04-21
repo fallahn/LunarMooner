@@ -31,7 +31,7 @@ source distribution.
 
 using namespace lm;
 
-CollisionWorld::CollisionWorld(xy::Scene& scene)
+CollisionWorld::CollisionWorld(const xy::Scene& scene)
 : m_scene(scene){}
 
 //public

@@ -109,7 +109,8 @@ void PostBlur::apply(const sf::RenderTexture& src, sf::RenderTarget& dst)
     //and draw....
     if (m_amount == 0)
     {
-        dst.draw(sf::Sprite(src.getTexture()));
+        m_outShader.setUniform("u_srcTexture", src.getTexture());
+        applyShader(m_outShader, dst);
     }
     else
     {        
@@ -117,10 +118,10 @@ void PostBlur::apply(const sf::RenderTexture& src, sf::RenderTarget& dst)
         blurMultipass(m_firstPassTextures);
         downSample(m_firstPassTextures[0], m_secondPassTextures[0]);
         blurMultipass(m_secondPassTextures);
-
         m_outShader.setUniform("u_srcTexture", m_secondPassTextures[0].getTexture());
-        applyShader(m_outShader, dst);
+        
     }
+    applyShader(m_outShader, dst);
 }
 
 //private

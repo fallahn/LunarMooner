@@ -40,7 +40,7 @@ namespace lm
     class CollisionWorld final
     {
     public:
-        explicit CollisionWorld(xy::Scene&);
+        explicit CollisionWorld(const xy::Scene&);
         ~CollisionWorld() = default;
         CollisionWorld(const CollisionWorld&) = delete;
         CollisionWorld& operator = (const CollisionWorld&) = delete;
@@ -52,7 +52,7 @@ namespace lm
     private:
         std::vector<CollisionComponent*> m_colliders;
 
-        xy::Scene& m_scene;
+        const xy::Scene& m_scene;
     };
 }
 
