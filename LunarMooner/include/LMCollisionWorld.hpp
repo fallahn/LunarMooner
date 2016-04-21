@@ -30,12 +30,17 @@ source distribution.
 
 #include <LMCollisionComponent.hpp>
 
+namespace xy
+{
+    class Scene;
+}
+
 namespace lm
 {
     class CollisionWorld final
     {
     public:
-        CollisionWorld();
+        explicit CollisionWorld(xy::Scene&);
         ~CollisionWorld() = default;
         CollisionWorld(const CollisionWorld&) = delete;
         CollisionWorld& operator = (const CollisionWorld&) = delete;
@@ -46,7 +51,8 @@ namespace lm
 
     private:
         std::vector<CollisionComponent*> m_colliders;
-        std::vector<CollisionComponent*> m_collidees;
+
+        xy::Scene& m_scene;
     };
 }
 

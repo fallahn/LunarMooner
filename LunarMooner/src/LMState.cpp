@@ -87,6 +87,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_messageBus        (context.appInstance.getMessageBus()),
     m_inputFlags        (0),
     m_prevInputFlags    (0),
+    m_collisionWorld    (m_scene),
     m_useController     (false)
 {
     XY_ASSERT(playerCount > 0, "Need at least one player");
@@ -99,12 +100,12 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     
     m_scene.setView(context.defaultView);
     m_scene.setSize({ -100.f, -100.f, 2120.f, 1280.f });
-    //m_scene.drawDebug(true);
+    m_scene.drawDebug(true);
 
-    auto pp = xy::PostProcess::create<lm::PostBlur>();
+    /*auto pp = xy::PostProcess::create<lm::PostBlur>();
     m_scene.addPostProcess(pp);
     pp = xy::PostProcess::create<xy::PostChromeAb>();
-    m_scene.addPostProcess(pp);
+    m_scene.addPostProcess(pp);*/
 
     initGameController(playerCount);
     initSounds();

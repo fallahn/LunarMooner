@@ -652,11 +652,13 @@ void GameController::createMothership()
 
     auto bounds = drawable->getDrawable().getGlobalBounds();
     auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, {bounds.width, bounds.height} }, CollisionComponent::ID::Mothership);
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(0.f, 0.f, bounds.width, bounds.height));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
     entity->addComponent(controller);
     entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->setPosition(960.f - (bounds.width / 2.f), mothershipStart.y);
     entity->addCommandCategories(LMCommandID::Mothership);
 
@@ -727,10 +729,13 @@ void GameController::spawnAlien(const sf::Vector2f& position)
     //this cludge assumes max size is 50 x 50
     collision->setScoreValue(100 - static_cast<sf::Uint16>(size.width + size.height));
 
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), size);
+
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
     entity->addComponent(controller);
     entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->setPosition(position);
     entity->addCommandCategories(LMCommandID::Alien);
 
@@ -749,28 +754,42 @@ void GameController::spawnAliens()
 
 void GameController::createTerrain()
 {
+    static const std::array<sf::FloatRect, 2u> sizes = 
+    {
+        sf::FloatRect(0.f, 0.f, 40.f, 1080.f),
+        sf::FloatRect(0.f, 0.f, alienArea.width, 40.f)
+    };
+
     //walls
-    auto collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ 40.f, 1080.f } }, lm::CollisionComponent::ID::Bounds);
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), sizes[0], lm::CollisionComponent::ID::Bounds);
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[0]);
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->setPosition(alienArea.left - 40.f, 0.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ 40.f, 1080.f } }, lm::CollisionComponent::ID::Bounds);
+    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[0], lm::CollisionComponent::ID::Bounds);
+    qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[0]);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->setPosition(alienArea.left + alienArea.width, 0.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ alienArea.width, 40.f } }, lm::CollisionComponent::ID::Bounds);
+    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds);
+    qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[1]);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->setPosition(alienArea.left, -40.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ alienArea.width, 40.f } }, lm::CollisionComponent::ID::Bounds);
+    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds);
+    qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[1]);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->setPosition(alienArea.left, 1080.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
@@ -835,8 +854,11 @@ void GameController::updatePlatforms()
             auto collision = m_collisionWorld.addComponent(getMessageBus(), { {}, p.size }, lm::CollisionComponent::ID::Tower);
             collision->setScoreValue(p.value);
 
+            auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(sf::Vector2f(), p.size));
+
             auto entity = xy::Entity::create(getMessageBus());
             entity->addComponent(collision);
+            entity->addComponent(qtc);
             entity->addCommandCategories(LMCommandID::TerrainObject);
             entity->setPosition(p.position);
 
@@ -1251,6 +1273,8 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     collision->setCallback(cb);
     collision->setScoreValue(1000);
 
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), size);
+
     auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
     ps->setLifetimeVariance(0.25f);
 
@@ -1293,6 +1317,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     entity->addComponent(ps);
     entity->addComponent(controller);
     entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->addComponent(as);
     entity->addComponent(lc);
     entity->setPosition(position);
@@ -1359,6 +1384,8 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     auto collision = m_collisionWorld.addComponent(getMessageBus(), bounds, type);
     collision->setScoreValue(20);
 
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), bounds);
+
     //for now we expect the same behaviour as aliens
     auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
 
@@ -1372,6 +1399,7 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     entity->setPosition(position);
     entity->addComponent(drawable);
     auto cc = entity->addComponent(collision);
+    entity->addComponent(qtc);
     entity->addComponent(controller);
     entity->addCommandCategories(LMCommandID::Item);
     entity->addComponent(lc);
