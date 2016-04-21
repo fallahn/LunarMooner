@@ -36,6 +36,8 @@ CollisionComponent::CollisionComponent(xy::MessageBus& mb, sf::FloatRect area, C
     m_entity        (nullptr),
     m_localBounds   (area),
     m_id            (id),
+    m_innerRadius   ((area.width > area.height) ? area.height / 2.f : area.width / 2.f),
+    m_outerRadius   ((area.width > area.height) ? area.width / 2.f : area.height / 2.f),
     m_scoreValue    (0u)
 {
     resolve = [](CollisionComponent*) {};

@@ -61,7 +61,7 @@ namespace lm
         sf::FloatRect globalBounds() const override;
 
         ID getID() const;
-        const xy::Entity& getParentEntity() const { return *m_entity; }
+        xy::Entity& getParentEntity() { return *m_entity; }
 
         void setScoreValue(sf::Uint16 v) { m_scoreValue = v; }
         sf::Uint16 getScoreValue() const { return m_scoreValue; }
@@ -71,10 +71,16 @@ namespace lm
 
         void addCollider(CollisionComponent*);
 
+        float getInnerRadius() const { return m_innerRadius; }
+        float getOuterRadius() const { return m_outerRadius; }
+
     private:
         xy::Entity* m_entity;
         sf::FloatRect m_localBounds;
         ID m_id;
+
+        float m_innerRadius;
+        float m_outerRadius;
 
         sf::Uint16 m_scoreValue;
 

@@ -40,6 +40,7 @@ namespace xy
 
 namespace lm
 {
+    class CollisionComponent;
     class WeaponEMP final : public xy::Component, public sf::Drawable
     {
     public:
@@ -57,6 +58,8 @@ namespace lm
 
         sf::CircleShape m_shape;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
+
+        void killThing(CollisionComponent*);
     };
 }
 
