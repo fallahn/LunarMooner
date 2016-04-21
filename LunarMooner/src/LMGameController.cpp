@@ -41,6 +41,7 @@ source distribution.
 #include <LMShieldDrawable.hpp>
 #include <LMLaserSight.hpp>
 #include <LMSpriteBatch.hpp>
+#include <LMWeaponEMP.hpp>
 #include <StateIds.hpp>
 #include <Game.hpp>
 
@@ -962,7 +963,15 @@ void GameController::fireSpecial()
             spawnBullet(position, LMDirection::Down);
             break;
         case SpecialWeapon::EMP:
+        {
+            auto emp = xy::Component::create<WeaponEMP>(getMessageBus(), m_scene);
+            auto ent = xy::Entity::create(getMessageBus());
+            ent->addComponent(emp);
+            ent->setPosition(position);
+            m_scene.addEntity(ent, xy::Scene::Layer::FrontFront);
 
+            //TODO raise event
+        }
             break;
         }
         m_playerStates[m_currentPlayer].cooldownTime = 0.f;
