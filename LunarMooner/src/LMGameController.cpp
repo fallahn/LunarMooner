@@ -41,7 +41,6 @@ source distribution.
 #include <LMShieldDrawable.hpp>
 #include <LMLaserSight.hpp>
 #include <LMSpriteBatch.hpp>
-#include <CommandIds.hpp>
 #include <StateIds.hpp>
 #include <Game.hpp>
 
@@ -864,26 +863,30 @@ void GameController::addRescuedHuman()
     m_mothership->addChild(entity);
 }
 
-void GameController::spawnBullet(const sf::Vector2f& position)
+void GameController::spawnBullet(const sf::Vector2f& position, LMDirection direction)
 {
+    sf::Vector2f size(bulletSize.y, bulletSize.x);
+    if (direction == LMDirection::Up || direction == LMDirection::Down)
+    {
+        size = bulletSize;
+    }
+
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    drawable->getDrawable().setSize(bulletSize);
+    drawable->getDrawable().setSize(size);
     drawable->getDrawable().setFillColor(sf::Color(90u, 255u, 220u, 190u));
     drawable->getDrawable().setOutlineColor(sf::Color(0u, 185u, 140u, 100u));
     drawable->getDrawable().setOutlineThickness(2.f);
     drawable->setBlendMode(sf::BlendAdd);
     
-    auto controller = xy::Component::create<BulletController>(getMessageBus());
+    auto controller = xy::Component::create<BulletController>(getMessageBus(), direction);
 
-    auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, bulletSize }, CollisionComponent::ID::Bullet);
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, size }, CollisionComponent::ID::Bullet);
     CollisionComponent::Callback cb = std::bind(&BulletController::collisionCallback, controller.get(), _1);
     collision->setCallback(cb);
 
-    //auto position = m_player->getPosition();
-
     auto entity = xy::Entity::create(getMessageBus());
     entity->setPosition(position);
-    entity->setOrigin(bulletSize / 2.f);
+    entity->setOrigin(size / 2.f);
     entity->addComponent(drawable);
     entity->addComponent(controller);
     entity->addComponent(collision);
@@ -899,45 +902,48 @@ void GameController::spawnBullet(const sf::Vector2f& position)
 
 void GameController::fireSpecial()
 {
-    float coolDown;
-    if (m_difficulty == xy::Difficulty::Easy)
-    {
-        coolDown = easyCoolDown;
-    }
-    else if (m_difficulty == xy::Difficulty::Medium)
-    {
-        coolDown = mediumCoolDown;
-    }
-    else
-    {
-        coolDown = hardCoolDown;
-    }
-
+    float coolDown = 0.5f;
+    //if (m_difficulty == xy::Difficulty::Easy)
+    //{
+    //    coolDown = easyCoolDown;
+    //}
+    //else if (m_difficulty == xy::Difficulty::Medium)
+    //{
+    //    coolDown = mediumCoolDown;
+    //}
+    //else
+    //{
+    //    coolDown = hardCoolDown;
+    //}
+    
     if (m_playerStates[m_currentPlayer].cooldownTime > coolDown)
     {
+        auto position = m_player->getPosition();
         switch (m_playerStates[m_currentPlayer].special)
         {
         default: break;
         case SpecialWeapon::DualLaser:
         {
-            auto position = m_player->getPosition();
             position.x -= playerSize.x / 2.f;
             spawnBullet(position);
             position.x += playerSize.x;
             spawnBullet(position);
-            m_playerStates[m_currentPlayer].cooldownTime = 0.f;
         }
             break;
         case SpecialWeapon::SideLaser:
-
+        {    
+            spawnBullet(position, LMDirection::Left);
+            spawnBullet(position, LMDirection::Right);
+        }
             break;
         case SpecialWeapon::DownLaser:
-
+            spawnBullet(position, LMDirection::Down);
             break;
         case SpecialWeapon::EMP:
 
             break;
         }
+        m_playerStates[m_currentPlayer].cooldownTime = 0.f;
     }
 }
 
