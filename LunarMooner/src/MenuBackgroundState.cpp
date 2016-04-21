@@ -87,12 +87,12 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 bool MenuBackgroundState::update(float dt)
 {
     //update lighting
-    auto ents = m_scene.queryQuadTree(m_scene.getVisibleArea());
+    auto lights = m_scene.getVisibleLights(m_scene.getVisibleArea());
     auto i = 0u;
-    for (; i < ents.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
+    for (; i < lights.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
     {
-        auto light = ents[i]->getEntity()->getComponent<xy::PointLight>();
-        if (light)
+        auto light = lights[i];
+        //if (light)
         {
             const std::string idx = std::to_string(i);
 
@@ -204,29 +204,23 @@ void MenuBackgroundState::setup()
 
     
     //lights
-    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 200.f);
+    auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 200.f, 50.f);
     lc->setDepth(100.f);
     lc->setDiffuseColour({ 255u, 235u, 185u });
-        
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect({ -50.f, -50.f }, { 100.f, 100.f }));
-    
+
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(1160.f, 340.f);
     entity->addComponent(lc);
-    entity->addComponent(qtc);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
-    lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f);
+    lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f, 250.f);
     lc->setDepth(600.f);
     lc->setDiffuseColour({ 255u, 245u, 235u });
     lc->setIntensity(2.f);
 
-    qtc = xy::Component::create<xy::QuadTreeComponent>(m_messageBus, sf::FloatRect({ -250.f, -250.f }, { 500.f, 500.f }));
-
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(1160.f, 340.f);
     entity->addComponent(lc);
-    entity->addComponent(qtc);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
     //music
