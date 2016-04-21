@@ -68,9 +68,9 @@ void CollisionWorld::update()
             if (ca->globalBounds().intersects(cb->globalBounds()))
             {
                 ca->addCollider(cb); //TODO sort this kludginess out boi
-                if (cb->getID() == CollisionComponent::ID::Alien ||
+                /*if (cb->getID() == CollisionComponent::ID::Alien ||
                     cb->getID() == CollisionComponent::ID::Ammo ||
-                    cb->getID() == CollisionComponent::ID::Shield)
+                    cb->getID() == CollisionComponent::ID::Shield)*/
                 {
                     cb->addCollider(ca);
                 }

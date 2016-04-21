@@ -34,20 +34,35 @@ using namespace lm;
 
 namespace
 {
-    const sf::Vector2f velocity(0.f, -600.f);
+    const float speed = 600.f;
 }
 
-BulletController::BulletController(xy::MessageBus& mb)
-    : xy::Component(mb, this),
-    m_entity(nullptr)
+BulletController::BulletController(xy::MessageBus& mb, LMDirection direction)
+    : xy::Component (mb, this),
+    m_entity        (nullptr)
 {
-
+    switch (direction)
+    {
+    default: break;
+    case LMDirection::Up:
+        m_velocity.y = -1.f;
+        break;
+    case LMDirection::Down:
+        m_velocity.y = 1.f;
+        break;
+    case LMDirection::Left:
+        m_velocity.x = 1.f;
+        break;
+    case LMDirection::Right:
+        m_velocity.x = -1.f;
+        break;
+    }
 }
 
 //public
 void BulletController::entityUpdate(xy::Entity& entity, float dt)
 {
-    entity.move(velocity * dt);
+    entity.move(m_velocity * speed * dt);
 }
 
 void BulletController::onStart(xy::Entity& entity)

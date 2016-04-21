@@ -29,6 +29,7 @@ source distribution.
 #define LM_GAME_CONTROLLER_HPP_
 
 #include <LMPlayerState.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/components/Component.hpp>
 #include <xygine/components/ParticleSystem.hpp>
@@ -124,7 +125,7 @@ namespace lm
         void updatePlatforms();
 
         void addRescuedHuman();
-        void spawnBullet(const sf::Vector2f&);
+        void spawnBullet(const sf::Vector2f&, LMDirection = LMDirection::Up);
         void fireSpecial();
 
         SpeedMeter* m_speedMeter;

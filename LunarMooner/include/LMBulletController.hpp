@@ -30,13 +30,15 @@ source distribution.
 
 #include <xygine/components/Component.hpp>
 
+#include <CommandIds.hpp>
+
 namespace lm
 {
     class CollisionComponent;
     class BulletController final : public xy::Component
     {
     public:
-        explicit BulletController(xy::MessageBus&);
+        BulletController(xy::MessageBus&, LMDirection);
         ~BulletController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -48,6 +50,7 @@ namespace lm
     private:
 
         xy::Entity* m_entity;
+        sf::Vector2f m_velocity;
     };
 }
 

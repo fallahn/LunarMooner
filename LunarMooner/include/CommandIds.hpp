@@ -53,6 +53,14 @@ enum LMInputFlags
     Special = 0x20
 };
 
+enum class LMDirection
+{
+    Up,
+    Down,
+    Left,
+    Right
+};
+
 enum LMMessageId
 {
     GameEvent = xy::Message::Count,
