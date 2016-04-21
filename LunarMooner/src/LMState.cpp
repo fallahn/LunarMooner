@@ -366,6 +366,7 @@ namespace
     bool lastJoyRight = false;
     bool lastPovLeft = false;
     bool lastPovRight = false;
+    bool lastThrust = false;
 
     //ewwww we've copied this from game controller
     const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
@@ -413,6 +414,18 @@ void LunarMoonerState::parseControllerInput()
     //dpad
     xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
     parse(lastPovLeft, lastPovRight, xValue);
+
+    //xbox triggers
+    float zValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Z);
+    bool thrust = (zValue < -joyDeadZone || zValue > joyDeadZone);
+    if (lastThrust != thrust)
+    {
+        (thrust) ?
+            m_inputFlags |= LMInputFlags::Thrust :
+            m_inputFlags &= ~LMInputFlags::Thrust;
+            
+    }
+    lastThrust = thrust;
 }
 
 void LunarMoonerState::initGameController(sf::Uint8 playerCount)

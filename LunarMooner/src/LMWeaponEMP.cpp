@@ -26,9 +26,13 @@ source distribution.
 *********************************************************************/
 
 #include <LMWeaponEMP.hpp>
+#include <LMCollisionComponent.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
 #include <xygine/Scene.hpp>
+#include <xygine/Reports.hpp>
+#include <xygine/util/Vector.hpp>
 
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -37,8 +41,8 @@ using namespace lm;
 
 namespace
 {
-    const float startIncrease = 600.f;
-    const float decreasePerSecond = 460.f;
+    const float startIncrease = 470.f;
+    const float decreasePerSecond = 540.f;
 }
 
 WeaponEMP::WeaponEMP(xy::MessageBus& mb, const xy::Scene& scene)
@@ -58,12 +62,10 @@ void WeaponEMP::entityUpdate(xy::Entity& entity, float dt)
 {
     m_radiusIncrease = std::max(0.f, m_radiusIncrease - (decreasePerSecond * dt));
     
-    auto scale = m_shape.getScale();
-    scale.x += m_radiusIncrease * dt;
-    scale.y += m_radiusIncrease * dt;
-
-    m_shape.setScale(scale);
-    m_shape.setOutlineThickness(2.f * (1 / scale.x));
+    auto radius = m_shape.getRadius();
+    radius += m_radiusIncrease * dt;
+    m_shape.setRadius(radius);
+    m_shape.setOrigin(radius, radius);
 
     if (m_radiusIncrease == 0)
     {
@@ -74,7 +76,58 @@ void WeaponEMP::entityUpdate(xy::Entity& entity, float dt)
     sf::Color c(255u, 0u, 255u, static_cast<sf::Uint8>(alpha * 255.f));
     m_shape.setOutlineColor(c);
 
-    //TODO collision detection
+    //collision detection
+    auto position = entity.getPosition();
+    const auto objects = m_scene.queryQuadTree({ position.x - radius, position.y - radius, radius * 2.f, radius * 2.f });
+    for (const auto& o : objects)
+    {
+        REPORT("Emp Collision", std::to_string(objects.size()));
+        if (CollisionComponent* cc = o->getEntity()->getComponent<CollisionComponent>())
+        {
+            //don't accidentally kill powerups!
+            switch(cc->getID())
+            {
+            default:break;
+            case CollisionComponent::ID::Alien:
+            case CollisionComponent::ID::Ammo:
+            case CollisionComponent::ID::Shield:
+            {
+                sf::FloatRect ccBounds = cc->globalBounds();
+                sf::Vector2f ccPosition(ccBounds.left + (ccBounds.width / 2.f), ccBounds.top + (ccBounds.height / 2.f));
+                sf::Vector2f distance = position = ccPosition;
+                float distSquared = xy::Util::Vector::lengthSquared(distance);
+                float radiusSquared = radius * radius;
+
+                //test outer radius
+                if ((cc->getOuterRadius() * cc->getOuterRadius()) + radiusSquared > distSquared)
+                {
+                    //we can't be colliding
+                    break;
+                }
+
+                //test inner radius
+                if ((cc->getInnerRadius() *  cc->getInnerRadius()) + radiusSquared < distSquared)
+                {
+                    //we're definitely colliding
+                    //kill the colliding thing
+                    killThing(cc);
+                    break;
+                }
+
+                //test point in rect
+                sf::Vector2f point = xy::Util::Vector::normalise(distance) * radius;
+                if (ccBounds.contains(position + point))
+                {
+                    //we're inside the box
+                    //kill thing
+                    killThing(cc);
+                }
+
+            }
+                break;
+            }
+        }
+    }
 }
 
 
@@ -83,4 +136,16 @@ void WeaponEMP::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.blendMode = sf::BlendAdd;
     rt.draw(m_shape, states);
+}
+
+void WeaponEMP::killThing(CollisionComponent* cc)
+{
+    cc->getParentEntity().destroy();
+
+    auto position = cc->getParentEntity().getPosition();
+    auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+    msg->posX = position.x;
+    msg->posY = position.y;
+    msg->type = LMGameEvent::AlienDied; //TODO new events for losing collectable
+    msg->value = 2; //let's not be too generous for being over powered :) //TODO subtract points for killing collectables
 }

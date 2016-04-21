@@ -139,7 +139,7 @@ void RoidBelt::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 //------roid-----//
 void RoidBelt::Roid::update(float dt, const sf::FloatRect& bounds)
 {
-    rotate(rotation * dt);
+    //rotate(rotation * dt);
     move(velocity * speed * dt);
 
     //check bounds

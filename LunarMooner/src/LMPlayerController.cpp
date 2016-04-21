@@ -244,7 +244,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                 if (roidController)
                 {
                     m_velocity += roidController->getVelocity();
-                    m_velocity *= 0.05f;
+                    m_velocity *= 0.15f;
                 }
             }
             
