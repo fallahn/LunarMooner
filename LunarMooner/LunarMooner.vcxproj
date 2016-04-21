@@ -133,6 +133,7 @@
     <ClInclude Include="include\LMShieldDrawable.hpp" />
     <ClInclude Include="include\LMSoundPlayer.hpp" />
     <ClInclude Include="include\LMSpriteBatch.hpp" />
+    <ClInclude Include="include\LMWeaponEMP.hpp" />
     <ClInclude Include="include\MenuAchievementState.hpp" />
     <ClInclude Include="include\MenuBackgroundState.hpp" />
     <ClInclude Include="include\CommandIds.hpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="src\LMShieldDrawable.cpp" />
     <ClCompile Include="src\LMSoundPlayer.cpp" />
     <ClCompile Include="src\LMSpriteBatch.cpp" />
+    <ClCompile Include="src\LMWeaponEMP.cpp" />
     <ClCompile Include="src\MenuAchievementState.cpp" />
     <ClCompile Include="src\MenuBackgroundState.cpp" />
     <ClCompile Include="src\Game.cpp" />
