@@ -95,7 +95,9 @@ struct LMGameEvent
         MeteorExploded,
         LaserFired,
         EarlyWarning,
-        LevelChanged
+        LevelChanged,
+        CollectibleDied,
+        EmpFired
     }type;
     float posX = 0.f; //<holds time remaining on level change
     float posY = 0.f; //<holds difficulty on level change
