@@ -929,9 +929,9 @@ void GameController::spawnBullet(const sf::Vector2f& position, LMDirection direc
 
 void GameController::fireSpecial()
 {
-    float coolDown = 0.f;
+    float coolDown = 0.1f;
     //TODO better to set this when difficulty is changed
-    if (m_difficulty == xy::Difficulty::Easy)
+    /*if (m_difficulty == xy::Difficulty::Easy)
     {
         coolDown = easyCoolDown;
     }
@@ -942,7 +942,7 @@ void GameController::fireSpecial()
     else
     {
         coolDown = hardCoolDown;
-    }
+    }*/
     
     if (m_playerStates[m_currentPlayer].cooldownTime > coolDown)
     {

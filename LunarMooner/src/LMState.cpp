@@ -470,6 +470,7 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::MissionTerminated, "assets/sound/speech/game_over.wav");
     soundPlayer->preCache(LMSoundID::HumanRescued, "assets/sound/speech/alright.wav");
     soundPlayer->preCache(LMSoundID::ShieldHit, "assets/sound/fx/shield_hit.wav");
+    soundPlayer->preCache(LMSoundID::EmpExplosion, "assets/sound/fx/emp_blast.wav");
 
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
@@ -518,6 +519,9 @@ void LunarMoonerState::initSounds()
             break;
         case LMGameEvent::HumanRescued:
             player->playSound(LMSoundID::HumanRescued, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::EmpFired:
+            player->playSound(LMSoundID::EmpExplosion, msgData.posX, msgData.posY);
             break;
         }
     };
