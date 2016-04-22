@@ -28,6 +28,8 @@ source distribution.
 #ifndef LM_WEAPON_EMP_HPP_
 #define LM_WEAPON_EMP_HPP_
 
+#include <LMCollisionComponent.hpp>
+
 #include <xygine/components/Component.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
@@ -59,7 +61,7 @@ namespace lm
         sf::CircleShape m_shape;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
 
-        void killThing(CollisionComponent*);
+        void killThing(CollisionComponent*, CollisionComponent::ID);
     };
 }
 

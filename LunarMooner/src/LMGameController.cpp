@@ -252,6 +252,10 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 spawnCollectable({ msgData.posX, msgData.posY });
             }
             break;
+        case LMGameEvent::CollectibleDied:
+            m_playerStates[m_currentPlayer].score += msgData.value;
+            m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
+            break;
         case LMGameEvent::MeteorExploded:
             if (msgData.value > 0)
             {
@@ -925,19 +929,20 @@ void GameController::spawnBullet(const sf::Vector2f& position, LMDirection direc
 
 void GameController::fireSpecial()
 {
-    float coolDown = 0.5f;
-    //if (m_difficulty == xy::Difficulty::Easy)
-    //{
-    //    coolDown = easyCoolDown;
-    //}
-    //else if (m_difficulty == xy::Difficulty::Medium)
-    //{
-    //    coolDown = mediumCoolDown;
-    //}
-    //else
-    //{
-    //    coolDown = hardCoolDown;
-    //}
+    float coolDown = 0.f;
+    //TODO better to set this when difficulty is changed
+    if (m_difficulty == xy::Difficulty::Easy)
+    {
+        coolDown = easyCoolDown;
+    }
+    else if (m_difficulty == xy::Difficulty::Medium)
+    {
+        coolDown = mediumCoolDown;
+    }
+    else
+    {
+        coolDown = hardCoolDown;
+    }
     
     if (m_playerStates[m_currentPlayer].cooldownTime > coolDown)
     {
@@ -970,7 +975,11 @@ void GameController::fireSpecial()
             ent->setPosition(position);
             m_scene.addEntity(ent, xy::Scene::Layer::FrontFront);
 
-            //TODO raise event
+            //raise event
+            auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+            msg->type = LMGameEvent::EmpFired;
+            msg->posX = position.x;
+            msg->posY = position.y;
         }
             break;
         }

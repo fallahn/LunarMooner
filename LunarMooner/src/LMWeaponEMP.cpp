@@ -26,7 +26,6 @@ source distribution.
 *********************************************************************/
 
 #include <LMWeaponEMP.hpp>
-#include <LMCollisionComponent.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
@@ -82,10 +81,11 @@ void WeaponEMP::entityUpdate(xy::Entity& entity, float dt)
     for (const auto& o : objects)
     {
         REPORT("Emp Collision", std::to_string(objects.size()));
-        if (CollisionComponent* cc = o->getEntity()->getComponent<CollisionComponent>())
+        CollisionComponent* cc = nullptr;
+        if (!o->destroyed() && (cc = o->getEntity()->getComponent<CollisionComponent>()))
         {
             //don't accidentally kill powerups!
-            switch(cc->getID())
+            switch(auto id = cc->getID())
             {
             default:break;
             case CollisionComponent::ID::Alien:
@@ -110,7 +110,7 @@ void WeaponEMP::entityUpdate(xy::Entity& entity, float dt)
                 {
                     //we're definitely colliding
                     //kill the colliding thing
-                    killThing(cc);
+                    killThing(cc, id);
                     break;
                 }
 
@@ -120,7 +120,7 @@ void WeaponEMP::entityUpdate(xy::Entity& entity, float dt)
                 {
                     //we're inside the box
                     //kill thing
-                    killThing(cc);
+                    killThing(cc, id);
                 }
 
             }
@@ -138,7 +138,7 @@ void WeaponEMP::draw(sf::RenderTarget& rt, sf::RenderStates states) const
     rt.draw(m_shape, states);
 }
 
-void WeaponEMP::killThing(CollisionComponent* cc)
+void WeaponEMP::killThing(CollisionComponent* cc, CollisionComponent::ID id)
 {
     cc->getParentEntity().destroy();
 
@@ -146,6 +146,6 @@ void WeaponEMP::killThing(CollisionComponent* cc)
     auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
     msg->posX = position.x;
     msg->posY = position.y;
-    msg->type = LMGameEvent::AlienDied; //TODO new events for losing collectable
-    msg->value = 2; //let's not be too generous for being over powered :) //TODO subtract points for killing collectables
+    msg->type = (id == CollisionComponent::ID::Alien) ? LMGameEvent::AlienDied : LMGameEvent::CollectibleDied;
+    msg->value = (id == CollisionComponent::ID::Alien) ? 2 : 0; //let's not be too generous for being over powered :)
 }
