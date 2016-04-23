@@ -41,6 +41,7 @@
             this.buttonTextureUp = new System.Windows.Forms.Button();
             this.buttonAddTexture = new System.Windows.Forms.Button();
             this.listBoxTextures = new System.Windows.Forms.ListBox();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.numericUpDownBoxVal = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.numericUpDownHeight = new System.Windows.Forms.NumericUpDown();
@@ -53,6 +54,9 @@
             this.radioButtonDeletePoint = new System.Windows.Forms.RadioButton();
             this.radioButtonMovePoint = new System.Windows.Forms.RadioButton();
             this.radioButtonAddPoint = new System.Windows.Forms.RadioButton();
+            this.splitContainer4 = new System.Windows.Forms.SplitContainer();
+            this.label4 = new System.Windows.Forms.Label();
+            this.numericUpDownWaterLevel = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -62,9 +66,17 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
+            this.splitContainer3.Panel1.SuspendLayout();
+            this.splitContainer3.Panel2.SuspendLayout();
+            this.splitContainer3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownBoxVal)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWidth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
+            this.splitContainer4.Panel1.SuspendLayout();
+            this.splitContainer4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWaterLevel)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -104,14 +116,14 @@
             this.saveAsToolStripMenuItem,
             this.quitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(36, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.newToolStripMenuItem.Text = "New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -119,7 +131,7 @@
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -127,7 +139,7 @@
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -136,7 +148,7 @@
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
             this.saveAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.saveAsToolStripMenuItem.Text = "Save As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
@@ -144,11 +156,12 @@
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
             this.quitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.quitToolStripMenuItem.Text = "Quit";
             // 
             // splitContainer2
             // 
+            this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
             this.splitContainer2.Name = "splitContainer2";
@@ -162,18 +175,7 @@
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.numericUpDownBoxVal);
-            this.splitContainer2.Panel2.Controls.Add(this.label3);
-            this.splitContainer2.Panel2.Controls.Add(this.numericUpDownHeight);
-            this.splitContainer2.Panel2.Controls.Add(this.label2);
-            this.splitContainer2.Panel2.Controls.Add(this.label1);
-            this.splitContainer2.Panel2.Controls.Add(this.numericUpDownWidth);
-            this.splitContainer2.Panel2.Controls.Add(this.radioButtonDeleteBox);
-            this.splitContainer2.Panel2.Controls.Add(this.radioButtonMoveBox);
-            this.splitContainer2.Panel2.Controls.Add(this.radioButtonAddBox);
-            this.splitContainer2.Panel2.Controls.Add(this.radioButtonDeletePoint);
-            this.splitContainer2.Panel2.Controls.Add(this.radioButtonMovePoint);
-            this.splitContainer2.Panel2.Controls.Add(this.radioButtonAddPoint);
+            this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
             this.splitContainer2.Size = new System.Drawing.Size(1156, 197);
             this.splitContainer2.SplitterDistance = 206;
             this.splitContainer2.TabIndex = 0;
@@ -214,6 +216,36 @@
             this.listBoxTextures.Size = new System.Drawing.Size(156, 147);
             this.listBoxTextures.TabIndex = 0;
             // 
+            // splitContainer3
+            // 
+            this.splitContainer3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer3.Name = "splitContainer3";
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.BackColor = System.Drawing.SystemColors.Control;
+            this.splitContainer3.Panel1.Controls.Add(this.numericUpDownBoxVal);
+            this.splitContainer3.Panel1.Controls.Add(this.label3);
+            this.splitContainer3.Panel1.Controls.Add(this.numericUpDownHeight);
+            this.splitContainer3.Panel1.Controls.Add(this.label2);
+            this.splitContainer3.Panel1.Controls.Add(this.label1);
+            this.splitContainer3.Panel1.Controls.Add(this.numericUpDownWidth);
+            this.splitContainer3.Panel1.Controls.Add(this.radioButtonDeleteBox);
+            this.splitContainer3.Panel1.Controls.Add(this.radioButtonMoveBox);
+            this.splitContainer3.Panel1.Controls.Add(this.radioButtonAddBox);
+            this.splitContainer3.Panel1.Controls.Add(this.radioButtonDeletePoint);
+            this.splitContainer3.Panel1.Controls.Add(this.radioButtonMovePoint);
+            this.splitContainer3.Panel1.Controls.Add(this.radioButtonAddPoint);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add(this.splitContainer4);
+            this.splitContainer3.Size = new System.Drawing.Size(946, 197);
+            this.splitContainer3.SplitterDistance = 221;
+            this.splitContainer3.TabIndex = 0;
+            // 
             // numericUpDownBoxVal
             // 
             this.numericUpDownBoxVal.Increment = new decimal(new int[] {
@@ -221,7 +253,7 @@
             0,
             0,
             0});
-            this.numericUpDownBoxVal.Location = new System.Drawing.Point(190, 130);
+            this.numericUpDownBoxVal.Location = new System.Drawing.Point(129, 128);
             this.numericUpDownBoxVal.Minimum = new decimal(new int[] {
             10,
             0,
@@ -229,26 +261,25 @@
             0});
             this.numericUpDownBoxVal.Name = "numericUpDownBoxVal";
             this.numericUpDownBoxVal.Size = new System.Drawing.Size(53, 20);
-            this.numericUpDownBoxVal.TabIndex = 11;
+            this.numericUpDownBoxVal.TabIndex = 23;
             this.numericUpDownBoxVal.Value = new decimal(new int[] {
             10,
             0,
             0,
             0});
-            this.numericUpDownBoxVal.ValueChanged += new System.EventHandler(this.numericUpDownBoxVal_ValueChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(163, 132);
+            this.label3.Location = new System.Drawing.Point(102, 130);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(17, 13);
-            this.label3.TabIndex = 10;
+            this.label3.TabIndex = 22;
             this.label3.Text = "V:";
             // 
             // numericUpDownHeight
             // 
-            this.numericUpDownHeight.Location = new System.Drawing.Point(190, 104);
+            this.numericUpDownHeight.Location = new System.Drawing.Point(129, 102);
             this.numericUpDownHeight.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -261,35 +292,34 @@
             0});
             this.numericUpDownHeight.Name = "numericUpDownHeight";
             this.numericUpDownHeight.Size = new System.Drawing.Size(52, 20);
-            this.numericUpDownHeight.TabIndex = 9;
+            this.numericUpDownHeight.TabIndex = 21;
             this.numericUpDownHeight.Value = new decimal(new int[] {
             20,
             0,
             0,
             0});
-            this.numericUpDownHeight.ValueChanged += new System.EventHandler(this.numericUpDownHeight_ValueChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(163, 106);
+            this.label2.Location = new System.Drawing.Point(102, 104);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(18, 13);
-            this.label2.TabIndex = 8;
+            this.label2.TabIndex = 20;
             this.label2.Text = "H:";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(163, 80);
+            this.label1.Location = new System.Drawing.Point(102, 78);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(21, 13);
-            this.label1.TabIndex = 7;
+            this.label1.TabIndex = 19;
             this.label1.Text = "W:";
             // 
             // numericUpDownWidth
             // 
-            this.numericUpDownWidth.Location = new System.Drawing.Point(190, 78);
+            this.numericUpDownWidth.Location = new System.Drawing.Point(129, 76);
             this.numericUpDownWidth.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -302,85 +332,110 @@
             0});
             this.numericUpDownWidth.Name = "numericUpDownWidth";
             this.numericUpDownWidth.Size = new System.Drawing.Size(52, 20);
-            this.numericUpDownWidth.TabIndex = 6;
+            this.numericUpDownWidth.TabIndex = 18;
             this.numericUpDownWidth.Value = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            this.numericUpDownWidth.ValueChanged += new System.EventHandler(this.numericUpDownWidth_ValueChanged);
             // 
             // radioButtonDeleteBox
             // 
             this.radioButtonDeleteBox.AutoSize = true;
-            this.radioButtonDeleteBox.Location = new System.Drawing.Point(166, 55);
+            this.radioButtonDeleteBox.Location = new System.Drawing.Point(105, 53);
             this.radioButtonDeleteBox.Name = "radioButtonDeleteBox";
             this.radioButtonDeleteBox.Size = new System.Drawing.Size(77, 17);
-            this.radioButtonDeleteBox.TabIndex = 5;
+            this.radioButtonDeleteBox.TabIndex = 17;
             this.radioButtonDeleteBox.TabStop = true;
             this.radioButtonDeleteBox.Text = "Delete Box";
             this.radioButtonDeleteBox.UseVisualStyleBackColor = true;
-            this.radioButtonDeleteBox.CheckedChanged += new System.EventHandler(this.radioButtonDeleteBox_CheckedChanged);
             // 
             // radioButtonMoveBox
             // 
             this.radioButtonMoveBox.AutoSize = true;
-            this.radioButtonMoveBox.Location = new System.Drawing.Point(166, 32);
+            this.radioButtonMoveBox.Location = new System.Drawing.Point(105, 30);
             this.radioButtonMoveBox.Name = "radioButtonMoveBox";
             this.radioButtonMoveBox.Size = new System.Drawing.Size(73, 17);
-            this.radioButtonMoveBox.TabIndex = 4;
+            this.radioButtonMoveBox.TabIndex = 16;
             this.radioButtonMoveBox.TabStop = true;
             this.radioButtonMoveBox.Text = "Move Box";
             this.radioButtonMoveBox.UseVisualStyleBackColor = true;
-            this.radioButtonMoveBox.CheckedChanged += new System.EventHandler(this.radioButtonMoveBox_CheckedChanged);
             // 
             // radioButtonAddBox
             // 
             this.radioButtonAddBox.AutoSize = true;
-            this.radioButtonAddBox.Location = new System.Drawing.Point(166, 8);
+            this.radioButtonAddBox.Location = new System.Drawing.Point(105, 6);
             this.radioButtonAddBox.Name = "radioButtonAddBox";
             this.radioButtonAddBox.Size = new System.Drawing.Size(65, 17);
-            this.radioButtonAddBox.TabIndex = 3;
+            this.radioButtonAddBox.TabIndex = 15;
             this.radioButtonAddBox.TabStop = true;
             this.radioButtonAddBox.Text = "Add Box";
             this.radioButtonAddBox.UseVisualStyleBackColor = true;
-            this.radioButtonAddBox.CheckedChanged += new System.EventHandler(this.radioButtonAddBox_CheckedChanged);
             // 
             // radioButtonDeletePoint
             // 
             this.radioButtonDeletePoint.AutoSize = true;
-            this.radioButtonDeletePoint.Location = new System.Drawing.Point(12, 55);
+            this.radioButtonDeletePoint.Location = new System.Drawing.Point(3, 52);
             this.radioButtonDeletePoint.Name = "radioButtonDeletePoint";
             this.radioButtonDeletePoint.Size = new System.Drawing.Size(83, 17);
-            this.radioButtonDeletePoint.TabIndex = 2;
+            this.radioButtonDeletePoint.TabIndex = 14;
             this.radioButtonDeletePoint.TabStop = true;
             this.radioButtonDeletePoint.Text = "Delete Point";
             this.radioButtonDeletePoint.UseVisualStyleBackColor = true;
-            this.radioButtonDeletePoint.CheckedChanged += new System.EventHandler(this.radioButtonDeletePoint_CheckedChanged);
             // 
             // radioButtonMovePoint
             // 
             this.radioButtonMovePoint.AutoSize = true;
-            this.radioButtonMovePoint.Location = new System.Drawing.Point(12, 32);
+            this.radioButtonMovePoint.Location = new System.Drawing.Point(3, 29);
             this.radioButtonMovePoint.Name = "radioButtonMovePoint";
             this.radioButtonMovePoint.Size = new System.Drawing.Size(79, 17);
-            this.radioButtonMovePoint.TabIndex = 1;
+            this.radioButtonMovePoint.TabIndex = 13;
             this.radioButtonMovePoint.TabStop = true;
             this.radioButtonMovePoint.Text = "Move Point";
             this.radioButtonMovePoint.UseVisualStyleBackColor = true;
-            this.radioButtonMovePoint.CheckedChanged += new System.EventHandler(this.radioButtonMovePoint_CheckedChanged);
             // 
             // radioButtonAddPoint
             // 
             this.radioButtonAddPoint.AutoSize = true;
-            this.radioButtonAddPoint.Location = new System.Drawing.Point(12, 9);
+            this.radioButtonAddPoint.Location = new System.Drawing.Point(3, 6);
             this.radioButtonAddPoint.Name = "radioButtonAddPoint";
             this.radioButtonAddPoint.Size = new System.Drawing.Size(71, 17);
-            this.radioButtonAddPoint.TabIndex = 0;
+            this.radioButtonAddPoint.TabIndex = 12;
             this.radioButtonAddPoint.TabStop = true;
             this.radioButtonAddPoint.Text = "Add Point";
             this.radioButtonAddPoint.UseVisualStyleBackColor = true;
-            this.radioButtonAddPoint.CheckedChanged += new System.EventHandler(this.radioButtonAddPoint_CheckedChanged);
+            // 
+            // splitContainer4
+            // 
+            this.splitContainer4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer4.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer4.Name = "splitContainer4";
+            // 
+            // splitContainer4.Panel1
+            // 
+            this.splitContainer4.Panel1.Controls.Add(this.numericUpDownWaterLevel);
+            this.splitContainer4.Panel1.Controls.Add(this.label4);
+            this.splitContainer4.Size = new System.Drawing.Size(721, 197);
+            this.splitContainer4.SplitterDistance = 252;
+            this.splitContainer4.TabIndex = 0;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 8);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(68, 13);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Water Level:";
+            // 
+            // numericUpDownWaterLevel
+            // 
+            this.numericUpDownWaterLevel.Location = new System.Drawing.Point(77, 6);
+            this.numericUpDownWaterLevel.Name = "numericUpDownWaterLevel";
+            this.numericUpDownWaterLevel.Size = new System.Drawing.Size(44, 20);
+            this.numericUpDownWaterLevel.TabIndex = 1;
+            this.numericUpDownWaterLevel.ValueChanged += new System.EventHandler(this.numericUpDownWaterLevel_ValueChanged);
             // 
             // MainWindow
             // 
@@ -400,12 +455,21 @@
             this.menuStrip1.PerformLayout();
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
-            this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel1.PerformLayout();
+            this.splitContainer3.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
+            this.splitContainer3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownBoxVal)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHeight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWidth)).EndInit();
+            this.splitContainer4.Panel1.ResumeLayout(false);
+            this.splitContainer4.Panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
+            this.splitContainer4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWaterLevel)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -425,18 +489,22 @@
         private System.Windows.Forms.ListBox listBoxTextures;
         private System.Windows.Forms.Button buttonTextureDown;
         private System.Windows.Forms.Button buttonTextureUp;
-        private System.Windows.Forms.RadioButton radioButtonDeletePoint;
-        private System.Windows.Forms.RadioButton radioButtonMovePoint;
-        private System.Windows.Forms.RadioButton radioButtonAddPoint;
-        private System.Windows.Forms.RadioButton radioButtonDeleteBox;
-        private System.Windows.Forms.RadioButton radioButtonMoveBox;
-        private System.Windows.Forms.RadioButton radioButtonAddBox;
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.NumericUpDown numericUpDownBoxVal;
+        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown numericUpDownHeight;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericUpDownWidth;
-        private System.Windows.Forms.NumericUpDown numericUpDownBoxVal;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.RadioButton radioButtonDeleteBox;
+        private System.Windows.Forms.RadioButton radioButtonMoveBox;
+        private System.Windows.Forms.RadioButton radioButtonAddBox;
+        private System.Windows.Forms.RadioButton radioButtonDeletePoint;
+        private System.Windows.Forms.RadioButton radioButtonMovePoint;
+        private System.Windows.Forms.RadioButton radioButtonAddPoint;
+        private System.Windows.Forms.SplitContainer splitContainer4;
+        private System.Windows.Forms.NumericUpDown numericUpDownWaterLevel;
+        private System.Windows.Forms.Label label4;
     }
 }
 

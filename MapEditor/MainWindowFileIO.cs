@@ -85,11 +85,13 @@ namespace MapEditor
             public string TextureName { get; set; }
             public List<Platform> Platforms { get; set; }
             public List<Point> Points { get; set; }
+            public float WaterLevel { get; set; }
             public MapDefinition()
             {
                 TextureName = "";
                 Platforms = new List<Platform>();
                 Points = new List<Point>();
+                WaterLevel = 0;
             }
         }
 
@@ -110,6 +112,8 @@ namespace MapEditor
             {
                 mapDef.Platforms.Add(new Platform(new Point(b.Box.Position.X, b.Box.Position.Y), new Point(b.Box.Size.X, b.Box.Size.Y), b.Value));
             }
+
+            mapDef.WaterLevel = (float)numericUpDownWaterLevel.Value;
 
             try
             {
@@ -172,6 +176,8 @@ namespace MapEditor
                     m_screenBoxes.Last().Box.Size = new SFML.Window.Vector2f(b.Size.X, b.Size.Y);
                     m_screenBoxes.Last().Value = b.Value;
                 }
+
+                numericUpDownWaterLevel.Value = (decimal)md.WaterLevel;
 
                 m_currentPath = path;
             }
