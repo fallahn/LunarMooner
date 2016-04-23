@@ -471,7 +471,7 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::HumanRescued, "assets/sound/speech/alright.wav");
     soundPlayer->preCache(LMSoundID::ShieldHit, "assets/sound/fx/shield_hit.wav");
     soundPlayer->preCache(LMSoundID::EmpExplosion, "assets/sound/fx/emp_blast.wav");
-
+    soundPlayer->preCache(LMSoundID::CollectibleDied, "assets/sound/fx/collectible_died.wav");
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
@@ -488,11 +488,11 @@ void LunarMoonerState::initSounds()
         case LMGameEvent::LaserFired:
             player->playSound(LMSoundID::Laser, msgData.posX, msgData.posY);
             break;
-        case LMGameEvent::PlayerDied:
-            //player->playSound(LMSoundID::PlayerDied, 960.f, 540.f);
-        
         case LMGameEvent::MeteorExploded:
             player->playSound(LMSoundID::ShieldHit, msgData.posX, msgData.posY);
+        case LMGameEvent::PlayerDied:
+            //player->playSound(LMSoundID::PlayerDied, 960.f, 540.f);
+            //break; //makes explodey below
         case LMGameEvent::AlienDied:
             player->playSound(xy::Util::Random::value(LMSoundID::Explosion01, LMSoundID::Explosion04), msgData.posX, msgData.posY);
             break;
@@ -522,6 +522,9 @@ void LunarMoonerState::initSounds()
             break;
         case LMGameEvent::EmpFired:
             player->playSound(LMSoundID::EmpExplosion, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::CollectibleDied:
+            player->playSound(LMSoundID::CollectibleDied, msgData.posX, msgData.posY);
             break;
         }
     };

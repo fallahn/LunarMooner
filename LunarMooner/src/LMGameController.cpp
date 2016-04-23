@@ -253,8 +253,9 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             }
             break;
         case LMGameEvent::CollectibleDied:
-            m_playerStates[m_currentPlayer].score += msgData.value;
-            m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
+            //m_playerStates[m_currentPlayer].score += msgData.value;
+            //m_scoreDisplay->showScore(msgData.value, { msgData.posX, msgData.posY });
+            m_itemCount--;
             break;
         case LMGameEvent::MeteorExploded:
             if (msgData.value > 0)
@@ -929,9 +930,9 @@ void GameController::spawnBullet(const sf::Vector2f& position, LMDirection direc
 
 void GameController::fireSpecial()
 {
-    float coolDown = 0.1f;
+    float coolDown = 0.f;
     //TODO better to set this when difficulty is changed
-    /*if (m_difficulty == xy::Difficulty::Easy)
+    if (m_difficulty == xy::Difficulty::Easy)
     {
         coolDown = easyCoolDown;
     }
@@ -942,7 +943,7 @@ void GameController::fireSpecial()
     else
     {
         coolDown = hardCoolDown;
-    }*/
+    }
     
     if (m_playerStates[m_currentPlayer].cooldownTime > coolDown)
     {

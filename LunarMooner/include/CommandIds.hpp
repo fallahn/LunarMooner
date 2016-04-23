@@ -171,7 +171,8 @@ enum LMSoundID
     PlayerDied,
     HumanRescued,
     ShieldHit,
-    EmpExplosion
+    EmpExplosion,
+    CollectibleDied
 };
 
 #endif //COMMAND_IDS_HPP_
