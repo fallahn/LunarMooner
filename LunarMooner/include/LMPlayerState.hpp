@@ -56,7 +56,7 @@ namespace lm
         std::vector<sf::Vector2f> humansRemaining;
         bool startNewRound = false;
         float timeRemaining = 0.f;
-        SpecialWeapon special = SpecialWeapon::EMP;
+        SpecialWeapon special = SpecialWeapon::None;
         float cooldownTime = 0.f;
     };
 }
