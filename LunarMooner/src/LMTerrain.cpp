@@ -128,6 +128,11 @@ void Terrain::setLevel(sf::Uint8 level)
     }
 }
 
+Terrain::WaterData Terrain::getWaterData() const
+{
+    return WaterData(m_textures[m_level], m_waterLevels[m_level]);
+}
+
 //private
 void Terrain::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
@@ -187,6 +192,7 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
     std::vector<sf::Vector2f> points;
     std::vector<Platform> platforms;
     sf::Texture texture;
+    float waterLevel = 0.f;
 
     picojson::value pv;
     auto err = picojson::parse(pv, jsonString);
@@ -264,6 +270,11 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
                 }
             }
         }
+
+        if (pv.get("WaterLevel").is<double>())
+        {
+            waterLevel = static_cast<float>(pv.get("WaterLevel").get<double>());
+        }
     }
     else
     {
@@ -277,6 +288,7 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
     }
     m_chains.emplace_back(std::make_pair(false, points));
     m_platforms.emplace_back(std::make_pair(false, platforms));
+    m_waterLevels.push_back(waterLevel);
     m_textures.push_back(texture);
 
     return true;

@@ -54,6 +54,14 @@ namespace lm
             sf::Uint16 value = 0;
         };
 
+        struct WaterData final
+        {
+            const sf::Texture& texture;
+            const float level;
+            WaterData(const sf::Texture& t, float l)
+                : texture(t), level(l) {}
+        };
+
         explicit Terrain(xy::MessageBus&);
         ~Terrain() = default;
 
@@ -70,11 +78,14 @@ namespace lm
         void setLevel(sf::Uint8);
         bool valid() const { return !m_textures.empty(); }
 
+        WaterData getWaterData() const;
+
     private:
         std::size_t m_level;
         
         mutable std::vector<std::pair<bool, std::vector<sf::Vector2f>>> m_chains;
         mutable std::vector<std::pair<bool, std::vector<Platform>>> m_platforms;
+        std::vector<float> m_waterLevels;
 
         sf::FloatRect m_bounds;
         xy::Entity* m_entity;
