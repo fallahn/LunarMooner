@@ -53,6 +53,7 @@ namespace MapEditor
             m_sfmlControl.DrawDelegates.Add(this.DrawSprites);
             m_sfmlControl.DrawDelegates.Add(this.DrawBoxes);
             m_sfmlControl.DrawDelegates.Add(this.DrawLines);
+            m_sfmlControl.DrawDelegates.Add(this.DrawWater);
 
             m_sfmlControl.UpdateDelegates.Add(this.UpdateLines);
 
@@ -68,6 +69,9 @@ namespace MapEditor
 
             m_backgroundShape.FillColor = SFML.Graphics.Color.Black;
             m_backgroundShape.Size = m_maxTextureSize;
+
+            m_waterShape.FillColor = new SFML.Graphics.Color(2, 40, 200, 120);
+            UpdateWater();
 
             listBoxTextures.DisplayMember = "Name";
 
@@ -136,7 +140,7 @@ namespace MapEditor
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("You Will Lose Any Unsaved Data", "Are You Sure?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("You Will Lose Any Unsaved Data", "Are You Sure?", MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
                 OpenFileDialog od = new OpenFileDialog();
                 od.Filter = "LM Map Files|*.lmm";
@@ -174,5 +178,6 @@ namespace MapEditor
             m_screenBoxes.Clear();
             m_screenPoints.Clear();
         }
+
     }
 }
