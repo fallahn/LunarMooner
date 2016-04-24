@@ -32,9 +32,9 @@ source distribution.
 #include <xygine/util/Vector.hpp>
 #include <xygine/util/Wavetable.hpp>
 #include <xygine/util/Random.hpp>
-#include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/components/AnimatedDrawable.hpp>
 
-#include <SFML/Graphics/CircleShape.hpp>
+//#include <SFML/Graphics/CircleShape.hpp>
 
 using namespace lm;
 
@@ -85,7 +85,8 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
     //do a little bobbing animation. This assumes as shape component
     //is attached - you'll need to change this if replacing the drawable
     m_waveTableIndex = (m_waveTableIndex + 1) % waveTable.size();
-    entity.getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->setPosition(0.f, waveTable[m_waveTableIndex]);
+    //entity.getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->setPosition(0.f, waveTable[m_waveTableIndex]);
+    entity.getComponent<xy::AnimatedDrawable>()->setPosition(0.f, waveTable[m_waveTableIndex]);
 
     //store position for when switching player states
     m_position = entity.getPosition();

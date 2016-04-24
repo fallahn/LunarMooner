@@ -151,6 +151,8 @@ namespace lm
         void spawnCollectable(const sf::Vector2f&);
 
         void showRoundSummary(bool);
+
+        void spawnDeadGuy(float, float);
     };
 }
 
