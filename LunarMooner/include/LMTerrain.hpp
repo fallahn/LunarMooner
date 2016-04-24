@@ -34,6 +34,7 @@ source distribution.
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Transformable.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 #include <array>
 
@@ -79,6 +80,7 @@ namespace lm
         bool valid() const { return !m_textures.empty(); }
 
         WaterData getWaterData() const;
+        void updateWater();
 
     private:
         std::size_t m_level;
@@ -89,6 +91,8 @@ namespace lm
 
         sf::FloatRect m_bounds;
         xy::Entity* m_entity;
+
+        sf::Shader m_waterShader;
 
         std::array<sf::Vertex, 4u> m_vertices;
         std::vector<sf::Texture> m_textures;

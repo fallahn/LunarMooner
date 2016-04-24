@@ -27,6 +27,7 @@ SET(LM_SRC
   ${LM_DIR}/LMSpriteBatch.cpp
   ${LM_DIR}/LMState.cpp
   ${LM_DIR}/LMTerrain.cpp
+  ${LM_DIR}/LMWaterDrawable.cpp
   ${LM_DIR}/LMWeaponEMP.cpp
   ${LM_DIR}/main.cpp
   ${LM_DIR}/MenuAchievementState.cpp

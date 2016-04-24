@@ -55,8 +55,8 @@
             this.radioButtonMovePoint = new System.Windows.Forms.RadioButton();
             this.radioButtonAddPoint = new System.Windows.Forms.RadioButton();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
-            this.label4 = new System.Windows.Forms.Label();
             this.numericUpDownWaterLevel = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -267,6 +267,7 @@
             0,
             0,
             0});
+            this.numericUpDownBoxVal.ValueChanged += new System.EventHandler(this.numericUpDownBoxVal_ValueChanged);
             // 
             // label3
             // 
@@ -298,6 +299,7 @@
             0,
             0,
             0});
+            this.numericUpDownHeight.ValueChanged += new System.EventHandler(this.numericUpDownHeight_ValueChanged);
             // 
             // label2
             // 
@@ -338,6 +340,7 @@
             0,
             0,
             0});
+            this.numericUpDownWidth.ValueChanged += new System.EventHandler(this.numericUpDownWidth_ValueChanged);
             // 
             // radioButtonDeleteBox
             // 
@@ -349,6 +352,7 @@
             this.radioButtonDeleteBox.TabStop = true;
             this.radioButtonDeleteBox.Text = "Delete Box";
             this.radioButtonDeleteBox.UseVisualStyleBackColor = true;
+            this.radioButtonDeleteBox.CheckedChanged += new System.EventHandler(this.radioButtonDeleteBox_CheckedChanged);
             // 
             // radioButtonMoveBox
             // 
@@ -360,6 +364,7 @@
             this.radioButtonMoveBox.TabStop = true;
             this.radioButtonMoveBox.Text = "Move Box";
             this.radioButtonMoveBox.UseVisualStyleBackColor = true;
+            this.radioButtonMoveBox.CheckedChanged += new System.EventHandler(this.radioButtonMoveBox_CheckedChanged);
             // 
             // radioButtonAddBox
             // 
@@ -371,6 +376,7 @@
             this.radioButtonAddBox.TabStop = true;
             this.radioButtonAddBox.Text = "Add Box";
             this.radioButtonAddBox.UseVisualStyleBackColor = true;
+            this.radioButtonAddBox.CheckedChanged += new System.EventHandler(this.radioButtonAddBox_CheckedChanged);
             // 
             // radioButtonDeletePoint
             // 
@@ -382,6 +388,7 @@
             this.radioButtonDeletePoint.TabStop = true;
             this.radioButtonDeletePoint.Text = "Delete Point";
             this.radioButtonDeletePoint.UseVisualStyleBackColor = true;
+            this.radioButtonDeletePoint.CheckedChanged += new System.EventHandler(this.radioButtonDeletePoint_CheckedChanged);
             // 
             // radioButtonMovePoint
             // 
@@ -393,6 +400,7 @@
             this.radioButtonMovePoint.TabStop = true;
             this.radioButtonMovePoint.Text = "Move Point";
             this.radioButtonMovePoint.UseVisualStyleBackColor = true;
+            this.radioButtonMovePoint.CheckedChanged += new System.EventHandler(this.radioButtonMovePoint_CheckedChanged);
             // 
             // radioButtonAddPoint
             // 
@@ -404,6 +412,7 @@
             this.radioButtonAddPoint.TabStop = true;
             this.radioButtonAddPoint.Text = "Add Point";
             this.radioButtonAddPoint.UseVisualStyleBackColor = true;
+            this.radioButtonAddPoint.CheckedChanged += new System.EventHandler(this.radioButtonAddPoint_CheckedChanged);
             // 
             // splitContainer4
             // 
@@ -420,6 +429,14 @@
             this.splitContainer4.SplitterDistance = 252;
             this.splitContainer4.TabIndex = 0;
             // 
+            // numericUpDownWaterLevel
+            // 
+            this.numericUpDownWaterLevel.Location = new System.Drawing.Point(77, 6);
+            this.numericUpDownWaterLevel.Name = "numericUpDownWaterLevel";
+            this.numericUpDownWaterLevel.Size = new System.Drawing.Size(44, 20);
+            this.numericUpDownWaterLevel.TabIndex = 1;
+            this.numericUpDownWaterLevel.ValueChanged += new System.EventHandler(this.numericUpDownWaterLevel_ValueChanged);
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -428,14 +445,6 @@
             this.label4.Size = new System.Drawing.Size(68, 13);
             this.label4.TabIndex = 0;
             this.label4.Text = "Water Level:";
-            // 
-            // numericUpDownWaterLevel
-            // 
-            this.numericUpDownWaterLevel.Location = new System.Drawing.Point(77, 6);
-            this.numericUpDownWaterLevel.Name = "numericUpDownWaterLevel";
-            this.numericUpDownWaterLevel.Size = new System.Drawing.Size(44, 20);
-            this.numericUpDownWaterLevel.TabIndex = 1;
-            this.numericUpDownWaterLevel.ValueChanged += new System.EventHandler(this.numericUpDownWaterLevel_ValueChanged);
             // 
             // MainWindow
             // 

@@ -28,15 +28,7 @@ source distribution.
 #ifndef LM_BLEND_SHADER_HPP_
 #define LM_BLEND_SHADER_HPP_
 
-#include <xygine/shaders/Default.hpp>
-
-#include <string>
-
-enum LMShaderID
-{
-    Prepass = xy::Shader::Count,
-    NormalMapColoured
-};
+#include <LMShaderIds.hpp>
 
 namespace lm
 {

@@ -42,6 +42,7 @@ source distribution.
 #include <LMLaserSight.hpp>
 #include <LMSpriteBatch.hpp>
 #include <LMWeaponEMP.hpp>
+#include <LMWaterDrawable.hpp>
 #include <StateIds.hpp>
 #include <Game.hpp>
 
@@ -64,6 +65,7 @@ using namespace std::placeholders;
 namespace
 {
     const sf::Vector2f playerSize(32.f, 42.f);
+    const sf::Color playerColour(127, 127, 127);
     const sf::Vector2f bulletSize(2.f, 24.f);
 
     const sf::Vector2f mothershipBounds(386.f, 1534.f);
@@ -87,7 +89,7 @@ namespace
     //aliens per level
     const std::array<sf::Uint8, 10u> alienCounts =
     {
-        12, 18, 18, 21, 21, 24, 27, 31, 35, 38
+        12, 18, 18, 21, 21, 24, 24, 26, 27, 30
     };
 
     const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
@@ -103,7 +105,7 @@ namespace
     const std::array<float, 10u> roundTimes =
     {
         75.f, 90.f, 100.f, 110.f, 120.f, 
-        130.f, 155.f, 160.f, 165.f, 170.f
+        130.f, 165.f, 175.f, 185.f, 195.f
     };
     //how much time to remove for current difficulty setting
     const float mediumPenalty = 4.f;
@@ -544,9 +546,26 @@ void GameController::spawnPlayer()
         m_scene.sendCommand(cmd);
 
         auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-        dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
+        dropshipDrawable->getDrawable().setFillColor(playerColour);
         dropshipDrawable->getDrawable().setSize(playerSize);
         dropshipDrawable->getDrawable().setOutlineColor(sf::Color::Cyan);
+
+        xy::Component::MessageHandler mh;
+        mh.id = LMMessageId::GameEvent;
+        mh.action = [](xy::Component* c, const xy::Message& msg)
+        {
+            auto& shape = static_cast<xy::SfDrawableComponent<sf::RectangleShape>*>(c)->getDrawable();
+            auto& msgData = msg.getData<LMGameEvent>();
+            if (msgData.type == LMGameEvent::HumanPickedUp)
+            {
+                shape.setFillColor(sf::Color::Blue);
+            }
+            else if (msgData.type == LMGameEvent::HumanRescued)
+            {
+                shape.setFillColor(playerColour);
+            }
+        };
+        dropshipDrawable->addMessageHandler(mh);
 
         auto playerController = xy::Component::create<lm::PlayerController>(getMessageBus(),
             m_mothership->getComponent<MothershipController>(), m_terrain->getChain());
@@ -601,7 +620,6 @@ void GameController::spawnPlayer()
         entity->addCommandCategories(LMCommandID::Player);
         m_scene.addEntity(entity, xy::Scene::BackFront);
 
-        xy::Component::MessageHandler mh;
         mh.id = xy::Message::UIMessage;
         mh.action = [fx1, fx2, fx3, this](xy::Component*, const xy::Message& msg)
         {
@@ -671,7 +689,7 @@ void GameController::createMothership()
     m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
     auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
+    dropshipDrawable->getDrawable().setFillColor(playerColour);
     dropshipDrawable->getDrawable().setSize(playerSize);
     xy::Util::Position::centreOrigin(dropshipDrawable->getDrawable());
 
@@ -819,6 +837,7 @@ void GameController::createTerrain()
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(alienArea.left, 1080.f - 320.f); //TODO fix these numbers
     m_terrain = entity->addComponent(terrain);
+
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 
     //need to do this after adding to entity to get correct transforms
@@ -832,7 +851,6 @@ void GameController::createTerrain()
     //entity->setScale(0.1f, 0.1f);
     entity->rotate(-180.f);
     entity->addComponent(shieldDrawable);
-
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 }
 
@@ -851,7 +869,7 @@ void GameController::updatePlatforms()
 
     m_delayedEvents.emplace_back();
     auto& de = m_delayedEvents.back();
-    de.time = 0.1f;
+    de.time = 0.02f;
     de.action = [this]()
     {
         auto platforms = m_terrain->getPlatforms();
@@ -870,6 +888,8 @@ void GameController::updatePlatforms()
 
             m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
         }
+
+        m_terrain->updateWater();
     };
 }
 
@@ -1243,7 +1263,7 @@ void GameController::addDelayedRespawn()
         msg->type = LMStateEvent::RoundBegin;
 
         auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-        dropshipDrawable->getDrawable().setFillColor(sf::Color::Blue);
+        dropshipDrawable->getDrawable().setFillColor(playerColour);
         dropshipDrawable->getDrawable().setSize(playerSize);
         xy::Util::Position::centreOrigin(dropshipDrawable->getDrawable());
 
