@@ -50,6 +50,7 @@ source distribution.
 #include <xygine/components/AudioSource.hpp>
 #include <xygine/components/PointLight.hpp>
 #include <xygine/components/QuadTreeComponent.hpp>
+#include <xygine/components/AnimatedDrawable.hpp>
 #include <xygine/util/Position.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
@@ -165,7 +166,11 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         case LMGameEvent::PlayerDied:
         {
             m_playerStates[m_currentPlayer].lives--;
-            
+            //if (m_player->carryingHuman())
+            {
+                spawnDeadGuy(msgData.posX, msgData.posY);
+            }
+
             //if died carrying last human move up to next level
             if (m_playerStates[m_currentPlayer].lives > -1
                 && m_humans.empty())
@@ -189,7 +194,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 de.action = [this]() 
                 {
                     showRoundSummary(false);
-                };
+                };             
             }
             
             m_player = nullptr;
@@ -702,20 +707,18 @@ void GameController::createMothership()
 
 namespace
 {
-    std::unique_ptr<xy::SfDrawableComponent<sf::CircleShape>> getHumanDrawable(xy::MessageBus& mb)
+    std::unique_ptr<xy::AnimatedDrawable> getHumanDrawable(xy::MessageBus& mb, xy::TextureResource& tr)
     {
-        auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(mb);
-        drawable->getDrawable().setRadius(10.f);
-        drawable->getDrawable().setFillColor(sf::Color::Blue);
-        drawable->getDrawable().setScale(1.f, 1.4f);
-        drawable->getDrawable().setOrigin(drawable->getDrawable().getGlobalBounds().width / 2.f, 0.f);
+        auto drawable = xy::Component::create<xy::AnimatedDrawable>(mb, tr.get("assets/images/game/doofer_01.png"));
+        auto bounds = drawable->localBounds();
+        drawable->setOrigin(bounds.width / 2.f, bounds.height / 2.f);
         return std::move(drawable);
     }
 }
 
 void GameController::spawnHuman(const sf::Vector2f& position)
 {
-    auto drawable = getHumanDrawable(getMessageBus());
+    auto drawable = getHumanDrawable(getMessageBus(), m_textureResource);
 
     auto controller = xy::Component::create<HumanController>(getMessageBus());
 
@@ -895,7 +898,7 @@ void GameController::updatePlatforms()
 
 void GameController::addRescuedHuman()
 {
-    auto drawable = getHumanDrawable(getMessageBus());
+    auto drawable = getHumanDrawable(getMessageBus(), m_textureResource);
     
     float width = m_mothership->globalBounds().width;
     width -= 8.f; //4 px padding each end
@@ -1409,7 +1412,12 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     CollisionComponent::ID type = 
         (xy::Util::Random::value(0, 4) < 2) ? CollisionComponent::ID::Shield : CollisionComponent::ID::Ammo;
 
-    auto drawable = getHumanDrawable(getMessageBus());
+    auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
+    drawable->getDrawable().setRadius(10.f);
+    drawable->getDrawable().setFillColor(sf::Color::Blue);
+    drawable->getDrawable().setScale(1.f, 1.4f);
+    drawable->getDrawable().setOrigin(drawable->getDrawable().getGlobalBounds().width / 2.f, 0.f);
+
     if (type == CollisionComponent::ID::Shield)
     {
         drawable->getDrawable().setFillColor(sf::Color::Cyan);
@@ -1483,4 +1491,16 @@ void GameController::showRoundSummary(bool doScores)
 
     auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
     msg->type = LMStateEvent::RoundEnd;
+}
+
+void GameController::spawnDeadGuy(float x, float y)
+{
+    auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_textureResource.get("assets/images/game/doofer_dead.png"));
+    auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
+    auto entity = xy::Entity::create(getMessageBus());
+    entity->addComponent(drawable);
+    entity->addComponent(controller);
+    entity->setPosition(x, y);
+    entity->addCommandCategories(LMCommandID::Alien); //yeah we're not an alien but we want to clear them at the same time
+    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 }
