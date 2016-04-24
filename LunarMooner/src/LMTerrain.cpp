@@ -26,6 +26,9 @@ source distribution.
 *********************************************************************/
 
 #include <LMTerrain.hpp>
+#include <LMWaterDrawable.hpp>
+#include <LMWaterShader.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
 #include <xygine/Resource.hpp>
@@ -58,6 +61,10 @@ Terrain::Terrain(xy::MessageBus& mb)
 
     m_bounds.width = size.x;
     m_bounds.height = size.y;
+
+
+    //load shaders (only one so far so shader resource not necessary)
+    m_waterShader.loadFromMemory(xy::Shader::Default::vertex, lm::WaterFrag);
 }
 
 //public
@@ -81,7 +88,7 @@ void Terrain::init(const std::string& mapDir, xy::TextureResource& tr)
         return (xy::FileSystem::getFileExtension(str) != ".lmm");
     }), files.end());
 
-    std::random_shuffle(files.begin(), files.end());
+    std::random_shuffle(files.rbegin(), files.rend());
 
     //load up to 10 of them (g++ requires explicit type)
     std::size_t max = std::min(std::size_t(10u), files.size());
@@ -131,6 +138,21 @@ void Terrain::setLevel(sf::Uint8 level)
 Terrain::WaterData Terrain::getWaterData() const
 {
     return WaterData(m_textures[m_level], m_waterLevels[m_level]);
+}
+
+void Terrain::updateWater()
+{
+    if (m_waterLevels[m_level] > 0)
+    {
+        auto wd = xy::Component::create<WaterDrawable>(getMessageBus(), m_textures[m_level], m_waterLevels[m_level]);
+        wd->setShader(m_waterShader);
+
+        auto entity = xy::Entity::create(getMessageBus());
+        entity->setPosition(0.f, m_textures[m_level].getSize().y - m_waterLevels[m_level]);
+        entity->addCommandCategories(LMCommandID::TerrainObject); //so we get destroyed when the time comes
+        entity->addComponent(wd);
+        m_entity->addChild(entity);
+    }
 }
 
 //private

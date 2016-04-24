@@ -179,5 +179,49 @@ namespace MapEditor
             m_screenPoints.Clear();
         }
 
+        //private void numericUpDownBoxVal_ValueChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void numericUpDownHeight_ValueChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void numericUpDownWidth_ValueChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void radioButtonDeleteBox_CheckedChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void radioButtonMoveBox_CheckedChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void radioButtonAddBox_CheckedChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void radioButtonDeletePoint_CheckedChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void radioButtonMovePoint_CheckedChanged(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void radioButtonAddPoint_CheckedChanged(object sender, EventArgs e)
+        //{
+
+        //}
     }
 }
