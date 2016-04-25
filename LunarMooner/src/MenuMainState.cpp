@@ -96,8 +96,8 @@ void MenuMainState::buildMenu()
     button->setPosition(960.f, 325.f);
     button->addCallback([this]()
     {
-        close();
-        requestStackPush(States::ID::SinglePlayer);
+        close(false);
+        requestStackPush(States::ID::MenuWeapon);
     });
     m_uiContainer.addControl(button);
 

@@ -43,7 +43,8 @@ namespace States
         HighScoresEnd,
         HighScoresMenu,
         MenuBackground,
-        MenuAchievement
+        MenuAchievement,
+        MenuWeapon
     };
 }
 

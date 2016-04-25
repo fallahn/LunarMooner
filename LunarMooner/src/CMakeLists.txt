@@ -35,6 +35,7 @@ SET(LM_SRC
   ${LM_DIR}/MenuMainState.cpp
   ${LM_DIR}/MenuOptionState.cpp
   ${LM_DIR}/MenuPauseState.cpp
+  ${LM_DIR}/MenuWeaponSelect.cpp
   ${LM_DIR}/OLAchievementTag.cpp
   ${LM_DIR}/OLOverlay.cpp
   ${LM_DIR}/PlayerProfile.cpp)

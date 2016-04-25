@@ -25,59 +25,61 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LUNAR_MOONER_STATE_HPP_
-#define LUNAR_MOONER_STATE_HPP_
+#ifndef LM_WEAPON_STATE_HPP_
+#define LM_WEAPON_STATE_HPP_
 
 #include <StateIds.hpp>
-#include <ResourceCollection.hpp>
-#include <LMCollisionWorld.hpp>
-#include <OLOverlay.hpp>
+#include <Achievements.hpp>
 
 #include <xygine/State.hpp>
-#include <xygine/Scene.hpp>
+#include <xygine/ui/Container.hpp>
 
-#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Text.hpp>
+
+#include <array>
+
+namespace xy
+{
+    class TextureResource;
+    class FontResource;
+    class MessageBus;
+}
+
+namespace sf
+{
+    class Font;
+}
 
 class PlayerProfile;
-class LunarMoonerState final : public xy::State
+class MenuWeaponState final : public xy::State
 {
 public:
-    LunarMoonerState(xy::StateStack&, Context, sf::Uint8, PlayerProfile&);
-    ~LunarMoonerState() = default;
+    MenuWeaponState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&, const PlayerProfile&);
+    ~MenuWeaponState() = default;
 
-    bool handleEvent(const sf::Event&) override;
-    void handleMessage(const xy::Message&) override;
     bool update(float) override;
     void draw() override;
+    bool handleEvent(const sf::Event&) override;
+    void handleMessage(const xy::Message&) override;
 
-    xy::StateId stateID() const { return (m_playerCount == 1) ? States::SinglePlayer : States::MultiPlayer; }
+    xy::StateId stateID() const override
+    {
+        return States::ID::MenuWeapon;
+    }
+
 private:
-    sf::Uint8 m_playerCount;
-    xy::Scene m_scene;
+
+    xy::TextureResource& m_textureResource;
+    xy::FontResource& m_fontResource;
+    const PlayerProfile& m_profile;
+
     xy::MessageBus& m_messageBus;
+    xy::UI::Container m_uiContainer;
+    sf::Sprite m_cursorSprite;
 
-    sf::Uint8 m_inputFlags;
-    sf::Uint8 m_prevInputFlags;
-
-    ResourceCollection m_resources;
-
-    sf::Text m_reportText;
-
-    lm::CollisionWorld m_collisionWorld;
-    lm::Overlay m_overlay;
-
-    bool m_useController;
-    void parseControllerInput();
-    
-    void initGameController(sf::Uint8, sf::Uint8);
-    void initSounds();
-    void initParticles();
-
-    void buildBackground();
-
-    sf::Sprite m_loadingSprite;
-    void updateLoadingScreen(float, sf::RenderWindow&) override;
+    void buildMenu(const sf::Font&);
 };
 
-#endif //LUNAR_MOONER_STATE_HPP_
+#endif //LM_WEAPON_STATE_HPP_
