@@ -29,12 +29,11 @@ source distribution.
 #define LUNAR_MOONER_STATE_HPP_
 
 #include <StateIds.hpp>
+#include <ResourceCollection.hpp>
 #include <LMCollisionWorld.hpp>
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
-#include <xygine/Resource.hpp>
-#include <xygine/ShaderResource.hpp>
 
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -60,10 +59,7 @@ private:
     sf::Uint8 m_inputFlags;
     sf::Uint8 m_prevInputFlags;
 
-    xy::FontResource m_fontResource;
-    xy::SoundResource m_soundResource;
-    xy::TextureResource m_textureResource;
-    xy::ShaderResource m_shaderResource;
+    ResourceCollection m_resources;
 
     sf::Text m_reportText;
 

@@ -92,7 +92,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 {
     XY_ASSERT(playerCount > 0, "Need at least one player");
 
-    m_loadingSprite.setTexture(m_textureResource.get("assets/images/ui/loading.png"));
+    m_loadingSprite.setTexture(m_resources.textureResource.get("assets/images/ui/loading.png"));
     m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
     m_loadingSprite.setPosition(m_loadingSprite.getOrigin());
 
@@ -116,7 +116,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     profile.enable(playerCount == 1);
 
     xy::Stats::clear();
-    m_reportText.setFont(m_fontResource.get("game_state_81"));
+    m_reportText.setFont(m_resources.fontResource.get("game_state_119"));
     m_reportText.setPosition(20.f, 860.f);
 
     m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
@@ -286,7 +286,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
     {
         auto& msgData = msg.getData<LMAchievementEvent>();
 
-        auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_fontResource, msgData.ID);
+        auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_resources.fontResource, msgData.ID);
         auto ent = xy::Entity::create(m_messageBus);
         ent->setPosition(960.f, 1080.f);
         ent->addComponent(tag);
@@ -313,7 +313,7 @@ bool LunarMoonerState::update(float dt)
     }
     
     //update lights
-    auto& normalMapShader = m_shaderResource.get(LMShaderID::NormalMapColoured);
+    auto& normalMapShader = m_resources.shaderResource.get(LMShaderID::NormalMapColoured);
     auto lights = m_scene.getVisibleLights(m_scene.getVisibleArea());
     auto i = 0u;
     for (; i < lights.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
@@ -432,7 +432,7 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount)
 {
     auto gameController =
         xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld,
-            getContext().appInstance.getAudioSettings(), m_soundResource, m_textureResource, m_fontResource);
+            getContext().appInstance.getAudioSettings(), m_resources);
 
     gameController->setDifficulty(getContext().appInstance.getGameSettings().difficulty);
 
@@ -450,7 +450,7 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount)
 
 void LunarMoonerState::initSounds()
 {
-    auto soundPlayer = xy::Component::create<lm::SoundPlayer>(m_messageBus, m_soundResource);
+    auto soundPlayer = xy::Component::create<lm::SoundPlayer>(m_messageBus, m_resources.soundResource);
     soundPlayer->preCache(LMSoundID::Laser, "assets/sound/fx/laser.wav");
     soundPlayer->preCache(LMSoundID::Explosion01, "assets/sound/fx/explode01.wav");
     soundPlayer->preCache(LMSoundID::Explosion02, "assets/sound/fx/explode02.wav");
@@ -591,7 +591,7 @@ void LunarMoonerState::initSounds()
 
 
     //game music
-    auto gameMusic = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+    auto gameMusic = xy::Component::create<xy::AudioSource>(m_messageBus, m_resources.soundResource);
     gameMusic->setSound("assets/sound/music/game.ogg", xy::AudioSource::Mode::Stream);
     gameMusic->setFadeOutTime(1.f);
     gameMusic->setFadeInTime(1.f);
@@ -677,23 +677,23 @@ void LunarMoonerState::initParticles()
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
     xy::ParticleSystem::Definition pd;
-    pd.loadFromFile("assets/particles/small_explosion.xyp", m_textureResource);
+    pd.loadFromFile("assets/particles/small_explosion.xyp", m_resources.textureResource);
     pc->addDefinition(LMParticleID::SmallExplosion, pd);
 }
 
 void LunarMoonerState::buildBackground()
 {
-    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
-    m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
+    m_resources.shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
+    m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
     
-    m_shaderResource.get(LMShaderID::NormalMapColoured).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+    m_resources.shaderResource.get(LMShaderID::NormalMapColoured).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
 
     //nuke effect
     auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, 1080.f));
     auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
     
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
-    auto nukeAudio = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+    auto nukeAudio = xy::Component::create<xy::AudioSource>(m_messageBus, m_resources.soundResource);
     nukeAudio->setSound("assets/sound/fx/nuke.wav");
     nukeAudio->setFadeInTime(5.f);
     nukeAudio->setFadeOutTime(1.f);
@@ -769,7 +769,7 @@ void LunarMoonerState::buildBackground()
     };
     nukeAudio->addMessageHandler(mh);
 
-    auto finalWarning = xy::Component::create<xy::AudioSource>(m_messageBus, m_soundResource);
+    auto finalWarning = xy::Component::create<xy::AudioSource>(m_messageBus, m_resources.soundResource);
     finalWarning->setSound("assets/sound/speech/meltdown5.wav");
     finalWarning->setFadeOutTime(1.f);
     finalWarning->setVolume(audioSettings.muted ? 0.f : audioSettings.volume * Game::MaxVolume);
@@ -860,7 +860,7 @@ void LunarMoonerState::buildBackground()
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
   
     //background
-    auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_textureResource);
+    auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
     background->setVelocity({ 0.f, 1.f });
     auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea);
 
@@ -868,12 +868,12 @@ void LunarMoonerState::buildBackground()
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(scoreMask);
 
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
-    moon->setBaseNormal(m_textureResource.get("assets/images/background/sphere_normal.png"));
-    moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal_02.png"));
-    moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse_02.png"));
-    moon->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
-    moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
-    moon->setNormalShader(m_shaderResource.get(LMShaderID::NormalMapColoured));
+    moon->setBaseNormal(m_resources.textureResource.get("assets/images/background/sphere_normal.png"));
+    moon->setDetailNormal(m_resources.textureResource.get("assets/images/background/moon_normal_02.png"));
+    moon->setDiffuseTexture(m_resources.textureResource.get("assets/images/background/moon_diffuse_02.png"));
+    moon->setMaskTexture(m_resources.textureResource.get("assets/images/background/moon_mask.png"));
+    moon->setPrepassShader(m_resources.shaderResource.get(LMShaderID::Prepass));
+    moon->setNormalShader(m_resources.shaderResource.get(LMShaderID::NormalMapColoured));
     moon->setRotationVelocity({ 0.f, 0.009f });
 
     entity = xy::Entity::create(m_messageBus);

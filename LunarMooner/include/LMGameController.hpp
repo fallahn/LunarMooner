@@ -49,6 +49,8 @@ namespace xy
     class FontResource;
 }
 
+struct ResourceCollection;
+
 namespace lm
 {
     class PlayerController;
@@ -60,7 +62,7 @@ namespace lm
     class GameController final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, const xy::App::AudioSettings&, xy::SoundResource&, xy::TextureResource&, xy::FontResource&);
+        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, const xy::App::AudioSettings&, ResourceCollection&);
         ~GameController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -79,9 +81,7 @@ namespace lm
         xy::Scene& m_scene;
         CollisionWorld& m_collisionWorld;
         const xy::App::AudioSettings& m_audioSettings;
-        xy::SoundResource& m_soundResource;
-        xy::TextureResource& m_textureResource;
-        xy::FontResource& m_fontResource;
+        ResourceCollection& m_resources;
 
         sf::Uint8 m_inputFlags;
 

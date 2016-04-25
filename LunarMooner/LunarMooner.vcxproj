@@ -164,6 +164,7 @@
     <ClInclude Include="include\MenuOptionState.hpp" />
     <ClInclude Include="include\MenuPauseState.hpp" />
     <ClInclude Include="include\PlayerProfile.hpp" />
+    <ClInclude Include="include\ResourceCollection.hpp" />
     <ClInclude Include="include\StateIds.hpp" />
   </ItemGroup>
   <ItemGroup>
