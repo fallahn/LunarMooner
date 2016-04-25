@@ -83,7 +83,7 @@ void PlayerProfile::load()
     }
 
     file.seekg(0, std::ios::end);
-    int fileSize = static_cast<int>(file.tellg());
+    std::size_t fileSize = static_cast<std::size_t>(file.tellg());
     file.seekg(0, std::ios::beg);
 
     if (fileSize < sizeof(Header))
