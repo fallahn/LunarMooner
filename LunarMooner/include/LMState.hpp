@@ -31,6 +31,7 @@ source distribution.
 #include <StateIds.hpp>
 #include <ResourceCollection.hpp>
 #include <LMCollisionWorld.hpp>
+#include <OLOverlay.hpp>
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
@@ -64,6 +65,7 @@ private:
     sf::Text m_reportText;
 
     lm::CollisionWorld m_collisionWorld;
+    lm::Overlay m_overlay;
 
     bool m_useController;
     void parseControllerInput();

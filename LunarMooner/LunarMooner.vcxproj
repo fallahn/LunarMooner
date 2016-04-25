@@ -127,7 +127,7 @@
     <ClInclude Include="include\BGRoidBelt.hpp" />
     <ClInclude Include="include\BGScoreboardMask.hpp" />
     <ClInclude Include="include\BGStarfield.hpp" />
-    <ClInclude Include="include\LMAchievementTag.hpp" />
+    <ClInclude Include="include\OLAchievementTag.hpp" />
     <ClInclude Include="include\LMLaserSight.hpp" />
     <ClInclude Include="include\LMNukeDrawable.hpp" />
     <ClInclude Include="include\LMShaderIds.hpp" />
@@ -163,6 +163,7 @@
     <ClInclude Include="include\MenuMainState.hpp" />
     <ClInclude Include="include\MenuOptionState.hpp" />
     <ClInclude Include="include\MenuPauseState.hpp" />
+    <ClInclude Include="include\OLOverlay.hpp" />
     <ClInclude Include="include\PlayerProfile.hpp" />
     <ClInclude Include="include\ResourceCollection.hpp" />
     <ClInclude Include="include\StateIds.hpp" />
@@ -172,7 +173,7 @@
     <ClCompile Include="src\BGRoidBelt.cpp" />
     <ClCompile Include="src\BGScoreMask.cpp" />
     <ClCompile Include="src\BGStarField.cpp" />
-    <ClCompile Include="src\LMAchievementTag.cpp" />
+    <ClCompile Include="src\OLAchievementTag.cpp" />
     <ClCompile Include="src\LMLaserSight.cpp" />
     <ClCompile Include="src\LMNukeDrawable.cpp" />
     <ClCompile Include="src\LMShieldDrawable.cpp" />
@@ -205,6 +206,7 @@
     <ClCompile Include="src\MenuMainState.cpp" />
     <ClCompile Include="src\MenuOptionState.cpp" />
     <ClCompile Include="src\MenuPauseState.cpp" />
+    <ClCompile Include="src\OLOverlay.cpp" />
     <ClCompile Include="src\PlayerProfile.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

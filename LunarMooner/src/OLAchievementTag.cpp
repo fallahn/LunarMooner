@@ -25,7 +25,7 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#include <LMAchievementTag.hpp>
+#include <OLAchievementTag.hpp>
 #include <Achievements.hpp>
 
 #include <xygine/Resource.hpp>
