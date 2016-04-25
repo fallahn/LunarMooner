@@ -33,6 +33,7 @@ source distribution.
 #include <MenuPauseState.hpp>
 #include <MenuHighScores.hpp>
 #include <MenuAchievementState.hpp>
+#include <MenuWeaponSelect.hpp>
 #include <LMState.hpp>
 #include <MenuBackgroundState.hpp>
 
@@ -139,4 +140,5 @@ void Game::registerStates()
     m_stateStack.registerState<MenuHighScoreState>(States::ID::HighScoresEnd, m_menuTextures, m_menuFonts, imTrue);
     m_stateStack.registerState<MenuBackgroundState>(States::ID::MenuBackground);
     m_stateStack.registerState<MenuAchievementState>(States::ID::MenuAchievement, m_menuTextures, m_menuFonts, m_profile);
+    m_stateStack.registerState<MenuWeaponState>(States::ID::MenuWeapon, m_menuTextures, m_menuFonts, m_profile);
 }

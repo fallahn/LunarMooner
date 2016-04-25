@@ -171,6 +171,9 @@
     <ClInclude Include="include\OLAchievementTag.hpp">
       <Filter>Header Files\overlay</Filter>
     </ClInclude>
+    <ClInclude Include="include\MenuWeaponSelect.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="src\OLOverlay.cpp">
       <Filter>Source Files\overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MenuWeaponSelect.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

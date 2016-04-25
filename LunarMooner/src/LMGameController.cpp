@@ -495,20 +495,21 @@ void GameController::setInput(sf::Uint8 input)
     m_inputFlags = input;
 }
 
-void GameController::addPlayer()
+void GameController::addPlayer(sf::Uint8 level)
 {
     m_playerStates.emplace_back();
 
     auto& state = m_playerStates.back();
+    state.level = level + 1;
 
     auto& humans = state.humansRemaining;
-    for (auto i = 0; i < humanCounts[0]; ++i)
+    for (auto i = 0; i < humanCounts[level]; ++i)
     {
         humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
     }
 
-    state.alienCount = alienCounts[0];
-    state.timeRemaining = roundTimes[0];
+    state.alienCount = alienCounts[level];
+    state.timeRemaining = roundTimes[level];
     //adjust for game difficulty
     if (m_difficulty == xy::Difficulty::Medium)
     {

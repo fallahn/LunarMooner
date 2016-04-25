@@ -127,6 +127,7 @@
     <ClInclude Include="include\BGRoidBelt.hpp" />
     <ClInclude Include="include\BGScoreboardMask.hpp" />
     <ClInclude Include="include\BGStarfield.hpp" />
+    <ClInclude Include="include\MenuWeaponSelect.hpp" />
     <ClInclude Include="include\OLAchievementTag.hpp" />
     <ClInclude Include="include\LMLaserSight.hpp" />
     <ClInclude Include="include\LMNukeDrawable.hpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="src\BGRoidBelt.cpp" />
     <ClCompile Include="src\BGScoreMask.cpp" />
     <ClCompile Include="src\BGStarField.cpp" />
+    <ClCompile Include="src\MenuWeaponSelect.cpp" />
     <ClCompile Include="src\OLAchievementTag.cpp" />
     <ClCompile Include="src\LMLaserSight.cpp" />
     <ClCompile Include="src\LMNukeDrawable.cpp" />
