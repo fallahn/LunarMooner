@@ -37,6 +37,11 @@ source distribution.
 
 using namespace lm;
 
+namespace
+{
+    const float padding = 20.f;
+}
+
 Overlay::Overlay(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene)
     : m_messageBus  (mb),
     m_resources     (rc)
@@ -59,8 +64,17 @@ void Overlay::handleMessage(const xy::Message& msg)
 
         auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_resources.fontResource, msgData.ID);
         auto ent = xy::Entity::create(m_messageBus);
-        ent->setPosition(960.f, 1080.f);
+        ent->setPosition(1920.f - padding, 1080.f); //really, screen size should be a config variable somewhere
         ent->addComponent(tag);
+
+        //check for existing notifications and stack them
+        if (!m_rootNode->getChildren().empty())
+        {
+            auto child = m_rootNode->removeChild(*m_rootNode->getChildren()[0]);
+            child->move(-ent->getPosition());
+            ent->addChild(child);
+        }
+
         m_rootNode->addChild(ent);
     }
 }

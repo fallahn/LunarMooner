@@ -52,8 +52,9 @@ namespace
 
 AchievementTag::AchievementTag(xy::MessageBus& mb, xy::FontResource& fr, sf::Int32 id)
     : xy::Component(mb, this),
-    m_inTime(moveTime),
-    m_holdTime(holdTime)
+    m_inTime    (moveTime),
+    m_holdTime  (holdTime),
+    m_alpha     (1.f)
 {
     m_text.setFont(fr.get("achievement_tag"));
     m_text.setCharacterSize(20u);
@@ -61,13 +62,13 @@ AchievementTag::AchievementTag(xy::MessageBus& mb, xy::FontResource& fr, sf::Int
     m_text.setString(text.substr(0, text.find_first_of('-') - 1));
     m_text.setFillColor(textColour);
     xy::Util::Position::centreOrigin(m_text);
-    m_text.setPosition(0.f, tagSize.y / 2.f);
+    m_text.setPosition(-tagSize.x / 2.f, tagSize.y / 2.f);
 
     m_shape.setSize(tagSize);
     m_shape.setFillColor(fillColour);
     m_shape.setOutlineThickness(2.f);
     m_shape.setOutlineColor(borderColour);
-    m_shape.setOrigin(tagSize.x / 2.f, 0.f);
+    m_shape.setOrigin(tagSize.x, 0.f);
 }
 
 //public
@@ -89,12 +90,23 @@ void AchievementTag::entityUpdate(xy::Entity& entity, float dt)
     }
     else
     {
-        //move out
-        entity.move(0.f, moveSpeed * dt);
-        if (entity.getPosition().y < 0)
-        {
-            entity.destroy();
-        }
+        //fade out
+        m_alpha = std::max(0.f, m_alpha - dt);
+        sf::Uint8 alpha = static_cast<sf::Uint8>(m_alpha * 255.f);
+
+        auto colour = fillColour;
+        colour.a = alpha;
+        m_shape.setFillColor(colour);
+
+        colour = borderColour;
+        colour.a = alpha;
+        m_shape.setOutlineColor(colour);
+
+        colour = textColour;
+        colour.a = alpha;
+        m_text.setFillColor(colour);
+
+        if (m_alpha == 0) entity.destroy();
     }
 }
 

@@ -57,6 +57,7 @@ namespace lm
 
         float m_inTime;
         float m_holdTime;
+        float m_alpha;
 
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
