@@ -37,7 +37,7 @@ using namespace lm;
 
 namespace
 {
-    float time = 0.f;
+    float timeElapsed = 0.f;
     const float timeMultiplier = 0.1f;
     const sf::Color colour(20u, 50u, 200u, 120u);
 }
@@ -75,14 +75,14 @@ WaterDrawable::WaterDrawable(xy::MessageBus& mb, const sf::Texture& t, float lev
 //public
 void WaterDrawable::entityUpdate(xy::Entity& entity, float dt)
 {
-    time += dt;
+    timeElapsed += dt;
 
     sf::RenderStates states;
     states.texture = &m_texture;
     states.shader = m_shader;
 
     m_shader->setUniform("u_texture", m_texture);
-    m_shader->setUniform("u_time", time * timeMultiplier);
+    m_shader->setUniform("u_time", timeElapsed * timeMultiplier);
     m_shader->setUniform("u_texOffset", m_reflectOffset);
 
     m_renderTexture.clear(sf::Color::Transparent);
