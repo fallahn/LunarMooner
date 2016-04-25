@@ -60,7 +60,8 @@ void CollisionWorld::update()
         for (auto c : collidees)
         {
             CollisionComponent* cb = nullptr;
-            if ((cb = c->getEntity()->getComponent<CollisionComponent>()) &&
+            if (!c->destroyed() &&
+                (cb = c->getEntity()->getComponent<CollisionComponent>()) &&
                 ca->globalBounds().intersects(cb->globalBounds()))
             {
                 ca->addCollider(cb);
