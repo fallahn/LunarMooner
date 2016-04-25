@@ -378,7 +378,15 @@ void PlayerProfile::raiseAchievementMessage(AchievementID id)
     msg->ID = id;
 
     //add XP
+    auto currentRank = getRank();
     m_XP += 100;
+    auto rank = getRank();
+    if (rank > currentRank)
+    {
+        //raise an event
+        auto xpMsg = m_messageBus.post<LMRankEvent>(LMMessageId::RankEvent);
+        xpMsg->rank = rank;
+    }
 }
 
 void PlayerProfile::awardXP()

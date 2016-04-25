@@ -25,6 +25,12 @@
     <Filter Include="Source Files\background">
       <UniqueIdentifier>{c299bcb5-0368-4e2f-a0f2-48d8f3357cd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\overlay">
+      <UniqueIdentifier>{8d54c67d-9233-44f0-be33-412757b1637d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\overlay">
+      <UniqueIdentifier>{92a9f2fe-dd32-471c-b1f9-3e110bb595ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CommandIds.hpp">
@@ -144,9 +150,6 @@
     <ClInclude Include="include\MenuAchievementState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\LMAchievementTag.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
     <ClInclude Include="include\LMWeaponEMP.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
@@ -161,6 +164,12 @@
     </ClInclude>
     <ClInclude Include="include\ResourceCollection.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OLOverlay.hpp">
+      <Filter>Header Files\overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OLAchievementTag.hpp">
+      <Filter>Header Files\overlay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -269,14 +278,17 @@
     <ClCompile Include="src\MenuAchievementState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LMAchievementTag.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
     <ClCompile Include="src\LMWeaponEMP.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="src\LMWaterDrawable.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OLAchievementTag.cpp">
+      <Filter>Source Files\overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OLOverlay.cpp">
+      <Filter>Source Files\overlay</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

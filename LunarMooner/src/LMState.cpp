@@ -30,7 +30,6 @@ source distribution.
 #include <LMPostBlur.hpp>
 #include <LMSoundPlayer.hpp>
 #include <LMNukeDrawable.hpp>
-#include <LMAchievementTag.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
 
@@ -88,6 +87,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_inputFlags        (0),
     m_prevInputFlags    (0),
     m_collisionWorld    (m_scene),
+    m_overlay           (m_messageBus, m_resources, m_scene),
     m_useController     (false)
 {
     XY_ASSERT(playerCount > 0, "Need at least one player");
@@ -106,6 +106,8 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_scene.addPostProcess(pp);
     pp = xy::PostProcess::create<xy::PostChromeAb>();
     m_scene.addPostProcess(pp);
+
+    m_overlay.setView(context.defaultView);
 
     initGameController(playerCount);
     initSounds();
@@ -163,6 +165,12 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         case keySpecial:
         case altKeySpecial:
             m_inputFlags &= ~LMInputFlags::Special;
+            break;
+        case sf::Keyboard::T:
+        {
+            auto msg = m_messageBus.post<LMAchievementEvent>(LMMessageId::AchievementEvent);
+            msg->ID = AchievementID::AcrossTheBoard;
+        }
             break;
         default:break;
         }
@@ -273,6 +281,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
         default: break;
         case xy::Message::UIEvent::ResizedWindow:
             m_scene.setView(getContext().defaultView);
+            m_overlay.setView(getContext().defaultView);
             break;
         case xy::Message::UIEvent::RequestControllerDisable:
             m_useController = false;
@@ -282,16 +291,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             break;
         }
     }
-    else if (msg.id == LMMessageId::AchievementEvent)
-    {
-        auto& msgData = msg.getData<LMAchievementEvent>();
-
-        auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_resources.fontResource, msgData.ID);
-        auto ent = xy::Entity::create(m_messageBus);
-        ent->setPosition(960.f, 1080.f);
-        ent->addComponent(tag);
-        m_scene.addEntity(ent, xy::Scene::Layer::UI);
-    }
+    m_overlay.handleMessage(msg);
 }
 
 bool LunarMoonerState::update(float dt)
@@ -341,6 +341,7 @@ bool LunarMoonerState::update(float dt)
 
     m_scene.update(dt);
     m_collisionWorld.update();
+    m_overlay.update(dt);
 
     m_reportText.setString(xy::Stats::getString());
 
@@ -352,6 +353,7 @@ void LunarMoonerState::draw()
     auto& rw = getContext().renderWindow;
 
     rw.draw(m_scene);
+    rw.draw(m_overlay);
 
     rw.setView(getContext().defaultView);
     rw.draw(m_reportText);

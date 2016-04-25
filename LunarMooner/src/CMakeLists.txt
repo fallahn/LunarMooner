@@ -5,7 +5,6 @@ SET(LM_SRC
   ${LM_DIR}/BGStarField.cpp
   ${LM_DIR}/Game.cpp
   ${LM_DIR}/GameOverState.cpp
-  ${LM_DIR}/LMAchievementTag.cpp
   ${LM_DIR}/LMAlienController.cpp
   ${LM_DIR}/LMAsteroidController.cpp
   ${LM_DIR}/LMBulletController.cpp
@@ -36,4 +35,6 @@ SET(LM_SRC
   ${LM_DIR}/MenuMainState.cpp
   ${LM_DIR}/MenuOptionState.cpp
   ${LM_DIR}/MenuPauseState.cpp
+  ${LM_DIR}/OLAchievementTag.cpp
+  ${LM_DIR}/OLOverlay.cpp
   ${LM_DIR}/PlayerProfile.cpp)
