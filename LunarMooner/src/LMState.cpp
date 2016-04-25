@@ -166,12 +166,6 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         case altKeySpecial:
             m_inputFlags &= ~LMInputFlags::Special;
             break;
-        case sf::Keyboard::T:
-        {
-            auto msg = m_messageBus.post<LMAchievementEvent>(LMMessageId::AchievementEvent);
-            msg->ID = AchievementID::AcrossTheBoard;
-        }
-            break;
         default:break;
         }
         break;
