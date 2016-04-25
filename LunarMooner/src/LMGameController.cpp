@@ -43,6 +43,7 @@ source distribution.
 #include <LMSpriteBatch.hpp>
 #include <LMWeaponEMP.hpp>
 #include <LMWaterDrawable.hpp>
+#include <ResourceCollection.hpp>
 #include <StateIds.hpp>
 #include <Game.hpp>
 
@@ -123,16 +124,13 @@ namespace
     const float hardCoolDown = 12.f;
 }
 
-GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as,
-    xy::SoundResource& sr, xy::TextureResource& tr, xy::FontResource& fr)
+GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as, ResourceCollection& rc)
     : xy::Component     (mb, this),
     m_difficulty        (xy::Difficulty::Easy),
     m_scene             (scene),
     m_collisionWorld    (cw),
     m_audioSettings     (as),
-    m_soundResource     (sr),
-    m_textureResource   (tr),
-    m_fontResource      (fr),
+    m_resources         (rc),
     m_inputFlags        (0),
     m_spawnReady        (true),
     m_player            (nullptr),
@@ -335,15 +333,15 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     addMessageHandler(handler);
 
     //precache player effects
-    m_particleDefs[LMParticleID::Thruster].loadFromFile("assets/particles/thrust.xyp", m_textureResource);
-    m_particleDefs[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_textureResource);
-    m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_textureResource);
-    m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_textureResource);
+    m_particleDefs[LMParticleID::Thruster].loadFromFile("assets/particles/thrust.xyp", m_resources.textureResource);
+    m_particleDefs[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_resources.textureResource);
+    m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_resources.textureResource);
+    m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_resources.textureResource);
 
-    m_soundCache.insert(std::make_pair(LMSoundID::Engine, m_soundResource.get("assets/sound/fx/thrust.wav")));
-    m_soundCache.insert(std::make_pair(LMSoundID::RCS, m_soundResource.get("assets/sound/fx/rcs.wav")));
-    m_soundCache.insert(std::make_pair(LMSoundID::RoundCountEnd, m_soundResource.get("assets/sound/fx/score_count_end.wav")));
-    m_soundCache.insert(std::make_pair(LMSoundID::RoundCountLoop, m_soundResource.get("assets/sound/fx/score_count_loop.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::Engine, m_resources.soundResource.get("assets/sound/fx/thrust.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::RCS, m_resources.soundResource.get("assets/sound/fx/rcs.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::RoundCountEnd, m_resources.soundResource.get("assets/sound/fx/score_count_end.wav")));
+    m_soundCache.insert(std::make_pair(LMSoundID::RoundCountLoop, m_resources.soundResource.get("assets/sound/fx/score_count_loop.wav")));
 
     //create sprite batch for aliens
     auto sprBatch = xy::Component::create<SpriteBatch>(getMessageBus());
@@ -589,21 +587,21 @@ void GameController::spawnPlayer()
         auto rcsRight = m_particleDefs[LMParticleID::RcsRight].createSystem(getMessageBus());
         rcsRight->setName("rcsRight");
 
-        auto sfx1 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+        auto sfx1 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
         sfx1->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx1->setFadeInTime(0.1f);
         sfx1->setFadeOutTime(0.3f);
         sfx1->setName("rcsEffectLeft");
         sfx1->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
-        auto sfx2 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+        auto sfx2 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
         sfx2->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx2->setFadeInTime(0.1f);
         sfx2->setFadeOutTime(0.3f);
         sfx2->setName("rcsEffectRight");
         sfx2->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
-        auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+        auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
         sfx3->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
         sfx3->setFadeInTime(0.1f);
         sfx3->setFadeOutTime(0.3f);
@@ -718,7 +716,7 @@ namespace
 
 void GameController::spawnHuman(const sf::Vector2f& position)
 {
-    auto drawable = getHumanDrawable(getMessageBus(), m_textureResource);
+    auto drawable = getHumanDrawable(getMessageBus(), m_resources.textureResource);
 
     auto controller = xy::Component::create<HumanController>(getMessageBus());
 
@@ -835,7 +833,7 @@ void GameController::createTerrain()
 
     //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus());
-    terrain->init("assets/maps", m_textureResource);
+    terrain->init("assets/maps", m_resources.textureResource);
 
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(alienArea.left, 1080.f - 320.f); //TODO fix these numbers
@@ -847,7 +845,7 @@ void GameController::createTerrain()
     updatePlatforms();
 
     auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);   
-    shieldDrawable->setTexture(m_textureResource.get("assets/images/game/shield_noise.png"));
+    shieldDrawable->setTexture(m_resources.textureResource.get("assets/images/game/shield_noise.png"));
     
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(960.f, 3700.f);//3700.f
@@ -898,7 +896,7 @@ void GameController::updatePlatforms()
 
 void GameController::addRescuedHuman()
 {
-    auto drawable = getHumanDrawable(getMessageBus(), m_textureResource);
+    auto drawable = getHumanDrawable(getMessageBus(), m_resources.textureResource);
     
     float width = m_mothership->globalBounds().width;
     width -= 8.f; //4 px padding each end
@@ -1024,7 +1022,7 @@ void GameController::createUI()
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //score / lives display etc
-    auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_fontResource, m_playerStates);
+    auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_resources.fontResource, m_playerStates);
     entity = xy::Entity::create(getMessageBus());
     m_scoreDisplay = entity->addComponent(scores);
 
@@ -1305,7 +1303,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     //drawable->getDrawable().setFillColor(sf::Color(255, 127, 0));
     drawable->getDrawable().setSize({ size.width, size.height });
     drawable->getDrawable().setOrigin({ size.width / 2.f, size.height / 2.f });
-    drawable->getDrawable().setTexture(&m_textureResource.get("assets/images/game/meteor.png"));
+    drawable->getDrawable().setTexture(&m_resources.textureResource.get("assets/images/game/meteor.png"));
 
     const float dir = (position.x < 960.f) ? 1.f : -1.f;
     auto controller = xy::Component::create<AsteroidController>(getMessageBus(), alienArea, sf::Vector2f(dir, 1.f));
@@ -1320,7 +1318,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     auto ps = m_particleDefs[LMParticleID::RoidTrail].createSystem(getMessageBus());
     ps->setLifetimeVariance(0.25f);
 
-    auto as = xy::Component::create<xy::AudioSource>(getMessageBus(), m_soundResource);
+    auto as = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
     as->setPitch(0.7f);
     as->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
     as->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
@@ -1478,7 +1476,7 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
 
 void GameController::showRoundSummary(bool doScores)
 {
-    auto summary = xy::Component::create<RoundSummary>(getMessageBus(), m_playerStates[m_currentPlayer], m_textureResource, m_fontResource, doScores);
+    auto summary = xy::Component::create<RoundSummary>(getMessageBus(), m_playerStates[m_currentPlayer], m_resources.textureResource, m_resources.fontResource, doScores);
     summary->setSoundBuffer(LMSoundID::RoundCountEnd, m_soundCache[LMSoundID::RoundCountEnd], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
     summary->setSoundBuffer(LMSoundID::RoundCountLoop, m_soundCache[LMSoundID::RoundCountLoop], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
     
@@ -1495,12 +1493,14 @@ void GameController::showRoundSummary(bool doScores)
 
 void GameController::spawnDeadGuy(float x, float y)
 {
-    auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_textureResource.get("assets/images/game/doofer_dead.png"));
-    auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
-    auto entity = xy::Entity::create(getMessageBus());
-    entity->addComponent(drawable);
-    entity->addComponent(controller);
-    entity->setPosition(x, y);
-    entity->addCommandCategories(LMCommandID::Alien); //yeah we're not an alien but we want to clear them at the same time
-    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    if (alienArea.contains(x, y))
+    {
+        auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_dead.png"));
+        auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
+        auto entity = xy::Entity::create(getMessageBus());
+        entity->addComponent(drawable);
+        entity->addComponent(controller);
+        entity->setPosition(x, y);
+        m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    }
 }
