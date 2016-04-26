@@ -43,6 +43,7 @@ source distribution.
 #include <LMSpriteBatch.hpp>
 #include <LMWeaponEMP.hpp>
 #include <LMWaterDrawable.hpp>
+#include <LMShaderIds.hpp>
 #include <ResourceCollection.hpp>
 #include <StateIds.hpp>
 #include <Game.hpp>
@@ -1497,6 +1498,11 @@ void GameController::spawnDeadGuy(float x, float y)
     if (alienArea.contains(x, y))
     {
         auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_dead.png"));
+        drawable->setNormalMap(m_resources.textureResource.get("assets/images/game/doofer_dead_normal.png"));
+        drawable->setShader(m_resources.shaderResource.get(LMShaderID::NormalMapColoured));
+        //TODO cahe all animation data
+        drawable->loadAnimationData("assets/images/game/doofer_dead.xya");
+        drawable->playAnimation(0);
         auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
         auto entity = xy::Entity::create(getMessageBus());
         entity->addComponent(drawable);
