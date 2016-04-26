@@ -31,6 +31,12 @@
     <Filter Include="Source Files\overlay">
       <UniqueIdentifier>{92a9f2fe-dd32-471c-b1f9-3e110bb595ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ui">
+      <UniqueIdentifier>{f406f99c-b43f-473f-a0fb-ee81cb86d756}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ui">
+      <UniqueIdentifier>{a608e090-b6a9-4926-9db0-fa185954285d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CommandIds.hpp">
@@ -174,6 +180,9 @@
     <ClInclude Include="include\MenuWeaponSelect.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\UIWeaponSelect.hpp">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -295,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="src\MenuWeaponSelect.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UIWeaponSelect.cpp">
+      <Filter>Source Files\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

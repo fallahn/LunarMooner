@@ -168,6 +168,7 @@
     <ClInclude Include="include\PlayerProfile.hpp" />
     <ClInclude Include="include\ResourceCollection.hpp" />
     <ClInclude Include="include\StateIds.hpp" />
+    <ClInclude Include="include\UIWeaponSelect.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BGPlanetDrawable.cpp" />
@@ -210,6 +211,7 @@
     <ClCompile Include="src\MenuPauseState.cpp" />
     <ClCompile Include="src\OLOverlay.cpp" />
     <ClCompile Include="src\PlayerProfile.cpp" />
+    <ClCompile Include="src\UIWeaponSelect.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
