@@ -38,4 +38,5 @@ SET(LM_SRC
   ${LM_DIR}/MenuWeaponSelect.cpp
   ${LM_DIR}/OLAchievementTag.cpp
   ${LM_DIR}/OLOverlay.cpp
-  ${LM_DIR}/PlayerProfile.cpp)
+  ${LM_DIR}/PlayerProfile.cpp
+  ${LM_DIR}/UIWeaponSelect.cpp)

@@ -26,7 +26,9 @@ source distribution.
 *********************************************************************/
 
 #include <MenuWeaponSelect.hpp>
+#include <UIWeaponSelect.hpp>
 #include <PlayerProfile.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/Resource.hpp>
 #include <xygine/App.hpp>
@@ -110,7 +112,23 @@ void MenuWeaponState::buildMenu(const sf::Font& font)
     label->setPosition(960.f, 160.f);
     m_uiContainer.addControl(label);
 
-    //TODO insert weapon selector here
+    //weapon selector
+    auto weaponSelect = xy::UI::create<lm::ui::WeaponSelect>(m_textureResource.get("assets/images/ui/weapon_select.png"));
+    weaponSelect->setAlignment(xy::UI::Alignment::Centre);
+    weaponSelect->setPosition(960.f, 420.f);
+    
+    sf::Int32 count = AchievementID::Rank50 - AchievementID::Rank10;
+    sf::Uint8 flags = 0u;
+    for (auto i = 0; i < count; ++i)
+    {
+        if (!m_profile.hasAchievement(static_cast<AchievementID>(AchievementID::Rank10 + i)))
+        {
+            flags |= (1 << i);
+        }
+    }
+    weaponSelect->setLockedFlags(flags);
+
+    m_uiContainer.addControl(weaponSelect);
 
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Back");
