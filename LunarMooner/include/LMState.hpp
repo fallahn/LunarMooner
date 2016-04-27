@@ -31,6 +31,7 @@ source distribution.
 #include <StateIds.hpp>
 #include <ResourceCollection.hpp>
 #include <LMCollisionWorld.hpp>
+#include <LMPlayerState.hpp>
 #include <OLOverlay.hpp>
 
 #include <xygine/State.hpp>
@@ -70,7 +71,7 @@ private:
     bool m_useController;
     void parseControllerInput();
     
-    void initGameController(sf::Uint8, sf::Uint8);
+    void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon);
     void initSounds();
     void initParticles();
 

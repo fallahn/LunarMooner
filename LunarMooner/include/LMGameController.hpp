@@ -70,7 +70,7 @@ namespace lm
 
         void setInput(sf::Uint8);
         
-        void addPlayer(sf::Uint8);
+        void addPlayer(sf::Uint8, SpecialWeapon);
         void start();
 
         void setDifficulty(xy::Difficulty d) { m_difficulty = d; }

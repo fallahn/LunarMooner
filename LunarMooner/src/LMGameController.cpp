@@ -496,12 +496,13 @@ void GameController::setInput(sf::Uint8 input)
     m_inputFlags = input;
 }
 
-void GameController::addPlayer(sf::Uint8 level)
+void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
 {
     m_playerStates.emplace_back();
 
     auto& state = m_playerStates.back();
     state.level = level + 1;
+    state.special = weapon;
 
     auto& humans = state.humansRemaining;
     for (auto i = 0; i < humanCounts[level]; ++i)

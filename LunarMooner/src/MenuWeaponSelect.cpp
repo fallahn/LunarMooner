@@ -27,6 +27,7 @@ source distribution.
 
 #include <MenuWeaponSelect.hpp>
 #include <UIWeaponSelect.hpp>
+#include <LMPlayerState.hpp>
 #include <PlayerProfile.hpp>
 #include <CommandIds.hpp>
 
@@ -40,7 +41,7 @@ source distribution.
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Font.hpp>
 
-MenuWeaponState::MenuWeaponState(xy::StateStack& ss, Context context, xy::TextureResource& tr, xy::FontResource& fr, const PlayerProfile& profile)
+MenuWeaponState::MenuWeaponState(xy::StateStack& ss, Context context, xy::TextureResource& tr, xy::FontResource& fr, PlayerProfile& profile)
     : xy::State(ss, context),
     m_textureResource(tr),
     m_fontResource(fr),
@@ -150,8 +151,19 @@ void MenuWeaponState::buildMenu(const sf::Font& font)
     button->setText("Begin!");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(1320.f, 975.f);
-    button->addCallback([this]()
+    button->addCallback([this, weaponSelect, flags]()
     {
+        //set the currently selected weapon
+        lm::SpecialWeapon weapon = lm::SpecialWeapon::None;
+        auto idx = weaponSelect->getSelectedIndex();
+        if ((flags & (1 << idx)) == 0)
+        {
+            weapon = static_cast<lm::SpecialWeapon>(idx + 1);
+        }
+
+        m_profile.setSpecialWeapon(weapon);
+        
+        //and raise message to say we're done
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::MenuClosed;
         msg->value = 0.f;
