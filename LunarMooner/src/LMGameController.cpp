@@ -109,7 +109,7 @@ namespace
     const std::array<float, 10u> roundTimes =
     {
         75.f, 90.f, 100.f, 110.f, 120.f, 
-        130.f, 165.f, 175.f, 185.f, 195.f
+        130.f, 175.f, 185.f, 195.f, 205.f
     };
     //how much time to remove for current difficulty setting
     const float mediumPenalty = 4.f;
@@ -1021,9 +1021,13 @@ void GameController::createUI()
     auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     auto entity = xy::Entity::create(getMessageBus());
     m_speedMeter = entity->addComponent(speedMeter);
-
     entity->setPosition(40.f, 600.f);
-
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
+    //TODO hook this up for player two
+    speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
+    entity = xy::Entity::create(getMessageBus());
+    entity->addComponent(speedMeter);
+    entity->setPosition(alienArea.left + alienArea.width + 40.f, 600.f);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //score / lives display etc
