@@ -1015,18 +1015,17 @@ void GameController::fireSpecial()
 void GameController::createUI()
 {
     //velocity meter
-    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), 50000.f);
+    /*auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), 50000.f, m_resources.textureResource);
     auto entity = xy::Entity::create(getMessageBus());
     m_speedMeter = entity->addComponent(speedMeter);
 
-    entity->rotate(-90.f);
-    entity->setPosition(alienArea.left + ((alienArea.width - m_speedMeter->getSize().y) / 2.f), m_speedMeter->getSize().x + 10.f);
+    entity->setPosition(60.f, 600.f);
 
-    m_scene.addEntity(entity, xy::Scene::Layer::UI);
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);*/
 
     //score / lives display etc
     auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_resources.fontResource, m_playerStates);
-    entity = xy::Entity::create(getMessageBus());
+    auto entity = xy::Entity::create(getMessageBus());
     m_scoreDisplay = entity->addComponent(scores);
 
     m_scene.addEntity(entity, xy::Scene::Layer::UI);

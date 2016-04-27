@@ -27,21 +27,49 @@ source distribution.
 
 #include <LMSpeedMeter.hpp>
 
+#include <xygine/Resource.hpp>
+
 #include <SFML/Graphics/RenderTarget.hpp>
 
 using namespace lm;
 
 namespace
 {
-    const float barWidth = 30.f;
-    const float barLength = 600.f;
+    const float radius = 80.f;
 }
 
-SpeedMeter::SpeedMeter(xy::MessageBus& mb, float maxVal)
+SpeedMeter::SpeedMeter(xy::MessageBus& mb, float maxVal, xy::TextureResource& tr, sf::Shader& shader)
     :xy::Component  (mb, this),
-    m_maxValue      (maxVal)
+    m_maxValue      (maxVal),
+    m_shader        (shader)
 {
+    m_mainTexture = tr.get("assets/images/game/console/velocimeter.png");
+    m_arrowTexture = tr.get("assets/images/game/console/velocity_marker.png");
+    m_normalTexture = tr.get("assets/images/game/console/velocity_normal.png");
 
+    //first 4 verts are red ring
+    sf::Vector2f size(m_mainTexture.getSize());
+    m_vertices[1].position.x = size.x / 2.f;
+    m_vertices[1].texCoords.x = size.x / 2.f;
+    m_vertices[2].position = { size.x / 2.f, size.y };
+    m_vertices[2].texCoords = m_vertices[2].position;
+    m_vertices[3].position.y = size.y;
+    m_vertices[3].texCoords.y = size.y;
+
+    //followed by overlay
+    //m_vertices[4].position.x = { size.x / 2.f };
+    m_vertices[4].texCoords.x = size.x / 2.f;
+    m_vertices[5].position.x = size.x / 2.f;
+    m_vertices[5].texCoords.x = size.x;
+    m_vertices[6].position = { size.x / 2.f, size.y };
+    m_vertices[6].texCoords = size;
+    m_vertices[7].position.y = size.y;
+    m_vertices[7].texCoords = { size.x / 2.f, size.y };
+
+    m_shape.setRadius(radius);
+    m_shape.setOrigin(radius, radius);
+    m_shape.setPosition(size.x / 4.f, size.y / 2.f);
+    m_shape.setTexture(&m_arrowTexture);
 }
 
 //public
@@ -55,23 +83,25 @@ void SpeedMeter::setValue(float val)
 {
     const float ratio = std::min(val / m_maxValue, 1.f);
 
-    m_shape.setSize({ barWidth, barLength * ratio });
-
-    sf::Uint8 red = static_cast<sf::Uint8>(255.f * ratio);
-    sf::Uint8 green = 255 - red;
-
-    m_shape.setFillColor({ red, green, 0 });
+    //set alpha of first 4 verts
+    sf::Color colour(255, 255, 255, static_cast<sf::Uint8>(ratio * 255.f));
+    for (auto i = 0u; i < 4u; ++i)
+    {
+        m_vertices[i].color = colour;
+    }
 
     m_currentValue = val;
 }
 
-sf::Vector2f SpeedMeter::getSize() const
-{
-    return{ barWidth, barLength };
-}
 
 //private
 void SpeedMeter::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
+    states.texture = &m_arrowTexture;
+    states.shader = &m_shader;
     rt.draw(m_shape, states);
+
+    states.texture = &m_mainTexture;
+    states.shader = nullptr;
+    rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 }
