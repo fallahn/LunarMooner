@@ -109,9 +109,15 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 
     m_overlay.setView(context.defaultView);
 
-    sf::Uint8 level = (playerCount == 1) ? profile.getRank() / 10 : 0;
+    sf::Uint8 level = 0;
+    lm::SpecialWeapon weapon = lm::SpecialWeapon::None;
+    if (playerCount == 1)
+    {
+        level = profile.getRank() / 10;
+        weapon = profile.getSpecialWeapon();
+    }
 
-    initGameController(playerCount, level);
+    initGameController(playerCount, level, weapon);
     initSounds();
     initParticles();
 
@@ -426,7 +432,7 @@ void LunarMoonerState::parseControllerInput()
     lastThrust = thrust;
 }
 
-void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level)
+void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level, lm::SpecialWeapon weapon)
 {
     auto gameController =
         xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld,
@@ -436,7 +442,7 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level
 
     for (auto i = 0; i < playerCount; ++i)
     {
-        gameController->addPlayer(level);
+        gameController->addPlayer(level, weapon);
     }
     gameController->start();
 

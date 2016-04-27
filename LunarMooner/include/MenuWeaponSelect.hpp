@@ -56,7 +56,7 @@ class PlayerProfile;
 class MenuWeaponState final : public xy::State
 {
 public:
-    MenuWeaponState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&, const PlayerProfile&);
+    MenuWeaponState(xy::StateStack&, Context, xy::TextureResource&, xy::FontResource&, PlayerProfile&);
     ~MenuWeaponState() = default;
 
     bool update(float) override;
@@ -73,7 +73,7 @@ private:
 
     xy::TextureResource& m_textureResource;
     xy::FontResource& m_fontResource;
-    const PlayerProfile& m_profile;
+    PlayerProfile& m_profile;
 
     xy::MessageBus& m_messageBus;
     xy::UI::Container m_uiContainer;
