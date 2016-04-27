@@ -183,6 +183,9 @@
     <ClInclude Include="include\UIWeaponSelect.hpp">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMVelocityShader.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

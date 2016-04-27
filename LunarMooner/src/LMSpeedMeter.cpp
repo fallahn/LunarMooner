@@ -28,24 +28,29 @@ source distribution.
 #include <LMSpeedMeter.hpp>
 
 #include <xygine/Resource.hpp>
+#include <xygine/util/Vector.hpp>
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 using namespace lm;
 
 namespace
 {
-    const float radius = 80.f;
+    //const float radius = 90.f;
 }
 
-SpeedMeter::SpeedMeter(xy::MessageBus& mb, float maxVal, xy::TextureResource& tr, sf::Shader& shader)
+SpeedMeter::SpeedMeter(xy::MessageBus& mb, const sf::Vector2f& maxVelocity, xy::TextureResource& tr, sf::Shader& shader)
     :xy::Component  (mb, this),
-    m_maxValue      (maxVal),
+    m_maxVelocity   (maxVelocity),
+    m_maxValue      (xy::Util::Vector::lengthSquared(maxVelocity)),
     m_shader        (shader)
 {
     m_mainTexture = tr.get("assets/images/game/console/velocimeter.png");
     m_arrowTexture = tr.get("assets/images/game/console/velocity_marker.png");
     m_normalTexture = tr.get("assets/images/game/console/velocity_normal.png");
+
+    m_arrowTexture.setRepeated(true);
 
     //first 4 verts are red ring
     sf::Vector2f size(m_mainTexture.getSize());
@@ -66,6 +71,7 @@ SpeedMeter::SpeedMeter(xy::MessageBus& mb, float maxVal, xy::TextureResource& tr
     m_vertices[7].position.y = size.y;
     m_vertices[7].texCoords = { size.x / 2.f, size.y };
 
+    const float radius = size.y / 2.f;
     m_shape.setRadius(radius);
     m_shape.setOrigin(radius, radius);
     m_shape.setPosition(size.x / 4.f, size.y / 2.f);
@@ -76,11 +82,12 @@ SpeedMeter::SpeedMeter(xy::MessageBus& mb, float maxVal, xy::TextureResource& tr
 void SpeedMeter::entityUpdate(xy::Entity&, float) 
 {
     //drops down to near zero when no player
-    setValue(m_currentValue * 0.9f);
+    setVelocity(m_currentVelocity * 0.9f);
 }
 
-void SpeedMeter::setValue(float val)
+void SpeedMeter::setVelocity(const sf::Vector2f& velocity)
 {
+    const float val = xy::Util::Vector::lengthSquared(velocity);
     const float ratio = std::min(val / m_maxValue, 1.f);
 
     //set alpha of first 4 verts
@@ -90,7 +97,11 @@ void SpeedMeter::setValue(float val)
         m_vertices[i].color = colour;
     }
 
-    m_currentValue = val;
+    m_currentVelocity = velocity;
+
+    m_offset.x = m_currentVelocity.x / m_maxVelocity.x;
+    m_offset.y = m_currentVelocity.y / m_maxVelocity.y;
+    m_offset *= 0.5f;
 }
 
 
@@ -99,6 +110,11 @@ void SpeedMeter::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.texture = &m_arrowTexture;
     states.shader = &m_shader;
+
+    m_shader.setUniform("u_normalMap", m_normalTexture);
+    m_shader.setUniform("u_diffuseMap", m_arrowTexture);
+    m_shader.setUniform("u_offset", m_offset);
+
     rt.draw(m_shape, states);
 
     states.texture = &m_mainTexture;
