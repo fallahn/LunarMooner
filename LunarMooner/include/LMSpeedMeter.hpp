@@ -31,26 +31,47 @@ source distribution.
 #include <xygine/components/Component.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Texture.hpp>
+
+#include <array>
+
+namespace sf
+{
+    class Shader;
+}
+
+namespace xy
+{
+    class TextureResource;
+}
 
 namespace lm
 {
     class SpeedMeter final :public xy::Component, public sf::Drawable
     {
     public:
-        SpeedMeter(xy::MessageBus&, float maxVal);
+        SpeedMeter(xy::MessageBus&, float maxVal, xy::TextureResource&, sf::Shader&);
         ~SpeedMeter() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
         void setValue(float);
-        sf::Vector2f getSize() const;
-
+        
     private:
         float m_currentValue;
         float m_maxValue;
-        sf::RectangleShape m_shape;
+        sf::CircleShape m_shape;
+
+        std::array<sf::Vertex, 8u> m_vertices;
+        sf::Texture m_mainTexture;
+        sf::Texture m_arrowTexture;
+        sf::Texture m_normalTexture;
+
+        sf::Shader& m_shader;
+
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
