@@ -127,6 +127,7 @@
     <ClInclude Include="include\BGRoidBelt.hpp" />
     <ClInclude Include="include\BGScoreboardMask.hpp" />
     <ClInclude Include="include\BGStarfield.hpp" />
+    <ClInclude Include="include\LMVelocityShader.hpp" />
     <ClInclude Include="include\MenuWeaponSelect.hpp" />
     <ClInclude Include="include\OLAchievementTag.hpp" />
     <ClInclude Include="include\LMLaserSight.hpp" />

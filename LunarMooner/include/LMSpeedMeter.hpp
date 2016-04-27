@@ -52,16 +52,19 @@ namespace lm
     class SpeedMeter final :public xy::Component, public sf::Drawable
     {
     public:
-        SpeedMeter(xy::MessageBus&, float maxVal, xy::TextureResource&, sf::Shader&);
+        SpeedMeter(xy::MessageBus&, const sf::Vector2f&, xy::TextureResource&, sf::Shader&);
         ~SpeedMeter() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
 
-        void setValue(float);
+        void setVelocity(const sf::Vector2f&);
         
     private:
-        float m_currentValue;
+        const sf::Vector2f m_maxVelocity;
+        sf::Vector2f m_currentVelocity;
+        sf::Vector2f m_offset;
+
         float m_maxValue;
         sf::CircleShape m_shape;
 

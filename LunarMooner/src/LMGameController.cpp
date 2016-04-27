@@ -44,6 +44,7 @@ source distribution.
 #include <LMWeaponEMP.hpp>
 #include <LMWaterDrawable.hpp>
 #include <LMShaderIds.hpp>
+#include <LMVelocityShader.hpp>
 #include <ResourceCollection.hpp>
 #include <StateIds.hpp>
 #include <Game.hpp>
@@ -344,6 +345,8 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_soundCache.insert(std::make_pair(LMSoundID::RoundCountEnd, m_resources.soundResource.get("assets/sound/fx/score_count_end.wav")));
     m_soundCache.insert(std::make_pair(LMSoundID::RoundCountLoop, m_resources.soundResource.get("assets/sound/fx/score_count_loop.wav")));
 
+    m_resources.shaderResource.preload(LMShaderID::VelocityMeter, xy::Shader::Default::vertex, lm::velocityFrag);
+
     //create sprite batch for aliens
     auto sprBatch = xy::Component::create<SpriteBatch>(getMessageBus());
     auto ent = xy::Entity::create(getMessageBus());
@@ -397,7 +400,7 @@ void GameController::entityUpdate(xy::Entity&, float dt)
     //update UI
     if (m_player)
     {
-        m_speedMeter->setValue(m_player->getSpeed());
+        m_speedMeter->setVelocity(m_player->getVelocity());
     }
 
     //count down round time - TODO we can neaten this up a bit
@@ -1015,17 +1018,17 @@ void GameController::fireSpecial()
 void GameController::createUI()
 {
     //velocity meter
-    /*auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), 50000.f, m_resources.textureResource);
+    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     auto entity = xy::Entity::create(getMessageBus());
     m_speedMeter = entity->addComponent(speedMeter);
 
-    entity->setPosition(60.f, 600.f);
+    entity->setPosition(40.f, 600.f);
 
-    m_scene.addEntity(entity, xy::Scene::Layer::UI);*/
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //score / lives display etc
     auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_resources.fontResource, m_playerStates);
-    auto entity = xy::Entity::create(getMessageBus());
+    entity = xy::Entity::create(getMessageBus());
     m_scoreDisplay = entity->addComponent(scores);
 
     m_scene.addEntity(entity, xy::Scene::Layer::UI);

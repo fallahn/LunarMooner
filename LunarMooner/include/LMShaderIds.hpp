@@ -36,7 +36,8 @@ enum LMShaderID
 {
     Prepass = xy::Shader::Count,
     NormalMapColoured,
-    WaterEffect
+    WaterEffect,
+    VelocityMeter
 };
 
 #endif //LM_SHADER_IDS_HPP_
