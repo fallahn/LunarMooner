@@ -41,7 +41,7 @@ namespace
     const float numSpace = 16.f;
 }
 
-LevelMeter::LevelMeter(sf::Texture& t)
+LevelMeter::LevelMeter(const sf::Texture& t)
     :   m_texture   (t),
     m_level         (0)
 {
