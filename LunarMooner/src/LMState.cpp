@@ -126,7 +126,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     profile.enable(playerCount == 1);
 
     xy::Stats::clear();
-    m_reportText.setFont(m_resources.fontResource.get("game_state_119"));
+    m_reportText.setFont(m_resources.fontResource.get("report_text"));
     m_reportText.setPosition(20.f, 860.f);
 
     m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
@@ -476,6 +476,8 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::ShieldHit, "assets/sound/fx/shield_hit.wav");
     soundPlayer->preCache(LMSoundID::EmpExplosion, "assets/sound/fx/emp_blast.wav");
     soundPlayer->preCache(LMSoundID::CollectibleDied, "assets/sound/fx/collectible_died.wav");
+    soundPlayer->preCache(LMSoundID::AnnouncePlayerOne, "assets/sound/speech/player_one.wav");
+    soundPlayer->preCache(LMSoundID::AnnouncePlayerTwo, "assets/sound/speech/player_two.wav");
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
@@ -563,6 +565,11 @@ void LunarMoonerState::initSounds()
             break;
         case LMStateEvent::GameOver:
             player->playSound(LMSoundID::MissionTerminated, 960.f, 540.f);
+            break;
+        case LMStateEvent::SwitchedPlayer:
+            (msgData.value == 1)
+                ? player->playSound(LMSoundID::AnnouncePlayerTwo, 960.f, 540.f)
+                : player->playSound(LMSoundID::AnnouncePlayerOne, 960.f, 540.f);
             break;
         }
     };
@@ -687,7 +694,7 @@ void LunarMoonerState::initParticles()
 
 void LunarMoonerState::buildBackground()
 {
-    m_resources.shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
+    m_resources.shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
     m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
     
     m_resources.shaderResource.get(LMShaderID::NormalMapColoured).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));

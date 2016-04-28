@@ -69,7 +69,7 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
     //m_scene.drawDebug(true);
 
     m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
-    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
+    m_shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
 
     m_normalMapShader = &m_shaderResource.get(LMShaderID::NormalMapColoured);
     m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));

@@ -1075,8 +1075,15 @@ void GameController::swapPlayerState()
     if (lastPlayer != m_currentPlayer
         || m_playerStates[m_currentPlayer].startNewRound)
     {
+        if (lastPlayer != m_currentPlayer)
+        {
+            auto msg = sendMessage<LMStateEvent>(LMMessageId::StateEvent);
+            msg->type = LMStateEvent::SwitchedPlayer;
+            msg->value = m_currentPlayer;
+        }
+
         restorePlayerState();
-        m_playerStates[m_currentPlayer].startNewRound = false;
+        m_playerStates[m_currentPlayer].startNewRound = false;       
     }
 }
 

@@ -115,8 +115,10 @@ struct LMStateEvent
         RoundEnd,
         CountDownStarted,
         CountDownInProgress,
-        CountDownWarning
+        CountDownWarning,
+        SwitchedPlayer
     }type;
+    sf::Int32 value = -1;
 };
 
 struct LMAchievementEvent
@@ -172,7 +174,9 @@ enum LMSoundID
     HumanRescued,
     ShieldHit,
     EmpExplosion,
-    CollectibleDied
+    CollectibleDied,
+    AnnouncePlayerOne,
+    AnnouncePlayerTwo
 };
 
 #endif //COMMAND_IDS_HPP_

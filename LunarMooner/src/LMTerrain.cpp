@@ -34,6 +34,7 @@ source distribution.
 #include <xygine/Resource.hpp>
 #include <xygine/util/Json.hpp>
 #include <xygine/FileSystem.hpp>
+#include <xygine/util/Random.hpp>
 
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -88,7 +89,7 @@ void Terrain::init(const std::string& mapDir, xy::TextureResource& tr)
         return (xy::FileSystem::getFileExtension(str) != ".lmm");
     }), files.end());
 
-    std::random_shuffle(files.rbegin(), files.rend());
+    std::shuffle(files.rbegin(), files.rend(), xy::Util::Random::rndEngine);
 
     //load up to 10 of them (g++ requires explicit type)
     std::size_t max = std::min(std::size_t(10u), files.size());
