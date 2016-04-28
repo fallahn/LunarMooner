@@ -268,6 +268,9 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
 
             m_potentialXP += levelXP;
             m_potentialXP += static_cast<int>(msgData.posX); //XP for time remaining
+
+            //award any XP (hey at least we completed a level!)
+            awardXP();
             break;
         case LMGameEvent::MeteorExploded:
             if (msgData.value > 0) //shot by player
@@ -321,8 +324,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                 m_potentialXP = 0;
                 break;
             case LMStateEvent::GameOver:
-                awardXP(); //only award XP earned if game played to end
-                m_potentialXP = 0;
+                awardXP(); //because we won't get a level change event when we're all dead
                 break;                
             }
         }
@@ -405,4 +407,6 @@ void PlayerProfile::awardXP()
         auto msg = m_messageBus.post<LMRankEvent>(LMMessageId::RankEvent);
         msg->rank = rank;
     }
+    m_potentialXP = 0;
+    save();
 }

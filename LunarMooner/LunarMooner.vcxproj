@@ -127,6 +127,7 @@
     <ClInclude Include="include\BGRoidBelt.hpp" />
     <ClInclude Include="include\BGScoreboardMask.hpp" />
     <ClInclude Include="include\BGStarfield.hpp" />
+    <ClInclude Include="include\LMLevelMeter.hpp" />
     <ClInclude Include="include\LMVelocityShader.hpp" />
     <ClInclude Include="include\MenuWeaponSelect.hpp" />
     <ClInclude Include="include\OLAchievementTag.hpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="src\BGRoidBelt.cpp" />
     <ClCompile Include="src\BGScoreMask.cpp" />
     <ClCompile Include="src\BGStarField.cpp" />
+    <ClCompile Include="src\LMLevelMeter.cpp" />
     <ClCompile Include="src\MenuWeaponSelect.cpp" />
     <ClCompile Include="src\OLAchievementTag.cpp" />
     <ClCompile Include="src\LMLaserSight.cpp" />

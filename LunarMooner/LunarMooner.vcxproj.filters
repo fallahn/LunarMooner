@@ -99,9 +99,6 @@
     <ClInclude Include="include\LMRoundSummary.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
-    <ClInclude Include="include\LMSpeedMeter.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
     <ClInclude Include="include\LMState.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
@@ -186,6 +183,12 @@
     <ClInclude Include="include\LMVelocityShader.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMSpeedMeter.hpp">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LMLevelMeter.hpp">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -240,9 +243,6 @@
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="src\LMRoundSummary.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LMSpeedMeter.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="src\LMState.cpp">
@@ -309,6 +309,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\UIWeaponSelect.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMSpeedMeter.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMLevelMeter.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
   </ItemGroup>

@@ -43,12 +43,14 @@ namespace xy
     class FontResource;
 }
 
+struct ResourceCollection;
+
 namespace lm
 {
     class RoundSummary final : public xy::Component, public sf::Drawable
     {
     public:
-        RoundSummary(xy::MessageBus&, PlayerState&, xy::TextureResource&, xy::FontResource&, bool = true);
+        RoundSummary(xy::MessageBus&, PlayerState&, ResourceCollection&, bool);
         ~RoundSummary() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }

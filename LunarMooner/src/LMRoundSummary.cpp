@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMRoundSummary.hpp>
+#include <ResourceCollection.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
 
@@ -48,7 +49,7 @@ namespace
     const sf::Uint16 updateStep = 4;
 }
 
-RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResource& tr, xy::FontResource& fr, bool doScores)
+RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, ResourceCollection& rc, bool doScores)
     : xy::Component     (mb, this),
     m_entity            (nullptr),
     m_playerState       (ps),
@@ -64,7 +65,7 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResou
     m_mainText.setFillColor(sf::Color::Yellow);
     m_mainText.setOutlineColor(sf::Color::Red);
     m_mainText.setOutlineThickness(2.f);
-    m_mainText.setFont(fr.get("round_summary_55"));
+    m_mainText.setFont(rc.fontResource.get("round_summary_68"));
     
     if (!doScores)
     {
@@ -81,7 +82,7 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, xy::TextureResou
         m_okText.setFillColor(sf::Color::Yellow);
         m_okText.setOutlineThickness(2.f);
         m_okText.setOutlineColor(sf::Color::Red);
-        m_okText.setFont(fr.get("round_summary_72"));
+        m_okText.setFont(rc.fontResource.get("round_summary_85"));
         m_okText.setCharacterSize(80u);
         m_okText.setPosition(960.f, 660.f);
         m_okText.setString("OK!");
