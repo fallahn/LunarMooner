@@ -1031,7 +1031,7 @@ void GameController::createUI()
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //score / lives display etc
-    auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_resources.fontResource, m_playerStates);
+    auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_resources, m_playerStates);
     entity = xy::Entity::create(getMessageBus());
     m_scoreDisplay = entity->addComponent(scores);
 
@@ -1485,7 +1485,7 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
 
 void GameController::showRoundSummary(bool doScores)
 {
-    auto summary = xy::Component::create<RoundSummary>(getMessageBus(), m_playerStates[m_currentPlayer], m_resources.textureResource, m_resources.fontResource, doScores);
+    auto summary = xy::Component::create<RoundSummary>(getMessageBus(), m_playerStates[m_currentPlayer], m_resources, doScores);
     summary->setSoundBuffer(LMSoundID::RoundCountEnd, m_soundCache[LMSoundID::RoundCountEnd], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
     summary->setSoundBuffer(LMSoundID::RoundCountLoop, m_soundCache[LMSoundID::RoundCountLoop], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
     

@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMPlayerInfoDisplay.hpp>
+#include <ResourceCollection.hpp>
 
 #include <xygine/Resource.hpp>
 #include <xygine/util/Position.hpp>
@@ -63,14 +64,14 @@ namespace
     const float textSpeed = -200.f;
 }
 
-ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, xy::FontResource& fr, std::vector<PlayerState>& ps)
+ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, ResourceCollection& rc, std::vector<PlayerState>& ps)
     : xy::Component         (mb, this),
-    m_fontResource          (fr),
+    m_fontResource          (rc.fontResource),
     m_playerStates          (ps),
     m_showMessage           (false),
     m_messageDisplayTime    (0.f)
 {
-    auto& font = fr.get("player_info_display_73");
+    auto& font = rc.fontResource.get("player_info_display_73");
 
     m_messageText.setFont(font);
     m_messageText.setCharacterSize(80u);

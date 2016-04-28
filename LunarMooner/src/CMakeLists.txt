@@ -14,6 +14,7 @@ SET(LM_SRC
   ${LM_DIR}/LMGameController.cpp
   ${LM_DIR}/LMHumanController.cpp
   ${LM_DIR}/LMLaserSight.cpp
+  ${LM_DIR}/LMLevelMeter.cpp
   ${LM_DIR}/LMMothershipController.cpp
   ${LM_DIR}/LMNukeDrawable.cpp
   ${LM_DIR}/LMPlayerController.cpp

@@ -40,12 +40,14 @@ namespace xy
     class FontResource;
 }
 
+struct ResourceCollection;
+
 namespace lm
 {
     class ScoreDisplay final : public sf::Drawable, public xy::Component
     {
     public:
-        ScoreDisplay(xy::MessageBus&, xy::FontResource&, std::vector<PlayerState>&);
+        ScoreDisplay(xy::MessageBus&, ResourceCollection&, std::vector<PlayerState>&);
         ~ScoreDisplay() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }        
