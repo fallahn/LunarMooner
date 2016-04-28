@@ -25,8 +25,8 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_LEVEL_METER_HPP_
-#define LM_LEVEL_METER_HPP_
+#ifndef LM_CLOCK_DISPLAY_HPP_
+#define LM_CLOCK_DISPLAY_HPP_
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
@@ -34,35 +34,52 @@ source distribution.
 
 #include <array>
 
+namespace sf
+{
+    class Texture;
+}
+
 namespace lm
 {
-    class LevelMeter final : public sf::Drawable, public sf::Transformable
+    class ClockDisplay final : public sf::Drawable, public sf::Transformable
     {
     public:
-        explicit LevelMeter(const sf::Texture&);
-        ~LevelMeter() = default;
+        explicit ClockDisplay(const sf::Texture&);
+        ~ClockDisplay() = default;
 
-        LevelMeter(const LevelMeter&) = delete;
-        LevelMeter& operator = (const LevelMeter&) = delete;
+        ClockDisplay(const ClockDisplay&) = delete;
+        ClockDisplay& operator = (const ClockDisplay&) = delete;
 
-        void update(float);
-        void setLevel(sf::Uint8 level) { m_level = level - 1; }
+        void setTime(float); //time in seconds
 
     private:
-
-        struct Pointer : public sf::Transformable
+        enum Digit
         {
-            std::array<sf::Vertex, 4> vertices;
-        }m_pointer;
+            Zero,
+            One,
+            Two,
+            Three,
+            Four,
+            Five,
+            Size,
+            Seven,
+            Eight,
+            Nine,
+            Colon,
+            Space,
+            Count
+        };
+        struct Quad
+        {
+            std::array<sf::Vector2f, 4u> coords;
+        };
+        std::array<Quad, Digit::Count> m_digits;
 
         const sf::Texture& m_texture;
 
-        std::array<float, 10> m_positions;
-        sf::Uint8 m_level;
-
-        std::array<sf::Vertex, 12> m_vertices;
+        std::array<sf::Vertex, 16u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
 
-#endif //LM_LEVEL_METER_HPP_
+#endif //LM_CLOCK_DISPLAY_HPP_

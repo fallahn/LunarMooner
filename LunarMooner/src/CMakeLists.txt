@@ -8,6 +8,7 @@ SET(LM_SRC
   ${LM_DIR}/LMAlienController.cpp
   ${LM_DIR}/LMAsteroidController.cpp
   ${LM_DIR}/LMBulletController.cpp
+  ${LM_DIR}/LMClockDisplay.cpp
   ${LM_DIR}/LMCollisionComponent.cpp
   ${LM_DIR}/LMCollisionWorld.cpp
   ${LM_DIR}/LMEarlyWarning.cpp

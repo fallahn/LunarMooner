@@ -25,44 +25,41 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_LEVEL_METER_HPP_
-#define LM_LEVEL_METER_HPP_
+#include <LMClockDisplay.hpp>
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Transformable.hpp>
-#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
-#include <array>
+using namespace lm;
 
-namespace lm
+namespace
 {
-    class LevelMeter final : public sf::Drawable, public sf::Transformable
-    {
-    public:
-        explicit LevelMeter(const sf::Texture&);
-        ~LevelMeter() = default;
-
-        LevelMeter(const LevelMeter&) = delete;
-        LevelMeter& operator = (const LevelMeter&) = delete;
-
-        void update(float);
-        void setLevel(sf::Uint8 level) { m_level = level - 1; }
-
-    private:
-
-        struct Pointer : public sf::Transformable
-        {
-            std::array<sf::Vertex, 4> vertices;
-        }m_pointer;
-
-        const sf::Texture& m_texture;
-
-        std::array<float, 10> m_positions;
-        sf::Uint8 m_level;
-
-        std::array<sf::Vertex, 12> m_vertices;
-        void draw(sf::RenderTarget&, sf::RenderStates) const override;
-    };
+    const int rows = 3;
+    const int cols = 4;
 }
 
-#endif //LM_LEVEL_METER_HPP_
+ClockDisplay::ClockDisplay(const sf::Texture& t)
+    : m_texture(t)
+{
+    //map our texture coords
+    sf::Vector2f size(t.getSize());
+    size.x /= cols;
+    size.y /= rows;
+
+
+}
+
+//public 
+void ClockDisplay::setTime(float time)
+{
+
+}
+
+//private
+void ClockDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
+{
+    states.transform *= getTransform();
+    states.texture = &m_texture;
+    rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
+}
