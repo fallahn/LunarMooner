@@ -32,20 +32,20 @@ source distribution.
 
 namespace lm
 {
-    const std::string velocityFrag =
+    static const std::string velocityFrag =
         "#version 120\n"
 
         "uniform sampler2D u_normalMap;\n"
         "uniform sampler2D u_diffuseMap;\n"
         "uniform vec2 u_offset = vec2(0.0);\n"
 
-        "const float distortion = 0.45;\n"
+        "const float distortion = 0.65;\n"
 
         "void main()\n"
-        "{\n"
-        "    vec2 coords = (texture2D(u_normalMap, gl_TexCoord[0].xy).rg * 2.0 - 1.0) * distortion;\n"
-        "    gl_FragColor = texture2D(u_diffuseMap, gl_TexCoord[0].xy + coords + u_offset);\n"
+        "{"
+        "    vec2 coords = (texture2D(u_normalMap, gl_TexCoord[0].xy).rg * 2.0 - 1.0) + u_offset;\n"
+        "    gl_FragColor = texture2D(u_diffuseMap, gl_TexCoord[0].xy + coords * distortion);\n"
         "}";
 }
 
-#endif //LM_VEOLOCITY_SHADER_HPP_
+#endif //LM_VELOCITY_SHADER_HPP_
