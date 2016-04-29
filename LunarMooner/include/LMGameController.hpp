@@ -56,6 +56,7 @@ namespace lm
     class PlayerController;
     class CollisionWorld;
     class SpeedMeter;
+    class CooldownMeter;
     class ScoreDisplay;
     class Terrain;
     class SpriteBatch;
@@ -73,10 +74,11 @@ namespace lm
         void addPlayer(sf::Uint8, SpecialWeapon);
         void start();
 
-        void setDifficulty(xy::Difficulty d) { m_difficulty = d; }
+        void setDifficulty(xy::Difficulty);
 
     private:
         xy::Difficulty m_difficulty;
+        float m_cooldownTime;
 
         xy::Scene& m_scene;
         CollisionWorld& m_collisionWorld;
@@ -128,7 +130,13 @@ namespace lm
         void spawnBullet(const sf::Vector2f&, LMDirection = LMDirection::Up);
         void fireSpecial();
 
-        std::array<SpeedMeter*, 2u> m_speedMeters;
+        struct UIComponents final
+        {
+            SpeedMeter* speedMeter = nullptr;
+            CooldownMeter* cooldownMeter = nullptr;
+        };
+
+        std::array<UIComponents, 2u> m_uiComponents;
         ScoreDisplay* m_scoreDisplay;
         void createUI();
 

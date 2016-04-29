@@ -192,6 +192,9 @@
     <ClInclude Include="include\LMClockDisplay.hpp">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMCoolDownMeter.hpp">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -321,6 +324,9 @@
       <Filter>Source Files\ui</Filter>
     </ClCompile>
     <ClCompile Include="src\LMClockDisplay.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMCoolDownMeter.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
   </ItemGroup>
