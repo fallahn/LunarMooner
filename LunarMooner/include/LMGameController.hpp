@@ -128,7 +128,7 @@ namespace lm
         void spawnBullet(const sf::Vector2f&, LMDirection = LMDirection::Up);
         void fireSpecial();
 
-        SpeedMeter* m_speedMeter;
+        std::array<SpeedMeter*, 2u> m_speedMeters;
         ScoreDisplay* m_scoreDisplay;
         void createUI();
 

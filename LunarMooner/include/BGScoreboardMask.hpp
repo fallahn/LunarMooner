@@ -35,18 +35,24 @@ source distribution.
 
 #include <array>
 
+namespace sf
+{
+    class Texture;
+}
+
 namespace lm
 {
     class ScoreMask final : public xy::Component, public sf::Drawable
     {
     public:
-        ScoreMask(xy::MessageBus&, const sf::FloatRect&);
+        ScoreMask(xy::MessageBus&, const sf::FloatRect&, const sf::Texture&);
         ~ScoreMask() = default;
 
         xy::Component::Type type()const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override {}
 
     private:
+        const sf::Texture& m_texture;
         std::array<sf::Vertex, 8u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

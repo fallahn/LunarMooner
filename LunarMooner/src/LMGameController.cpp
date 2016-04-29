@@ -142,7 +142,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_mothership        (nullptr),
     m_terrain           (nullptr),
     m_alienBatch        (nullptr),
-    m_speedMeter        (nullptr),
+    m_speedMeters       ({ nullptr, nullptr }),
     m_scoreDisplay      (nullptr),
     m_currentPlayer     (0),
     m_flushRoidEvents   (false),
@@ -402,7 +402,7 @@ void GameController::entityUpdate(xy::Entity&, float dt)
     //update UI
     if (m_player)
     {
-        m_speedMeter->setVelocity(m_player->getVelocity());
+        m_speedMeters[m_currentPlayer]->setVelocity(m_player->getVelocity());
     }
 
     //count down round time - TODO we can neaten this up a bit
@@ -1022,14 +1022,14 @@ void GameController::createUI()
     //velocity meter
     auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     auto entity = xy::Entity::create(getMessageBus());
-    m_speedMeter = entity->addComponent(speedMeter);
-    entity->setPosition(40.f, 600.f);
+    m_speedMeters[0] = entity->addComponent(speedMeter);
+    entity->setPosition(40.f, 810.f);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
     //TODO hook this up for player two
     speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     entity = xy::Entity::create(getMessageBus());
-    entity->addComponent(speedMeter);
-    entity->setPosition(alienArea.left + alienArea.width + 40.f, 600.f);
+    m_speedMeters[1] = entity->addComponent(speedMeter);
+    entity->setPosition(alienArea.left + alienArea.width + 40.f, 810.f);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //score / lives display etc

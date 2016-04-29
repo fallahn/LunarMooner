@@ -358,7 +358,7 @@ void LunarMoonerState::draw()
     rw.draw(m_overlay);
 
     rw.setView(getContext().defaultView);
-    rw.draw(m_reportText);
+    //rw.draw(m_reportText);
 }
 
 //private
@@ -705,7 +705,7 @@ void LunarMoonerState::buildBackground()
     m_resources.shaderResource.get(LMShaderID::NormalMapColoured).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
 
     //nuke effect
-    auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, 1080.f));
+    auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, xy::DefaultSceneSize.y));
     auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
     
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
@@ -878,10 +878,10 @@ void LunarMoonerState::buildBackground()
     //background
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
     background->setVelocity({ 0.f, 1.f });
-    auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea);
+    auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea, m_resources.textureResource.get("assets/images/game/console/panel.png"));
 
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
-    m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(scoreMask);
+    m_scene.getLayer(xy::Scene::Layer::UI).addComponent(scoreMask);
 
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
     moon->setBaseNormal(m_resources.textureResource.get("assets/images/background/sphere_normal.png"));
