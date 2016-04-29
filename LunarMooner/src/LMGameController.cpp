@@ -34,6 +34,7 @@ source distribution.
 #include <LMBulletController.hpp>
 #include <LMAsteroidController.hpp>
 #include <LMSpeedMeter.hpp>
+#include <LMCoolDownMeter.hpp>
 #include <LMPlayerInfoDisplay.hpp>
 #include <LMRoundSummary.hpp>
 #include <LMTerrain.hpp>
@@ -131,6 +132,7 @@ namespace
 GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as, ResourceCollection& rc)
     : xy::Component     (mb, this),
     m_difficulty        (xy::Difficulty::Easy),
+    m_cooldownTime      (easyCoolDown),
     m_scene             (scene),
     m_collisionWorld    (cw),
     m_audioSettings     (as),
@@ -142,7 +144,6 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_mothership        (nullptr),
     m_terrain           (nullptr),
     m_alienBatch        (nullptr),
-    m_speedMeters       ({ nullptr, nullptr }),
     m_scoreDisplay      (nullptr),
     m_currentPlayer     (0),
     m_flushRoidEvents   (false),
@@ -319,12 +320,15 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 default: break;
                 case xy::Difficulty::Easy:
                     controller->setSpeed(easySpeed);
+                    m_cooldownTime = easyCoolDown;
                     break;
                 case xy::Difficulty::Medium:
                     controller->setSpeed(mediumSpeed);
+                    m_cooldownTime = mediumCoolDown;
                     break;
                 case xy::Difficulty::Hard:
                     controller->setSpeed(hardSpeed);
+                    m_cooldownTime = hardCoolDown;
                     break;
                 }
             }
@@ -402,7 +406,14 @@ void GameController::entityUpdate(xy::Entity&, float dt)
     //update UI
     if (m_player)
     {
-        m_speedMeters[m_currentPlayer]->setVelocity(m_player->getVelocity());
+        m_uiComponents[m_currentPlayer].speedMeter->setVelocity(m_player->getVelocity());        
+    }
+
+    if (m_playerStates[m_currentPlayer].special != SpecialWeapon::None)
+    {
+        //update special weapon cool down time
+        m_playerStates[m_currentPlayer].cooldownTime += dt;
+        m_uiComponents[m_currentPlayer].cooldownMeter->setValue(std::min(1.f, m_playerStates[m_currentPlayer].cooldownTime / m_cooldownTime));
     }
 
     //count down round time - TODO we can neaten this up a bit
@@ -448,9 +459,6 @@ void GameController::entityUpdate(xy::Entity&, float dt)
         msg->type = LMGameEvent::ExtraLife;
     }
     m_playerStates[m_currentPlayer].previousScore = m_playerStates[m_currentPlayer].score;
-
-    //update special weapon cool down time
-    m_playerStates[m_currentPlayer].cooldownTime += dt;
 }
 
 void GameController::setInput(sf::Uint8 input)
@@ -540,6 +548,24 @@ void GameController::start()
 
     auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
     msg->type = LMStateEvent::RoundBegin;
+}
+
+void GameController::setDifficulty(xy::Difficulty difficulty)
+{
+    m_difficulty = difficulty;
+    switch (m_difficulty)
+    {
+    default: break;
+    case xy::Difficulty::Easy:
+        m_cooldownTime = easyCoolDown;
+        break;
+    case xy::Difficulty::Medium:
+        m_cooldownTime = mediumCoolDown;
+        break;
+    case xy::Difficulty::Hard:
+        m_cooldownTime = hardCoolDown;
+        break;
+    }
 }
 
 //private
@@ -958,23 +984,8 @@ void GameController::spawnBullet(const sf::Vector2f& position, LMDirection direc
 }
 
 void GameController::fireSpecial()
-{
-    float coolDown = 0.f;
-    //TODO better to set this when difficulty is changed
-    if (m_difficulty == xy::Difficulty::Easy)
-    {
-        coolDown = easyCoolDown;
-    }
-    else if (m_difficulty == xy::Difficulty::Medium)
-    {
-        coolDown = mediumCoolDown;
-    }
-    else
-    {
-        coolDown = hardCoolDown;
-    }
-    
-    if (m_playerStates[m_currentPlayer].cooldownTime > coolDown)
+{    
+    if (m_playerStates[m_currentPlayer].cooldownTime > m_cooldownTime)
     {
         auto position = m_player->getPosition();
         switch (m_playerStates[m_currentPlayer].special)
@@ -1022,14 +1033,27 @@ void GameController::createUI()
     //velocity meter
     auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     auto entity = xy::Entity::create(getMessageBus());
-    m_speedMeters[0] = entity->addComponent(speedMeter);
+    m_uiComponents[0].speedMeter = entity->addComponent(speedMeter);
     entity->setPosition(40.f, 810.f);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
-    //TODO hook this up for player two
+    //for player two
     speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     entity = xy::Entity::create(getMessageBus());
-    m_speedMeters[1] = entity->addComponent(speedMeter);
+    m_uiComponents[1].speedMeter = entity->addComponent(speedMeter);
     entity->setPosition(alienArea.left + alienArea.width + 40.f, 810.f);
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
+
+    //cooldown meter
+    auto cooldownMeter = xy::Component::create<CooldownMeter>(getMessageBus(), m_resources.textureResource.get("assets/images/game/console/weapon_charge.png"));
+    entity = xy::Entity::create(getMessageBus());
+    m_uiComponents[0].cooldownMeter = entity->addComponent(cooldownMeter);
+    entity->setPosition(40.f, 340.f);
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
+
+    cooldownMeter = xy::Component::create<CooldownMeter>(getMessageBus(), m_resources.textureResource.get("assets/images/game/console/weapon_charge.png"));
+    entity = xy::Entity::create(getMessageBus());
+    m_uiComponents[1].cooldownMeter = entity->addComponent(cooldownMeter);
+    entity->setPosition(alienArea.left + alienArea.width + 40.f, 340.f);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //score / lives display etc
