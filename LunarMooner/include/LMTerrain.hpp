@@ -29,6 +29,7 @@ source distribution.
 #define LM_TERRAIN_HPP_
 
 #include <xygine/components/Component.hpp>
+#include <xygine/ShaderProperty.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -45,7 +46,7 @@ namespace xy
 
 namespace lm
 {
-    class Terrain final : public sf::Drawable, public xy::Component
+    class Terrain final : public sf::Drawable, public xy::Component, public xy::ShaderProperty
     {
     public:
         struct Platform final
@@ -96,6 +97,7 @@ namespace lm
 
         std::array<sf::Vertex, 4u> m_vertices;
         std::vector<sf::Texture> m_textures;
+        sf::Texture m_normalMap;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
 
         bool load(const std::string&, xy::TextureResource&);

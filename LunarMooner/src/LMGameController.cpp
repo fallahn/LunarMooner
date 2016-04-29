@@ -815,7 +815,7 @@ void GameController::createTerrain()
 {
     static const std::array<sf::FloatRect, 2u> sizes = 
     {
-        sf::FloatRect(0.f, 0.f, 40.f, 1080.f),
+        sf::FloatRect(0.f, 0.f, 40.f, xy::DefaultSceneSize.y),
         sf::FloatRect(0.f, 0.f, alienArea.width, 40.f)
     };
 
@@ -849,7 +849,7 @@ void GameController::createTerrain()
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
     entity->addComponent(qtc);
-    entity->setPosition(alienArea.left, 1080.f);
+    entity->setPosition(alienArea.left, xy::DefaultSceneSize.y);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
     //flame effects - we know these work so lets make part of the map file
@@ -868,6 +868,7 @@ void GameController::createTerrain()
     //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus());
     terrain->init("assets/maps", m_resources.textureResource);
+    terrain->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
 
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(alienArea.left, xy::DefaultSceneSize.y - 320.f); //TODO fix these numbers
@@ -1030,30 +1031,35 @@ void GameController::fireSpecial()
 
 void GameController::createUI()
 {
+    static const float padding = 40.f;
+    static const float speedHeight = 810.f;
+    static const float cooldownHeight = 340.f;
+    static const sf::Vector2f maxVelocity(200.f, 200.f);
+
     //velocity meter
-    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
+    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), maxVelocity, m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     auto entity = xy::Entity::create(getMessageBus());
     m_uiComponents[0].speedMeter = entity->addComponent(speedMeter);
-    entity->setPosition(40.f, 810.f);
+    entity->setPosition(padding, speedHeight);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
     //for player two
-    speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), sf::Vector2f(200.f, 200.f), m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
+    speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), maxVelocity, m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
     entity = xy::Entity::create(getMessageBus());
     m_uiComponents[1].speedMeter = entity->addComponent(speedMeter);
-    entity->setPosition(alienArea.left + alienArea.width + 40.f, 810.f);
+    entity->setPosition(alienArea.left + alienArea.width + padding, speedHeight);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //cooldown meter
     auto cooldownMeter = xy::Component::create<CooldownMeter>(getMessageBus(), m_resources.textureResource.get("assets/images/game/console/weapon_charge.png"));
     entity = xy::Entity::create(getMessageBus());
     m_uiComponents[0].cooldownMeter = entity->addComponent(cooldownMeter);
-    entity->setPosition(40.f, 340.f);
+    entity->setPosition(padding, cooldownHeight);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     cooldownMeter = xy::Component::create<CooldownMeter>(getMessageBus(), m_resources.textureResource.get("assets/images/game/console/weapon_charge.png"));
     entity = xy::Entity::create(getMessageBus());
     m_uiComponents[1].cooldownMeter = entity->addComponent(cooldownMeter);
-    entity->setPosition(alienArea.left + alienArea.width + 40.f, 340.f);
+    entity->setPosition(alienArea.left + alienArea.width + padding, cooldownHeight);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
     //score / lives display etc
@@ -1533,8 +1539,8 @@ void GameController::spawnDeadGuy(float x, float y)
     {
         auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_dead.png"));
         drawable->setNormalMap(m_resources.textureResource.get("assets/images/game/doofer_dead_normal.png"));
-        drawable->setShader(m_resources.shaderResource.get(LMShaderID::NormalMapColoured));
-        //TODO cahe all animation data
+        drawable->setShader(m_resources.shaderResource.get(LMShaderID::NormalMapPlanet));
+        //TODO cache all animation data
         drawable->loadAnimationData("assets/images/game/doofer_dead.xya");
         drawable->playAnimation(0);
         auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);

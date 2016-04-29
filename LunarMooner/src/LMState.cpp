@@ -117,6 +117,13 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
         weapon = profile.getSpecialWeapon();
     }
 
+    //precache ALL shaders first
+    m_resources.shaderResource.preload(LMShaderID::NormalMapGame, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
+    //m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_ambientColour", sf::Glsl::Vec3(0.1f, 0.1f, 0.07f));
+    m_resources.shaderResource.preload(LMShaderID::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
+    m_resources.shaderResource.get(LMShaderID::NormalMapPlanet).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+    m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    
+
     initGameController(playerCount, level, weapon);
     initSounds();
     initParticles();
@@ -315,7 +322,8 @@ bool LunarMoonerState::update(float dt)
     }
     
     //update lights
-    auto& normalMapShader = m_resources.shaderResource.get(LMShaderID::NormalMapColoured);
+    auto& normalMapPlanetShader = m_resources.shaderResource.get(LMShaderID::NormalMapPlanet);
+    auto& normalMapGameShader = m_resources.shaderResource.get(LMShaderID::NormalMapGame);
     auto lights = m_scene.getVisibleLights(m_scene.getVisibleArea());
     auto i = 0u;
     for (; i < lights.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
@@ -324,20 +332,28 @@ bool LunarMoonerState::update(float dt)
         //if (light)
         {
             const std::string idx = std::to_string(i);
-
             auto pos = light->getWorldPosition();
-            normalMapShader.setUniform("u_pointLightPositions[" + std::to_string(i) + "]", pos);
-            normalMapShader.setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
-            normalMapShader.setUniform("u_pointLights[" + idx + "].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
+
+            normalMapPlanetShader.setUniform("u_pointLightPositions[" + idx + "]", pos);
+            normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
+            normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
             //normalMapShader.setUniform("u_pointLights[" + idx + "].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
-            normalMapShader.setUniform("u_pointLights[" + idx + "].inverseRange", light->getInverseRange());
+            normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].inverseRange", light->getInverseRange());
+
+            normalMapGameShader.setUniform("u_pointLightPositions[" + idx + "]", pos);
+            normalMapGameShader.setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
+            normalMapGameShader.setUniform("u_pointLights[" + idx + "].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
+            //normalMapShader.setUniform("u_pointLights[" + idx + "].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
+            normalMapGameShader.setUniform("u_pointLights[" + idx + "].inverseRange", light->getInverseRange());
         }
     }
 
     //switch off inactive lights
     for (; i < xy::Shader::NormalMapped::MaxPointLights; ++i)
     {
-        normalMapShader.setUniform("u_pointLights[" + std::to_string(i) + "].intensity", 0.f);
+        const auto idx = std::to_string(i);
+        normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].intensity", 0.f);
+        normalMapGameShader.setUniform("u_pointLights[" + idx + "].intensity", 0.f);
     }
     REPORT("Light Count", std::to_string(lights.size()));
 
@@ -698,12 +714,7 @@ void LunarMoonerState::initParticles()
 }
 
 void LunarMoonerState::buildBackground()
-{
-    m_resources.shaderResource.preload(LMShaderID::NormalMapColoured, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
-    m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
-    
-    m_resources.shaderResource.get(LMShaderID::NormalMapColoured).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
-
+{    
     //nuke effect
     auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, xy::DefaultSceneSize.y));
     auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
@@ -889,7 +900,7 @@ void LunarMoonerState::buildBackground()
     moon->setDiffuseTexture(m_resources.textureResource.get("assets/images/background/moon_diffuse_02.png"));
     moon->setMaskTexture(m_resources.textureResource.get("assets/images/background/moon_mask.png"));
     moon->setPrepassShader(m_resources.shaderResource.get(LMShaderID::Prepass));
-    moon->setNormalShader(m_resources.shaderResource.get(LMShaderID::NormalMapColoured));
+    moon->setNormalShader(m_resources.shaderResource.get(LMShaderID::NormalMapPlanet));
     moon->setRotationVelocity({ 0.f, 0.009f });
 
     entity = xy::Entity::create(m_messageBus);

@@ -97,6 +97,9 @@ void Terrain::init(const std::string& mapDir, xy::TextureResource& tr)
     {
         load(mapDir + "/" + files[i], tr);
     }
+
+    //temp normal map
+    m_normalMap = tr.get("buns"); //resource returns flat normal map if texture not found ;)
 }
 
 const std::vector<sf::Vector2f>& Terrain::getChain() const
@@ -160,6 +163,16 @@ void Terrain::updateWater()
 void Terrain::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.texture = &m_textures[m_level];
+    
+    auto shader = const_cast<sf::Shader*>(getActiveShader()); //this may be a design flaw
+    if (shader)
+    {
+        states.shader = shader;
+        shader->setUniform("u_diffuseMap", *states.texture);
+        shader->setUniform("u_normalMap", m_normalMap);
+        //auto worldView = Scene::getViewMatrix() * states.transform;
+        shader->setUniform("u_inverseWorldViewMatrix", sf::Glsl::Mat4(states.transform.getInverse()));
+    }
     rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 }
 
