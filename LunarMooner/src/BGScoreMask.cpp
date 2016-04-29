@@ -29,6 +29,7 @@ source distribution.
 
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 using namespace lm;
 
@@ -37,10 +38,10 @@ namespace
     const sf::Color borderColour(0u, 20u, 50u, 190u);
 }
 
-ScoreMask::ScoreMask(xy::MessageBus& mb, const sf::FloatRect& area)
-    : xy::Component(mb, this)
+ScoreMask::ScoreMask(xy::MessageBus& mb, const sf::FloatRect& area, const sf::Texture& t)
+    : xy::Component (mb, this),
+    m_texture       (t)
 {
-    //ugh magic numbers for screen size again
     m_vertices = 
     {
         sf::Vector2f(),
@@ -54,14 +55,20 @@ ScoreMask::ScoreMask(xy::MessageBus& mb, const sf::FloatRect& area)
         sf::Vector2f(area.left + area.width, xy::DefaultSceneSize.y)
     };
 
-    m_vertices[0].color = sf::Color::Transparent;
-    m_vertices[1].color = borderColour;
-    m_vertices[2].color = borderColour;
-    m_vertices[3].color = sf::Color::Transparent;
-    m_vertices[4].color = borderColour;
-    m_vertices[5].color = sf::Color::Transparent;
-    m_vertices[6].color = sf::Color::Transparent;
-    m_vertices[7].color = borderColour;
+    for (auto i = 0u; i < 4; ++i)
+    {
+        m_vertices[i].texCoords = m_vertices[i].position;
+        m_vertices[i + 4].texCoords = m_vertices[i].position;
+    }
+
+    //m_vertices[0].color = sf::Color::Transparent;
+    //m_vertices[1].color = borderColour;
+    //m_vertices[2].color = borderColour;
+    //m_vertices[3].color = sf::Color::Transparent;
+    //m_vertices[4].color = borderColour;
+    //m_vertices[5].color = sf::Color::Transparent;
+    //m_vertices[6].color = sf::Color::Transparent;
+    //m_vertices[7].color = borderColour;
 }
 
 //public
@@ -69,5 +76,6 @@ ScoreMask::ScoreMask(xy::MessageBus& mb, const sf::FloatRect& area)
 //private
 void ScoreMask::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
+    states.texture = &m_texture;
     rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 }
