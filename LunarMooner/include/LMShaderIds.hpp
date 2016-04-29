@@ -35,7 +35,8 @@ source distribution.
 enum LMShaderID
 {
     Prepass = xy::Shader::Count,
-    NormalMapColoured,
+    NormalMapPlanet,
+    NormalMapGame,
     WaterEffect,
     VelocityMeter
 };
