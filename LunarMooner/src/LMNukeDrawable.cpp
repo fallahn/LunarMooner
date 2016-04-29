@@ -41,7 +41,7 @@ namespace
     const float maxX = 12.f;
     const float maxY = 10.f;
     const std::size_t offsetCount = 30u;
-    const sf::Vector2f basePosition(960.f, 540.f);
+    const sf::Vector2f basePosition(xy::DefaultSceneSize / 2.f);
 
     const float maxAlpha = 0.96f;
     const float maxTime = 10.f;

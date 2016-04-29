@@ -64,7 +64,7 @@ void Overlay::handleMessage(const xy::Message& msg)
 
         auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_resources.fontResource, msgData.ID);
         auto ent = xy::Entity::create(m_messageBus);
-        ent->setPosition(1920.f - padding, 1080.f); //really, screen size should be a config variable somewhere
+        ent->setPosition(xy::DefaultSceneSize.x - padding, xy::DefaultSceneSize.y);
         ent->addComponent(tag);
 
         //check for existing notifications and stack them

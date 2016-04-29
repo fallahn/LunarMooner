@@ -91,10 +91,12 @@ void MenuHighScoreState::handleMessage(const xy::Message& msg)
 //private
 void MenuHighScoreState::buildMenu(const sf::Font& font)
 {
+    const float centreX = xy::DefaultSceneSize.x / 2.f;
+
     const auto& scores = getContext().appInstance.getScores();
     auto list = xy::UI::create<xy::UI::ScoreList>(font);
     list->setAlignment(xy::UI::Alignment::Centre);
-    list->setPosition(960.f, 590.f);
+    list->setPosition(centreX, 590.f);
     list->setList(scores);
     list->setIndex(getContext().appInstance.getLastScoreIndex());
     m_uiContainer.addControl(list);
@@ -121,7 +123,7 @@ void MenuHighScoreState::buildMenu(const sf::Font& font)
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("OK");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 875.f);
+    button->setPosition(centreX, 875.f);
     button->addCallback([this]()
     {
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);

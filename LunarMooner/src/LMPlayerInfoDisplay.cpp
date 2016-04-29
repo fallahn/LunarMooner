@@ -43,7 +43,7 @@ namespace
 {
     const sf::Vector2f messageSpeed(-1800.f, 0.f);
     const float messageDisplayTime = 2.f;
-    const sf::Vector2f messagePosition(960.f, 540.f);
+    const sf::Vector2f messagePosition(xy::DefaultSceneSize / 2.f);
 
     const std::array<sf::Vector2f, 4u> textPositions = 
     {
@@ -86,8 +86,9 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, ResourceCollection& rc, std::vect
         m_playerTexts.back().setPosition(textPositions[i]);
     }
 
-    m_bounds.width = 1920.f;
-    m_bounds.height = 1080.f;
+    m_bounds.width = xy::DefaultSceneSize.x;
+    m_bounds.height = xy::DefaultSceneSize.y;
+
 }
 
 //public
@@ -138,6 +139,7 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
     {
         return (st.text.getFillColor().a == 0);
     }), m_scoreTags.end());
+
 }
 
 void ScoreDisplay::setPlayerActive(std::size_t idx)

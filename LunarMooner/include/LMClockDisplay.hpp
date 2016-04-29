@@ -77,7 +77,7 @@ namespace lm
 
         const sf::Texture& m_texture;
 
-        std::array<sf::Vertex, 16u> m_vertices;
+        std::array<sf::Vertex, 20u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }

@@ -31,6 +31,8 @@ source distribution.
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
+#include <functional>
+
 using namespace lm;
 
 namespace
@@ -47,13 +49,74 @@ ClockDisplay::ClockDisplay(const sf::Texture& t)
     size.x /= cols;
     size.y /= rows;
 
+    auto i = 0;
+    for (auto y = 0; y < rows; ++y)
+    {
+        for (auto x = 0; x < cols; ++x, ++i)
+        {
+            const sf::Vector2f offset(x * size.x, y * size.y);
+            m_digits[i].coords[0] = offset;
+            m_digits[i].coords[1] = { offset.x + size.x, y * size.y };
+            m_digits[i].coords[2] = offset + size;
+            m_digits[i].coords[3] = { offset.x, offset.y + size.y };
+        }
+    }
 
+    //set clock quad positions
+    for (auto i = 0; i < 5; ++i)
+    {
+        const sf::Vector2f offset(i * size.x, 0);
+        std::size_t idx = i * 4;
+
+        m_vertices[idx++].position = offset;
+        m_vertices[idx++].position = { offset.x + size.x, offset.y };
+        m_vertices[idx++].position = { offset.x + size.x, size.y };
+        m_vertices[idx].position = { offset.x, size.y };
+    }
+
+    //middle quad is always colon
+    std::size_t idx = 8;
+    m_vertices[idx++].texCoords = m_digits[Digit::Colon].coords[0];
+    m_vertices[idx++].texCoords = m_digits[Digit::Colon].coords[1];
+    m_vertices[idx++].texCoords = m_digits[Digit::Colon].coords[2];
+    m_vertices[idx].texCoords = m_digits[Digit::Colon].coords[3];
 }
 
 //public 
 void ClockDisplay::setTime(float time)
 {
+    std::function<void(Digit, std::uint32_t)> setDigit = [this](Digit d, std::uint32_t idx)
+    {
+        idx *= 4;
+        m_vertices[idx++].texCoords = m_digits[d].coords[0];
+        m_vertices[idx++].texCoords = m_digits[d].coords[1];
+        m_vertices[idx++].texCoords = m_digits[d].coords[2];
+        m_vertices[idx].texCoords = m_digits[d].coords[3];
+    };
+    
+    //minutes
+    std::uint32_t minutes = static_cast<std::uint32_t>(time / 60.f);
+    if (minutes > 9)
+    {
+        setDigit(static_cast<Digit>(minutes / 10), 0);
+    }
+    else
+    {
+        setDigit(Digit::Space, 0);
+    }
+    setDigit(static_cast<Digit>(minutes % 10), 1);
 
+    //second
+    std::uint32_t seconds = static_cast<std::uint32_t>(std::fmod(time, 60.f));
+    if (seconds > 9)
+    {
+        setDigit(static_cast<Digit>(seconds / 10), 3);
+    }
+    else
+    {
+        setDigit(Digit::Zero, 3);
+    }
+    setDigit(static_cast<Digit>(seconds % 10), 4);
 }
 
 //private

@@ -84,6 +84,8 @@ namespace
 
     const float meteorThreshold = 540.f; //player must be below this to spawn meteor
 
+    const sf::Vector2f shieldPosition(xy::DefaultSceneSize.x / 2.f, 3700.f);
+
     //humans to rescue per level
     std::array<sf::Uint8, 10u> humanCounts = 
     {
@@ -692,7 +694,7 @@ void GameController::createMothership()
     entity->addComponent(controller);
     entity->addComponent(collision);
     entity->addComponent(qtc);
-    entity->setPosition(960.f - (bounds.width / 2.f), mothershipStart.y);
+    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (bounds.width / 2.f), mothershipStart.y);
     entity->addCommandCategories(LMCommandID::Mothership);
 
     m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
@@ -842,7 +844,7 @@ void GameController::createTerrain()
     terrain->init("assets/maps", m_resources.textureResource);
 
     entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(alienArea.left, 1080.f - 320.f); //TODO fix these numbers
+    entity->setPosition(alienArea.left, xy::DefaultSceneSize.y - 320.f); //TODO fix these numbers
     m_terrain = entity->addComponent(terrain);
 
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
@@ -854,7 +856,7 @@ void GameController::createTerrain()
     shieldDrawable->setTexture(m_resources.textureResource.get("assets/images/game/shield_noise.png"));
     
     entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(960.f, 3700.f);//3700.f
+    entity->setPosition(shieldPosition);//3700.f
     //entity->setScale(0.1f, 0.1f);
     entity->rotate(-180.f);
     entity->addComponent(shieldDrawable);
@@ -1295,18 +1297,12 @@ void GameController::addDelayedRespawn()
 
 void GameController::spawnEarlyWarning(const sf::Vector2f& dest)
 {
-    auto laser = xy::Component::create<LaserSight>(getMessageBus(), (dest.x < 960.f) ? 45.f : 135.f);
+    auto laser = xy::Component::create<LaserSight>(getMessageBus(), (dest.x < (xy::DefaultSceneSize.x / 2.f)) ? 45.f : 135.f);
     auto laserEnt = xy::Entity::create(getMessageBus());
     laserEnt->addComponent(laser);
     laserEnt->setWorldPosition(dest);
     m_scene.addEntity(laserEnt, xy::Scene::Layer::BackFront);
     
-    /*auto ew = xy::Component::create<EarlyWarning>(getMessageBus(), dest);
-    auto ent = xy::Entity::create(getMessageBus());
-    ent->addComponent(ew);
-    ent->setPosition(960.f, 0.f);
-    m_scene.addEntity(ent, xy::Scene::Layer::UI);*/
-
     auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
     msg->type = LMGameEvent::EarlyWarning;
 }
@@ -1321,7 +1317,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     drawable->getDrawable().setOrigin({ size.width / 2.f, size.height / 2.f });
     drawable->getDrawable().setTexture(&m_resources.textureResource.get("assets/images/game/meteor.png"));
 
-    const float dir = (position.x < 960.f) ? 1.f : -1.f;
+    const float dir = (position.x < (xy::DefaultSceneSize.x / 2.f)) ? 1.f : -1.f;
     auto controller = xy::Component::create<AsteroidController>(getMessageBus(), alienArea, sf::Vector2f(dir, 1.f));
 
     auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);

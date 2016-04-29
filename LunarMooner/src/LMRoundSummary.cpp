@@ -187,14 +187,14 @@ void RoundSummary::setSoundBuffer(sf::Int32 id, sf::SoundBuffer& buffer, float v
     {
         m_countEnd.setBuffer(buffer);
         m_countEnd.setVolume(volume);
-        m_countEnd.setPosition(960.f, 540.f, 0.f);
+        m_countEnd.setPosition(xy::DefaultSceneSize.x / 2.f, xy::DefaultSceneSize.y / 2.f, 0.f);
         m_countEnd.setAttenuation(0.f);
     }
     else if (id == LMSoundID::RoundCountLoop)
     {
         m_countLoop.setBuffer(buffer);
         m_countLoop.setVolume(volume);
-        m_countLoop.setPosition(960.f, 540.f, 0.f);
+        m_countLoop.setPosition(xy::DefaultSceneSize.x / 2.f, xy::DefaultSceneSize.y / 2.f, 0.f);
         m_countLoop.setAttenuation(0.f);
         m_countLoop.setLoop(true);
         if (!m_summaryComplete)

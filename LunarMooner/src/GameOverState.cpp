@@ -109,21 +109,23 @@ void GameOverState::handleMessage(const xy::Message& msg)
 //private
 void GameOverState::buildMenu(const sf::Font& font)
 {
+    const float centreX = xy::DefaultSceneSize.x / 2.f;
+
     auto label = xy::UI::create<xy::UI::Label>(font);
     label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(960.f, 400.f);
+    label->setPosition(centreX, 400.f);
     label->setString("GAME OVER");
     m_uiContainer.addControl(label);
     
     m_scoreLabel = xy::UI::create<xy::UI::Label>(font);
     m_scoreLabel->setAlignment(xy::UI::Alignment::Centre);
-    m_scoreLabel->setPosition(960.f, 460.f);
+    m_scoreLabel->setPosition(centreX, 460.f);
     m_scoreLabel->setString("Your Score:");
     m_uiContainer.addControl(m_scoreLabel);
 
     auto textbox = xy::UI::create<xy::UI::TextBox>(font);
     textbox->setAlignment(xy::UI::Alignment::Centre);
-    textbox->setPosition(960.f, 540.f);
+    textbox->setPosition(centreX, 540.f);
     textbox->setLabelText("Enter your name:");
     textbox->setText("Player 1");
     textbox->setMaxLength(18u);
@@ -132,7 +134,7 @@ void GameOverState::buildMenu(const sf::Font& font)
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("OK");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 675.f);
+    button->setPosition(centreX, 675.f);
     button->addCallback([this, textbox]()
     {
         if (m_playerCount > 0 && m_currentPlayer < m_playerCount)

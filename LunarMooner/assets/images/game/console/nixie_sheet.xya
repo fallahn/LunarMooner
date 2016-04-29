@@ -8,7 +8,7 @@
     }
   ],
   "FrameCount": 12,
-  "FrameSize": "110, 134",
+  "FrameSize": "40, 47",
   "FrameRate": 6.0,
   "Texture": "nixie_sheet.png",
   "NormalMap": "none.png"
