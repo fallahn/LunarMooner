@@ -100,23 +100,25 @@ namespace
 //private
 void MenuWeaponState::buildMenu(const sf::Font& font)
 {
+    const float centreX = xy::DefaultSceneSize.x / 2.f;
+
     auto label = xy::UI::create<xy::UI::Label>(font);
     label->setString("Select Secondary Weapon");
     label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(960.f, 86.f);
+    label->setPosition(centreX, 86.f);
     label->setCharacterSize(40u);
     m_uiContainer.addControl(label);
    
     label = xy::UI::create<xy::UI::Label>(font);
     label->setString("Rank " + std::to_string(m_profile.getRank()) + ": " +std::to_string(m_profile.getXP()) + "XP");
     label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(960.f, 160.f);
+    label->setPosition(centreX, 160.f);
     m_uiContainer.addControl(label);
 
     //weapon selector
     auto weaponSelect = xy::UI::create<lm::ui::WeaponSelect>(m_textureResource.get("assets/images/ui/weapon_select.png"));
     weaponSelect->setAlignment(xy::UI::Alignment::Centre);
-    weaponSelect->setPosition(960.f, 420.f);
+    weaponSelect->setPosition(centreX, 420.f);
     
     sf::Int32 count = AchievementID::Rank50 - AchievementID::Rank10;
     sf::Uint8 flags = 0u;

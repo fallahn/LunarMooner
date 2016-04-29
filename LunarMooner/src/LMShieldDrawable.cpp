@@ -41,7 +41,7 @@ using namespace lm;
 namespace
 {
     const sf::Color shieldColour = sf::Color(0u, 255u, 255u, 220u);
-    const float halfWidth = 960.f;
+    const float halfWidth = xy::DefaultSceneSize.x / 2.f;
 
     const float thickness = 100.f;
 

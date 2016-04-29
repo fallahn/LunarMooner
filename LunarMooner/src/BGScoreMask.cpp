@@ -45,13 +45,13 @@ ScoreMask::ScoreMask(xy::MessageBus& mb, const sf::FloatRect& area)
     {
         sf::Vector2f(),
         sf::Vector2f(area.left, 0.f),
-        sf::Vector2f(area.left, 1080.f),
-        sf::Vector2f(0.f, 1080.f),
+        sf::Vector2f(area.left, xy::DefaultSceneSize.y),
+        sf::Vector2f(0.f, xy::DefaultSceneSize.y),
 
         sf::Vector2f(area.left + area.width, 0.f),
-        sf::Vector2f(1920.f, 0.f),
-        sf::Vector2f(1920.f, 1080.f),
-        sf::Vector2f(area.left + area.width, 1080.f)
+        sf::Vector2f(xy::DefaultSceneSize.x, 0.f),
+        xy::DefaultSceneSize,
+        sf::Vector2f(area.left + area.width, xy::DefaultSceneSize.y)
     };
 
     m_vertices[0].color = sf::Color::Transparent;

@@ -29,6 +29,7 @@ source distribution.
 #define LM_PLAYER_INF_DISP_HPP_
 
 #include <LMPlayerState.hpp>
+#include <LMClockDisplay.hpp>
 
 #include <xygine/components/Component.hpp>
 

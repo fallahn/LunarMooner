@@ -488,6 +488,9 @@ void LunarMoonerState::initSounds()
     {
         lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
         auto& msgData = msg.getData<LMGameEvent>();
+
+        const auto screenCentre = xy::DefaultSceneSize / 2.f;
+
         switch (msgData.type)
         {
         default: break;
@@ -497,13 +500,13 @@ void LunarMoonerState::initSounds()
         case LMGameEvent::MeteorExploded:
             player->playSound(LMSoundID::ShieldHit, msgData.posX, msgData.posY);
         case LMGameEvent::PlayerDied:
-            //player->playSound(LMSoundID::PlayerDied, 960.f, 540.f);
+            //player->playSound(LMSoundID::PlayerDied, screenCentre);
             //break; //makes explodey below
         case LMGameEvent::AlienDied:
             player->playSound(xy::Util::Random::value(LMSoundID::Explosion01, LMSoundID::Explosion04), msgData.posX, msgData.posY);
             break;
         case LMGameEvent::EarlyWarning:
-            player->playSound(LMSoundID::StrikeWarning, 960.f, 540.f);
+            player->playSound(LMSoundID::StrikeWarning, screenCentre.x, screenCentre.y);
             break;
         case LMGameEvent::PlayerLanded:
             player->playSound(LMSoundID::ShipLanded, msgData.posX, msgData.posY);
@@ -521,7 +524,7 @@ void LunarMoonerState::initSounds()
             player->playSound(LMSoundID::ShieldLost, msgData.posX, msgData.posY);
             break;
         case LMGameEvent::ExtraLife:
-            player->playSound(LMSoundID::LifeBonus, 960.f, 540.f);
+            player->playSound(LMSoundID::LifeBonus, screenCentre.x, screenCentre.y);
             break;
         case LMGameEvent::HumanRescued:
             player->playSound(LMSoundID::HumanRescued, msgData.posX, msgData.posY);
@@ -541,19 +544,21 @@ void LunarMoonerState::initSounds()
     {
         lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
         auto& msgData = msg.getData<LMStateEvent>();
+
+        const auto screenCentre = xy::DefaultSceneSize / 2.f;
+
         switch (msgData.type)
         {
         default: break;
-            //lots of magic numbers here...
         case LMStateEvent::CountDownStarted:
-            player->playSound(LMSoundID::NukeWarning, 960.f, 540.f);
+            player->playSound(LMSoundID::NukeWarning, screenCentre.x, screenCentre.y);
             break;
         case LMStateEvent::CountDownWarning:
-            player->playSound(LMSoundID::NukeWarning30, 960.f, 540.f);
+            player->playSound(LMSoundID::NukeWarning30, screenCentre.x, screenCentre.y);
             break;
         case LMStateEvent::RoundEnd:
             player->setChannelVolume(1, 0.f); //mutes voice over
-            player->playSound(LMSoundID::RoundEnded, 960.f, 540.f);
+            player->playSound(LMSoundID::RoundEnded, screenCentre.x, screenCentre.y);
             break;
         case LMStateEvent::RoundBegin:
         {
@@ -564,12 +569,12 @@ void LunarMoonerState::initSounds()
         }
             break;
         case LMStateEvent::GameOver:
-            player->playSound(LMSoundID::MissionTerminated, 960.f, 540.f);
+            player->playSound(LMSoundID::MissionTerminated, screenCentre.x, screenCentre.y);
             break;
         case LMStateEvent::SwitchedPlayer:
             (msgData.value == 1)
-                ? player->playSound(LMSoundID::AnnouncePlayerTwo, 960.f, 540.f)
-                : player->playSound(LMSoundID::AnnouncePlayerOne, 960.f, 540.f);
+                ? player->playSound(LMSoundID::AnnouncePlayerTwo, screenCentre.x, screenCentre.y)
+                : player->playSound(LMSoundID::AnnouncePlayerOne, screenCentre.x, screenCentre.y);
             break;
         }
     };
@@ -866,7 +871,7 @@ void LunarMoonerState::buildBackground()
     entity->addComponent(ne);
     entity->addComponent(nukeAudio);
     entity->addComponent(finalWarning);
-    entity->setPosition(960.f, 540.f);
+    entity->setPosition(xy::DefaultSceneSize / 2.f);
     m_scene.setActiveCamera(entity->addComponent(camera));
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
   
@@ -888,7 +893,7 @@ void LunarMoonerState::buildBackground()
     moon->setRotationVelocity({ 0.f, 0.009f });
 
     entity = xy::Entity::create(m_messageBus);
-    entity->setPosition(960.f - (moonWidth), 540.f);
+    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), xy::DefaultSceneSize.y / 2.f);
     entity->addComponent(moon);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
@@ -899,7 +904,7 @@ void LunarMoonerState::buildBackground()
     lc->setIntensity(1.2f);
 
     entity = xy::Entity::create(m_messageBus);
-    entity->setPosition(alienArea.left + alienArea.width, 540.f);
+    entity->setPosition(alienArea.left + alienArea.width, xy::DefaultSceneSize.y / 2.f);
     entity->addComponent(lc);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }

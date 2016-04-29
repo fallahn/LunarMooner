@@ -105,10 +105,12 @@ namespace
 //private
 void MenuAchievementState::buildMenu(const sf::Font& font)
 {
+    const float centreX = xy::DefaultSceneSize.x / 2.f;
+
     auto label = xy::UI::create<xy::UI::Label>(font);
     label->setString("Achievements");
     label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(960.f, 86.f);
+    label->setPosition(centreX, 86.f);
     label->setCharacterSize(40u);
     m_uiContainer.addControl(label);
 
@@ -128,13 +130,13 @@ void MenuAchievementState::buildMenu(const sf::Font& font)
     label = xy::UI::create<xy::UI::Label>(font);
     label->setString("Rank " + std::to_string(m_profile.getRank()) + ": " +std::to_string(m_profile.getXP()) + "XP");
     label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(960.f, 900.f);
+    label->setPosition(centreX, 900.f);
     m_uiContainer.addControl(label);
 
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("OK");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(960.f, 975.f);
+    button->setPosition(centreX, 975.f);
     button->addCallback([this]()
     {
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);

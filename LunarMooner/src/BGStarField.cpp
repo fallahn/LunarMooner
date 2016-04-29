@@ -66,8 +66,8 @@ Starfield::Starfield(xy::MessageBus& mb, xy::TextureResource& tr)
     
     m_shader.loadFromMemory(fragShader, sf::Shader::Fragment);
 
-    m_bounds.width = 1920.f;
-    m_bounds.height = 1080.f;
+    m_bounds.width = xy::DefaultSceneSize.x;
+    m_bounds.height = xy::DefaultSceneSize.y;
 
     //create stars
     for (auto i = 0u; i < maxStars; ++i)
