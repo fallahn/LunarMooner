@@ -63,6 +63,8 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
         {
             float movement = (position.x < m_destination.x) ? walkSpeed : -walkSpeed;
             entity.move(movement * dt, 0.f);
+
+            //TODO raise animation change message
         }
         else
         {
@@ -82,12 +84,16 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
         entity.destroy();
     }
 
-    //do a little bobbing animation. This assumes as shape component
-    //is attached - you'll need to change this if replacing the drawable
-    m_waveTableIndex = (m_waveTableIndex + 1) % waveTable.size();
-    //entity.getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->setPosition(0.f, waveTable[m_waveTableIndex]);
-    entity.getComponent<xy::AnimatedDrawable>()->setPosition(0.f, waveTable[m_waveTableIndex]);
-
+    //do a little bobbing animation.
+    if (!m_gotoDestination)
+    {
+        m_waveTableIndex = (m_waveTableIndex + 1) % waveTable.size();
+        entity.getComponent<xy::AnimatedDrawable>()->setPosition(0.f, waveTable[m_waveTableIndex]);
+    }
+    else
+    {
+        entity.getComponent<xy::AnimatedDrawable>()->setPosition(0.f, 0.f);
+    }
     //store position for when switching player states
     m_position = entity.getPosition();
 }
@@ -96,4 +102,6 @@ void HumanController::setDestination(const sf::Vector2f& dest)
 {
     m_destination = dest;
     m_gotoDestination = true;
+
+    //TODO raise animation change
 }

@@ -742,9 +742,15 @@ void GameController::createMothership()
 
 namespace
 {
-    std::unique_ptr<xy::AnimatedDrawable> getHumanDrawable(xy::MessageBus& mb, xy::TextureResource& tr)
+    std::unique_ptr<xy::AnimatedDrawable> getHumanDrawable(xy::MessageBus& mb, ResourceCollection& rc)
     {
-        auto drawable = xy::Component::create<xy::AnimatedDrawable>(mb, tr.get("assets/images/game/doofer_01.png"));
+        auto drawable = xy::Component::create<xy::AnimatedDrawable>(mb, rc.textureResource.get("assets/images/game/doofer_01.png"));
+        drawable->loadAnimationData("assets/images/game/doofer_01.xya");
+        drawable->playAnimation(1);
+        drawable->setMaskMap(rc.textureResource.get("assets/images/game/doofer_01_mask.png"));
+        drawable->setNormalMap(rc.textureResource.get("assets/images/game/doofer_01_normal.png"));
+        drawable->setShader(rc.shaderResource.get(LMShaderID::NormalMapGame));
+
         auto bounds = drawable->localBounds();
         drawable->setOrigin(bounds.width / 2.f, bounds.height / 2.f);
         return std::move(drawable);
@@ -753,7 +759,7 @@ namespace
 
 void GameController::spawnHuman(const sf::Vector2f& position)
 {
-    auto drawable = getHumanDrawable(getMessageBus(), m_resources.textureResource);
+    auto drawable = getHumanDrawable(getMessageBus(), m_resources);
 
     auto controller = xy::Component::create<HumanController>(getMessageBus());
 
@@ -934,7 +940,7 @@ void GameController::updatePlatforms()
 
 void GameController::addRescuedHuman()
 {
-    auto drawable = getHumanDrawable(getMessageBus(), m_resources.textureResource);
+    auto drawable = getHumanDrawable(getMessageBus(), m_resources);
     
     float width = m_mothership->globalBounds().width;
     width -= 8.f; //4 px padding each end

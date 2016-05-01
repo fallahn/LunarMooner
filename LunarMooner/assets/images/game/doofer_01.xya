@@ -1,0 +1,33 @@
+{
+  "Animations": [
+    {
+      "Start": 0,
+      "End": 11,
+      "Loop": true,
+      "Name": "climb"
+    },
+    {
+      "Start": 12,
+      "End": 23,
+      "Loop": true,
+      "Name": "wave"
+    },
+    {
+      "Start": 24,
+      "End": 35,
+      "Loop": true,
+      "Name": "run_left"
+    },
+    {
+      "Start": 36,
+      "End": 47,
+      "Loop": true,
+      "Name": "run_right"
+    }
+  ],
+  "FrameCount": 48,
+  "FrameSize": "56, 56",
+  "FrameRate": 24.0,
+  "Texture": "doofer_01.png",
+  "NormalMap": "doofer_01_normal.png"
+}
