@@ -168,10 +168,13 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             break;
         case LMGameEvent::PlayerDied:
         {
+            sf::Int16 velX = msgData.value >> 16;
+            sf::Int16 velY = msgData.value & 0xffff;         
+            
             m_playerStates[m_currentPlayer].lives--;
             //if (m_player->carryingHuman())
             {
-                spawnDeadGuy(msgData.posX, msgData.posY);
+                spawnDeadGuy(msgData.posX, msgData.posY, sf::Vector2f(velX, velY));
             }
 
             //if died carrying last human move up to next level
@@ -1533,7 +1536,7 @@ void GameController::showRoundSummary(bool doScores)
     msg->type = LMStateEvent::RoundEnd;
 }
 
-void GameController::spawnDeadGuy(float x, float y)
+void GameController::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
 {
     if (alienArea.contains(x, y))
     {
@@ -1544,6 +1547,7 @@ void GameController::spawnDeadGuy(float x, float y)
         drawable->loadAnimationData("assets/images/game/doofer_dead.xya");
         drawable->playAnimation(0);
         auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
+        controller->setVelocity(vel);
         auto entity = xy::Entity::create(getMessageBus());
         entity->addComponent(drawable);
         entity->addComponent(controller);

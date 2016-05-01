@@ -58,7 +58,7 @@ void SoundPlayer::preCache(ResourceID id, const std::string& path, sf::Uint8 cha
     m_buffers[id].channel = channel;
 }
 
-void SoundPlayer::playSound(ResourceID id, float x, float y)
+void SoundPlayer::playSound(ResourceID id, float x, float y, float pitch)
 {
     m_sounds.emplace_back(m_buffers[id].buffer);
     auto& sound = m_sounds.back();
@@ -66,6 +66,7 @@ void SoundPlayer::playSound(ResourceID id, float x, float y)
     sound.setPosition({ x, y, 0.f });
     sound.setVolume(m_volume * m_channelVolumes[m_buffers[id].channel]);
     sound.setAttenuation(0.f);
+    sound.setPitch(pitch);
     sound.play();
 }
 

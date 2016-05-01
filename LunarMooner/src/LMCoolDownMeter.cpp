@@ -81,7 +81,7 @@ void CooldownMeter::setValue(float value)
         //raise an event for sfx
         auto msg = sendMessage<LMGameEvent>(LMMessageId::GameEvent);
         msg->type = LMGameEvent::WeaponCharged;
-        msg->value = static_cast<sf::Int16>(level);
+        msg->value = static_cast<sf::Int32>(level);
     }
 }
 

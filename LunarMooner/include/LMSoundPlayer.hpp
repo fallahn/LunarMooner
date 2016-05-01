@@ -55,7 +55,7 @@ namespace lm
 
         using ResourceID = sf::Int32;
         void preCache(ResourceID, const std::string&, sf::Uint8 = 0);
-        void playSound(ResourceID, float, float);
+        void playSound(ResourceID, float, float, float = 1.f);
         void setMasterVolume(float);
         void setChannelVolume(sf::Uint8, float);
     private:

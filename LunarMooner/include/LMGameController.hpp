@@ -160,7 +160,7 @@ namespace lm
 
         void showRoundSummary(bool);
 
-        void spawnDeadGuy(float, float);
+        void spawnDeadGuy(float, float, const sf::Vector2f&);
     };
 }
 

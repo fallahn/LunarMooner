@@ -102,7 +102,7 @@ struct LMGameEvent
     }type;
     float posX = 0.f; //<holds time remaining on level change
     float posY = 0.f; //<holds difficulty on level change
-    sf::Int16 value = 0;
+    sf::Int32 value = 0;
 };
 
 struct LMStateEvent
@@ -177,7 +177,9 @@ enum LMSoundID
     EmpExplosion,
     CollectibleDied,
     AnnouncePlayerOne,
-    AnnouncePlayerTwo
+    AnnouncePlayerTwo,
+    ChargeProgress,
+    ChargeComplete
 };
 
 #endif //COMMAND_IDS_HPP_
