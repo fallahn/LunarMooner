@@ -494,9 +494,13 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::CollectibleDied, "assets/sound/fx/collectible_died.wav");
     soundPlayer->preCache(LMSoundID::AnnouncePlayerOne, "assets/sound/speech/player_one.wav");
     soundPlayer->preCache(LMSoundID::AnnouncePlayerTwo, "assets/sound/speech/player_two.wav");
+    soundPlayer->preCache(LMSoundID::ChargeComplete, "assets/sound/fx/charge_complete.wav", 2);
+    soundPlayer->preCache(LMSoundID::ChargeProgress, "assets/sound/fx/charge_progress.wav", 2);
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
+
+    soundPlayer->setChannelVolume(2, 0.25f);
 
     xy::Component::MessageHandler mh;
     mh.id = LMMessageId::GameEvent;
@@ -550,6 +554,21 @@ void LunarMoonerState::initSounds()
             break;
         case LMGameEvent::CollectibleDied:
             player->playSound(LMSoundID::CollectibleDied, msgData.posX, msgData.posY);
+            break;
+        case LMGameEvent::WeaponCharged:
+            switch (msgData.value)
+            {
+            default: break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                player->playSound(LMSoundID::ChargeProgress, screenCentre.x, screenCentre.y);
+                break;
+            case 5:
+                player->playSound(LMSoundID::ChargeComplete, screenCentre.x, screenCentre.y);
+                break;
+            }
             break;
         }
     };

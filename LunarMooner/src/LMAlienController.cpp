@@ -119,6 +119,11 @@ void AlienController::collisionCallback(CollisionComponent* cc)
     }
 }
 
+void AlienController::setVelocity(const sf::Vector2f& vel)
+{
+    m_velocity = xy::Util::Vector::normalise(vel);
+}
+
 //private
 sf::Vector3f AlienController::getManifold(const sf::FloatRect& worldRect)
 {

@@ -566,4 +566,9 @@ void PlayerController::broadcastDeath()
     //auto bounds = m_entity->globalBounds();
     msg->posX = m_entity->getPosition().x;// +(bounds.width / 2.f);
     msg->posY = m_entity->getPosition().y;// +(bounds.height / 2.f);
+
+    sf::Int16 velX = static_cast<sf::Int16>(m_velocity.x);
+    sf::Int16 velY = static_cast<sf::Int16>(m_velocity.y);
+
+    msg->value = (velX << 16) | velY;
 }
