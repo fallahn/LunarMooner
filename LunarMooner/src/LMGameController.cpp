@@ -645,6 +645,11 @@ void GameController::spawnPlayer()
         sfx3->setName("thrustEffect");
         sfx3->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
+        auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
+        lc->setDepth(110.f);
+        lc->setDiffuseColour({ 255u, 185u, 135u });
+        lc->setIntensity(1.1f);
+
         auto entity = xy::Entity::create(getMessageBus());
         entity->setPosition(spawnPos);
         entity->setOrigin(playerSize / 2.f);
@@ -657,8 +662,15 @@ void GameController::spawnPlayer()
         auto fx1 = entity->addComponent(sfx1);
         auto fx2 = entity->addComponent(sfx2);
         auto fx3 = entity->addComponent(sfx3);
+        entity->addComponent(lc);
         entity->addCommandCategories(LMCommandID::Player);
-        m_scene.addEntity(entity, xy::Scene::BackFront);
+        auto playerEntity = m_scene.addEntity(entity, xy::Scene::BackFront);
+
+        /*auto thrustLight = xy::Component::create<xy::PointLight>(getMessageBus(), 700.f, 300.f);
+        entity = xy::Entity::create(getMessageBus());
+        entity->setPosition(0.f, 100.f);
+        entity->addComponent(thrustLight);
+        playerEntity->addChild(entity);*/
 
         mh.id = xy::Message::UIMessage;
         mh.action = [fx1, fx2, fx3, this](xy::Component*, const xy::Message& msg)
