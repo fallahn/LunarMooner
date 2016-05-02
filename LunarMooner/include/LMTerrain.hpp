@@ -97,7 +97,8 @@ namespace lm
 
         std::array<sf::Vertex, 4u> m_vertices;
         std::vector<sf::Texture> m_textures;
-        sf::Texture m_normalMap;
+        std::vector<sf::Texture> m_normalMaps;
+        std::vector<sf::Texture>m_maskMaps;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
 
         bool load(const std::string&, xy::TextureResource&);

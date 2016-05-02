@@ -97,9 +97,6 @@ void Terrain::init(const std::string& mapDir, xy::TextureResource& tr)
     {
         load(mapDir + "/" + files[i], tr);
     }
-
-    //temp normal map
-    m_normalMap = tr.get("buns"); //resource returns flat normal map if texture not found ;)
 }
 
 const std::vector<sf::Vector2f>& Terrain::getChain() const
@@ -164,12 +161,13 @@ void Terrain::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.texture = &m_textures[m_level];
     
-    auto shader = const_cast<sf::Shader*>(getActiveShader()); //this may be a design flaw
+    auto shader = getShader();
     if (shader)
     {
         states.shader = shader;
         shader->setUniform("u_diffuseMap", *states.texture);
-        shader->setUniform("u_normalMap", m_normalMap);
+        shader->setUniform("u_normalMap", m_normalMaps[m_level]);
+        shader->setUniform("u_maskMap", m_maskMaps[m_level]);
         //auto worldView = Scene::getViewMatrix() * states.transform;
         shader->setUniform("u_inverseWorldViewMatrix", sf::Glsl::Mat4(states.transform.getInverse()));
     }
@@ -228,6 +226,8 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
     std::vector<sf::Vector2f> points;
     std::vector<Platform> platforms;
     sf::Texture texture;
+    std::string textureFile;
+    std::string mapDir;
     float waterLevel = 0.f;
 
     picojson::value pv;
@@ -236,10 +236,10 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
     {
         if (pv.get("TextureName").is<std::string>())
         {
-            std::string textureFile = pv.get("TextureName").get<std::string>();
+            textureFile = pv.get("TextureName").get<std::string>();
             if (!textureFile.empty())
             {
-                std::string mapDir = xy::FileSystem::getFilePath(path);
+                mapDir = xy::FileSystem::getFilePath(path);
                 texture = tr.get(mapDir + textureFile);
             }
             else
@@ -326,6 +326,21 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
     m_platforms.emplace_back(std::make_pair(false, platforms));
     m_waterLevels.push_back(waterLevel);
     m_textures.push_back(texture);
+
+    //TODO set fallback colours for texture resource
+    std::function<std::string(const std::string)> getTextureName = 
+        [&textureFile](const std::string name)->std::string 
+    {
+        std::string retVal;
+        if (std::size_t pos = textureFile.find_last_of('.') != std::string::npos)
+        {
+            retVal = textureFile;
+            retVal.insert(pos + 1, name);
+        }
+        return std::move(retVal);
+    };
+    m_normalMaps.push_back(tr.get(mapDir + getTextureName("_normal")));
+    m_maskMaps.push_back(tr.get(mapDir + getTextureName("_mask")));
 
     return true;
 }
