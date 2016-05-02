@@ -50,8 +50,9 @@ namespace lm
 
         xy::Component::Type type()const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override {}
-
+        sf::FloatRect globalBounds() const override { return m_bounds; }
     private:
+        sf::FloatRect m_bounds;
         const sf::Texture& m_texture;
         std::array<sf::Vertex, 8u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;

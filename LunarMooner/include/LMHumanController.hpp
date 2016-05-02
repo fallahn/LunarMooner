@@ -30,12 +30,25 @@ source distribution.
 
 #include <xygine/components/Component.hpp>
 
+namespace xy
+{
+    class AnimatedDrawable;
+}
+
 namespace lm
 {
     class HumanController final : public xy::Component
     {
     public:
-        explicit HumanController(xy::MessageBus&);
+        enum AnimationID
+        {
+            Climb = 0,
+            Wave,
+            RunLeft,
+            RunRight
+        };
+
+        HumanController(xy::MessageBus&, xy::AnimatedDrawable&);
         ~HumanController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -46,6 +59,7 @@ namespace lm
         const sf::Vector2f& getPosition() const { return m_position; }
 
     private:
+        xy::AnimatedDrawable& m_drawable;
         bool m_gotoDestination;
         sf::Vector2f m_destination;
         sf::Vector2f m_position;

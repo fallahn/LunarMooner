@@ -45,8 +45,9 @@ namespace
     const auto waveTable = xy::Util::Wavetable::sine(5.f, 3.f);
 }
 
-HumanController::HumanController(xy::MessageBus& mb)
+HumanController::HumanController(xy::MessageBus& mb, xy::AnimatedDrawable& ad)
     : xy::Component     (mb, this),
+    m_drawable          (ad),
     m_gotoDestination   (false),
     m_waveTableIndex    (xy::Util::Random::value(0, waveTable.size() - 1))
 {
@@ -64,7 +65,10 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
             float movement = (position.x < m_destination.x) ? walkSpeed : -walkSpeed;
             entity.move(movement * dt, 0.f);
 
-            //TODO raise animation change message
+            if (std::abs(entity.getPosition().x - m_destination.x) <= 2)
+            {
+                m_drawable.playAnimation(AnimationID::Climb);
+            }
         }
         else
         {
@@ -103,5 +107,5 @@ void HumanController::setDestination(const sf::Vector2f& dest)
     m_destination = dest;
     m_gotoDestination = true;
 
-    //TODO raise animation change
+    m_drawable.playAnimation((dest.x - m_position.x > 0) ? AnimationID::RunRight : AnimationID::RunLeft);
 }

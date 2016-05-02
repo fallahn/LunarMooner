@@ -746,7 +746,7 @@ namespace
     {
         auto drawable = xy::Component::create<xy::AnimatedDrawable>(mb, rc.textureResource.get("assets/images/game/doofer_01.png"));
         drawable->loadAnimationData("assets/images/game/doofer_01.xya");
-        drawable->playAnimation(1);
+        drawable->playAnimation(HumanController::Wave);
         drawable->setMaskMap(rc.textureResource.get("assets/images/game/doofer_01_mask.png"));
         drawable->setNormalMap(rc.textureResource.get("assets/images/game/doofer_01_normal.png"));
         drawable->setShader(rc.shaderResource.get(LMShaderID::NormalMapGame));
@@ -761,7 +761,7 @@ void GameController::spawnHuman(const sf::Vector2f& position)
 {
     auto drawable = getHumanDrawable(getMessageBus(), m_resources);
 
-    auto controller = xy::Component::create<HumanController>(getMessageBus());
+    auto controller = xy::Component::create<HumanController>(getMessageBus(), *drawable.get());
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
