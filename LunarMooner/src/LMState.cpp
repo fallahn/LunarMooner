@@ -119,7 +119,8 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 
     //precache ALL shaders first
     m_resources.shaderResource.preload(LMShaderID::NormalMapGame, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
-    //m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_ambientColour", sf::Glsl::Vec3(0.1f, 0.1f, 0.07f));
+    m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_directionalLight.intensity", 0.5f);
+    m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_directionalLight.diffuseColour", sf::Glsl::Vec4(1.f, 0.8f, 0.7f, 1.f));
     m_resources.shaderResource.preload(LMShaderID::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
     m_resources.shaderResource.get(LMShaderID::NormalMapPlanet).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
     m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    

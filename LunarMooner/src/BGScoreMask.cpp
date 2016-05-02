@@ -61,14 +61,8 @@ ScoreMask::ScoreMask(xy::MessageBus& mb, const sf::FloatRect& area, const sf::Te
         m_vertices[i + 4].texCoords = m_vertices[i].position;
     }
 
-    //m_vertices[0].color = sf::Color::Transparent;
-    //m_vertices[1].color = borderColour;
-    //m_vertices[2].color = borderColour;
-    //m_vertices[3].color = sf::Color::Transparent;
-    //m_vertices[4].color = borderColour;
-    //m_vertices[5].color = sf::Color::Transparent;
-    //m_vertices[6].color = sf::Color::Transparent;
-    //m_vertices[7].color = borderColour;
+    m_bounds.width = xy::DefaultSceneSize.x;
+    m_bounds.height = xy::DefaultSceneSize.y;
 }
 
 //public
