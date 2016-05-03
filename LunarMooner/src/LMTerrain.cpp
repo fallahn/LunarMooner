@@ -339,7 +339,9 @@ bool Terrain::load(const std::string& path, xy::TextureResource& tr)
         }
         return std::move(retVal);
     };
+    tr.setFallbackColour({ 127, 127, 255 }); //flat normal
     m_normalMaps.push_back(tr.get(mapDir + getTextureName("_normal")));
+    tr.setFallbackColour(sf::Color::Black);
     m_maskMaps.push_back(tr.get(mapDir + getTextureName("_mask")));
 
     return true;
