@@ -26,7 +26,6 @@ source distribution.
 *********************************************************************/
 
 #include <OLAchievementTag.hpp>
-#include <Achievements.hpp>
 
 #include <xygine/Resource.hpp>
 #include <xygine/Entity.hpp>
@@ -50,7 +49,7 @@ namespace
     const float moveSpeed = tagSize.y / moveTime;
 }
 
-AchievementTag::AchievementTag(xy::MessageBus& mb, xy::FontResource& fr, sf::Int32 id)
+AchievementTag::AchievementTag(xy::MessageBus& mb, xy::FontResource& fr, const std::string& text)
     : xy::Component(mb, this),
     m_inTime    (moveTime),
     m_holdTime  (holdTime),
@@ -58,8 +57,7 @@ AchievementTag::AchievementTag(xy::MessageBus& mb, xy::FontResource& fr, sf::Int
 {
     m_text.setFont(fr.get("achievement_tag"));
     m_text.setCharacterSize(20u);
-    auto text = achievementNames[id];
-    m_text.setString(text.substr(0, text.find_first_of('-') - 1));
+    m_text.setString(text);
     m_text.setFillColor(textColour);
     xy::Util::Position::centreOrigin(m_text);
     m_text.setPosition(-tagSize.x / 2.f, tagSize.y / 2.f);

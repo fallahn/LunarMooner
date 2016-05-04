@@ -44,7 +44,7 @@ namespace lm
     class AchievementTag final : public xy::Component, public sf::Drawable
     {
     public:
-        AchievementTag(xy::MessageBus&, xy::FontResource&, sf::Int32);
+        AchievementTag(xy::MessageBus&, xy::FontResource&, const std::string&);
         ~AchievementTag() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }

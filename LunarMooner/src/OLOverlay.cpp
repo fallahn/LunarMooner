@@ -29,6 +29,7 @@ source distribution.
 #include <OLAchievementTag.hpp>
 #include <CommandIds.hpp>
 #include <ResourceCollection.hpp>
+#include <Achievements.hpp>
 
 #include <xygine/Scene.hpp>
 
@@ -58,11 +59,10 @@ void Overlay::update(float dt)
 
 void Overlay::handleMessage(const xy::Message& msg)
 {
-    if (msg.id == LMMessageId::AchievementEvent)
+    const static std::function<void(const std::string&)> displayTag = 
+        [this](const std::string& text)
     {
-        auto& msgData = msg.getData<LMAchievementEvent>();
-
-        auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_resources.fontResource, msgData.ID);
+        auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_resources.fontResource, text);
         auto ent = xy::Entity::create(m_messageBus);
         ent->setPosition(xy::DefaultSceneSize.x - padding, xy::DefaultSceneSize.y);
         ent->addComponent(tag);
@@ -76,6 +76,22 @@ void Overlay::handleMessage(const xy::Message& msg)
         }
 
         m_rootNode->addChild(ent);
+    };
+    
+    if (msg.id == LMMessageId::AchievementEvent)
+    {
+        auto& msgData = msg.getData<LMAchievementEvent>();
+
+        auto text = achievementNames[msgData.ID];
+        text = text.substr(0, text.find_first_of('-') - 1);
+
+        displayTag(text);
+    }
+    else if(msg.id == LMMessageId::RankEvent)
+    {
+        auto& msgData = msg.getData<LMRankEvent>();
+        std::string text = "RANK UP!\nLevel: " + std::to_string(msgData.rank);
+        displayTag(text);
     }
 }
 
