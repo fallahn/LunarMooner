@@ -129,7 +129,12 @@ struct LMAchievementEvent
 
 struct LMRankEvent
 {
-    sf::Int32 rank = 0;
+    enum
+    {
+        RankUp,
+        XPAwarded
+    }type;
+    sf::Int32 value = 0;
 };
 
 struct LMMenuEvent
