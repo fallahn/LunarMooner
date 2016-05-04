@@ -129,6 +129,7 @@
     <ClInclude Include="include\BGStarfield.hpp" />
     <ClInclude Include="include\LMClockDisplay.hpp" />
     <ClInclude Include="include\LMCoolDownMeter.hpp" />
+    <ClInclude Include="include\LMCounterDisplay.hpp" />
     <ClInclude Include="include\LMLevelMeter.hpp" />
     <ClInclude Include="include\LMVelocityShader.hpp" />
     <ClInclude Include="include\MenuWeaponSelect.hpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="src\BGStarField.cpp" />
     <ClCompile Include="src\LMClockDisplay.cpp" />
     <ClCompile Include="src\LMCoolDownMeter.cpp" />
+    <ClCompile Include="src\LMCounterDisplay.cpp" />
     <ClCompile Include="src\LMLevelMeter.cpp" />
     <ClCompile Include="src\MenuWeaponSelect.cpp" />
     <ClCompile Include="src\OLAchievementTag.cpp" />

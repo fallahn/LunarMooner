@@ -25,61 +25,55 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_PLAYER_INF_DISP_HPP_
-#define LM_PLAYER_INF_DISP_HPP_
-
-#include <LMPlayerState.hpp>
-
-#include <xygine/components/Component.hpp>
+#ifndef LM_COUNTER_DISPLAY_HPP_
+#define LM_COUNTER_DISPLAY_HPP_
 
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/Transformable.hpp>
+#include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Text.hpp>
 
-namespace xy
-{
-    class FontResource;
-}
+#include <array>
+#include <vector>
 
-struct ResourceCollection;
+namespace sf
+{
+    class Texture;
+    class Font;
+}
 
 namespace lm
 {
-    class ScoreDisplay final : public sf::Drawable, public xy::Component
+    class CounterDisplay final : public sf::Drawable, public sf::Transformable
     {
     public:
-        ScoreDisplay(xy::MessageBus&, ResourceCollection&, std::vector<PlayerState>&);
-        ~ScoreDisplay() = default;
+        CounterDisplay(sf::Texture&, const sf::Font&, const std::string&, sf::Uint8);
+        ~CounterDisplay() = default;
+        CounterDisplay(const CounterDisplay&) = delete;
+        CounterDisplay& operator = (const CounterDisplay&) = delete;
 
-        xy::Component::Type type() const override { return xy::Component::Type::Drawable; }        
-        void entityUpdate(xy::Entity&, float) override;
-        sf::FloatRect globalBounds() const override { return m_bounds; }
-
-        void setPlayerActive(std::size_t);
-        void showMessage(const std::string&);
-        void showScore(sf::Uint16, const sf::Vector2f&, sf::Color = sf::Color::Yellow);
+        void update(float);
+        void setValue(int);
 
     private:
-        sf::FloatRect m_bounds;
 
-        xy::FontResource& m_fontResource;
-        std::vector<PlayerState>& m_playerStates;
-
-        sf::Text m_messageText;
-        bool m_showMessage;
-        float m_messageDisplayTime;
-
-        std::vector<sf::Text> m_playerTexts;
-
-        struct ScoreTag final
+        struct SubRect final : public sf::Transformable
         {
-            sf::Text text;
-            float alpha = 1.f;
+            std::array<sf::Vertex, 4u> vertices;
+            sf::Int8 currentValue = 0;
+            sf::Int8 targetValue = 0;
+            float targetPosition = 0.f;
+            sf::Vector2f size;
             void update(float);
         };
-        std::list<ScoreTag> m_scoreTags;
+        std::vector<SubRect> m_subRects;
 
+        const sf::Texture& m_texture;
+        sf::Text m_text;
+
+        std::vector<sf::Vertex> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
 
-#endif //LM_PLAYER_INF_DISP_HPP_
+#endif //LM_COUNTER_DISPLAY_HPP_
