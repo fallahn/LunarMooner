@@ -90,7 +90,15 @@ void Overlay::handleMessage(const xy::Message& msg)
     else if(msg.id == LMMessageId::RankEvent)
     {
         auto& msgData = msg.getData<LMRankEvent>();
-        std::string text = "RANK UP!\nLevel: " + std::to_string(msgData.rank);
+        std::string text;
+        if (msgData.type == LMRankEvent::RankUp)
+        {
+            text = "RANK UP!\nLevel: " + std::to_string(msgData.value);
+        }
+        else if (msgData.type == LMRankEvent::XPAwarded)
+        {
+            text = "+" + std::to_string(msgData.value) + " XP!";
+        }
         displayTag(text);
     }
 }

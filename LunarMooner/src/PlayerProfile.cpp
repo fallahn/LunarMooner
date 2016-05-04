@@ -332,7 +332,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
         case LMMessageId::RankEvent:
         {
             auto& msgData = msg.getData<LMRankEvent>();
-            switch (msgData.rank)
+            switch (msgData.value)
             {
             default: break;
             case 10:
@@ -387,7 +387,8 @@ void PlayerProfile::raiseAchievementMessage(AchievementID id)
     {
         //raise an event
         auto xpMsg = m_messageBus.post<LMRankEvent>(LMMessageId::RankEvent);
-        xpMsg->rank = rank;
+        xpMsg->type = LMRankEvent::RankUp;
+        xpMsg->value = rank;
     }
 }
 
@@ -398,14 +399,20 @@ void PlayerProfile::awardXP()
     const float multiplier = static_cast<float>(currentRank + 10.f) / 10.f;
     const float award = static_cast<float>(m_potentialXP) * multiplier;
 
-    m_XP += static_cast<int>(award);
+    auto xp = static_cast<int>(award);
+    auto msg = m_messageBus.post<LMRankEvent>(LMMessageId::RankEvent);
+    msg->type = LMRankEvent::XPAwarded;
+    msg->value = xp;
+
+    m_XP += xp;
 
     int rank = getRank();
     if (rank > currentRank)
     {
         //raise an event
-        auto msg = m_messageBus.post<LMRankEvent>(LMMessageId::RankEvent);
-        msg->rank = rank;
+        msg = m_messageBus.post<LMRankEvent>(LMMessageId::RankEvent);
+        msg->value = rank;
+        msg->type = LMRankEvent::RankUp;
     }
     m_potentialXP = 0;
     save();
