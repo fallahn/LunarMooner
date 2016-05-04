@@ -43,8 +43,8 @@ namespace
 }
 
 CounterDisplay::CounterDisplay(sf::Texture& texture, const sf::Font& font, const std::string& label, sf::Uint8 digitCount)
-    : m_texture (texture),
-    m_subRects  (digitCount),
+    : m_subRects(digitCount),
+    m_texture   (texture),
     m_vertices  (digitCount * 8) //8 verts per digit
 {
     texture.setRepeated(true);
@@ -127,8 +127,8 @@ void CounterDisplay::setValue(int value)
     getDigits(digits, value);
 
     //may be fewer digits than display capable of
-    auto diff = m_subRects.size() - digits.size();
-    for (auto i = 0u, j = diff; i < digits.size(); ++i, ++diff) 
+    std::size_t diff = m_subRects.size() - digits.size();
+    for (std::size_t i = 0u; i < digits.size(); ++i, ++diff) 
     {
         m_subRects[diff].targetValue = digits[i];
 
