@@ -29,6 +29,9 @@ source distribution.
 #define LM_PLAYER_INF_DISP_HPP_
 
 #include <LMPlayerState.hpp>
+#include <LMLevelMeter.hpp>
+#include <LMClockDisplay.hpp>
+#include <LMCounterDisplay.hpp>
 
 #include <xygine/components/Component.hpp>
 
@@ -68,7 +71,24 @@ namespace lm
         bool m_showMessage;
         float m_messageDisplayTime;
 
-        std::vector<sf::Text> m_playerTexts;
+        //std::vector<sf::Text> m_playerTexts;
+
+        struct UIElements final : public sf::Drawable
+        {
+            UIElements(ResourceCollection&, const sf::Font&, sf::Uint8);
+            void update(float);
+
+            ClockDisplay clockDisplay;
+            CounterDisplay ammo;
+            CounterDisplay lives;
+            CounterDisplay score;
+            LevelMeter level;
+
+        private:
+            void draw(sf::RenderTarget&, sf::RenderStates) const override;
+        };
+        //TODO understand perfect forwarding so we can construct these in place
+        std::vector<std::unique_ptr<UIElements>> m_uiElements;
 
         struct ScoreTag final
         {

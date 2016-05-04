@@ -82,8 +82,10 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, ResourceCollection& rc, std::vect
     XY_ASSERT(ps.size() <= 4, "Currently only supporting 4 player display");
     for (auto i = 0u; i < ps.size(); ++i)
     {
-        m_playerTexts.emplace_back("",font, 24u);
-        m_playerTexts.back().setPosition(textPositions[i]);
+        //m_playerTexts.emplace_back("",font, 24u);
+        //m_playerTexts.back().setPosition(textPositions[i]);
+
+        m_uiElements.emplace_back(std::make_unique<UIElements>(rc, font, i));
     }
 
     m_bounds.width = xy::DefaultSceneSize.x;
@@ -111,21 +113,28 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
     std::string lives;
     for (auto i = 0u; i < m_playerStates.size(); ++i)
     {
-        std::stringstream ss;
-        ss << std::setw(2) << std::setfill('0') 
-            << static_cast<std::uint32_t>(m_playerStates[i].timeRemaining / 60.f) << ":" 
-            << std::setw(2) << std::setfill('0')
-            << std::floor(std::fmod(m_playerStates[i].timeRemaining, 60.f));
-        std::string remainingTime = ss.str();
-        
-        lives = (m_playerStates[i].lives > -1) ? "Lives: " + std::to_string(m_playerStates[i].lives) : "GAME OVER";
-        m_playerTexts[i].setString(
-            "Player " + names[i] + "\n"
-            "Score: " + std::to_string(m_playerStates[i].score) + "\n"
-            "Level: " + std::to_string(m_playerStates[i].level) + "\n"
-            "Ammo: " + std::to_string(m_playerStates[i].ammo) + "\n"
-            + lives + "\n"
-            + remainingTime);
+        //std::stringstream ss;
+        //ss << std::setw(2) << std::setfill('0') 
+        //    << static_cast<std::uint32_t>(m_playerStates[i].timeRemaining / 60.f) << ":" 
+        //    << std::setw(2) << std::setfill('0')
+        //    << std::floor(std::fmod(m_playerStates[i].timeRemaining, 60.f));
+        //std::string remainingTime = ss.str();
+        //
+        //lives = (m_playerStates[i].lives > -1) ? "Lives: " + std::to_string(m_playerStates[i].lives) : "GAME OVER";
+        //m_playerTexts[i].setString(
+        //    "Player " + names[i] + "\n"
+        //    "Score: " + std::to_string(m_playerStates[i].score) + "\n"
+        //    "Level: " + std::to_string(m_playerStates[i].level) + "\n"
+        //    "Ammo: " + std::to_string(m_playerStates[i].ammo) + "\n"
+        //    + lives + "\n"
+        //    + remainingTime);
+
+        m_uiElements[i]->ammo.setValue(m_playerStates[i].ammo);
+        m_uiElements[i]->clockDisplay.setTime(m_playerStates[i].timeRemaining);
+        m_uiElements[i]->level.setLevel(m_playerStates[i].level);
+        m_uiElements[i]->lives.setValue(m_playerStates[i].lives);
+        m_uiElements[i]->score.setValue(m_playerStates[i].score);
+        m_uiElements[i]->update(dt);
     }
 
     //update any active scores and remove dead ones
@@ -142,15 +151,15 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
 
 void ScoreDisplay::setPlayerActive(std::size_t idx)
 {
-    XY_ASSERT(idx < m_playerTexts.size(), "Index out of range");
-    for (auto & p : m_playerTexts)
-    {
-        p.setFillColor(sf::Color::Yellow);
-        p.setOutlineThickness(1.f);
-        p.setOutlineColor(sf::Color::Red);
-    }
-    m_playerTexts[idx].setFillColor(sf::Color::White);    
-    m_playerTexts[idx].setOutlineThickness(0.f);
+    //XY_ASSERT(idx < m_playerTexts.size(), "Index out of range");
+    //for (auto & p : m_playerTexts)
+    //{
+    //    p.setFillColor(sf::Color::Yellow);
+    //    p.setOutlineThickness(1.f);
+    //    p.setOutlineColor(sf::Color::Red);
+    //}
+    //m_playerTexts[idx].setFillColor(sf::Color::White);    
+    //m_playerTexts[idx].setOutlineThickness(0.f);
 }
 
 void ScoreDisplay::showMessage(const std::string& msg)
@@ -179,14 +188,19 @@ void ScoreDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     if(m_showMessage) rt.draw(m_messageText, states);
     
-    for (const auto& text : m_playerTexts)
-    {
-        rt.draw(text, states);
-    }
+    //for (const auto& text : m_playerTexts)
+    //{
+    //    rt.draw(text, states);
+    //}
 
     for (const auto& st : m_scoreTags)
     {
         rt.draw(st.text, states);
+    }
+
+    for (const auto& s : m_uiElements)
+    {
+        rt.draw(*s);
     }
 }
 
@@ -200,4 +214,49 @@ void ScoreDisplay::ScoreTag::update(float dt)
     auto colour = text.getFillColor();
     colour.a = static_cast<sf::Uint8>(255.f * std::max(0.f, alpha));
     text.setFillColor(colour);
+}
+
+
+//ui elements struct
+ScoreDisplay::UIElements::UIElements(ResourceCollection& rc, const sf::Font& font, sf::Uint8 player)
+    : clockDisplay  (rc.textureResource.get("assets/images/game/console/nixie_sheet.png")),
+    ammo            (rc.textureResource.get("assets/images/game/console/counter.png"), font, "Ammo", 2),
+    lives           (rc.textureResource.get("assets/images/game/console/counter.png"), font, "Lives", 2),
+    score           (rc.textureResource.get("assets/images/game/console/counter.png"), font, "", 6),
+    level           (rc.textureResource.get("assets/images/game/console/level_meter.png"))
+{
+    //hackety blunge to layout elements
+    if (player == 0)
+    {
+        clockDisplay.setPosition(40.f, 34.f);
+        ammo.setPosition(191.f, 142.f);
+        lives.setPosition(191.f, 196.f);
+        score.setPosition(66.f, 270.f);
+        level.setPosition(42.f, 536.f);
+    }
+    else
+    {
+        clockDisplay.setPosition(1680.f, 34.f);
+        ammo.setPosition(1831.f, 142.f);
+        lives.setPosition(1831.f, 196.f);
+        score.setPosition(1706.f, 270.f);
+        level.setPosition(1682.f, 536.f);
+    }
+}
+
+void ScoreDisplay::UIElements::update(float dt)
+{
+    ammo.update(dt);
+    lives.update(dt);
+    score.update(dt);
+    level.update(dt);
+}
+
+void ScoreDisplay::UIElements::draw(sf::RenderTarget& rt, sf::RenderStates states) const
+{
+    rt.draw(clockDisplay, states);
+    rt.draw(ammo, states);
+    rt.draw(score, states);
+    rt.draw(lives, states);
+    rt.draw(level, states);
 }
