@@ -39,7 +39,7 @@ using namespace lm;
 
 namespace
 {
-    const float textSpacing = 14.f;
+    const float textSpacing = 34.f;
 }
 
 CounterDisplay::CounterDisplay(sf::Texture& texture, const sf::Font& font, const std::string& label, sf::Uint8 digitCount)
