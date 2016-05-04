@@ -88,7 +88,6 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, ResourceCollection& rc, std::vect
 
     m_bounds.width = xy::DefaultSceneSize.x;
     m_bounds.height = xy::DefaultSceneSize.y;
-
 }
 
 //public
@@ -139,7 +138,6 @@ void ScoreDisplay::entityUpdate(xy::Entity&, float dt)
     {
         return (st.text.getFillColor().a == 0);
     }), m_scoreTags.end());
-
 }
 
 void ScoreDisplay::setPlayerActive(std::size_t idx)

@@ -94,12 +94,13 @@ void Overlay::handleMessage(const xy::Message& msg)
         if (msgData.type == LMRankEvent::RankUp)
         {
             text = "RANK UP!\nLevel: " + std::to_string(msgData.value);
+            displayTag(text);
         }
-        else if (msgData.type == LMRankEvent::XPAwarded)
+        else if (msgData.type == LMRankEvent::XPAwarded && msgData.value > 0)
         {
             text = "+" + std::to_string(msgData.value) + " XP!";
-        }
-        displayTag(text);
+            displayTag(text);
+        }       
     }
 }
 

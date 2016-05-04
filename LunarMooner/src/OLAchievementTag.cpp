@@ -55,7 +55,8 @@ AchievementTag::AchievementTag(xy::MessageBus& mb, xy::FontResource& fr, const s
     m_holdTime  (holdTime),
     m_alpha     (1.f)
 {
-    m_text.setFont(fr.get("achievement_tag"));
+    auto& font = fr.get("achievement_tag");
+    m_text.setFont(font);
     m_text.setCharacterSize(20u);
     m_text.setString(text);
     m_text.setFillColor(textColour);

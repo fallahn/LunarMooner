@@ -12,6 +12,7 @@ SET(LM_SRC
   ${LM_DIR}/LMCollisionComponent.cpp
   ${LM_DIR}/LMCollisionWorld.cpp
   ${LM_DIR}/LMCoolDownMeter.cpp
+  ${LM_DIR}/LMCounterDisplay.cpp
   ${LM_DIR}/LMEarlyWarning.cpp
   ${LM_DIR}/LMGameController.cpp
   ${LM_DIR}/LMHumanController.cpp
