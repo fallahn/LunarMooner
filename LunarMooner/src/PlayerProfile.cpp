@@ -332,29 +332,32 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
         case LMMessageId::RankEvent:
         {
             auto& msgData = msg.getData<LMRankEvent>();
-            switch (msgData.value)
+            if (msgData.type == LMRankEvent::RankUp)
             {
-            default: break;
-            case 10:
-                m_achievements[AchievementID::Rank10].unlocked = true;
-                raiseAchievementMessage(AchievementID::Rank10);
-                break;
-            case 20:
-                m_achievements[AchievementID::Rank20].unlocked = true;
-                raiseAchievementMessage(AchievementID::Rank20);
-                break;
-            case 30:
-                m_achievements[AchievementID::Rank30].unlocked = true;
-                raiseAchievementMessage(AchievementID::Rank30);
-                break;
-            case 40:
-                m_achievements[AchievementID::Rank40].unlocked = true;
-                raiseAchievementMessage(AchievementID::Rank40);
-                break;
-            case 50:
-                m_achievements[AchievementID::Rank50].unlocked = true;
-                raiseAchievementMessage(AchievementID::Rank50);
-                break;
+                switch (msgData.value)
+                {
+                default: break;
+                case 10:
+                    m_achievements[AchievementID::Rank10].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Rank10);
+                    break;
+                case 20:
+                    m_achievements[AchievementID::Rank20].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Rank20);
+                    break;
+                case 30:
+                    m_achievements[AchievementID::Rank30].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Rank30);
+                    break;
+                case 40:
+                    m_achievements[AchievementID::Rank40].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Rank40);
+                    break;
+                case 50:
+                    m_achievements[AchievementID::Rank50].unlocked = true;
+                    raiseAchievementMessage(AchievementID::Rank50);
+                    break;
+                }
             }
         }
             break;

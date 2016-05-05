@@ -37,6 +37,7 @@ source distribution.
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 namespace xy
 {
@@ -71,11 +72,9 @@ namespace lm
         bool m_showMessage;
         float m_messageDisplayTime;
 
-        //std::vector<sf::Text> m_playerTexts;
-
         struct UIElements final : public sf::Drawable
         {
-            UIElements(ResourceCollection&, const sf::Font&, sf::Uint8);
+            UIElements(ResourceCollection&, sf::Uint8);
             void update(float);
 
             ClockDisplay clockDisplay;
@@ -87,8 +86,8 @@ namespace lm
         private:
             void draw(sf::RenderTarget&, sf::RenderStates) const override;
         };
-        //TODO understand perfect forwarding so we can construct these in place
-        std::vector<std::unique_ptr<UIElements>> m_uiElements;
+        std::vector<UIElements> m_uiElements;
+        sf::Sprite m_activePlayerSprite;
 
         struct ScoreTag final
         {

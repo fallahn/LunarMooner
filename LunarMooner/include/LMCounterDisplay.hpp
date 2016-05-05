@@ -47,15 +47,18 @@ namespace lm
     class CounterDisplay final : public sf::Drawable, public sf::Transformable
     {
     public:
-        CounterDisplay(sf::Texture&, const sf::Font&, const std::string&, sf::Uint8);
+        CounterDisplay(sf::Texture&, sf::Uint8);
         ~CounterDisplay() = default;
         CounterDisplay(const CounterDisplay&) = delete;
         CounterDisplay& operator = (const CounterDisplay&) = delete;
+        CounterDisplay(CounterDisplay&&) = default;
 
         void update(float);
         void setValue(int);
 
     private:
+
+        int m_currentValue;
 
         struct SubRect final : public sf::Transformable
         {
@@ -69,8 +72,6 @@ namespace lm
         std::vector<SubRect> m_subRects;
 
         const sf::Texture& m_texture;
-        sf::Text m_text;
-
         std::vector<sf::Vertex> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

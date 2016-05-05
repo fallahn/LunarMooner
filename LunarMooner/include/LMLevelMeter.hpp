@@ -45,6 +45,8 @@ namespace lm
         LevelMeter(const LevelMeter&) = delete;
         LevelMeter& operator = (const LevelMeter&) = delete;
 
+        LevelMeter(LevelMeter&&) noexcept = default;
+
         void update(float);
         void setLevel(sf::Uint8 level) { m_level = level - 1; }
 

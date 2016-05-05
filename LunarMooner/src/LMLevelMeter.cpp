@@ -36,6 +36,7 @@ using namespace lm;
 namespace
 {
     const float pointerSize = 12.f;
+    const float pointerHeight = pointerSize * 2.f;
     const float pointerY = 48.f;
     const float padLeft = 21.f;
     const float numSpace = 16.f;
@@ -67,9 +68,9 @@ LevelMeter::LevelMeter(const sf::Texture& t)
     //arrow
     m_pointer.vertices[1].position.x = pointerSize;
     m_pointer.vertices[1].texCoords.x = pointerSize;
-    m_pointer.vertices[2].position = { pointerSize, pointerSize };
-    m_pointer.vertices[2].texCoords = m_pointer.vertices[2].position;
-    m_pointer.vertices[3].position.y = pointerSize;
+    m_pointer.vertices[2].position = { pointerSize, pointerHeight };
+    m_pointer.vertices[2].texCoords = { pointerSize, pointerSize };
+    m_pointer.vertices[3].position.y = pointerHeight;
     m_pointer.vertices[3].texCoords.y = pointerSize;
 
     for (auto i = 0u; i < 4; ++i)
@@ -77,7 +78,7 @@ LevelMeter::LevelMeter(const sf::Texture& t)
         m_vertices[i + 4].texCoords = m_pointer.vertices[i].texCoords;
     }
 
-    m_pointer.setOrigin(pointerSize / 2.f, pointerSize);
+    m_pointer.setOrigin(pointerSize / 2.f, pointerHeight);
     m_pointer.setPosition(180.f, pointerY);
 
     //calc positions of numbers on dial
