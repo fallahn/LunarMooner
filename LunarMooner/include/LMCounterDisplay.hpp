@@ -32,6 +32,7 @@ source distribution.
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/System/Time.hpp>
 
 #include <array>
 #include <vector>
@@ -63,10 +64,11 @@ namespace lm
         struct SubRect final : public sf::Transformable
         {
             std::array<sf::Vertex, 4u> vertices;
-            sf::Int8 currentValue = 0;
-            sf::Int8 targetValue = 0;
-            float targetPosition = 0.f;
+			int targetValue = 0;
+			int lastValue = 0;
+			int factor = 0;
             sf::Vector2f size;
+			sf::Time timeSinceValueChange = sf::seconds(0);
             void update(float);
         };
         std::vector<SubRect> m_subRects;

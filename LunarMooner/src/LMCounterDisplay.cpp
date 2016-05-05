@@ -41,6 +41,7 @@ using namespace lm;
 namespace
 {
     const float textSpacing = 34.f;
+	const sf::Time	updateTime = sf::seconds(2);	//the time taken to update the value
 }
 
 CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount)
@@ -56,6 +57,7 @@ CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount)
     size.y /= 10.f;
 
     auto v = 0u;
+	auto factor = 0;
     for (auto i = 0u; i < m_subRects.size(); ++i)
     {
         m_subRects[i].vertices[1].texCoords.x = size.x;
@@ -73,6 +75,9 @@ CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount)
         m_vertices[v++] = m_subRects[i].vertices[1];
         m_vertices[v++] = m_subRects[i].vertices[2];
         m_vertices[v++] = m_subRects[i].vertices[3];
+		
+		//tell it which factor this digit is displaying
+		m_subRects[i].factor = digitCount - 1 - factor++; //abrakadabra
     }
 
     for (const auto& sr : m_subRects)
@@ -98,11 +103,8 @@ void CounterDisplay::update(float dt)
             m_vertices[i++].texCoords = tx.transformPoint(v.texCoords);
         }
 
-        //scrolls digit if not set
-        if (sr.currentValue != sr.targetValue)
-        {
-            sr.update(dt);
-        }
+        //update digit
+        sr.update(dt);
     }
 }
 
@@ -110,42 +112,20 @@ void CounterDisplay::setValue(int value)
 {
     XY_ASSERT(value < (std::pow(10.f, m_subRects.size()) - 1), "Value too large!");
 
+	bool valueChanged = value != m_currentValue;
+
     LMDirection direction = (value > m_currentValue) ? LMDirection::Up : LMDirection::Down;
-    m_currentValue = value;
 
-    std::function<void(std::vector<sf::Uint8>&, int)> getDigits =
-        [&getDigits](std::vector<sf::Uint8>& op, int number)
-    {
-        std::vector<sf::Uint8> retVal;
-        if (number > 9)
-        {
-            getDigits(op, number / 10);
-        }
-        op.push_back(number % 10);
-    };
-
-    std::vector<sf::Uint8> digits;
-    getDigits(digits, value);
-
-    //may be fewer digits than display capable of
-    std::size_t diff = m_subRects.size() - digits.size();
-    for (std::size_t i = 0u; i < digits.size(); ++i, ++diff) 
-    {
-        //only set a new target if not moving
-        if (m_subRects[diff].currentValue == m_subRects[diff].targetValue)
-        {
-            m_subRects[diff].targetValue = digits[i];
-
-            sf::Int8 distance = m_subRects[diff].targetValue - m_subRects[diff].currentValue;
-            if (distance < 0 && direction == LMDirection::Up) distance += 10;
-            else if (distance > 0 && direction == LMDirection::Down) distance -= 10;
-
-            if (distance != 0)
-            {
-                m_subRects[diff].targetPosition = m_subRects[diff].getPosition().y + (distance * m_subRects[diff].size.y);
-            }
-        }
-    }
+	for (auto& digit : m_subRects)
+	{
+		digit.targetValue = value;
+		if (valueChanged)
+		{
+			digit.timeSinceValueChange = sf::seconds(0);
+			digit.lastValue = m_currentValue;
+		}
+	} 
+	m_currentValue = value;
 }
 
 //private
@@ -159,21 +139,25 @@ void CounterDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 //digit update
 void CounterDisplay::SubRect::update(float dt)
 {
-    static const float moveSpeed = 100.f;
-
-    auto pos = getPosition();
-    if (pos.y > targetPosition)
-    {
-        move(0.f, -moveSpeed *dt);
-    }
-    else
-    {
-        move(0.f, moveSpeed * dt);
-    }
-
-    if (std::abs(pos.y - targetPosition) < 2.f)
-    {
-        setPosition(pos.x, targetPosition);
-        currentValue = targetValue;
-    }
+	timeSinceValueChange += sf::seconds(dt);
+	float factoredValue(targetValue / static_cast<int>(std::pow(10, factor)));
+	float factoredLastValue(lastValue / static_cast<int>(std::pow(10, factor)));
+	if (timeSinceValueChange > updateTime)
+	{
+		//update finished - set to final value
+		vertices[0].texCoords = sf::Vector2f(0, size.y * factoredValue);
+		vertices[1].texCoords = sf::Vector2f(size.x, size.y * factoredValue);
+		vertices[2].texCoords = sf::Vector2f(size.x, size.y * factoredValue + size.y);
+		vertices[3].texCoords = sf::Vector2f(0, size.y * factoredValue + size.y);
+	}
+	else
+	{
+		//update in progress, update values accordingly
+		auto timeFactor = timeSinceValueChange / updateTime;
+		auto currentY = factoredLastValue + (factoredValue - factoredLastValue)*timeFactor;
+		vertices[0].texCoords = sf::Vector2f(0, size.y * currentY );
+		vertices[1].texCoords = sf::Vector2f(size.x, size.y * currentY);
+		vertices[2].texCoords = sf::Vector2f(size.x, size.y * currentY + size.y);
+		vertices[3].texCoords = sf::Vector2f(0, size.y * currentY + size.y);
+	}
 }
