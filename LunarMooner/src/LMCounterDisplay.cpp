@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LMCounterDisplay.hpp>
+#include <CommandIds.hpp>
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -42,16 +43,13 @@ namespace
     const float textSpacing = 34.f;
 }
 
-CounterDisplay::CounterDisplay(sf::Texture& texture, const sf::Font& font, const std::string& label, sf::Uint8 digitCount)
-    : m_subRects(digitCount),
-    m_texture   (texture),
-    m_vertices  (digitCount * 8) //8 verts per digit
+CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount)
+    : m_currentValue(0),
+    m_subRects      (digitCount),
+    m_texture       (texture),
+    m_vertices      (digitCount * 8) //8 verts per digit
 {
     texture.setRepeated(true);
-
-    m_text.setFont(font);
-    m_text.setString(label);
-    m_text.setPosition(-(m_text.getLocalBounds().width + textSpacing), 0.f);
 
     sf::Vector2f size(texture.getSize());
     size.x /= 2.f;
@@ -112,6 +110,9 @@ void CounterDisplay::setValue(int value)
 {
     XY_ASSERT(value < (std::pow(10.f, m_subRects.size()) - 1), "Value too large!");
 
+    LMDirection direction = (value > m_currentValue) ? LMDirection::Up : LMDirection::Down;
+    m_currentValue = value;
+
     std::function<void(std::vector<sf::Uint8>&, int)> getDigits =
         [&getDigits](std::vector<sf::Uint8>& op, int number)
     {
@@ -130,16 +131,19 @@ void CounterDisplay::setValue(int value)
     std::size_t diff = m_subRects.size() - digits.size();
     for (std::size_t i = 0u; i < digits.size(); ++i, ++diff) 
     {
-        m_subRects[diff].targetValue = digits[i];
-
-        sf::Int8 distance = m_subRects[diff].targetValue - m_subRects[diff].currentValue;
-        if (distance != 0)
+        //only set a new target if not moving
+        if (m_subRects[diff].currentValue == m_subRects[diff].targetValue)
         {
-            if (std::abs(distance > 5))
+            m_subRects[diff].targetValue = digits[i];
+
+            sf::Int8 distance = m_subRects[diff].targetValue - m_subRects[diff].currentValue;
+            if (distance < 0 && direction == LMDirection::Up) distance += 10;
+            else if (distance > 0 && direction == LMDirection::Down) distance -= 10;
+
+            if (distance != 0)
             {
-                distance = 10 - distance;
+                m_subRects[diff].targetPosition = m_subRects[diff].getPosition().y + (distance * m_subRects[diff].size.y);
             }
-            m_subRects[diff].targetPosition = (m_subRects[diff].currentValue * m_subRects[diff].size.y) + (distance * m_subRects[diff].size.y);
         }
     }
 }
@@ -148,8 +152,6 @@ void CounterDisplay::setValue(int value)
 void CounterDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.transform *= getTransform();
-
-    rt.draw(m_text, states);
     states.texture = &m_texture;
     rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 }

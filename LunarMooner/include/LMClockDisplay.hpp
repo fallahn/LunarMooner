@@ -50,6 +50,8 @@ namespace lm
         ClockDisplay(const ClockDisplay&) = delete;
         ClockDisplay& operator = (const ClockDisplay&) = delete;
 
+        ClockDisplay(ClockDisplay&&) noexcept = default;
+
         void setTime(float); //time in seconds
 
     private:
