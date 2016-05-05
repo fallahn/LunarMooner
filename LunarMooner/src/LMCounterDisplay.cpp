@@ -142,22 +142,20 @@ void CounterDisplay::SubRect::update(float dt)
 	timeSinceValueChange += sf::seconds(dt);
 	float factoredValue(targetValue / static_cast<int>(std::pow(10, factor)));
 	float factoredLastValue(lastValue / static_cast<int>(std::pow(10, factor)));
+	float newVal;
 	if (timeSinceValueChange > updateTime)
 	{
 		//update finished - set to final value
-		vertices[0].texCoords = sf::Vector2f(0, size.y * factoredValue);
-		vertices[1].texCoords = sf::Vector2f(size.x, size.y * factoredValue);
-		vertices[2].texCoords = sf::Vector2f(size.x, size.y * factoredValue + size.y);
-		vertices[3].texCoords = sf::Vector2f(0, size.y * factoredValue + size.y);
+		newVal = factoredValue;
 	}
 	else
 	{
 		//update in progress, update values accordingly
 		auto timeFactor = timeSinceValueChange / updateTime;
-		auto currentY = factoredLastValue + (factoredValue - factoredLastValue)*timeFactor;
-		vertices[0].texCoords = sf::Vector2f(0, size.y * currentY );
-		vertices[1].texCoords = sf::Vector2f(size.x, size.y * currentY);
-		vertices[2].texCoords = sf::Vector2f(size.x, size.y * currentY + size.y);
-		vertices[3].texCoords = sf::Vector2f(0, size.y * currentY + size.y);
+		newVal = factoredLastValue + (factoredValue - factoredLastValue)*timeFactor;
 	}
+	vertices[0].texCoords = sf::Vector2f(0, size.y * newVal);
+	vertices[1].texCoords = sf::Vector2f(size.x, size.y * newVal);
+	vertices[2].texCoords = sf::Vector2f(size.x, size.y * newVal + size.y);
+	vertices[3].texCoords = sf::Vector2f(0, size.y * newVal + size.y);
 }

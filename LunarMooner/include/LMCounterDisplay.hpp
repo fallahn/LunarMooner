@@ -64,9 +64,9 @@ namespace lm
         struct SubRect final : public sf::Transformable
         {
             std::array<sf::Vertex, 4u> vertices;
-			int targetValue = 0;
-			int lastValue = 0;
-			int factor = 0;
+			sf::Int32 targetValue = 0;
+			sf::Int32 lastValue = 0;
+			sf::Int8 factor = 0;
             sf::Vector2f size;
 			sf::Time timeSinceValueChange = sf::seconds(0);
             void update(float);
