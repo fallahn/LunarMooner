@@ -47,7 +47,7 @@ CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount, sf::T
     : m_currentValue(0),
     m_subRects      (digitCount),
     m_texture       (texture),
-    m_vertices      (digitCount * 8) //8 verts per digit
+    m_vertices      (digitCount * 12) //12 verts per digit
 {
     texture.setRepeated(true);
 
@@ -68,12 +68,9 @@ CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount, sf::T
         m_subRects[i].vertices[2].position = { (size.x * i) + size.x , size.y };
         m_subRects[i].vertices[3].position = { size.x * i, size.y };
 
+
         m_subRects[i].size = size;
 
-        m_vertices[v++] = m_subRects[i].vertices[0];
-        m_vertices[v++] = m_subRects[i].vertices[1];
-        m_vertices[v++] = m_subRects[i].vertices[2];
-        m_vertices[v++] = m_subRects[i].vertices[3];
 
         m_subRects[i].updateTime = updateTime;
 
@@ -146,6 +143,7 @@ void CounterDisplay::SubRect::update(float dt)
 	//make them floats to have digits partially in view
     int factoredValue(targetValue / static_cast<int>(std::pow(10, factor)));
     int factoredLastValue(lastValue / static_cast<int>(std::pow(10, factor)));
+
 
     float newVal;
     if (timeSinceValueChange > updateTime)
