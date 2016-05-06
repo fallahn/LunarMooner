@@ -92,11 +92,6 @@ void MenuWeaponState::handleMessage(const xy::Message& msg)
 
 }
 
-namespace
-{
-
-}
-
 //private
 void MenuWeaponState::buildMenu(const sf::Font& font)
 {
@@ -121,15 +116,16 @@ void MenuWeaponState::buildMenu(const sf::Font& font)
     weaponSelect->setPosition(centreX, 420.f);
     
     sf::Int32 count = AchievementID::Rank50 - AchievementID::Rank10;
-    sf::Uint8 flags = 0u;
+    sf::Uint8 flags = 0xff;
     for (auto i = 0; i < count; ++i)
     {
-        if (!m_profile.hasAchievement(static_cast<AchievementID>(AchievementID::Rank10 + i)))
+        if (m_profile.hasAchievement(static_cast<AchievementID>(AchievementID::Rank10 + i)))
         {
-            flags |= (1 << i);
+            flags &= ~(1 << i);
         }
     }
     weaponSelect->setLockedFlags(flags);
+    
 
     m_uiContainer.addControl(weaponSelect);
 

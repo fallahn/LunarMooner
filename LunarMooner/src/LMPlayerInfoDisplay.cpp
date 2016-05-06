@@ -85,7 +85,7 @@ ScoreDisplay::ScoreDisplay(xy::MessageBus& mb, ResourceCollection& rc, std::vect
     m_messageText.setOutlineColor(sf::Color::Red);
     m_messageText.setOutlineThickness(2.f);
 
-    XY_ASSERT(ps.size() <= 4, "Currently only supporting 4 player display");
+    XY_ASSERT(ps.size() <= 2, "Currently only supporting 2 player display");
     for (auto i = 0u; i < ps.size(); ++i)
     {
         m_uiElements.emplace_back(rc, i);

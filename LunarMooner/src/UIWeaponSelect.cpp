@@ -175,23 +175,26 @@ void WeaponSelect::setLockedFlags(sf::Uint8 flags)
 {
     for (auto i = 0u; i < m_items.size(); ++i)
     {
-        if (flags & (1 << i))
+        if (flags & (1 << i)) //locked
         {
             m_items[i].vertices[0].texCoords.y = m_bounds.height;
             m_items[i].vertices[1].texCoords.y =  m_bounds.height;
             m_items[i].vertices[2].texCoords.y = m_bounds.height * 2.f;
             m_items[i].vertices[3].texCoords.y = m_bounds.height * 2.f;
         }
-        else
+        else //unlocked
         {
             m_items[i].vertices[0].texCoords.y = 0.f;
             m_items[i].vertices[1].texCoords.y = 0.f;
             m_items[i].vertices[2].texCoords.y = m_bounds.height - 1.f;
             m_items[i].vertices[3].texCoords.y = m_bounds.height - 1.f;
+
+            m_nextIndex = i; //select the highest unlocked
         }
     }
 
     updateVertexArray();
+    m_items[m_nextIndex].setPosition(m_bounds.width, 0.f);
 }
 
 //private

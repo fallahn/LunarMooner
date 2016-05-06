@@ -129,6 +129,7 @@ void CounterDisplay::update(float dt)
 void CounterDisplay::setValue(int value)
 {
     XY_ASSERT(value < (std::pow(10.f, m_subRects.size()) - 1), "Value too large!");
+    value = std::max(0, value); //kludge to prevent negative numbers
 
     bool valueChanged = value != m_currentValue;
 

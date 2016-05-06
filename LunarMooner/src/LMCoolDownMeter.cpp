@@ -83,7 +83,7 @@ void CooldownMeter::entityUpdate(xy::Entity&, float dt)
     }
 
     //update button alpha
-    if (m_level < 1)
+    if (m_level < frameCount - 1.f)
     {
         m_alpha = std::max(0.f, m_alpha - dt);
         sf::Color c(255u, 255u, 255u, static_cast<sf::Uint8>(m_alpha * 255.f));
