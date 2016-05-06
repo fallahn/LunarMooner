@@ -156,7 +156,7 @@ void CounterDisplay::SubRect::update(float dt)
     {
         //update in progress, update values accordingly
         auto timeFactor = timeSinceValueChange / updateTime;
-        newVal = factoredLastValue + (factoredValue - factoredLastValue)*timeFactor;
+        newVal = factoredLastValue + (factoredValue - factoredLastValue)*static_cast<float>(std::sin((timeFactor-0.5f)*(std::atan(1)*4))+1)/2;
     }
     vertices[0].texCoords = sf::Vector2f(0, size.y * newVal);
     vertices[1].texCoords = sf::Vector2f(size.x, size.y * newVal);
