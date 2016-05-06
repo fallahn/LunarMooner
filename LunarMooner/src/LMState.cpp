@@ -104,7 +104,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 
     auto pp = xy::PostProcess::create<lm::PostBlur>();
     m_scene.addPostProcess(pp);
-    pp = xy::PostProcess::create<xy::PostChromeAb>();
+    pp = xy::PostProcess::create<xy::PostChromeAb>(false);
     m_scene.addPostProcess(pp);
 
     m_overlay.setView(context.defaultView);

@@ -115,8 +115,6 @@ void CounterDisplay::setValue(int value)
 
     bool valueChanged = value != m_currentValue;
 
-    LMDirection direction = (value > m_currentValue) ? LMDirection::Up : LMDirection::Down;
-
     for (auto& digit : m_subRects)
     {
         digit.targetValue = value;

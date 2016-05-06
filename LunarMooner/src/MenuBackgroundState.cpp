@@ -63,7 +63,7 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
-    auto pp = xy::PostProcess::create<xy::PostChromeAb>();
+    auto pp = xy::PostProcess::create<xy::PostChromeAb>(true);
     m_scene.addPostProcess(pp);
 
     //m_scene.drawDebug(true);
