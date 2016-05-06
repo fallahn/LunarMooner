@@ -64,6 +64,7 @@ namespace lm
         struct SubRect final : public sf::Transformable
         {
             std::array<sf::Vertex, 4u> vertices;
+            std::array<sf::Vertex, 4u> blurVertices;
             sf::Int32 targetValue = 0;
             sf::Int32 lastValue = 0;
             sf::Int8 factor = 0;
