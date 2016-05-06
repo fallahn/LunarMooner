@@ -29,6 +29,7 @@ source distribution.
 #include <CommandIds.hpp>
 
 #include <xygine/Assert.hpp>
+#include <xygine/util/Random.hpp>
 
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -39,13 +40,16 @@ using namespace lm;
 namespace
 {
     const float frameCount = 6.f;
+    const float frameRate = 1.f / 12.f;
 }
 
 CooldownMeter::CooldownMeter(xy::MessageBus& mb, const sf::Texture& t)
     : xy::Component (mb, this),
     m_texture       (t),
     m_size          (t.getSize()),
-    m_level         (0.f)
+    m_level         (0.f),
+    m_frameTime     (0.f),
+    m_currentFrame  (xy::Util::Random::value(0, static_cast<int>(frameCount - 1)))
 {
     m_size.y /= frameCount;
 
@@ -59,7 +63,20 @@ CooldownMeter::CooldownMeter(xy::MessageBus& mb, const sf::Texture& t)
 //public
 void CooldownMeter::entityUpdate(xy::Entity&, float dt)
 {
+    m_frameTime += dt;
+    if(m_frameTime > frameRate)
+    {
+        m_frameTime = 0.f;
+        m_currentFrame = (m_currentFrame + 1) % static_cast<int>(frameCount);
 
+        const float offset = m_currentFrame * m_size.y;
+        m_vertices[0].texCoords.y = offset;
+        m_vertices[1].texCoords.y = offset;
+        m_vertices[2].texCoords.y = offset + m_size.y;
+        m_vertices[3].texCoords.y = offset + m_size.y;
+    }
+
+    //update button alpha
 }
 
 void CooldownMeter::setValue(float value)
@@ -70,11 +87,6 @@ void CooldownMeter::setValue(float value)
     if (level != m_level)
     {
         //update frame
-        const float offset = level * m_size.y;
-        m_vertices[0].texCoords.y = offset;
-        m_vertices[1].texCoords.y = offset;
-        m_vertices[2].texCoords.y = offset + m_size.y;
-        m_vertices[3].texCoords.y = offset + m_size.y;
 
         m_level = level;
 

@@ -58,6 +58,9 @@ namespace lm
         sf::Vector2f m_size;
         float m_level;
 
+        float m_frameTime;
+        std::size_t m_currentFrame;
+
         std::array<sf::Vertex, 4u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
