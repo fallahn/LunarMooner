@@ -76,6 +76,7 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, ResourceCollecti
     }
     else
     {
+        m_playerState.score += (m_livesBonus + m_humanBonus + m_timeBonus);
 
         m_mainText.setPosition(600.f, 200.f);
         m_mainText.setCharacterSize(50u);
