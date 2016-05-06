@@ -14,9 +14,10 @@ need to have SFML installed (building the latest revision is recommended)
 and [xygine](https://github.com/fallahn/xygine/wiki/Building).
 
 OS X:  
-The CMake file is ocasionally tested on OS X and has been proven to work
+The CMake file is occasionally tested on OS X and has been proven to work,
 but as testing is intermittent due to lack of access to hardware breaking
-changes may unfortunately be sometime incurred.
+changes may unfortunately sometimes occur. Pull requests to fix any build
+errors are gratefully accepted.
 
 ######Contributions
 Contributions should be acknowledged and are gratefully accepted from:  

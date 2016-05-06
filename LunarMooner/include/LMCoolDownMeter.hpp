@@ -32,6 +32,7 @@ source distribution.
 
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 #include <array>
 
@@ -40,12 +41,13 @@ namespace sf
     class Texture;
 }
 
+struct ResourceCollection;
 namespace lm
 {
     class CooldownMeter final : public xy::Component, public sf::Drawable
     {
     public:
-        CooldownMeter(xy::MessageBus&, const sf::Texture&);
+        CooldownMeter(xy::MessageBus&, ResourceCollection&);
         ~CooldownMeter() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
@@ -60,6 +62,9 @@ namespace lm
 
         float m_frameTime;
         std::size_t m_currentFrame;
+
+        sf::Sprite  m_buttonSprite;
+        float m_alpha;
 
         std::array<sf::Vertex, 4u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;

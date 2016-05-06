@@ -27,6 +27,7 @@ source distribution.
 
 #include <LMCoolDownMeter.hpp>
 #include <CommandIds.hpp>
+#include <ResourceCollection.hpp>
 
 #include <xygine/Assert.hpp>
 #include <xygine/util/Random.hpp>
@@ -40,16 +41,17 @@ using namespace lm;
 namespace
 {
     const float frameCount = 6.f;
-    const float frameRate = 1.f / 12.f;
+    const float frameRate = 1.f / 6.f;
 }
 
-CooldownMeter::CooldownMeter(xy::MessageBus& mb, const sf::Texture& t)
+CooldownMeter::CooldownMeter(xy::MessageBus& mb, ResourceCollection& rc)
     : xy::Component (mb, this),
-    m_texture       (t),
-    m_size          (t.getSize()),
+    m_texture       (rc.textureResource.get("assets/images/game/console/weapon_charge.png")),
+    m_size          (m_texture.getSize()),
     m_level         (0.f),
     m_frameTime     (0.f),
-    m_currentFrame  (xy::Util::Random::value(0, static_cast<int>(frameCount - 1)))
+    m_currentFrame  (xy::Util::Random::value(0, static_cast<int>(frameCount - 1))),
+    m_alpha         (0.f)
 {
     m_size.y /= frameCount;
 
@@ -58,6 +60,10 @@ CooldownMeter::CooldownMeter(xy::MessageBus& mb, const sf::Texture& t)
     m_vertices[3].position.y = m_size.y;
 
     for (auto& v : m_vertices)v.texCoords = v.position;
+
+    m_buttonSprite.setTexture(rc.textureResource.get("assets/images/game/console/weapon_button.png"));
+    m_buttonSprite.setOrigin(sf::Vector2f(m_buttonSprite.getTexture()->getSize()) / 2.f);
+    m_buttonSprite.setPosition(m_size.x / 2.f, 111.f);
 }
 
 //public
@@ -77,6 +83,12 @@ void CooldownMeter::entityUpdate(xy::Entity&, float dt)
     }
 
     //update button alpha
+    if (m_level < 1)
+    {
+        m_alpha = std::max(0.f, m_alpha - dt);
+        sf::Color c(255u, 255u, 255u, static_cast<sf::Uint8>(m_alpha * 255.f));
+        m_buttonSprite.setColor(c);
+    }
 }
 
 void CooldownMeter::setValue(float value)
@@ -86,7 +98,9 @@ void CooldownMeter::setValue(float value)
 
     if (level != m_level)
     {
-        //update frame
+        //update button alpha
+        m_alpha = 1.f;
+        m_buttonSprite.setColor(sf::Color::White);
 
         m_level = level;
 
@@ -102,4 +116,8 @@ void CooldownMeter::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
     states.texture = &m_texture;
     rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
+
+    states.texture = nullptr;
+    states.blendMode = sf::BlendAdd;
+    rt.draw(m_buttonSprite, states);
 }
