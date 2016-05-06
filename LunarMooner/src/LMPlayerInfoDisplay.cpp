@@ -199,9 +199,9 @@ void ScoreDisplay::ScoreTag::update(float dt)
 //ui elements struct
 ScoreDisplay::UIElements::UIElements(ResourceCollection& rc, sf::Uint8 player)
     : clockDisplay  (rc.textureResource.get("assets/images/game/console/nixie_sheet.png")),
-    ammo            (rc.textureResource.get("assets/images/game/console/counter.png"), 2),
-    lives           (rc.textureResource.get("assets/images/game/console/counter.png"), 2),
-    score           (rc.textureResource.get("assets/images/game/console/counter.png"), 6),
+    ammo            (rc.textureResource.get("assets/images/game/console/counter.png"), 2, sf::seconds(0.5f)),
+    lives           (rc.textureResource.get("assets/images/game/console/counter.png"), 2, sf::seconds(0.5f)),
+    score           (rc.textureResource.get("assets/images/game/console/counter.png"), 6, sf::seconds(2.0f)),
     level           (rc.textureResource.get("assets/images/game/console/level_meter.png"))
 {
     //hackety blunge to layout elements
