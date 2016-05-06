@@ -1077,11 +1077,14 @@ void GameController::createUI()
     entity->setPosition(padding, cooldownHeight);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 
-    cooldownMeter = xy::Component::create<CooldownMeter>(getMessageBus(), m_resources.textureResource.get("assets/images/game/console/weapon_charge.png"));
-    entity = xy::Entity::create(getMessageBus());
-    m_uiComponents[1].cooldownMeter = entity->addComponent(cooldownMeter);
-    entity->setPosition(alienArea.left + alienArea.width + padding, cooldownHeight);
-    m_scene.addEntity(entity, xy::Scene::Layer::UI);
+    if (m_playerStates.size() > 1)
+    {
+        cooldownMeter = xy::Component::create<CooldownMeter>(getMessageBus(), m_resources.textureResource.get("assets/images/game/console/weapon_charge.png"));
+        entity = xy::Entity::create(getMessageBus());
+        m_uiComponents[1].cooldownMeter = entity->addComponent(cooldownMeter);
+        entity->setPosition(alienArea.left + alienArea.width + padding, cooldownHeight);
+        m_scene.addEntity(entity, xy::Scene::Layer::UI);
+    }
 
     //score / lives display etc
     auto scores = xy::Component::create<ScoreDisplay>(getMessageBus(), m_resources, m_playerStates);
