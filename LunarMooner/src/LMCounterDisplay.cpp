@@ -140,13 +140,17 @@ void CounterDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 void CounterDisplay::SubRect::update(float dt)
 {
     timeSinceValueChange += sf::seconds(dt);
-    float factoredValue(targetValue / static_cast<int>(std::pow(10, factor)));
-    float factoredLastValue(lastValue / static_cast<int>(std::pow(10, factor)));
+
+	//these are ints so the value is floored to an integer,
+	//make them floats to have digits partially in view
+    int factoredValue(targetValue / static_cast<int>(std::pow(10, factor)));
+    int factoredLastValue(lastValue / static_cast<int>(std::pow(10, factor)));
+
     float newVal;
     if (timeSinceValueChange > updateTime)
     {
         //update finished - set to final value
-        newVal = factoredValue;
+        newVal = static_cast<float>(factoredValue);
     }
     else
     {
