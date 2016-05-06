@@ -129,17 +129,14 @@ void RoundSummary::entityUpdate(xy::Entity&, float dt)
         if (m_livesBonus > 0)
         {
             m_livesBonus -= updateStep;
-            m_playerState.score += updateStep;
         }
         else if (m_humanBonus > 0)
         {
             m_humanBonus -= updateStep;
-            m_playerState.score += updateStep;
         }
         else if (m_timeBonus > 0)
         {
             m_timeBonus -= updateStep;
-            m_playerState.score += updateStep;
         }
         else
         {            
@@ -155,6 +152,7 @@ void RoundSummary::entityUpdate(xy::Entity&, float dt)
 void RoundSummary::onStart(xy::Entity& ent)
 {
     m_entity = &ent;
+	m_playerState.score += (m_timeBonus + m_humanBonus + m_livesBonus);
 }
 
 void RoundSummary::completeSummary()
