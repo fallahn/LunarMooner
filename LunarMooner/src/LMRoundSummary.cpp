@@ -76,6 +76,7 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, ResourceCollecti
     }
     else
     {
+
         m_mainText.setPosition(600.f, 200.f);
         m_mainText.setCharacterSize(50u);
 
@@ -152,7 +153,6 @@ void RoundSummary::entityUpdate(xy::Entity&, float dt)
 void RoundSummary::onStart(xy::Entity& ent)
 {
     m_entity = &ent;
-	m_playerState.score += (m_timeBonus + m_humanBonus + m_livesBonus);
 }
 
 void RoundSummary::completeSummary()

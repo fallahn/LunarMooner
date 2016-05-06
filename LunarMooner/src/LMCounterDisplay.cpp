@@ -47,7 +47,7 @@ CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount, sf::T
     : m_currentValue(0),
     m_subRects      (digitCount),
     m_texture       (texture),
-    m_vertices      (digitCount * 8) //8 verts per digit
+    m_vertices      (digitCount * 12) //12 verts per digit
 {
     texture.setRepeated(true);
 
@@ -68,12 +68,25 @@ CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount, sf::T
         m_subRects[i].vertices[2].position = { (size.x * i) + size.x , size.y };
         m_subRects[i].vertices[3].position = { size.x * i, size.y };
 
+        //use the same verts for the motion blur to start off with
+        m_subRects[i].blurVertices[0] = m_subRects[i].vertices[0];
+        m_subRects[i].blurVertices[1] = m_subRects[i].vertices[1];
+        m_subRects[i].blurVertices[2] = m_subRects[i].vertices[2];
+        m_subRects[i].blurVertices[3] = m_subRects[i].vertices[3];
+
         m_subRects[i].size = size;
 
-        m_vertices[v++] = m_subRects[i].vertices[0];
-        m_vertices[v++] = m_subRects[i].vertices[1];
-        m_vertices[v++] = m_subRects[i].vertices[2];
-        m_vertices[v++] = m_subRects[i].vertices[3];
+        for (auto& vert : m_subRects[i].vertices)
+        {
+        	m_vertices[v++] = vert;
+        }
+        
+        //add blur verts and make them 50% alpha
+        for (auto& vert : m_subRects[i].blurVertices)
+        {
+        	vert.color = sf::Color(255,255,255,128);
+        	m_vertices[v++] = vert;
+        }
 
         m_subRects[i].updateTime = updateTime;
 
@@ -100,6 +113,10 @@ void CounterDisplay::update(float dt)
     {
         const auto& tx = sr.getTransform();
         for (const auto v : sr.vertices)
+        {
+            m_vertices[i++].texCoords = tx.transformPoint(v.texCoords);
+        }
+        for (const auto v : sr.blurVertices)
         {
             m_vertices[i++].texCoords = tx.transformPoint(v.texCoords);
         }
@@ -144,6 +161,12 @@ void CounterDisplay::SubRect::update(float dt)
 	//make them floats to have digits partially in view
     int factoredValue(targetValue / static_cast<int>(std::pow(10, factor)));
     int factoredLastValue(lastValue / static_cast<int>(std::pow(10, factor)));
+
+    //update the motion blur
+    blurVertices[0].texCoords = vertices[0].texCoords;
+    blurVertices[1].texCoords = vertices[1].texCoords;
+    blurVertices[2].texCoords = vertices[2].texCoords;
+    blurVertices[3].texCoords = vertices[3].texCoords;
 
     float newVal;
     if (timeSinceValueChange > updateTime)
