@@ -41,10 +41,9 @@ using namespace lm;
 namespace
 {
     const float textSpacing = 34.f;
-    const sf::Time	updateTime = sf::seconds(2);	//the time taken to update the value
 }
 
-CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount)
+CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount, sf::Time updateTime)
     : m_currentValue(0),
     m_subRects      (digitCount),
     m_texture       (texture),
@@ -75,7 +74,9 @@ CounterDisplay::CounterDisplay(sf::Texture& texture, sf::Uint8 digitCount)
         m_vertices[v++] = m_subRects[i].vertices[1];
         m_vertices[v++] = m_subRects[i].vertices[2];
         m_vertices[v++] = m_subRects[i].vertices[3];
-        
+
+        m_subRects[i].updateTime = updateTime;
+
         //tell it which factor this digit is displaying
         m_subRects[i].factor = digitCount - 1 - factor++; //abrakadabra
     }
