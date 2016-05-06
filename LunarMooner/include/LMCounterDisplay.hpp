@@ -48,7 +48,7 @@ namespace lm
     class CounterDisplay final : public sf::Drawable, public sf::Transformable
     {
     public:
-        CounterDisplay(sf::Texture&, sf::Uint8);
+        CounterDisplay(sf::Texture&, sf::Uint8, sf::Time);
         ~CounterDisplay() = default;
         CounterDisplay(const CounterDisplay&) = delete;
         CounterDisplay& operator = (const CounterDisplay&) = delete;
@@ -69,6 +69,7 @@ namespace lm
             sf::Int8 factor = 0;
             sf::Vector2f size;
             sf::Time timeSinceValueChange = sf::seconds(0);
+            sf::Time updateTime;
             void update(float);
         };
         std::vector<SubRect> m_subRects;
