@@ -70,7 +70,7 @@ using namespace std::placeholders;
 
 namespace
 {
-    const sf::Vector2f playerSize(42.f, 64.f);
+    const sf::Vector2f playerSize(50.f, 80.f);
     const sf::Color playerColour(127, 127, 127);
     const sf::Vector2f bulletSize(2.f, 24.f);
 
@@ -702,7 +702,7 @@ void GameController::createMothership()
 {
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
     drawable->getDrawable().setRadius(10.f);
-    drawable->getDrawable().setScale(12.f, 4.f);
+    drawable->getDrawable().setScale(12.f, 5.f);
     drawable->getDrawable().setFillColor(sf::Color::Yellow);
 
     auto controller = xy::Component::create<lm::MothershipController>(getMessageBus(), mothershipBounds);
@@ -957,7 +957,7 @@ void GameController::addRescuedHuman()
     offset *= m_playerStates[m_currentPlayer].humansSaved;
 
     auto entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(pad + offset + 4.f, 24.f);
+    entity->setPosition(pad + offset + 4.f, 44.f);
     entity->addComponent(drawable);
     m_mothership->addChild(entity);
 }

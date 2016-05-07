@@ -252,7 +252,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             
 
             m_shield = false;
-            //m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+            m_entity->getComponent<PlayerDrawable>()->setShield(false);
 
             auto position = m_entity->getPosition();
             auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
@@ -310,7 +310,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
         msg->value = cc->getScoreValue();
 
         m_shield = true;
-        //m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(2.f);
+        m_entity->getComponent<PlayerDrawable>()->setShield(true);
     }
     break;
     case CollisionComponent::ID::Tower:
@@ -338,7 +338,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                     m_velocity *= 0.9f;
                     //broke the shield :(
                     m_shield = false;
-                    //m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+                    m_entity->getComponent<PlayerDrawable>()->setShield(false);
 
                     auto position = m_entity->getPosition();
                     auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);

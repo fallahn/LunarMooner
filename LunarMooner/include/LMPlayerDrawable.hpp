@@ -59,7 +59,7 @@ namespace lm
         void entityUpdate(xy::Entity&, float) override;
 
         void setScale(float);
-
+        void setShield(bool b) { m_hasShield = b; }
     private:
 
         struct Quad final : public sf::Transformable
@@ -67,10 +67,11 @@ namespace lm
             std::array<sf::Vertex, 4> vertices;
         };
         std::array<Quad, 2> m_legs;
+        bool m_hasShield;
 
         sf::Texture& m_diffuseTexture;
         sf::Texture& m_normalMap;
-        //sf::Texture& m_maskMap;
+        sf::Texture& m_shieldTexture;
 
         std::array<sf::Vertex, 12> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
