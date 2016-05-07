@@ -30,6 +30,7 @@ source distribution.
 #include <LMMothershipController.hpp>
 #include <LMAsteroidController.hpp>
 #include <LMAlienController.hpp>
+#include <LMPlayerDrawable.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
 
@@ -146,6 +147,7 @@ void PlayerController::entityUpdate(xy::Entity& entity, float dt)
     m_rcsRight->setInertia(m_velocity);
 
     //REPORT("Current Speed", std::to_string(xy::Util::Vector::lengthSquared(m_velocity)));
+    entity.getComponent<PlayerDrawable>()->setScale(getSpeed());
 }
 
 void PlayerController::onStart(xy::Entity& entity)
@@ -211,7 +213,7 @@ sf::Vector2f PlayerController::getPosition() const
 
 float PlayerController::getSpeed() const
 {
-    return xy::Util::Vector::lengthSquared(m_velocity);
+    return std::min(1.f, xy::Util::Vector::lengthSquared(m_velocity) / maxLandingVelocity);
 }
 
 void PlayerController::collisionCallback(CollisionComponent* cc)
@@ -250,7 +252,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
             
 
             m_shield = false;
-            m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+            //m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
 
             auto position = m_entity->getPosition();
             auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
@@ -308,7 +310,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
         msg->value = cc->getScoreValue();
 
         m_shield = true;
-        m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(2.f);
+        //m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(2.f);
     }
     break;
     case CollisionComponent::ID::Tower:
@@ -336,7 +338,7 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
                     m_velocity *= 0.9f;
                     //broke the shield :(
                     m_shield = false;
-                    m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+                    //m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
 
                     auto position = m_entity->getPosition();
                     auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);

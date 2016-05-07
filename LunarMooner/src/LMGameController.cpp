@@ -27,6 +27,7 @@ source distribution.
 
 #include <LMGameController.hpp>
 #include <LMPlayerController.hpp>
+#include <LMPlayerDrawable.hpp>
 #include <LMMothershipController.hpp>
 #include <LMCollisionWorld.hpp>
 #include <LMHumanController.hpp>
@@ -69,7 +70,7 @@ using namespace std::placeholders;
 
 namespace
 {
-    const sf::Vector2f playerSize(32.f, 42.f);
+    const sf::Vector2f playerSize(42.f, 64.f);
     const sf::Color playerColour(127, 127, 127);
     const sf::Vector2f bulletSize(2.f, 24.f);
 
@@ -585,16 +586,14 @@ void GameController::spawnPlayer()
         cmd.action = [](xy::Entity& ent, float) {ent.destroy(); };
         m_scene.sendCommand(cmd);
 
-        auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-        dropshipDrawable->getDrawable().setFillColor(playerColour);
-        dropshipDrawable->getDrawable().setSize(playerSize);
-        dropshipDrawable->getDrawable().setOutlineColor(sf::Color::Cyan);
+        auto dropshipDrawable = xy::Component::create<PlayerDrawable>(getMessageBus(), m_resources.textureResource, playerSize);
+        dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
 
         xy::Component::MessageHandler mh;
         mh.id = LMMessageId::GameEvent;
         mh.action = [](xy::Component* c, const xy::Message& msg)
         {
-            auto& shape = static_cast<xy::SfDrawableComponent<sf::RectangleShape>*>(c)->getDrawable();
+            /*auto& shape = static_cast<xy::SfDrawableComponent<sf::RectangleShape>*>(c)->getDrawable();
             auto& msgData = msg.getData<LMGameEvent>();
             if (msgData.type == LMGameEvent::HumanPickedUp)
             {
@@ -603,7 +602,7 @@ void GameController::spawnPlayer()
             else if (msgData.type == LMGameEvent::HumanRescued)
             {
                 shape.setFillColor(playerColour);
-            }
+            }*/
         };
         dropshipDrawable->addMessageHandler(mh);
 
@@ -666,11 +665,6 @@ void GameController::spawnPlayer()
         entity->addCommandCategories(LMCommandID::Player);
         auto playerEntity = m_scene.addEntity(entity, xy::Scene::BackFront);
 
-        /*auto thrustLight = xy::Component::create<xy::PointLight>(getMessageBus(), 700.f, 300.f);
-        entity = xy::Entity::create(getMessageBus());
-        entity->setPosition(0.f, 100.f);
-        entity->addComponent(thrustLight);
-        playerEntity->addChild(entity);*/
 
         mh.id = xy::Message::UIMessage;
         mh.action = [fx1, fx2, fx3, this](xy::Component*, const xy::Message& msg)
