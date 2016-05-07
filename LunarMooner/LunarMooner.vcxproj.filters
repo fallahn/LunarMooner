@@ -199,7 +199,7 @@
       <Filter>Header Files\ui</Filter>
     </ClInclude>
     <ClInclude Include="include\LMPlayerDrawable.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

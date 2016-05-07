@@ -38,8 +38,10 @@ using namespace lm;
 
 PlayerDrawable::PlayerDrawable(xy::MessageBus& mb, xy::TextureResource& tr, const sf::Vector2f& size)
     : xy::Component (mb, this),
+    m_hasShield     (false),
     m_diffuseTexture(tr.get("assets/images/game/ship_diffuse.png")),
-    m_normalMap     (tr.get("assets/images/game/ship_normal.png"))
+    m_normalMap     (tr.get("assets/images/game/ship_normal.png")),
+    m_shieldTexture (tr.get("assets/images/game/ship_shield.png"))
 {
     sf::Vector2f texSize(m_diffuseTexture.getSize());
     const float offset = (texSize.x - size.x) / 2.f;
@@ -119,5 +121,14 @@ void PlayerDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 
     states.shader = getActiveShader();
     states.texture = &m_diffuseTexture;
+    
     rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
+
+    if (m_hasShield)
+    {
+        states.blendMode = sf::BlendAdd;
+        states.texture = &m_shieldTexture;
+        states.shader = nullptr;
+        rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
+    }
 }
