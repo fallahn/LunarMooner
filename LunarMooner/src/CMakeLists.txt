@@ -21,6 +21,7 @@ SET(LM_SRC
   ${LM_DIR}/LMMothershipController.cpp
   ${LM_DIR}/LMNukeDrawable.cpp
   ${LM_DIR}/LMPlayerController.cpp
+  ${LM_DIR}/LMPlayerDrawable.cpp
   ${LM_DIR}/LMPlayerInfoDisplay.cpp
   ${LM_DIR}/LMPostBlur.cpp
   ${LM_DIR}/LMRoundSummary.cpp

@@ -131,6 +131,7 @@
     <ClInclude Include="include\LMCoolDownMeter.hpp" />
     <ClInclude Include="include\LMCounterDisplay.hpp" />
     <ClInclude Include="include\LMLevelMeter.hpp" />
+    <ClInclude Include="include\LMPlayerDrawable.hpp" />
     <ClInclude Include="include\LMVelocityShader.hpp" />
     <ClInclude Include="include\MenuWeaponSelect.hpp" />
     <ClInclude Include="include\OLAchievementTag.hpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="src\LMCoolDownMeter.cpp" />
     <ClCompile Include="src\LMCounterDisplay.cpp" />
     <ClCompile Include="src\LMLevelMeter.cpp" />
+    <ClCompile Include="src\LMPlayerDrawable.cpp" />
     <ClCompile Include="src\MenuWeaponSelect.cpp" />
     <ClCompile Include="src\OLAchievementTag.cpp" />
     <ClCompile Include="src\LMLaserSight.cpp" />

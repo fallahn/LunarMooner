@@ -99,7 +99,7 @@ void CooldownMeter::setValue(float value)
     if (level != m_level)
     {
         //update button alpha
-        m_alpha = 1.f;
+        m_alpha = std::min(1.f, level / 5.f);
         m_buttonSprite.setColor(sf::Color::White);
 
         m_level = level;

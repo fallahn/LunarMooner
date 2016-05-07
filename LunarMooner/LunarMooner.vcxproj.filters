@@ -198,6 +198,9 @@
     <ClInclude Include="include\LMCounterDisplay.hpp">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMPlayerDrawable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -334,6 +337,9 @@
     </ClCompile>
     <ClCompile Include="src\LMCounterDisplay.cpp">
       <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMPlayerDrawable.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
