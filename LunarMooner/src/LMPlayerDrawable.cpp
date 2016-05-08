@@ -119,7 +119,7 @@ void PlayerDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
         shader->setUniform("u_normalMap", m_normalMap);
 
         const auto& tx = states.transform.getInverse();
-        shader->setUniform("u_inversWorldViewMatrix", sf::Glsl::Mat4(tx));
+        shader->setUniform("u_inverseWorldViewMatrix", sf::Glsl::Mat4(tx));
     }
 
     states.shader = getActiveShader();
