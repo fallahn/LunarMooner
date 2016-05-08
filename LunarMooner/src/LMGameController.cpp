@@ -71,7 +71,6 @@ using namespace std::placeholders;
 namespace
 {
     const sf::Vector2f playerSize(50.f, 80.f);
-    const sf::Color playerColour(127, 127, 127);
     const sf::Vector2f bulletSize(2.f, 24.f);
 
     const sf::Vector2f mothershipBounds(386.f, 1534.f);
@@ -97,7 +96,7 @@ namespace
     //aliens per level
     const std::array<sf::Uint8, 10u> alienCounts =
     {
-        12, 18, 18, 21, 21, 24, 24, 26, 27, 30
+        12, 14, 14, 18, 18, 21, 21, 24, 26, 28
     };
 
     const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
@@ -734,14 +733,21 @@ void GameController::createMothership()
 
     m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
-    auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    dropshipDrawable->getDrawable().setFillColor(playerColour);
-    dropshipDrawable->getDrawable().setSize(playerSize);
-    xy::Util::Position::centreOrigin(dropshipDrawable->getDrawable());
+    //TODO this is repeated for respawns, could pop into own function
+    auto dropshipDrawable = xy::Component::create<PlayerDrawable>(getMessageBus(), m_resources.textureResource, playerSize);
+    dropshipDrawable->setOrigin(playerSize / 2.f);
+    dropshipDrawable->setSpeed(0.8f);
+    dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
+
+    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
+    lc->setDepth(110.f);
+    lc->setDiffuseColour({ 255u, 185u, 135u });
+    lc->setIntensity(1.1f);
 
     entity = xy::Entity::create(getMessageBus());    
     entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
     entity->addComponent(dropshipDrawable);
+    entity->addComponent(lc);
     entity->addCommandCategories(LMCommandID::DropShip);
     m_mothership->addChild(entity);
 }
@@ -765,11 +771,16 @@ namespace
 
 void GameController::spawnHuman(const sf::Vector2f& position)
 {
+    /*auto shadow = getHumanDrawable(getMessageBus(), m_resources);
+    shadow->setScale(1.2f, 1.2f);
+    shadow->setColour({ 0, 0, 0, 140 });
+*/
     auto drawable = getHumanDrawable(getMessageBus(), m_resources);
 
     auto controller = xy::Component::create<HumanController>(getMessageBus(), *drawable.get());
 
     auto entity = xy::Entity::create(getMessageBus());
+    //entity->addComponent(shadow);
     entity->addComponent(drawable);
     entity->addComponent(controller);
     entity->setPosition(position);
@@ -1329,15 +1340,22 @@ void GameController::addDelayedRespawn()
         auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
         msg->type = LMStateEvent::RoundBegin;
 
-        auto dropshipDrawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-        dropshipDrawable->getDrawable().setFillColor(playerColour);
-        dropshipDrawable->getDrawable().setSize(playerSize);
-        xy::Util::Position::centreOrigin(dropshipDrawable->getDrawable());
+        auto dropshipDrawable = xy::Component::create<PlayerDrawable>(getMessageBus(), m_resources.textureResource, playerSize);
+        dropshipDrawable->setOrigin(playerSize / 2.f);
+        dropshipDrawable->setSpeed(0.8f);
+        dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
+
+        //TODO fix this light not adding in xygine
+        auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
+        lc->setDepth(110.f);
+        lc->setDiffuseColour({ 255u, 185u, 135u });
+        lc->setIntensity(1.1f);
 
         auto entity = xy::Entity::create(getMessageBus());
         auto bounds = m_mothership->getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->getDrawable().getGlobalBounds();
         entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
         entity->addComponent(dropshipDrawable);
+        entity->addComponent(lc);
         entity->addCommandCategories(LMCommandID::DropShip);
         m_mothership->addChild(entity);
     };

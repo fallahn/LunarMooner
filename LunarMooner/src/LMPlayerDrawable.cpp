@@ -43,6 +43,9 @@ PlayerDrawable::PlayerDrawable(xy::MessageBus& mb, xy::TextureResource& tr, cons
     m_normalMap     (tr.get("assets/images/game/ship_normal.png")),
     m_shieldTexture (tr.get("assets/images/game/ship_shield.png"))
 {
+    m_bounds.width = size.x;
+    m_bounds.height = size.y;
+
     sf::Vector2f texSize(m_diffuseTexture.getSize());
     const float offset = (texSize.x - size.x) / 2.f;
 
@@ -62,7 +65,6 @@ PlayerDrawable::PlayerDrawable(xy::MessageBus& mb, xy::TextureResource& tr, cons
     m_legs[0].vertices[3].position.y = size.y;
     m_legs[0].vertices[3].texCoords.y = size.y;
     m_legs[0].setOrigin(offset, 0.f);
-    //m_legs[0].setPosition(offset, 0.f);
 
     //right leg
     m_legs[1].vertices[0].texCoords.x = offset + size.x;
@@ -75,12 +77,13 @@ PlayerDrawable::PlayerDrawable(xy::MessageBus& mb, xy::TextureResource& tr, cons
     m_legs[1].setPosition(size.x, 0.f);
 
     auto i = 4u;
-    for (const auto& l : m_legs)
+    for (auto& l : m_legs)
     {
         for (const auto& v : l.vertices)
         {
             m_vertices[i++] = v;
         }
+        l.setScale(0.2f, 1.f);
     }
 }
 
@@ -99,7 +102,7 @@ void PlayerDrawable::entityUpdate(xy::Entity&, float)
     }
 }
 
-void PlayerDrawable::setScale(float scale)
+void PlayerDrawable::setSpeed(float scale)
 {
     for (auto& l : m_legs)
     {
@@ -121,6 +124,7 @@ void PlayerDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 
     states.shader = getActiveShader();
     states.texture = &m_diffuseTexture;
+    states.transform *= getTransform();
     
     rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 

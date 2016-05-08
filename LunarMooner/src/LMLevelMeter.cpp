@@ -38,8 +38,8 @@ namespace
     const float pointerSize = 12.f;
     const float pointerHeight = pointerSize * 2.f;
     const float pointerY = 48.f;
-    const float padLeft = 21.f;
-    const float numSpace = 16.f;
+    const float padLeft = 18.f;
+    const float numSpace = 16.5f;
 }
 
 LevelMeter::LevelMeter(const sf::Texture& t)
