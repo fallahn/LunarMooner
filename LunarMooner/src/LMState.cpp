@@ -717,8 +717,9 @@ void LunarMoonerState::initParticles()
         switch (msgData.type)
         {
         default: break;
-        case LMGameEvent::AlienDied:
         case LMGameEvent::PlayerDied:
+            component->fire(LMParticleID::LargeExplosion, { msgData.posX, msgData.posY });
+        case LMGameEvent::AlienDied:
         case LMGameEvent::MeteorExploded:
             component->fire(LMParticleID::SmallExplosion, { msgData.posX, msgData.posY });
             break;
@@ -733,6 +734,9 @@ void LunarMoonerState::initParticles()
     xy::ParticleSystem::Definition pd;
     pd.loadFromFile("assets/particles/small_explosion.xyp", m_resources.textureResource);
     pc->addDefinition(LMParticleID::SmallExplosion, pd);
+
+    pd.loadFromFile("assets/particles/large_explosion.xyp", m_resources.textureResource);
+    pc->addDefinition(LMParticleID::LargeExplosion, pd);
 }
 
 void LunarMoonerState::buildBackground()
