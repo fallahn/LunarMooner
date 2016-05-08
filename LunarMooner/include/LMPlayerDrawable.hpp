@@ -49,7 +49,7 @@ namespace xy
 
 namespace lm
 {
-    class PlayerDrawable final : public xy::Component, public xy::ShaderProperty, public sf::Drawable
+    class PlayerDrawable final : public xy::Component, public xy::ShaderProperty, public sf::Drawable, public sf::Transformable
     {
     public:
         PlayerDrawable(xy::MessageBus&, xy::TextureResource&, const sf::Vector2f&);
@@ -57,8 +57,9 @@ namespace lm
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
+        sf::FloatRect globalBounds() const override { return getTransform().transformRect(m_bounds); }
 
-        void setScale(float);
+        void setSpeed(float);
         void setShield(bool b) { m_hasShield = b; }
     private:
 
@@ -68,6 +69,8 @@ namespace lm
         };
         std::array<Quad, 2> m_legs;
         bool m_hasShield;
+
+        sf::FloatRect m_bounds;
 
         sf::Texture& m_diffuseTexture;
         sf::Texture& m_normalMap;

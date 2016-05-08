@@ -147,7 +147,7 @@ void PlayerController::entityUpdate(xy::Entity& entity, float dt)
     m_rcsRight->setInertia(m_velocity);
 
     //REPORT("Current Speed", std::to_string(xy::Util::Vector::lengthSquared(m_velocity)));
-    entity.getComponent<PlayerDrawable>()->setScale(getSpeed());
+    entity.getComponent<PlayerDrawable>()->setSpeed(getSpeed());
 }
 
 void PlayerController::onStart(xy::Entity& entity)
@@ -532,7 +532,7 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
                         m_velocity *= damping;
 
                         m_shield = false;
-                        m_entity->getComponent<xy::SfDrawableComponent<sf::RectangleShape>>()->getDrawable().setOutlineThickness(0.f);
+                        m_entity->getComponent<PlayerDrawable>()->setShield(false);
 
                         auto position = m_entity->getPosition();
                         auto shieldMsg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
