@@ -739,15 +739,15 @@ void GameController::createMothership()
     dropshipDrawable->setSpeed(0.8f);
     dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
 
-    auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
+    /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
     lc->setDepth(110.f);
     lc->setDiffuseColour({ 255u, 185u, 135u });
-    lc->setIntensity(1.1f);
+    lc->setIntensity(1.1f);*/
 
     entity = xy::Entity::create(getMessageBus());    
     entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
     entity->addComponent(dropshipDrawable);
-    entity->addComponent(lc);
+    //entity->addComponent(lc);
     entity->addCommandCategories(LMCommandID::DropShip);
     m_mothership->addChild(entity);
 }
@@ -1346,16 +1346,16 @@ void GameController::addDelayedRespawn()
         dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
 
         //TODO fix this light not adding in xygine
-        auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
+        /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
         lc->setDepth(110.f);
         lc->setDiffuseColour({ 255u, 185u, 135u });
-        lc->setIntensity(1.1f);
+        lc->setIntensity(1.1f);*/
 
         auto entity = xy::Entity::create(getMessageBus());
         auto bounds = m_mothership->getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->getDrawable().getGlobalBounds();
         entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
         entity->addComponent(dropshipDrawable);
-        entity->addComponent(lc);
+        //entity->addComponent(lc);
         entity->addCommandCategories(LMCommandID::DropShip);
         m_mothership->addChild(entity);
     };
