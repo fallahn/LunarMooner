@@ -1,0 +1,43 @@
+{
+  "Editor": {
+    "EmitterPosition": "0, 0",
+    "BackgroundColour": 255,
+    "EnableMovement": false
+  },
+  "ReleaseCount": 3,
+  "Delay": 0.0,
+  "Duration": 0.3,
+  "Texture": "assets/images/particles/explosion.png",
+  "Colour": -1,
+  "BlendMode": "Add",
+  "ParticleSize": "10, 10",
+  "ParticlePosition": "0, 0",
+  "FollowParent": false,
+  "Lifetime": 0.6,
+  "InitialVelocity": "0, 0",
+  "RandomInitialVelocities": [
+    "-20, -33",
+    "31, -13",
+    "0, 6",
+    "-4, 14",
+    "23, -3"
+  ],
+  "EmitRate": 13.0,
+  "RandomInitialPositions": [
+    "4, 6",
+    "6, -7",
+    "-4, 3",
+    "4, 3",
+    "-6, -1",
+    "5, -5"
+  ],
+  "Affectors": [
+    {
+      "Type": "Scale",
+      "Data": [
+        10.0,
+        10.0
+      ]
+    }
+  ]
+}

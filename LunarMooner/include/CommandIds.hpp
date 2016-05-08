@@ -149,7 +149,8 @@ enum LMParticleID
     RcsLeft,
     RcsRight,
     RoidTrail,
-    SmallExplosion
+    SmallExplosion,
+    LargeExplosion
 };
 
 enum LMSoundID

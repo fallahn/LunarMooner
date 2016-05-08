@@ -523,7 +523,7 @@ void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
     auto& humans = state.humansRemaining;
     for (auto i = 0; i < humanCounts[level]; ++i)
     {
-        humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1045.f, 1060.f));
+        humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1025.f, 1030.f));
     }
 
     state.alienCount = alienCounts[level];
