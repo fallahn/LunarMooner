@@ -1,0 +1,15 @@
+{
+  "Animations": [
+    {
+      "Start": 0,
+      "End": 31,
+      "Loop": true,
+      "Name": "default"
+    }
+  ],
+  "FrameCount": 32,
+  "FrameSize": "32, 32",
+  "FrameRate": 12.0,
+  "Texture": "shield_item.png",
+  "NormalMap": "none.png"
+}
