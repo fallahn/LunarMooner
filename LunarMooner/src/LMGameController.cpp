@@ -1488,22 +1488,37 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     CollisionComponent::ID type = 
         (xy::Util::Random::value(0, 4) < 2) ? CollisionComponent::ID::Shield : CollisionComponent::ID::Ammo;
 
-    auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
-    drawable->getDrawable().setRadius(10.f);
-    drawable->getDrawable().setFillColor(sf::Color::Blue);
-    drawable->getDrawable().setScale(1.f, 1.4f);
-    drawable->getDrawable().setOrigin(drawable->getDrawable().getGlobalBounds().width / 2.f, 0.f);
+
+    sf::FloatRect bounds;
+    sf::Color fillColour;
+    
+    auto entity = xy::Entity::create(getMessageBus());
+    entity->setPosition(position);
 
     if (type == CollisionComponent::ID::Shield)
     {
-        drawable->getDrawable().setFillColor(sf::Color::Cyan);
+        //TODO cache animation file
+        auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/shield_item.png"));
+        drawable->loadAnimationData("assets/images/game/shield_item.xya");
+        drawable->playAnimation(0);
+        drawable->setScale(0.8f, 1.f);
+        fillColour = sf::Color::Cyan;
+        bounds = drawable->globalBounds();
+        entity->addComponent(drawable);
     }
     else
     {
-        drawable->getDrawable().setFillColor(sf::Color::Yellow);
+        fillColour = sf::Color::Yellow;
+        
+        auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
+        drawable->getDrawable().setRadius(10.f);
+        drawable->getDrawable().setScale(1.f, 1.4f);
+        drawable->getDrawable().setOrigin(drawable->getDrawable().getGlobalBounds().width / 2.f, 0.f);
+        drawable->getDrawable().setFillColor(fillColour);
+        bounds = drawable->getDrawable().getLocalBounds();
+        entity->addComponent(drawable);
     }
 
-    auto bounds = drawable->getDrawable().getLocalBounds();
     auto collision = m_collisionWorld.addComponent(getMessageBus(), bounds, type);
     collision->setScoreValue(20);
 
@@ -1515,12 +1530,10 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     //lights!
     auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
     lc->setDepth(150.f);
-    lc->setDiffuseColour(drawable->getDrawable().getFillColor());
+    lc->setDiffuseColour(fillColour);
     lc->setIntensity(0.9f);
 
-    auto entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(position);
-    entity->addComponent(drawable);
+        
     auto cc = entity->addComponent(collision);
     entity->addComponent(qtc);
     entity->addComponent(controller);
