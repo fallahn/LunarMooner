@@ -30,6 +30,7 @@ source distribution.
 
 #include <LMPlayerState.hpp>
 #include <CommandIds.hpp>
+#include <DemoRecorder.hpp>
 
 #include <xygine/components/Component.hpp>
 #include <xygine/components/ParticleSystem.hpp>
@@ -77,6 +78,8 @@ namespace lm
         void setDifficulty(xy::Difficulty);
 
     private:
+        DemoRecorder m_demoRecorder;
+        
         xy::Difficulty m_difficulty;
         float m_cooldownTime;
 

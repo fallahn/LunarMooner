@@ -311,7 +311,7 @@ bool LunarMoonerState::update(float dt)
     //get input
     if(m_useController) parseControllerInput();
     
-    if (m_inputFlags != m_prevInputFlags)
+    //if (m_inputFlags != m_prevInputFlags)
     {
         m_prevInputFlags = m_inputFlags;
         xy::Command cmd;

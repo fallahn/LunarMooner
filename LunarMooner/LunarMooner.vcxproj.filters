@@ -201,6 +201,9 @@
     <ClInclude Include="include\LMPlayerDrawable.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\DemoRecorder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -340,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="src\LMPlayerDrawable.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DemoRecorder.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
