@@ -28,6 +28,7 @@ source distribution.
 #include <DemoRecorder.hpp>
 
 #include <ctime>
+#include <cmath>
 #include <cstring>
 #include <sstream>
 #include <fstream>
