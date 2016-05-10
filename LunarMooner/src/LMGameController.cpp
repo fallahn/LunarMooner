@@ -292,6 +292,13 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             addDelayedRespawn();
             LOG("Summary finished", xy::Logger::Type::Info);
             break;
+        case LMStateEvent::RoundBegin:
+            //hmm potential bug here if changing difficulty mid-round
+            m_demoRecorder.start(m_playerStates[m_currentPlayer], m_difficulty);
+            break;
+        case LMStateEvent::RoundEnd:
+            m_demoRecorder.stop(false);
+            break;
         }
     };
     addMessageHandler(handler);
@@ -466,6 +473,8 @@ void GameController::entityUpdate(xy::Entity&, float dt)
 
 void GameController::setInput(sf::Uint8 input)
 {    
+    m_demoRecorder.recordInput(input);
+    
     bool shoot = ((input & LMInputFlags::Shoot) != 0
         && (m_inputFlags & LMInputFlags::Shoot) == 0);
 
@@ -541,6 +550,8 @@ void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
 
 void GameController::start()
 {
+    xy::Util::Random::rndEngine.seed(m_demoRecorder.getSeed());
+    
     createTerrain();
     createMothership();
     spawnAliens();
