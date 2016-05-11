@@ -27,6 +27,9 @@ source distribution.
 
 #include <DemoRecorder.hpp>
 
+#include <xygine/Log.hpp>
+#include <xygine/Assert.hpp>
+
 #include <ctime>
 #include <cmath>
 #include <cstring>
@@ -36,8 +39,9 @@ source distribution.
 
 DemoRecorder::DemoRecorder()
     : m_seed    (0),
+    m_buffer    (18000), //allows up to 300 seconds
     m_ptr       (nullptr),
-    m_started   (false)
+    m_enabled   (true)
 {
 
 }
@@ -51,12 +55,13 @@ sf::Uint32 DemoRecorder::getSeed()
 
 void DemoRecorder::start(const lm::PlayerState& ps, xy::Difficulty diff)
 {
-    std::size_t size = static_cast<std::size_t>(std::ceil(ps.timeRemaining * 60.f)); //60fps
+    if (!m_enabled) return;
+    
+    std::size_t size = static_cast<std::size_t>(std::ceil((ps.timeRemaining + 1.f) * 60.f)); //60fps
     size += sizeof(ps);
     size += sizeof(diff);
     size += sizeof(m_seed);
 
-    m_buffer = std::vector<char>(size);
     m_ptr = m_buffer.data();
 
     std::memcpy(m_ptr, &ps, sizeof(ps));
@@ -66,12 +71,13 @@ void DemoRecorder::start(const lm::PlayerState& ps, xy::Difficulty diff)
     std::memcpy(m_ptr, &m_seed, sizeof(m_seed));
     m_ptr += sizeof(m_seed);
 
-    m_started = true;
+    LOG("Started Recording Demo", xy::Logger::Type::Info);
 }
 
 void DemoRecorder::recordInput(sf::Uint8 input)
 {
-    if (m_started)
+    //XY_ASSERT(m_started, "Demo recording not enabled");
+    if(m_ptr)
     {
         *m_ptr = input;
         m_ptr++;
@@ -80,7 +86,9 @@ void DemoRecorder::recordInput(sf::Uint8 input)
 
 void DemoRecorder::stop(bool saveFile)
 {
-    m_started = false;
+    if (!m_enabled || !m_ptr) return;
+    
+    *m_ptr = 0xff; //termination value
     if (saveFile)
     {
         auto time = std::time(nullptr);
@@ -98,7 +106,14 @@ void DemoRecorder::stop(bool saveFile)
             file.write(m_buffer.data(), m_ptr - m_buffer.data());
         }
         file.close();
+
+        LOG("Save demo file to " + filename, xy::Logger::Type::Info);
     }
+
+    m_ptr = nullptr;
+    m_buffer.clear();
+
+    LOG("Stopped Recording Demo", xy::Logger::Type::Info);
 }
 
 //private

@@ -127,6 +127,7 @@
     <ClInclude Include="include\BGRoidBelt.hpp" />
     <ClInclude Include="include\BGScoreboardMask.hpp" />
     <ClInclude Include="include\BGStarfield.hpp" />
+    <ClInclude Include="include\DemoPlayer.hpp" />
     <ClInclude Include="include\DemoRecorder.hpp" />
     <ClInclude Include="include\LMClockDisplay.hpp" />
     <ClInclude Include="include\LMCoolDownMeter.hpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="src\BGRoidBelt.cpp" />
     <ClCompile Include="src\BGScoreMask.cpp" />
     <ClCompile Include="src\BGStarField.cpp" />
+    <ClCompile Include="src\DemoPlayer.cpp" />
     <ClCompile Include="src\DemoRecorder.cpp" />
     <ClCompile Include="src\LMClockDisplay.cpp" />
     <ClCompile Include="src\LMCoolDownMeter.cpp" />

@@ -3,6 +3,7 @@ SET(LM_SRC
   ${LM_DIR}/BGRoidBelt.cpp
   ${LM_DIR}/BGScoreMask.cpp
   ${LM_DIR}/BGStarField.cpp
+  ${LM_DIR}/DemoPlayer.cpp
   ${LM_DIR}/DemoRecorder.cpp
   ${LM_DIR}/Game.cpp
   ${LM_DIR}/GameOverState.cpp

@@ -294,7 +294,10 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             break;
         case LMStateEvent::RoundBegin:
             //hmm potential bug here if changing difficulty mid-round
-            m_demoRecorder.start(m_playerStates[m_currentPlayer], m_difficulty);
+            if (m_playerStates[m_currentPlayer].lives > -1)
+            {
+                m_demoRecorder.start(m_playerStates[m_currentPlayer], m_difficulty);
+            }
             break;
         case LMStateEvent::RoundEnd:
             m_demoRecorder.stop(false);
@@ -550,6 +553,11 @@ void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
 
 void GameController::start()
 {
+    /*if (m_demoPlayer.loadDemo("test.lmd"))
+    {
+        int buns = 0;
+    }*/
+    
     xy::Util::Random::rndEngine.seed(m_demoRecorder.getSeed());
     
     createTerrain();

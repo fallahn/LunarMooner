@@ -25,33 +25,38 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_DEMO_RECORDER_HPP_
-#define LM_DEMO_RECORDER_HPP_
+#ifndef LM_DEMO_PLAYER_HPP_
+#define LM_DEMO_PLAYER_HPP_
 
 #include <LMPlayerState.hpp>
 
 #include <xygine/Difficulty.hpp>
 
+#include <string>
 #include <vector>
 
-class DemoRecorder
+class DemoPlayer final
 {
 public:
-    DemoRecorder();
-    ~DemoRecorder() = default;
-    DemoRecorder(const DemoRecorder&) = delete;
-    DemoRecorder operator = (const DemoRecorder&) = delete;
+    DemoPlayer();
+    ~DemoPlayer() = default;
+    DemoPlayer(const DemoPlayer&) = delete;
+    DemoPlayer& operator = (const DemoPlayer&) = delete;
 
-    sf::Uint32 getSeed();
-    void start(const lm::PlayerState&, xy::Difficulty);
-    void recordInput(sf::Uint8);
-    void stop(bool = true);
-    void setEnabled(bool b) { m_enabled = b; }
+    bool loadDemo(const std::string&);
+    const lm::PlayerState& getPlayerState() const { return m_state; }
+    sf::Uint32 getSeed() const { return m_seed; }
+    xy::Difficulty getDifficulty() const { return m_difficulty; }
+    sf::Uint8 getNextInput();
+
 private:
+
+    lm::PlayerState m_state;
     sf::Uint32 m_seed;
-    std::vector<char> m_buffer;
+    xy::Difficulty m_difficulty;
+    std::vector<char> m_inputData;
     char* m_ptr;
-    bool m_enabled;
 };
 
-#endif //LM_DEMO_RECORDER_HPP_
+
+#endif //LM_DEMO_PLAYER_HPP_
