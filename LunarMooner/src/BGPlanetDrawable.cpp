@@ -116,7 +116,7 @@ void PlanetDrawable::setDetailNormal(sf::Texture& t)
     auto texSize = t.getSize();
     if (m_renderTexture.getSize().x == 0)
     {
-        m_renderTexture.create(texSize.x, texSize.y, 3);
+        m_renderTexture.create(texSize.x, texSize.y, 3u);
     }
 }
 
@@ -145,7 +145,7 @@ void PlanetDrawable::setDiffuseTexture(sf::Texture& t)
 
     if (m_renderTexture.getSize().x == 0)
     {
-        m_renderTexture.create(texSize.x, texSize.y, 3);
+        m_renderTexture.create(texSize.x, texSize.y, 3u);
     }
 }
 
@@ -157,7 +157,7 @@ void PlanetDrawable::setMaskTexture(sf::Texture& t)
     auto texSize = t.getSize();
     if (m_renderTexture.getSize().x == 0)
     {
-        m_renderTexture.create(texSize.x, texSize.y, 3);
+        m_renderTexture.create(texSize.x, texSize.y, 3u);
     }
 }
 
