@@ -300,7 +300,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             }
             break;
         case LMStateEvent::RoundEnd:
-            m_demoRecorder.stop(false);
+            m_demoRecorder.stop(true);
             break;
         }
     };
@@ -477,6 +477,8 @@ void GameController::entityUpdate(xy::Entity&, float dt)
 void GameController::setInput(sf::Uint8 input)
 {    
     m_demoRecorder.recordInput(input);
+
+	input = m_demoPlayer.getNextInput();
     
     bool shoot = ((input & LMInputFlags::Shoot) != 0
         && (m_inputFlags & LMInputFlags::Shoot) == 0);
@@ -553,13 +555,15 @@ void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
 
 void GameController::start()
 {
-    /*if (m_demoPlayer.loadDemo("test.lmd"))
+    if (m_demoPlayer.loadDemo("test.lmd"))
     {
-        int buns = 0;
-    }*/
-    
-    xy::Util::Random::rndEngine.seed(m_demoRecorder.getSeed());
-    
+		xy::Util::Random::rndEngine.seed(m_demoPlayer.getSeed());
+    }
+	else
+	{
+		xy::Util::Random::rndEngine.seed(m_demoRecorder.getSeed());
+	}
+
     createTerrain();
     createMothership();
     spawnAliens();
