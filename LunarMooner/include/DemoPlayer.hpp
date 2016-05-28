@@ -48,6 +48,7 @@ public:
     sf::Uint32 getSeed() const { return m_seed; }
     xy::Difficulty getDifficulty() const { return m_difficulty; }
     sf::Uint8 getNextInput();
+	bool isPlaying();
 
 private:
 
@@ -56,6 +57,7 @@ private:
     xy::Difficulty m_difficulty;
     std::vector<char> m_inputData;
     char* m_ptr;
+	bool m_playing = false;
 };
 
 
