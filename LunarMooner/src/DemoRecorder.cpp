@@ -56,17 +56,8 @@ sf::Uint32 DemoRecorder::getSeed()
 void DemoRecorder::start(const lm::PlayerState& ps, xy::Difficulty diff)
 {
     if (!m_enabled) return;
-    
-    std::size_t size = static_cast<std::size_t>(std::ceil((ps.timeRemaining + 1.f) * 60.f)); //60fps
-    size += sizeof(ps);
-	auto humansRemainingSize(ps.humansRemaining.size());
-	if (!ps.humansRemaining.empty())
-	{
-		size += sizeof(ps.humansRemaining[0])*humansRemainingSize;
-	}
-    size += sizeof(diff);
-    size += sizeof(m_seed);
 
+	auto humansRemainingSize(ps.humansRemaining.size());
     m_ptr = m_buffer.data();
 
     std::memcpy(m_ptr, &ps.alienCount, sizeof(ps.alienCount));
