@@ -70,16 +70,50 @@ bool DemoPlayer::loadDemo(const std::string& path)
     file.close();
 
     m_ptr = m_inputData.data();
-    std::memcpy(&m_state, m_ptr, sizeof(m_state));
-    m_ptr += sizeof(m_state);
-    std::memcpy(&m_difficulty, m_ptr, sizeof(m_difficulty));
+	std::memcpy(&m_state.alienCount, m_ptr, sizeof(m_state.alienCount));
+	m_ptr += sizeof(m_state.alienCount);
+	std::memcpy(&m_state.ammo, m_ptr, sizeof(m_state.ammo));
+	m_ptr += sizeof(m_state.ammo);
+	std::memcpy(&m_state.cooldownTime, m_ptr, sizeof(m_state.cooldownTime));
+	m_ptr += sizeof(m_state.cooldownTime);
+	std::memcpy(&m_state.humansSaved, m_ptr, sizeof(m_state.humansSaved));
+	m_ptr += sizeof(m_state.humansSaved);
+	std::memcpy(&m_state.level, m_ptr, sizeof(m_state.level));
+	m_ptr += sizeof(m_state.level);
+	std::memcpy(&m_state.lives, m_ptr, sizeof(m_state.lives));
+	m_ptr += sizeof(m_state.lives);
+	std::memcpy(&m_state.previousScore, m_ptr, sizeof(m_state.previousScore));
+	m_ptr += sizeof(m_state.previousScore);
+	std::memcpy(&m_state.score, m_ptr, sizeof(m_state.score));
+	m_ptr += sizeof(m_state.score);
+	std::memcpy(&m_state.special, m_ptr, sizeof(m_state.special));
+	m_ptr += sizeof(m_state.special);
+	std::memcpy(&m_state.startNewRound, m_ptr, sizeof(m_state.startNewRound));
+	m_ptr += sizeof(m_state.startNewRound);
+	std::memcpy(&m_state.timeRemaining, m_ptr, sizeof(m_state.timeRemaining));
+	m_ptr += sizeof(m_state.timeRemaining);
+
+	int humansRemainingSize(0);
+	std::memcpy(&humansRemainingSize, m_ptr, sizeof(humansRemainingSize));
+	m_ptr += sizeof(humansRemainingSize);
+	m_state.humansRemaining.resize(humansRemainingSize);
+	while (humansRemainingSize--)
+	{
+		std::memcpy(&m_state.humansRemaining[humansRemainingSize], m_ptr, sizeof(m_state.humansRemaining[humansRemainingSize]));
+		m_ptr += sizeof(m_state.humansRemaining[humansRemainingSize]);
+	}
     m_ptr += sizeof(m_difficulty);
     std::memcpy(&m_seed, m_ptr, sizeof(m_seed));
     m_ptr += sizeof(m_seed);
-    return true;
+    return (m_playing = true);
 }
 
 sf::Uint8 DemoPlayer::getNextInput()
 {
     return (m_ptr) ? *m_ptr++ : 0xff;
+}
+
+bool DemoPlayer::isPlaying()
+{
+	return m_playing;
 }

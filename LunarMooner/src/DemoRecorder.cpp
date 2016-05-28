@@ -56,16 +56,39 @@ sf::Uint32 DemoRecorder::getSeed()
 void DemoRecorder::start(const lm::PlayerState& ps, xy::Difficulty diff)
 {
     if (!m_enabled) return;
-    
-    std::size_t size = static_cast<std::size_t>(std::ceil((ps.timeRemaining + 1.f) * 60.f)); //60fps
-    size += sizeof(ps);
-    size += sizeof(diff);
-    size += sizeof(m_seed);
 
+	auto humansRemainingSize(ps.humansRemaining.size());
     m_ptr = m_buffer.data();
 
-    std::memcpy(m_ptr, &ps, sizeof(ps));
-    m_ptr += sizeof(ps);
+    std::memcpy(m_ptr, &ps.alienCount, sizeof(ps.alienCount));
+    m_ptr += sizeof(ps.alienCount);
+	std::memcpy(m_ptr, &ps.ammo, sizeof(ps.ammo));
+	m_ptr += sizeof(ps.ammo);
+	std::memcpy(m_ptr, &ps.cooldownTime, sizeof(ps.cooldownTime));
+	m_ptr += sizeof(ps.cooldownTime);
+	std::memcpy(m_ptr, &ps.humansSaved, sizeof(ps.humansSaved));
+	m_ptr += sizeof(ps.humansSaved);
+	std::memcpy(m_ptr, &ps.level, sizeof(ps.level));
+	m_ptr += sizeof(ps.level);
+	std::memcpy(m_ptr, &ps.lives, sizeof(ps.lives));
+	m_ptr += sizeof(ps.lives);
+	std::memcpy(m_ptr, &ps.previousScore, sizeof(ps.previousScore));
+	m_ptr += sizeof(ps.previousScore);
+	std::memcpy(m_ptr, &ps.score, sizeof(ps.score));
+	m_ptr += sizeof(ps.score);
+	std::memcpy(m_ptr, &ps.special, sizeof(ps.special));
+	m_ptr += sizeof(ps.special);
+	std::memcpy(m_ptr, &ps.startNewRound, sizeof(ps.startNewRound));
+	m_ptr += sizeof(ps.startNewRound);
+	std::memcpy(m_ptr, &ps.timeRemaining, sizeof(ps.timeRemaining));
+	m_ptr += sizeof(ps.timeRemaining);
+	std::memcpy(m_ptr, &humansRemainingSize, sizeof(humansRemainingSize));
+	m_ptr += sizeof(humansRemainingSize);
+	while (humansRemainingSize--)
+	{
+		std::memcpy(m_ptr, &ps.humansRemaining[humansRemainingSize], sizeof(ps.humansRemaining[humansRemainingSize]));
+		m_ptr += sizeof(ps.humansRemaining[humansRemainingSize]);
+	}
     std::memcpy(m_ptr, &diff, sizeof(diff));
     m_ptr += sizeof(diff);
     std::memcpy(m_ptr, &m_seed, sizeof(m_seed));
@@ -100,7 +123,7 @@ void DemoRecorder::stop(bool saveFile)
 
         std::string filename = ss.str();
 
-        std::fstream file(filename, std::ios::out | std::ios::binary);
+        std::fstream file("test.lmd", std::ios::out | std::ios::binary);
         if (file.is_open() && file.good() && !file.fail())
         {
             file.write(m_buffer.data(), m_ptr - m_buffer.data());

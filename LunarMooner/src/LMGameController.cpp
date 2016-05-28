@@ -294,13 +294,15 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             break;
         case LMStateEvent::RoundBegin:
             //hmm potential bug here if changing difficulty mid-round
-            if (m_playerStates[m_currentPlayer].lives > -1)
+            if (m_playerStates[m_currentPlayer].lives > -1
+				&& !m_demoPlayer.isPlaying())
             {
                 m_demoRecorder.start(m_playerStates[m_currentPlayer], m_difficulty);
             }
             break;
         case LMStateEvent::RoundEnd:
-            m_demoRecorder.stop(false);
+			if(!m_demoPlayer.isPlaying())
+				m_demoRecorder.stop(true);
             break;
         }
     };
@@ -476,7 +478,10 @@ void GameController::entityUpdate(xy::Entity&, float dt)
 
 void GameController::setInput(sf::Uint8 input)
 {    
-    m_demoRecorder.recordInput(input);
+	if(m_demoPlayer.isPlaying())
+		input = m_demoPlayer.getNextInput();
+	else
+		m_demoRecorder.recordInput(input);
     
     bool shoot = ((input & LMInputFlags::Shoot) != 0
         && (m_inputFlags & LMInputFlags::Shoot) == 0);
@@ -553,13 +558,15 @@ void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
 
 void GameController::start()
 {
-    /*if (m_demoPlayer.loadDemo("test.lmd"))
+    if (m_demoPlayer.loadDemo("test.lmd"))
     {
-        int buns = 0;
-    }*/
-    
-    xy::Util::Random::rndEngine.seed(m_demoRecorder.getSeed());
-    
+		xy::Util::Random::rndEngine.seed(m_demoPlayer.getSeed());
+    }
+	else
+	{
+		xy::Util::Random::rndEngine.seed(m_demoRecorder.getSeed());
+	}
+
     createTerrain();
     createMothership();
     spawnAliens();
