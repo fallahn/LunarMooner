@@ -294,13 +294,15 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             break;
         case LMStateEvent::RoundBegin:
             //hmm potential bug here if changing difficulty mid-round
-            if (m_playerStates[m_currentPlayer].lives > -1)
+            if (m_playerStates[m_currentPlayer].lives > -1
+				&& !m_demoPlayer.isPlaying())
             {
                 m_demoRecorder.start(m_playerStates[m_currentPlayer], m_difficulty);
             }
             break;
         case LMStateEvent::RoundEnd:
-            m_demoRecorder.stop(true);
+			if(!m_demoPlayer.isPlaying())
+				m_demoRecorder.stop(true);
             break;
         }
     };
@@ -476,9 +478,10 @@ void GameController::entityUpdate(xy::Entity&, float dt)
 
 void GameController::setInput(sf::Uint8 input)
 {    
-    m_demoRecorder.recordInput(input);
-
-	input = m_demoPlayer.getNextInput();
+	if(m_demoPlayer.isPlaying())
+		input = m_demoPlayer.getNextInput();
+	else
+		m_demoRecorder.recordInput(input);
     
     bool shoot = ((input & LMInputFlags::Shoot) != 0
         && (m_inputFlags & LMInputFlags::Shoot) == 0);

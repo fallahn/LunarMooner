@@ -105,10 +105,15 @@ bool DemoPlayer::loadDemo(const std::string& path)
     m_ptr += sizeof(m_difficulty);
     std::memcpy(&m_seed, m_ptr, sizeof(m_seed));
     m_ptr += sizeof(m_seed);
-    return true;
+    return (m_playing = true);
 }
 
 sf::Uint8 DemoPlayer::getNextInput()
 {
     return (m_ptr) ? *m_ptr++ : 0xff;
+}
+
+bool DemoPlayer::isPlaying()
+{
+	return m_playing;
 }
