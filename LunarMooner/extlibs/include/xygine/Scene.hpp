@@ -198,14 +198,25 @@ namespace xy
 
         /*!
         \brief Returns the view matrix of the active camera if a scene exists
-        else returns an identity matrix
+        else returns an identity matrix. This is useful when performing 2D lighting
         */
         static sf::Transform getViewMatrix();
 
+        /*!
+        \brief Retrieves the scene's current ambient colour for shaders which
+        perform lighting
+        */
+        const sf::Color& getAmbientColour() const { return m_ambientColour; }
+
+        /*!
+        \brief Sets the ambient colour for shaders which are used in scene lighting
+        */
+        void setAmbientColour(const sf::Color& colour) { m_ambientColour = colour; }
     private:
 
         QuadTree m_quadTree; //must live longer than any entity
         QuadTree m_lightTree;
+        sf::Color m_ambientColour;
         std::vector<Entity::Ptr> m_layers;
         std::vector<std::pair<Layer, Entity::Ptr>> m_pendingEntities;
         
