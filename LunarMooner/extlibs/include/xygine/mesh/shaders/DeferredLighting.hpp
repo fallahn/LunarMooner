@@ -36,12 +36,14 @@ namespace xy
     {
         namespace Mesh
         {
-            static const std::string bunsFrag =
+            static const std::string DebugFrag =
                 "#version 150\n"
+                "uniform sampler2D u_texture;\n"
+                "in vec2 v_texCoord;\n"
                 "out vec4 fragOut;\n"
                 "void main()\n"
                 "{\n"
-                "fragOut = vec4(1.0, 1.0, 0.0, 1.0);\n"
+                "    fragOut = texture(u_texture, v_texCoord);\n"
                 "}\n";
 
             static const std::string LightingVert =
@@ -75,7 +77,7 @@ namespace xy
                 "{\n"
                 "    PointLight u_pointLights[MAX_POINT_LIGHTS];\n"
                 "    vec4 u_ambientColour;\n"
-                "    vec3 u_cameraWorldPosition;\n"                
+                "    vec3 u_cameraWorldPosition;\n"
                 "};\n"
 
                 "uniform sampler2D u_diffuseMap;\n"
@@ -84,7 +86,7 @@ namespace xy
                 "uniform sampler2D u_positionMap;\n"
                 "uniform sampler2D u_aoMap;\n"
                 "uniform sampler2D u_illuminationMap;\n"
-                
+
 
                 "in vec2 v_texCoord;\n"
 

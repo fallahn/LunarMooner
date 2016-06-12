@@ -217,6 +217,19 @@ namespace xy
         */
         static sf::Vector2f getMouseWorldPosition();
 
+        /*!
+        \brief Sets the visibility of the mouse cursor.
+        Prefer this to setting via the render window directly to allow
+        imgui windows to correctly display/hide the mouse based on their
+        visibility status
+        */
+        static void setMouseCursorVisible(bool);
+
+        /*!
+        \brief Quits the application
+        */
+        static void quit();
+
     protected:
         /*!
         \brief Returns a reference to the current render window
@@ -255,11 +268,10 @@ namespace xy
         */
         virtual void updateApp(float dt) = 0;
         /*!
-        \brief Updates the render window
-
-        The render window clear() and display() functions
-        should be called in the implementation, with any custom drawing
-        done in between
+        \brief Draws to the render window.
+        All drawing operations should be started from here. clear() and
+        display() are called automatically by xygine and need to be manually
+        used in derived applications.
         */
         virtual void draw() = 0;
 

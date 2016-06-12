@@ -104,9 +104,7 @@ void Game::updateApp(float dt)
 
 void Game::draw()
 {
-    getRenderWindow().clear(sf::Color::Black);
     m_stateStack.draw();
-    getRenderWindow().display();
 }
 
 void Game::initialise()

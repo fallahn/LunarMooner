@@ -31,6 +31,10 @@ source distribution.
 #include <xygine/mesh/Material.hpp>
 #include <xygine/mesh/UniformBuffer.hpp>
 #include <xygine/mesh/RenderQuad.hpp>
+#include <xygine/mesh/MeshResource.hpp>
+#include <xygine/mesh/MaterialResource.hpp>
+#include <xygine/mesh/Skeleton.hpp>
+#include <xygine/ShaderResource.hpp>
 #include <xygine/MultiRenderTexture.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
@@ -50,6 +54,7 @@ namespace xy
     class Mesh;
     class Model;
     class Scene;
+    class ModelBuilder;
     /*!
     \brief Mesh rendering class. The MeshRenderer is
     responsible for drawing the model components in a scene.
@@ -72,14 +77,35 @@ namespace xy
         which belong to this MeshRenderer
         */
         MeshRenderer(const sf::Vector2u&, const Scene&);
-        ~MeshRenderer() = default;
+        ~MeshRenderer();
+
+        /*!
+        \brief Loads a model via the provided model builder.
+        Models added to the MeshRenderer are mapped to the given ID an
+        resource managed, along with any other model properties such as
+        materials or animations.
+        \param std::int32_t Unique ID to map the model to.
+        \param ModelBuilder Reference to the instance of a model builder
+        used to load the model into the renderer's resource manager.
+        */
+        void loadModel(std::int32_t, ModelBuilder&);
+
+        /*!
+        \brief Creates a model component from previously loaded model data.
+        This will return a model component complete with mesh and any materials
+        and aniamtions if they were loaded via the ModelBuilder.
+        \param std::int32_t Unique ID used when loading the model.
+        \param MessageBus Reference to the actuve message bus.
+        \returns Model component if successful, else nullptr (for example an invalid ID was provided)
+        */
+        std::unique_ptr<Model> createModel(std::int32_t, MessageBus&);
 
         /*!
         \brief Factory function for creating Model components.
         Model components require registration with the MeshRenderer
-        so the only valid way to create them is via this factory function.
+        so the only valid way to create them is via this function (or one of its overloads).
         */
-        std::unique_ptr<Model> createModel(MessageBus&, const Mesh&);
+        std::unique_ptr<Model> createModel(const Mesh&, MessageBus&);
 
         /*!
         \brief Updates the MeshRenderer with the current scene status.
@@ -101,7 +127,7 @@ namespace xy
         projection and view matrix. This UniformBuffer will automatically update
         the properties of any material which uses a shader with a u_matrixBlock
         uniform.
-        \see Shader3D::DefaultVertex
+        \see Shader::Mesh::DefaultVertex
         */
         const UniformBuffer& getMatrixUniforms() const { return m_matrixBlockBuffer; }
 
@@ -124,8 +150,18 @@ namespace xy
     private:
         struct Lock final {};
 
-        sf::Shader m_defaultShader;
-        std::unique_ptr<Material> m_defaultMaterial;
+        MeshResource m_meshResource;
+        MaterialResource m_materialResource;
+        ShaderResource m_shaderResource;
+
+        struct AnimationData
+        {
+            AnimationData(std::unique_ptr<Skeleton>& s, const std::vector<Skeleton::Animation>& a)
+                : skeleton(std::move(s)), animations(a) {}
+            std::unique_ptr<Skeleton> skeleton;
+            std::vector<Skeleton::Animation> animations;
+        };
+        std::map<std::int32_t, AnimationData> m_animationResource;
 
         const Scene& m_scene;
         glm::mat4 m_viewMatrix;
@@ -189,6 +225,7 @@ namespace xy
         mutable xy::MultiRenderTexture m_gBuffer;
         void drawScene() const;
 
+        sf::Shader m_debugShader;
         sf::Texture m_dummyTetxure;
         sf::Sprite m_dummySprite;
         std::unique_ptr<RenderQuad> m_outputQuad;
@@ -200,6 +237,8 @@ namespace xy
         void initSSAO();
         void initSelfIllum();
         void initOutput();
+
+        void setupConCommands();
     };
 }
 
