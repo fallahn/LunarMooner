@@ -49,6 +49,12 @@ namespace xy
                 "in vec3 a_bitangent;\n" \
                 "#endif\n" \
 
+                "#if defined(SKINNED)\n" \
+                "in vec4 a_boneIndices;\n" \
+                "in vec4 a_boneWeights;\n" \
+                "uniform mat4[80] u_boneMatrices;\n" \
+                "#endif\n"
+
                 "uniform mat4 u_worldMatrix;\n" \
                 "uniform mat4 u_worldViewMatrix;\n" \
                 "uniform mat3 u_normalMatrix;\n" \
@@ -71,21 +77,45 @@ namespace xy
 
                 "void main()\n" \
                 "{\n" \
-                "    vec4 viewPosition = u_worldViewMatrix * vec4(a_position, 1.0);\n" \
-                "    v_worldPosition = (u_worldMatrix * vec4(a_position, 1.0)).xyz;\n" \
+                "    vec3 position = a_position;\n" \
+
+                "#if defined(SKINNED)\n" \
+                "	mat4 skinMatrix = u_boneMatrices[int(a_boneIndices.x)] * a_boneWeights.x;\n" \
+                "	skinMatrix += u_boneMatrices[int(a_boneIndices.y)] * a_boneWeights.y;\n" \
+                "	skinMatrix += u_boneMatrices[int(a_boneIndices.z)] * a_boneWeights.z;\n" \
+                "	skinMatrix += u_boneMatrices[int(a_boneIndices.w)] * a_boneWeights.w;\n" \
+                "	position = (skinMatrix * vec4(position, 1.0)).xyz;\n" \
+                "#endif\n" \
+
+                "    vec4 viewPosition = u_worldViewMatrix * vec4(position, 1.0);\n" \
+                "    v_worldPosition = (u_worldMatrix * vec4(position, 1.0)).xyz;\n" \
                 "    gl_Position = u_projectionMatrix * viewPosition;\n" \
 
                 "#if defined(TEXTURED) || defined(BUMP)\n" \
                 "    v_texCoord = a_texCoord0;\n" \
                 "#endif\n" \
 
+                "    vec3 normal = a_normal;\n" \
+                "#if defined(SKINNED)\n" \
+                "    normal = (skinMatrix * vec4(normal, 0.0)).xyz;\n" \
+                "#endif\n" \
+
+                "#if defined(BUMP)\n" \
+                "    vec3 tangent = a_tangent;\n" \
+                "    vec3 bitangent = a_bitangent;\n" \
+                "#if defined(SKINNED)\n" \
+                "    tangent = (skinMatrix * vec4(tangent, 0.0)).xyz;\n" \
+                "    bitangent = (skinMatrix * vec4(bitangent, 0.0)).xyz;\n" \
+                "#endif\n" \
+                "#endif\n" \
+
                 "#if !defined(BUMP)\n"
-                "    v_normalVector = u_normalMatrix * a_normal;\n" \
+                "    v_normalVector = u_normalMatrix * normal;\n" \
                 "#else\n"
                 /*"    mat3 normalMatrix = inverse(mat3(u_worldMatrix));\n" \*/
-                "    v_tbn[0] = normalize(u_normalMatrix * a_tangent);\n" \
-                "    v_tbn[1] = normalize(u_normalMatrix * a_bitangent);\n" \
-                "    v_tbn[2] = normalize(u_normalMatrix * a_normal);\n" \
+                "    v_tbn[0] = normalize(u_worldMatrix * vec4(tangent, 0.0)).xyz;\n" \
+                "    v_tbn[1] = normalize(u_worldMatrix * vec4(bitangent, 0.0)).xyz;\n" \
+                "    v_tbn[2] = normalize(u_worldMatrix * vec4(normal, 0.0)).xyz;\n" \
                 /*"    v_tbn = mat3(t, b, n);\n" \*/
                 "#endif\n"
                 "}";
@@ -136,7 +166,7 @@ namespace xy
                 "    fragOut[1] = vec4(normalize(v_normalVector), 1.0);\n" \
                 "#else\n" \
                 "    vec3 normal = texture(u_normalMap, v_texCoord).rgb * 2.0 - 1.0;\n" \
-                "    fragOut[1] = vec4(normalize(v_tbn[0] * normal.x + v_tbn[1] * normal.y + v_tbn[2] * normal.z).grb, 1.0);\n" \
+                "    fragOut[1] = vec4(normalize(v_tbn[0] * normal.x + v_tbn[1] * normal.y + v_tbn[2] * normal.z).rgb, 1.0);\n" \
                 "#endif\n"
                 "#if defined(BUMP) || defined(TEXTURED)\n"
                 "    fragOut[2] = texture(u_maskMap, v_texCoord);\n"
@@ -161,5 +191,8 @@ namespace xy
 
 #define DEFERRED_TEXTURED_BUMPED_VERTEX "#version 150\n#define BUMP\n#define TEXTURED\n" + xy::Shader::Mesh::DeferredVertex
 #define DEFERRED_TEXTURED_BUMPED_FRAGMENT "#version 150\n#define BUMP\n#define TEXTURED\n" + xy::Shader::Mesh::DeferredFragment
+
+#define DEFERRED_TEXTURED_BUMPED_SKINNED_VERTEX "#version 150\n#define BUMP\n#define TEXTURED\n#define SKINNED\n" + xy::Shader::Mesh::DeferredVertex
+#define DEFERRED_TEXTURED_SKINNED_VERTEX "#version 150\n#define TEXTURED\n#define SKINNED\n" + xy::Shader::Mesh::DeferredVertex
 
 #endif //XY_MESH_DEFERRED_HPP_
