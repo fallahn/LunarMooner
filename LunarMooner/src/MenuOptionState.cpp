@@ -60,7 +60,7 @@ MenuOptionState::MenuOptionState(xy::StateStack& stateStack, Context context, xy
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId = (paused) ? States::ID::PausedOptions : States::ID::MenuOptions;
+    msg->stateID = (paused) ? States::ID::PausedOptions : States::ID::MenuOptions;
 }
 
 //public
@@ -274,5 +274,5 @@ void MenuOptionState::close()
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuClosed;
-    msg->stateId = (m_pausedGame) ? States::ID::PausedOptions : States::ID::MenuOptions;
+    msg->stateID = (m_pausedGame) ? States::ID::PausedOptions : States::ID::MenuOptions;
 }

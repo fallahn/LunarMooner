@@ -52,7 +52,7 @@ public:
     bool update(float) override;
     void draw() override;
 
-    xy::StateId stateID() const { return (m_playerCount == 1) ? States::SinglePlayer : States::MultiPlayer; }
+    xy::StateID stateID() const { return (m_playerCount == 1) ? States::SinglePlayer : States::MultiPlayer; }
 private:
     sf::Uint8 m_playerCount;
     xy::Scene m_scene;

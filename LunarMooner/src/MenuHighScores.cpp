@@ -53,7 +53,7 @@ MenuHighScoreState::MenuHighScoreState(xy::StateStack& ss, Context context, xy::
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId =(endGame) ?  States::ID::HighScoresEnd : States::ID::HighScoresMenu;
+    msg->stateID =(endGame) ?  States::ID::HighScoresEnd : States::ID::HighScoresMenu;
 }
 
 //public
@@ -129,7 +129,7 @@ void MenuHighScoreState::buildMenu(const sf::Font& font)
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::MenuClosed;
         msg->value = 0.f;
-        msg->stateId = (m_endGame) ? States::ID::HighScoresEnd : States::ID::HighScoresMenu;
+        msg->stateID = (m_endGame) ? States::ID::HighScoresEnd : States::ID::HighScoresMenu;
 
         if (m_endGame)
         {

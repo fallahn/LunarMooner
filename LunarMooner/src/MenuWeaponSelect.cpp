@@ -57,7 +57,7 @@ MenuWeaponState::MenuWeaponState(xy::StateStack& ss, Context context, xy::Textur
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId = States::ID::MenuWeapon;
+    msg->stateID = States::ID::MenuWeapon;
 }
 
 //public
@@ -138,7 +138,7 @@ void MenuWeaponState::buildMenu(const sf::Font& font)
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::MenuClosed;
         msg->value = 0.f;
-        msg->stateId = States::ID::MenuWeapon;
+        msg->stateID = States::ID::MenuWeapon;
 
         requestStackPop();
         requestStackPush(States::ID::MenuMain);
@@ -165,7 +165,7 @@ void MenuWeaponState::buildMenu(const sf::Font& font)
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::MenuClosed;
         msg->value = 0.f;
-        msg->stateId = States::ID::MenuWeapon;
+        msg->stateID = States::ID::MenuWeapon;
 
         requestStackClear();
         requestStackPush(States::ID::SinglePlayer);

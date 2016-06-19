@@ -314,7 +314,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
         //if game over screen opened broadcast scores for each player
         auto& msgData = msg.getData<xy::Message::UIEvent>();
         if (msgData.type == xy::Message::UIEvent::MenuOpened
-            && msgData.stateId == States::ID::GameOver)
+            && msgData.stateID == States::ID::GameOver)
         {
             for (auto i = 0u; i < m_playerStates.size(); ++i)
             {
