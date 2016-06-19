@@ -58,7 +58,7 @@ public:
     bool handleEvent(const sf::Event&) override;
     void handleMessage(const xy::Message&) override;
 
-    xy::StateId stateID() const override
+    xy::StateID stateID() const override
     {
         return (m_endGame) ? States::ID::HighScoresEnd : States::ID::HighScoresMenu;
     }

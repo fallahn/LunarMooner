@@ -56,7 +56,7 @@ GameOverState::GameOverState(xy::StateStack& ss, Context context, xy::TextureRes
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId = States::ID::GameOver;
+    msg->stateID = States::ID::GameOver;
 }
 
 //public
@@ -162,5 +162,5 @@ void GameOverState::close()
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuClosed;
     msg->value = 0.f;
-    msg->stateId = States::ID::GameOver;
+    msg->stateID = States::ID::GameOver;
 }

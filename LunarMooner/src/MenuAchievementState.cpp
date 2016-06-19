@@ -54,7 +54,7 @@ MenuAchievementState::MenuAchievementState(xy::StateStack& ss, Context context, 
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId = States::ID::MenuAchievement;
+    msg->stateID = States::ID::MenuAchievement;
 }
 
 //public
@@ -142,7 +142,7 @@ void MenuAchievementState::buildMenu(const sf::Font& font)
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::MenuClosed;
         msg->value = 0.f;
-        msg->stateId = States::ID::MenuAchievement;
+        msg->stateID = States::ID::MenuAchievement;
 
         requestStackPop();
         requestStackPush(States::ID::MenuMain);

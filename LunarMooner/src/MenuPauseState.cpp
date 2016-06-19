@@ -48,7 +48,7 @@ MenuPauseState::MenuPauseState(xy::StateStack& ss, Context context, xy::TextureR
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
-    msg->stateId = States::ID::Pause;
+    msg->stateID = States::ID::Pause;
 }
 
 //public
@@ -161,5 +161,5 @@ void MenuPauseState::close()
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuClosed;
     msg->value = 0.f;
-    msg->stateId = States::ID::Pause;
+    msg->stateID = States::ID::Pause;
 }

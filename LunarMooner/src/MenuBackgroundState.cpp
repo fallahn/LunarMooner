@@ -80,7 +80,7 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::RequestState;
-    msg->stateId = States::ID::MenuMain;
+    msg->stateID = States::ID::MenuMain;
 }
 
 //public
@@ -273,7 +273,7 @@ void MenuBackgroundState::setup()
         {
             auto& msgData = msg.getData<xy::Message::AudioEvent>();
             if (msgData.action == xy::Message::AudioEvent::Stop
-                && msgData.entityId == entId)
+                && msgData.entityID == entId)
             {
                 music->setSound("assets/sound/music/" + m_musicFiles[xy::Util::Random::value(0, m_musicFiles.size() - 1)], xy::AudioSource::Mode::Stream);
                 music->play();

@@ -48,7 +48,7 @@ MenuMainState::MenuMainState(xy::StateStack& stack, Context context, xy::Texture
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuOpened;
     msg->value = 0.f;
-    msg->stateId = States::ID::MenuMain;
+    msg->stateID = States::ID::MenuMain;
 
     context.renderWindow.setMouseCursorVisible(false);
 }
@@ -171,5 +171,5 @@ void MenuMainState::close(bool clear)
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::MenuClosed;
     msg->value = 0.f;
-    msg->stateId = States::ID::MenuMain;
+    msg->stateID = States::ID::MenuMain;
 }

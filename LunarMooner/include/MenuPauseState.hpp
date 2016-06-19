@@ -58,7 +58,7 @@ public:
     bool handleEvent(const sf::Event&) override;
     void handleMessage(const xy::Message&) override;
 
-    xy::StateId stateID() const override { return States::Pause; }
+    xy::StateID stateID() const override { return States::Pause; }
 
 private:
     xy::TextureResource& m_textureResource;

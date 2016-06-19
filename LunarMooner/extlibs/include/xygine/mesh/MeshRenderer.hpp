@@ -36,6 +36,7 @@ source distribution.
 #include <xygine/mesh/Skeleton.hpp>
 #include <xygine/ShaderResource.hpp>
 #include <xygine/MultiRenderTexture.hpp>
+#include <xygine/mesh/DepthRenderTexture.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -175,30 +176,44 @@ namespace xy
             Mask,
             Position
         };
-
+        //TODO sort out this mutable mess
         struct MatrixBlock final
         {
             //use raw arrays 'cos GLSL
             float u_viewMatrix[16];
-            float u_projectionMatrix[16];            
-        }m_matrixBlock;
-        UniformBuffer m_matrixBlockBuffer;
+            float u_projectionMatrix[16];
+            float u_lightViewProjectionMatrix[16];
+        }mutable m_matrixBlock;
+        mutable UniformBuffer m_matrixBlockBuffer;
 
         struct PointLight final
         {
             float diffuseColour[4];
             float specularColour[4];
             float inverseRange;
+            float range;
             float intensity;
-            float padding[2]; //GLSL must align to multiple of vec4 (including the start of the next member!)
+            float padding; //GLSL must align to multiple of vec4 (including the start of the next member!)
             float position[3];
             float morePadding;
+            float vpMatrix[16];
+        };
+        struct SkyLight final
+        {
+            float diffuseColour[4];
+            float specularColour[4];
+            float direction[3];
+            float padding;
+            float vpMatrix[16];
+            float intensity;           
         };
         struct LightBlock final
         {
             PointLight u_pointLights[8];
             float u_ambientColour[4];
             float u_cameraWorldPosition[3];
+            float padding;
+            SkyLight u_skyLight;
         }m_lightingBlock;
         UniformBuffer m_lightingBlockBuffer;
 
@@ -221,6 +236,10 @@ namespace xy
         sf::Shader m_lightingShader;
         UniformBlockID m_lightingBlockID;
 
+        mutable DepthRenderTexture m_depthTexture;
+        sf::Shader m_depthShader;
+        void drawDepth() const;
+
         mutable std::vector<Model*> m_models;
         mutable xy::MultiRenderTexture m_gBuffer;
         void drawScene() const;
@@ -233,6 +252,8 @@ namespace xy
 
         void updateView();
         void updateLights(const glm::vec3&);     
+
+        void resizeGBuffer(sf::Uint32, sf::Uint32);
 
         void initSSAO();
         void initSelfIllum();
