@@ -1,8 +1,8 @@
 /*********************************************************************
-Matt Marchant 2016
+Matt Marchant 2014 - 2016
 http://trederia.blogspot.com
 
-LunarMooner - Zlib license.
+xygine - Zlib license.
 
 This software is provided 'as-is', without any express or
 implied warranty. In no event will the authors be held
@@ -25,8 +25,8 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_SOUNDPLAYER_HPP_
-#define LM_SOUNDPLAYER_HPP_
+#ifndef XY_SOUNDPLAYER_HPP_
+#define XY_SOUNDPLAYER_HPP_
 
 #include <xygine/components/Component.hpp>
 
@@ -40,11 +40,18 @@ source distribution.
 namespace xy
 {
     class SoundResource;
-}
 
-namespace lm
-{
-    class SoundPlayer final : public xy::Component
+    /*!
+    \brief Sound Player component.
+    As an alternative to audio source components, the sound
+    player component can be attached to a single scene entity
+    and be used to play sounds via xy::Command or xy::Message
+    objects. Sounds are pre-cached and assigned to an audio channel.
+    Audio channels have their own volume property, so that groups
+    of sounds can be adjusted together. The volume of a channel
+    is relative to the master audio volume of the sound player.
+    */
+    class XY_EXPORT_API SoundPlayer final : public xy::Component
     {
     public:
         SoundPlayer(xy::MessageBus&, xy::SoundResource&);
@@ -54,10 +61,35 @@ namespace lm
         void entityUpdate(xy::Entity&, float) override;
 
         using ResourceID = sf::Int32;
+        /*!
+        \brief Pre-load a sound file for playing.
+        \param ResourceID ID to map to this sound resource
+        \param std::string Path to resource to load
+        \param sf::Uint8 Channel via which the sound should be played.
+        There are a maximum of 16 different channels
+        */
         void preCache(ResourceID, const std::string&, sf::Uint8 = 0);
-        void playSound(ResourceID, float, float, float = 1.f);
+        /*!
+        \brief Plays a pre-cached sound.
+        \param ResourceID ID of the sound to be played
+        \param float X position in world coordinates of the sound
+        \param float Y position of the sound in world coordinates
+        \param float Pitch of the sound
+        */
+        void playSound(ResourceID, float x, float y, float pitch = 1.f);
+        /*!
+        \brief Sets the master volume of the sound player.
+        Range is 0.f - 100.f
+        */
         void setMasterVolume(float);
-        void setChannelVolume(sf::Uint8, float);
+        /*!
+        \brief Sets the volume of a given channel.
+        \param sf::Uint8 channel to set the volume for
+        \param float Value to set the volume to in range 0 - 1.
+        The volume is a percentage of the master volume.
+        There are a maximum of 16 different channels.
+        */
+        void setChannelVolume(sf::Uint8 channel, float);
     private:
         xy::SoundResource& m_soundResource;
         struct Buffer final
@@ -71,8 +103,8 @@ namespace lm
         std::list<sf::Sound> m_sounds;
         float m_volume;
 
-        std::array<float, 4u> m_channelVolumes;
+        std::array<float, 16u> m_channelVolumes;
     };
 }
 
-#endif //LM_SOUNDPLATER_HPP_
+#endif //XY_SOUNDPLAYER_HPP_
