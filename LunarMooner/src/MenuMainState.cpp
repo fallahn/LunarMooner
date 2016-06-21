@@ -50,7 +50,7 @@ MenuMainState::MenuMainState(xy::StateStack& stack, Context context, xy::Texture
     msg->value = 0.f;
     msg->stateID = States::ID::MenuMain;
 
-    context.renderWindow.setMouseCursorVisible(false);
+    xy::App::setMouseCursorVisible(false);
 }
 
 //public

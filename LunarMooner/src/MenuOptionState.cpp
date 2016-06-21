@@ -249,6 +249,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
         settings.VideoMode.height = res & 0xFFFF;
         settings.WindowStyle = (fullscreenCheckbox->checked()) ? sf::Style::Fullscreen : sf::Style::Close;
         getContext().appInstance.applyVideoSettings(settings);
+        xy::App::setMouseCursorVisible(false);
 
         auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
         msg->type = xy::Message::UIEvent::ResizedWindow;

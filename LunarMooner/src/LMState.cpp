@@ -28,7 +28,6 @@ source distribution.
 #include <LMState.hpp>
 #include <LMGameController.hpp>
 #include <LMPostBlur.hpp>
-#include <LMSoundPlayer.hpp>
 #include <LMNukeDrawable.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
@@ -49,6 +48,7 @@ source distribution.
 #include <xygine/components/PointLight.hpp>
 #include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/components/Camera.hpp>
+#include <xygine/components/SoundPlayer.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 
 #include <SFML/Window/Event.hpp>
@@ -473,7 +473,7 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level
 
 void LunarMoonerState::initSounds()
 {
-    auto soundPlayer = xy::Component::create<lm::SoundPlayer>(m_messageBus, m_resources.soundResource);
+    auto soundPlayer = xy::Component::create<xy::SoundPlayer>(m_messageBus, m_resources.soundResource);
     soundPlayer->preCache(LMSoundID::Laser, "assets/sound/fx/laser.wav");
     soundPlayer->preCache(LMSoundID::Explosion01, "assets/sound/fx/explode01.wav");
     soundPlayer->preCache(LMSoundID::Explosion02, "assets/sound/fx/explode02.wav");
@@ -509,7 +509,7 @@ void LunarMoonerState::initSounds()
     mh.id = LMMessageId::GameEvent;
     mh.action = [](xy::Component* c, const xy::Message& msg)
     {
-        lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
+        xy::SoundPlayer* player = dynamic_cast<xy::SoundPlayer*>(c);
         auto& msgData = msg.getData<LMGameEvent>();
 
         const auto screenCentre = xy::DefaultSceneSize / 2.f;
@@ -580,7 +580,7 @@ void LunarMoonerState::initSounds()
     mh.id = LMMessageId::StateEvent;
     mh.action = [this](xy::Component* c, const xy::Message& msg)
     {
-        lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
+        xy::SoundPlayer* player = dynamic_cast<xy::SoundPlayer*>(c);
         auto& msgData = msg.getData<LMStateEvent>();
 
         const auto screenCentre = xy::DefaultSceneSize / 2.f;
@@ -622,7 +622,7 @@ void LunarMoonerState::initSounds()
     mh.id = xy::Message::UIMessage;
     mh.action = [this](xy::Component* c, const xy::Message& msg)
     {
-        lm::SoundPlayer* player = dynamic_cast<lm::SoundPlayer*>(c);
+        xy::SoundPlayer* player = dynamic_cast<xy::SoundPlayer*>(c);
         auto& msgData = msg.getData<xy::Message::UIEvent>();
         switch (msgData.type)
         {

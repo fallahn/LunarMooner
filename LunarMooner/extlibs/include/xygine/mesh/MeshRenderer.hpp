@@ -193,10 +193,10 @@ namespace xy
             float inverseRange;
             float range;
             float intensity;
-            float padding; //GLSL must align to multiple of vec4 (including the start of the next member!)
+            bool castShadow;
             float position[3];
-            float morePadding;
-            float vpMatrix[16];
+            float padding;
+            float vpMatrix[16];            
         };
         struct SkyLight final
         {
@@ -224,11 +224,11 @@ namespace xy
         sf::Texture m_ssaoNoiseTexture;
         void createNoiseTexture();
 
-        sf::Shader m_lightBlurShader;
+        mutable sf::Shader m_lightBlurShader;
         sf::Shader m_lightDownsampleShader;
         mutable sf::RenderTexture m_lightBlurTexture;
         mutable sf::RenderTexture m_lightDownsampleTexture;
-        sf::Sprite m_lightBlurSprite;
+        mutable sf::Sprite m_lightBlurSprite;
         sf::Sprite m_downSampleSprite;
         bool m_doLightBlur;
         sf::Texture m_lightFallback;
@@ -260,6 +260,7 @@ namespace xy
         void initOutput();
 
         void setupConCommands();
+        void addDebugMenus();
     };
 }
 
