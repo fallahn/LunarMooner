@@ -79,7 +79,7 @@ namespace xy
         void playSound(ResourceID, float x, float y, float pitch = 1.f);
         /*!
         \brief Sets the master volume of the sound player.
-        Range is 0.f - 100.f
+        Range is 0.f - 1.f
         */
         void setMasterVolume(float);
         /*!
