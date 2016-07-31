@@ -155,7 +155,6 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\LMNukeDrawable.hpp" />
     <ClInclude Include="include\LMShaderIds.hpp" />
     <ClInclude Include="include\LMShieldDrawable.hpp" />
-    <ClInclude Include="include\LMSpriteBatch.hpp" />
     <ClInclude Include="include\LMWaterDrawable.hpp" />
     <ClInclude Include="include\LMWaterShader.hpp" />
     <ClInclude Include="include\LMWeaponEMP.hpp" />
@@ -208,7 +207,6 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\LMLaserSight.cpp" />
     <ClCompile Include="src\LMNukeDrawable.cpp" />
     <ClCompile Include="src\LMShieldDrawable.cpp" />
-    <ClCompile Include="src\LMSpriteBatch.cpp" />
     <ClCompile Include="src\LMWaterDrawable.cpp" />
     <ClCompile Include="src\LMWeaponEMP.cpp" />
     <ClCompile Include="src\MenuAchievementState.cpp" />

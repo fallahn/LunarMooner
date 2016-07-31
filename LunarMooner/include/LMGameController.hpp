@@ -49,6 +49,7 @@ namespace xy
     class SoundResource;
     class TextureResource;
     class FontResource;
+    class SpriteBatch;
 }
 
 struct ResourceCollection;
@@ -61,7 +62,6 @@ namespace lm
     class CooldownMeter;
     class ScoreDisplay;
     class Terrain;
-    class SpriteBatch;
     class GameController final : public xy::Component
     {
     public:
@@ -124,7 +124,7 @@ namespace lm
         std::list<DelayedEvent> m_pendingDelayedEvents;
 
         std::vector<xy::Entity*> m_aliens;
-        SpriteBatch* m_alienBatch;
+        xy::SpriteBatch* m_alienBatch;
         void spawnAlien(const sf::Vector2f&);
         void spawnAliens();
 
