@@ -129,9 +129,6 @@
     <ClInclude Include="include\LMLaserSight.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
-    <ClInclude Include="include\LMSpriteBatch.hpp">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
     <ClInclude Include="include\LMNukeDrawable.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
@@ -285,9 +282,6 @@
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="src\LMLaserSight.cpp">
-      <Filter>Source Files\game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LMSpriteBatch.cpp">
       <Filter>Source Files\game</Filter>
     </ClCompile>
     <ClCompile Include="src\LMNukeDrawable.cpp">

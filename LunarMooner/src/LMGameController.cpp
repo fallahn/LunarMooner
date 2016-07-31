@@ -42,7 +42,6 @@ source distribution.
 #include <LMEarlyWarning.hpp>
 #include <LMShieldDrawable.hpp>
 #include <LMLaserSight.hpp>
-#include <LMSpriteBatch.hpp>
 #include <LMWeaponEMP.hpp>
 #include <LMWaterDrawable.hpp>
 #include <LMShaderIds.hpp>
@@ -56,6 +55,7 @@ source distribution.
 #include <xygine/components/PointLight.hpp>
 #include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/components/AnimatedDrawable.hpp>
+#include <xygine/components/SpriteBatch.hpp>
 #include <xygine/util/Position.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
@@ -369,7 +369,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_resources.shaderResource.preload(LMShaderID::VelocityMeter, xy::Shader::Default::vertex, lm::velocityFrag);
 
     //create sprite batch for aliens
-    auto sprBatch = xy::Component::create<SpriteBatch>(getMessageBus());
+    auto sprBatch = xy::Component::create<xy::SpriteBatch>(getMessageBus());
     auto ent = xy::Entity::create(getMessageBus());
     m_alienBatch = ent->addComponent(sprBatch);
     m_scene.addEntity(ent, xy::Scene::Layer::BackMiddle);
