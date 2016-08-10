@@ -29,7 +29,6 @@ SET(LM_SRC
   ${LM_DIR}/LMRoundSummary.cpp
   ${LM_DIR}/LMShieldDrawable.cpp
   ${LM_DIR}/LMSpeedMeter.cpp
-  ${LM_DIR}/LMSpriteBatch.cpp
   ${LM_DIR}/LMState.cpp
   ${LM_DIR}/LMTerrain.cpp
   ${LM_DIR}/LMWaterDrawable.cpp
