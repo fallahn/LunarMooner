@@ -35,6 +35,7 @@ source distribution.
 
 namespace xy
 {
+    class App;    
     /*!
     \brief Console class
     The console is used to display messages and xygine specific information
@@ -93,8 +94,8 @@ namespace xy
         static void doCommand(const std::string&);
 
     private:
-        static void draw();
-        static void registerDefaultCommands();
+        static void draw(App*);
+        static void registerDefaultCommands(App*);
         
     };
 }
