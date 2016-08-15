@@ -103,9 +103,9 @@ namespace
     const std::array<sf::FloatRect, 4u> alienSizes =
     {
         sf::FloatRect(0.f, 0.f, 20.f, 16.f),
-        { 0.f, 0.f, 28.f, 30.f },
-        { 0.f, 0.f, 14.f, 16.f },
-        { 0.f, 0.f, 18.f, 26.f }
+        { 20.f, 0.f, 28.f, 30.f },
+        { 48.f, 0.f, 14.f, 16.f },
+        { 62.f, 0.f, 18.f, 26.f }
     };
 
     //time limits per level
@@ -370,6 +370,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
 
     //create sprite batch for aliens
     auto sprBatch = xy::Component::create<xy::SpriteBatch>(getMessageBus());
+    sprBatch->setTexture(&rc.textureResource.get("assets/images/game/debris.png"));
     auto ent = xy::Entity::create(getMessageBus());
     m_alienBatch = ent->addComponent(sprBatch);
     m_scene.addEntity(ent, xy::Scene::Layer::BackMiddle);
@@ -829,7 +830,7 @@ void GameController::spawnAlien(const sf::Vector2f& position)
 
     auto drawable = m_alienBatch->addSprite(getMessageBus());
     drawable->setTextureRect(size);
-    drawable->setColour(sf::Color::Red);
+    //drawable->setColour(sf::Color::Red);
 
     auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
 
