@@ -38,7 +38,21 @@ enum LMShaderID
     NormalMapPlanet,
     NormalMapGame,
     WaterEffect,
-    VelocityMeter
+    VelocityMeter,
+    MeshTextured,
+    MeshNormalMapped
+};
+
+enum LMMaterialID
+{
+    PlayerShip = 0,
+    MotherShip,
+    DeadDoofer
+};
+
+enum LMModelID
+{
+    PlayerModel = 0
 };
 
 #endif //LM_SHADER_IDS_HPP_

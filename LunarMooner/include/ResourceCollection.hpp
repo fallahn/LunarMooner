@@ -30,6 +30,7 @@ source distribution.
 
 #include <xygine/Resource.hpp>
 #include <xygine/ShaderResource.hpp>
+#include <xygine/mesh/MaterialResource.hpp>
 
 struct ResourceCollection
 {
@@ -37,6 +38,7 @@ struct ResourceCollection
     xy::ShaderResource shaderResource;
     xy::FontResource fontResource;
     xy::SoundResource soundResource;
+    xy::MaterialResource materialResource;
 
     ResourceCollection() = default;
     ResourceCollection(const ResourceCollection&) = delete;

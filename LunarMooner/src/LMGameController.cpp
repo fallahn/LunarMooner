@@ -56,11 +56,13 @@ source distribution.
 #include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/components/AnimatedDrawable.hpp>
 #include <xygine/components/SpriteBatch.hpp>
+#include <xygine/components/Model.hpp>
 #include <xygine/util/Position.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
 #include <xygine/util/Math.hpp>
 #include <xygine/Resource.hpp>
+#include <xygine/mesh/MeshRenderer.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -129,7 +131,7 @@ namespace
     const float hardCoolDown = 12.f;
 }
 
-GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as, ResourceCollection& rc)
+GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as, ResourceCollection& rc, xy::MeshRenderer& mr)
     : xy::Component     (mb, this),
     m_difficulty        (xy::Difficulty::Easy),
     m_cooldownTime      (easyCoolDown),
@@ -137,6 +139,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_collisionWorld    (cw),
     m_audioSettings     (as),
     m_resources         (rc),
+    m_meshRenderer      (mr),
     m_inputFlags        (0),
     m_spawnReady        (true),
     m_player            (nullptr),
@@ -675,6 +678,12 @@ void GameController::spawnPlayer()
         lc->setDiffuseColour({ 255u, 185u, 135u });
         lc->setIntensity(1.1f);
 
+        auto model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
+        model->rotate(xy::Model::Axis::Y, 180.f);
+        model->rotate(xy::Model::Axis::X, 90.f);
+        model->setPosition({ 25.f, 66.f, 0.f });
+        model->setScale({ 1.05f, 1.05f, 1.05f });
+
         auto entity = xy::Entity::create(getMessageBus());
         entity->setPosition(spawnPos);
         entity->setOrigin(playerSize / 2.f);
@@ -688,6 +697,7 @@ void GameController::spawnPlayer()
         auto fx2 = entity->addComponent(sfx2);
         auto fx3 = entity->addComponent(sfx3);
         entity->addComponent(lc);
+        entity->addComponent(model);
         entity->addCommandCategories(LMCommandID::Player);
         auto playerEntity = m_scene.addEntity(entity, xy::Scene::BackFront);
 
