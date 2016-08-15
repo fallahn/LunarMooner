@@ -51,6 +51,8 @@ source distribution.
 #include <xygine/components/SoundPlayer.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 
+#include <xygine/mesh/IQMBuilder.hpp>
+
 #include <SFML/Window/Event.hpp>
 
 namespace
@@ -84,6 +86,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_playerCount       (playerCount),
     m_scene             (context.appInstance.getMessageBus()),
     m_messageBus        (context.appInstance.getMessageBus()),
+    m_meshRenderer      ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene),
     m_inputFlags        (0),
     m_prevInputFlags    (0),
     m_collisionWorld    (m_scene),
@@ -130,6 +133,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     initGameController(playerCount, level, weapon);
     initSounds();
     initParticles();
+    initMeshes();
 
     buildBackground();
 
@@ -273,6 +277,7 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
 void LunarMoonerState::handleMessage(const xy::Message& msg)
 {
     m_scene.handleMessage(msg);
+    m_meshRenderer.handleMessage(msg);
 
     if (msg.id == LMMessageId::StateEvent)
     {
@@ -362,6 +367,7 @@ bool LunarMoonerState::update(float dt)
 
     m_scene.update(dt);
     m_collisionWorld.update();
+    m_meshRenderer.update();
     m_overlay.update(dt);
 
     m_reportText.setString(xy::Stats::getString());
@@ -377,6 +383,7 @@ void LunarMoonerState::draw()
     rw.draw(m_overlay);
 
     rw.setView(getContext().defaultView);
+    rw.draw(m_meshRenderer);
     //rw.draw(m_reportText);
 }
 
@@ -455,7 +462,7 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level
 {
     auto gameController =
         xy::Component::create<lm::GameController>(m_messageBus, m_scene, m_collisionWorld,
-            getContext().appInstance.getAudioSettings(), m_resources);
+            getContext().appInstance.getAudioSettings(), m_resources, m_meshRenderer);
 
     gameController->setDifficulty(getContext().appInstance.getGameSettings().difficulty);
 
@@ -737,6 +744,22 @@ void LunarMoonerState::initParticles()
 
     pd.loadFromFile("assets/particles/large_explosion.xyp", m_resources.textureResource);
     pc->addDefinition(LMParticleID::LargeExplosion, pd);
+}
+
+void LunarMoonerState::initMeshes()
+{
+    m_scene.setAmbientColour({ 76, 70, 72 });
+    m_scene.getSkyLight().setIntensity(0.4f);
+    m_scene.getSkyLight().setDiffuseColour({ 255, 255, 100 });
+    m_scene.getSkyLight().setSpecularColour({ 120, 255, 58 });
+    m_scene.getSkyLight().setDirection({ 0.25f, 0.5f, -1.f });
+
+    xy::IQMBuilder ib("assets/models/player_ship.iqm");
+    ib.build();
+
+    m_meshRenderer.loadModel(LMModelID::PlayerModel, ib);
+
+    //TODO preload other meshes, and materials
 }
 
 void LunarMoonerState::buildBackground()

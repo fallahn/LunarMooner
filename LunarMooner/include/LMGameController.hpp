@@ -50,6 +50,7 @@ namespace xy
     class TextureResource;
     class FontResource;
     class SpriteBatch;
+    class MeshRenderer;
 }
 
 struct ResourceCollection;
@@ -65,7 +66,7 @@ namespace lm
     class GameController final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, const xy::App::AudioSettings&, ResourceCollection&);
+        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, const xy::App::AudioSettings&, ResourceCollection&, xy::MeshRenderer&);
         ~GameController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -89,6 +90,7 @@ namespace lm
         CollisionWorld& m_collisionWorld;
         const xy::App::AudioSettings& m_audioSettings;
         ResourceCollection& m_resources;
+        xy::MeshRenderer& m_meshRenderer;
 
         sf::Uint8 m_inputFlags;
 

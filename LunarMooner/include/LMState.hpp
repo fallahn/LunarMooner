@@ -36,6 +36,7 @@ source distribution.
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
+#include <xygine/mesh/MeshRenderer.hpp>
 
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -58,6 +59,8 @@ private:
     xy::Scene m_scene;
     xy::MessageBus& m_messageBus;
 
+    xy::MeshRenderer m_meshRenderer;
+
     sf::Uint8 m_inputFlags;
     sf::Uint8 m_prevInputFlags;
 
@@ -74,6 +77,7 @@ private:
     void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon);
     void initSounds();
     void initParticles();
+    void initMeshes();
 
     void buildBackground();
 
