@@ -844,7 +844,7 @@ void GameController::spawnAlien(const sf::Vector2f& position)
 
     auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
 
-    auto collision = m_collisionWorld.addComponent(getMessageBus(), size, lm::CollisionComponent::ID::Alien);
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f,0.f}, {size.width, size.height} }, lm::CollisionComponent::ID::Alien);
     lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);
     collision->setCallback(cb);
     //smaller are worth more because they are harder to hit
