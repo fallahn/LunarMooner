@@ -52,7 +52,9 @@ enum LMMaterialID
 
 enum LMModelID
 {
-    PlayerModel = 0
+    PlayerModel = 0,
+    MothershipModel,
+    DeadDooferModel
 };
 
 #endif //LM_SHADER_IDS_HPP_

@@ -52,6 +52,7 @@ source distribution.
 #include <xygine/shaders/NormalMapped.hpp>
 
 #include <xygine/mesh/IQMBuilder.hpp>
+#include <xygine/mesh/shaders/DeferredRenderer.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -130,10 +131,12 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_resources.shaderResource.get(LMShaderID::NormalMapPlanet).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
     m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    
 
-    initGameController(playerCount, level, weapon);
+    m_resources.shaderResource.preload(LMShaderID::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
+
     initSounds();
     initParticles();
     initMeshes();
+    initGameController(playerCount, level, weapon);
 
     buildBackground();
 
@@ -755,9 +758,18 @@ void LunarMoonerState::initMeshes()
     m_scene.getSkyLight().setDirection({ 0.25f, 0.5f, -1.f });
 
     xy::IQMBuilder ib("assets/models/player_ship.iqm");
-    ib.build();
-
     m_meshRenderer.loadModel(LMModelID::PlayerModel, ib);
+
+    xy::IQMBuilder ib2("assets/models/mothership.iqm");
+    m_meshRenderer.loadModel(LMModelID::MothershipModel, ib2);
+
+    auto& playerMat = m_resources.materialResource.add(LMMaterialID::PlayerShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
+    playerMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/ship_diffuse.png") });
+    playerMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+
+    auto& shipMat = m_resources.materialResource.add(LMMaterialID::MotherShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
+    shipMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/mothership_diffuse.png") });
+    shipMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
 
     //TODO preload other meshes, and materials
 }
