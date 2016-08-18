@@ -683,6 +683,7 @@ void GameController::spawnPlayer()
         model->rotate(xy::Model::Axis::X, 90.f);
         model->setPosition({ 25.f, 66.f, 0.f });
         model->setScale({ 1.05f, 1.05f, 1.05f });
+        model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
 
         auto entity = xy::Entity::create(getMessageBus());
         entity->setPosition(spawnPos);
@@ -736,10 +737,11 @@ void GameController::spawnPlayer()
 
 void GameController::createMothership()
 {
+    //TODO remove this - currently used to fudge entity bounds
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
     drawable->getDrawable().setRadius(10.f);
     drawable->getDrawable().setScale(12.f, 5.f);
-    drawable->getDrawable().setFillColor(sf::Color::Yellow);
+    drawable->getDrawable().setFillColor(sf::Color::Transparent);
 
     auto controller = xy::Component::create<lm::MothershipController>(getMessageBus(), mothershipBounds);
     switch (m_difficulty)
@@ -760,8 +762,16 @@ void GameController::createMothership()
     auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, {bounds.width, bounds.height} }, CollisionComponent::ID::Mothership);
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(0.f, 0.f, bounds.width, bounds.height));
 
+    auto model = m_meshRenderer.createModel(LMModelID::MothershipModel, getMessageBus());
+    model->rotate(xy::Model::Axis::Y, 180.f);
+    model->rotate(xy::Model::Axis::X, 95.f);
+    model->setScale({ 1.8f, 2.6f, 0.8f });
+    model->setPosition({ bounds.width / 2.f, (bounds.height / 2.f) + 4.f, -20.f });
+    model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::MotherShip));
+
     auto entity = xy::Entity::create(getMessageBus());
-    entity->addComponent(drawable);
+    entity->addComponent(drawable); //TODO this is a kludge to get entity bounds - need to fix this
+    entity->addComponent(model);
     entity->addComponent(controller);
     entity->addComponent(collision);
     entity->addComponent(qtc);
@@ -775,6 +785,13 @@ void GameController::createMothership()
     dropshipDrawable->setOrigin(playerSize / 2.f);
     dropshipDrawable->setSpeed(0.8f);
     dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
+
+    model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
+    model->rotate(xy::Model::Axis::Y, 180.f);
+    model->rotate(xy::Model::Axis::X, 90.f);
+    model->setPosition({ 25.f, 66.f, 0.f });
+    model->setScale({ 1.05f, 1.05f, 1.05f });
+    model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
 
     /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
     lc->setDepth(110.f);
