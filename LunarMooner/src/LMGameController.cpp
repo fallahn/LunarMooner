@@ -616,7 +616,6 @@ void GameController::spawnPlayer()
         m_scene.sendCommand(cmd);
 
         auto dropshipDrawable = xy::Component::create<PlayerDrawable>(getMessageBus(), m_resources.textureResource, playerSize);
-        dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
 
         xy::Component::MessageHandler mh;
         mh.id = LMMessageId::GameEvent;
@@ -758,15 +757,15 @@ void GameController::createMothership()
         break;
     }
 
+    auto model = m_meshRenderer.createModel(LMModelID::MothershipModel, getMessageBus());
+    model->rotate(xy::Model::Axis::Y, 180.f);
+    model->rotate(xy::Model::Axis::X, 95.f);
+
     auto bounds = drawable->getDrawable().getGlobalBounds();
     auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, {bounds.width, bounds.height} }, CollisionComponent::ID::Mothership);
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(0.f, 0.f, bounds.width, bounds.height));
 
-    auto model = m_meshRenderer.createModel(LMModelID::MothershipModel, getMessageBus());
-    model->rotate(xy::Model::Axis::Y, 180.f);
-    model->rotate(xy::Model::Axis::X, 95.f);
-    model->setScale({ 1.8f, 2.6f, 0.8f });
-    model->setPosition({ bounds.width / 2.f, (bounds.height / 2.f) + 4.f, -20.f });
+    model->setPosition({ bounds.width / 2.f, (bounds.height / 2.f), 0.f });
     model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::MotherShip));
 
     auto entity = xy::Entity::create(getMessageBus());
@@ -780,28 +779,16 @@ void GameController::createMothership()
 
     m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
-    //TODO this is repeated for respawns, could pop into own function
-    auto dropshipDrawable = xy::Component::create<PlayerDrawable>(getMessageBus(), m_resources.textureResource, playerSize);
-    dropshipDrawable->setOrigin(playerSize / 2.f);
-    dropshipDrawable->setSpeed(0.8f);
-    dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
-
     model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
     model->rotate(xy::Model::Axis::Y, 180.f);
     model->rotate(xy::Model::Axis::X, 90.f);
-    model->setPosition({ 25.f, 66.f, 0.f });
+    model->setPosition({ 0.f, 33.f, 0.f });
     model->setScale({ 1.05f, 1.05f, 1.05f });
     model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
 
-    /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
-    lc->setDepth(110.f);
-    lc->setDiffuseColour({ 255u, 185u, 135u });
-    lc->setIntensity(1.1f);*/
-
     entity = xy::Entity::create(getMessageBus());    
-    entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
-    entity->addComponent(dropshipDrawable);
-    //entity->addComponent(lc);
+    entity->setPosition(bounds.width / 2.f, bounds.height / 2.f /*+ 10.f*/);
+    entity->addComponent(model);
     entity->addCommandCategories(LMCommandID::DropShip);
     m_mothership->addChild(entity);
 }
@@ -861,7 +848,7 @@ void GameController::spawnAlien(const sf::Vector2f& position)
 
     auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
 
-    auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f,0.f}, {size.width, size.height} }, lm::CollisionComponent::ID::Alien);
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f }, { size.width, size.height } }, lm::CollisionComponent::ID::Alien);
     lm::CollisionComponent::Callback cb = std::bind(&AlienController::collisionCallback, controller.get(), std::placeholders::_1);
     collision->setCallback(cb);
     //smaller are worth more because they are harder to hit
