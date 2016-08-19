@@ -75,7 +75,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>include;extlibs/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SFML_NO_DEPRECATED_WARNINGS;_MBCS;%(PreprocessorDefinitions);_DEBUG_</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG_;_CRT_SECURE_NO_WARNINGS;SFML_NO_DEPRECATED_WARNINGS;_MBCS;%(PreprocessorDefinitions);_DEBUG_</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>extlibs/lib/box2d-2.3.2;extlibs/lib/sfml;extlibs/lib/xygine</AdditionalLibraryDirectories>

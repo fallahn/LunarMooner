@@ -699,7 +699,7 @@ void GameController::spawnPlayer()
         entity->addComponent(lc);
         entity->addComponent(model);
         entity->addCommandCategories(LMCommandID::Player);
-        auto playerEntity = m_scene.addEntity(entity, xy::Scene::BackFront);
+        auto playerEntity = m_scene.addEntity(entity, xy::Scene::FrontFront);
 
 
         mh.id = xy::Message::UIMessage;
@@ -777,12 +777,12 @@ void GameController::createMothership()
     entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (bounds.width / 2.f), mothershipStart.y);
     entity->addCommandCategories(LMCommandID::Mothership);
 
-    m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
 
     model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
     model->rotate(xy::Model::Axis::Y, 180.f);
     model->rotate(xy::Model::Axis::X, 90.f);
-    model->setPosition({ 0.f, 33.f, 0.f });
+    model->setPosition({ 0.f, 24.f, 0.f });
     model->setScale({ 1.05f, 1.05f, 1.05f });
     model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
 
@@ -954,7 +954,7 @@ void GameController::createTerrain()
     //entity->setScale(0.1f, 0.1f);
     entity->rotate(-180.f);
     entity->addComponent(shieldDrawable);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }
 
 void GameController::updatePlatforms()
