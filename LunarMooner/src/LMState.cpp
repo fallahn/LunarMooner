@@ -49,6 +49,7 @@ source distribution.
 #include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/components/Camera.hpp>
 #include <xygine/components/SoundPlayer.hpp>
+#include <xygine/components/MeshDrawable.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 
 #include <xygine/mesh/IQMBuilder.hpp>
@@ -112,6 +113,8 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_scene.addPostProcess(pp);
 
     m_overlay.setView(context.defaultView);
+
+    //m_meshRenderer.setView(context.defaultView);
 
     sf::Uint8 level = 0;
     lm::SpecialWeapon weapon = lm::SpecialWeapon::None;
@@ -302,6 +305,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
         case xy::Message::UIEvent::ResizedWindow:
             m_scene.setView(getContext().defaultView);
             m_overlay.setView(getContext().defaultView);
+            //m_meshRenderer.setView(getContext().defaultView);
             break;
         case xy::Message::UIEvent::RequestControllerDisable:
             m_useController = false;
@@ -385,9 +389,8 @@ void LunarMoonerState::draw()
     rw.draw(m_scene);
     rw.draw(m_overlay);
 
-    rw.setView(getContext().defaultView);
-    rw.draw(m_meshRenderer);
-    //rw.draw(m_reportText);
+    //rw.setView(getContext().defaultView);
+    //rw.draw(m_meshRenderer);
 }
 
 //private
@@ -772,6 +775,12 @@ void LunarMoonerState::initMeshes()
     shipMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
 
     //TODO preload other meshes, and materials
+
+    //add drawable to scene
+    auto md = m_meshRenderer.createDrawable(m_messageBus);
+    auto entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(md);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 }
 
 void LunarMoonerState::buildBackground()
