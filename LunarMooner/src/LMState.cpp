@@ -135,6 +135,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    
 
     m_resources.shaderResource.preload(LMShaderID::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
+    m_resources.shaderResource.preload(LMShaderID::MeshVertexColoured, DEFERRED_VERTCOLOURED_VERTEX, DEFERRED_VERTCOLOURED_FRAGMENT);
 
     initSounds();
     initParticles();
@@ -766,6 +767,9 @@ void LunarMoonerState::initMeshes()
     xy::IQMBuilder ib2("assets/models/mothership.iqm");
     m_meshRenderer.loadModel(LMModelID::MothershipModel, ib2);
 
+    xy::IQMBuilder ib3("assets/models/corpse.iqm");
+    m_meshRenderer.loadModel(LMModelID::DeadDooferModel, ib3);
+
     auto& playerMat = m_resources.materialResource.add(LMMaterialID::PlayerShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
     playerMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/ship_diffuse.png") });
     playerMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
@@ -773,6 +777,9 @@ void LunarMoonerState::initMeshes()
     auto& shipMat = m_resources.materialResource.add(LMMaterialID::MotherShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
     shipMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/mothership_diffuse.png") });
     shipMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+
+    auto& dooferMat = m_resources.materialResource.add(LMMaterialID::DeadDoofer, m_resources.shaderResource.get(LMShaderID::MeshVertexColoured));
+    dooferMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
 
     //TODO preload other meshes, and materials
 

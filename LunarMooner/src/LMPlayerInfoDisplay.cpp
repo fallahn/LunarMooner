@@ -45,14 +45,6 @@ namespace
     const float messageDisplayTime = 2.f;
     const sf::Vector2f messagePosition(xy::DefaultSceneSize / 2.f);
 
-    const std::array<sf::Vector2f, 4u> textPositions = 
-    {
-        sf::Vector2f(20.f, 20.f),
-        sf::Vector2f(1660, 20.f),
-        sf::Vector2f(20.f, 560.f),
-        sf::Vector2f(1660, 560.f)
-    };
-
     const std::array<std::string, 4u> names =
     {
         "One",
