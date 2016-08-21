@@ -672,10 +672,10 @@ void GameController::spawnPlayer()
         sfx3->setName("thrustEffect");
         sfx3->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
-        auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
+        /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
         lc->setDepth(110.f);
         lc->setDiffuseColour({ 255u, 185u, 135u });
-        lc->setIntensity(1.1f);
+        lc->setIntensity(1.1f);*/
 
         auto model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
         model->rotate(xy::Model::Axis::Y, 180.f);
@@ -696,7 +696,7 @@ void GameController::spawnPlayer()
         auto fx1 = entity->addComponent(sfx1);
         auto fx2 = entity->addComponent(sfx2);
         auto fx3 = entity->addComponent(sfx3);
-        entity->addComponent(lc);
+        //entity->addComponent(lc);
         entity->addComponent(model);
         entity->addCommandCategories(LMCommandID::Player);
         auto playerEntity = m_scene.addEntity(entity, xy::Scene::FrontFront);
@@ -855,7 +855,7 @@ void GameController::spawnAlien(const sf::Vector2f& position)
     //this cludge assumes max size is 50 x 50
     collision->setScoreValue(100 - static_cast<sf::Uint16>(size.width + size.height));
 
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), size);
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect( { 0.f, 0.f },{ size.width, size.height } ));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable);
@@ -1381,22 +1381,17 @@ void GameController::addDelayedRespawn()
         auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
         msg->type = LMStateEvent::RoundBegin;
 
-        auto dropshipDrawable = xy::Component::create<PlayerDrawable>(getMessageBus(), m_resources.textureResource, playerSize);
-        dropshipDrawable->setOrigin(playerSize / 2.f);
-        dropshipDrawable->setSpeed(0.8f);
-        dropshipDrawable->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
-
-        //TODO fix this light not adding in xygine
-        /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
-        lc->setDepth(110.f);
-        lc->setDiffuseColour({ 255u, 185u, 135u });
-        lc->setIntensity(1.1f);*/
+        auto model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
+        model->rotate(xy::Model::Axis::Y, 180.f);
+        model->rotate(xy::Model::Axis::X, 90.f);
+        model->setPosition({ 0.f, 24.f, 0.f });
+        model->setScale({ 1.05f, 1.05f, 1.05f });
+        model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
 
         auto entity = xy::Entity::create(getMessageBus());
         auto bounds = m_mothership->getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->getDrawable().getGlobalBounds();
         entity->setPosition(bounds.width / 2.f, bounds.height / 2.f + 10.f);
-        entity->addComponent(dropshipDrawable);
-        //entity->addComponent(lc);
+        entity->addComponent(model);
         entity->addCommandCategories(LMCommandID::DropShip);
         m_mothership->addChild(entity);
     };

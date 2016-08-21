@@ -37,6 +37,18 @@
     <Filter Include="Source Files\ui">
       <UniqueIdentifier>{a608e090-b6a9-4926-9db0-fa185954285d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\planet hopper">
+      <UniqueIdentifier>{b6463767-5570-4da3-8074-10ca202340ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\planet hopper">
+      <UniqueIdentifier>{16539222-3351-4e0c-bed8-32c90579659e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\rock dodger">
+      <UniqueIdentifier>{65d3316f-f1ff-4c66-b48b-2577d47c54df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\rock dodger">
+      <UniqueIdentifier>{89bf50d5-ea54-4045-8329-95ff97a538d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CommandIds.hpp">
@@ -201,6 +213,12 @@
     <ClInclude Include="include\DemoPlayer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PlanetHoppingState.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RockDodgingState.hpp">
+      <Filter>Header Files\rock dodger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -340,6 +358,12 @@
     </ClCompile>
     <ClCompile Include="src\DemoPlayer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlanetHoppingState.cpp">
+      <Filter>Source Files\planet hopper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RockDodgingState.cpp">
+      <Filter>Source Files\rock dodger</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

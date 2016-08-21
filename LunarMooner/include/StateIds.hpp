@@ -44,7 +44,9 @@ namespace States
         HighScoresMenu,
         MenuBackground,
         MenuAchievement,
-        MenuWeapon
+        MenuWeapon,
+        PlanetHopping,
+        RockDodging
     };
 }
 

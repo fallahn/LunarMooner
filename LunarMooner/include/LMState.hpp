@@ -66,8 +66,6 @@ private:
 
     ResourceCollection m_resources;
 
-    sf::Text m_reportText;
-
     lm::CollisionWorld m_collisionWorld;
     lm::Overlay m_overlay;
 

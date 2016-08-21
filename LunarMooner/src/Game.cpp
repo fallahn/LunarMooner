@@ -36,6 +36,8 @@ source distribution.
 #include <MenuWeaponSelect.hpp>
 #include <LMState.hpp>
 #include <MenuBackgroundState.hpp>
+#include <PlanetHoppingState.hpp>
+#include <RockDodgingState.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -139,4 +141,6 @@ void Game::registerStates()
     m_stateStack.registerState<MenuBackgroundState>(States::ID::MenuBackground);
     m_stateStack.registerState<MenuAchievementState>(States::ID::MenuAchievement, m_menuTextures, m_menuFonts, m_profile);
     m_stateStack.registerState<MenuWeaponState>(States::ID::MenuWeapon, m_menuTextures, m_menuFonts, m_profile);
+    m_stateStack.registerState<PlanetHoppingState>(States::PlanetHopping);
+    m_stateStack.registerState<RockDodgingState>(States::RockDodging);
 }
