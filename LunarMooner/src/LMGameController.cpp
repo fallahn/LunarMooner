@@ -1627,16 +1627,22 @@ void GameController::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
 {
     if (alienArea.contains(x, y))
     {
-        auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_dead.png"));
-        drawable->setNormalMap(m_resources.textureResource.get("assets/images/game/doofer_dead_normal.png"));
-        drawable->setShader(m_resources.shaderResource.get(LMShaderID::NormalMapPlanet));
-        //TODO cache all animation data
-        drawable->loadAnimationData("assets/images/game/doofer_dead.xya");
-        drawable->playAnimation(0);
+        //auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_dead.png"));
+        //drawable->setNormalMap(m_resources.textureResource.get("assets/images/game/doofer_dead_normal.png"));
+        //drawable->setShader(m_resources.shaderResource.get(LMShaderID::NormalMapPlanet));
+        ////TODO cache all animation data
+        //drawable->loadAnimationData("assets/images/game/doofer_dead.xya");
+        //drawable->playAnimation(0);
+
+        auto model = m_meshRenderer.createModel(LMModelID::DeadDooferModel, getMessageBus());
+        model->setScale({ 0.2f, 0.2f, 0.2f });
+        model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::DeadDoofer));
+
         auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
         controller->setVelocity(vel);
         auto entity = xy::Entity::create(getMessageBus());
-        entity->addComponent(drawable);
+        //entity->addComponent(drawable);
+        entity->addComponent(model);
         entity->addComponent(controller);
         entity->setPosition(x, y);
         m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);

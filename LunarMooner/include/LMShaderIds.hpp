@@ -40,7 +40,8 @@ enum LMShaderID
     WaterEffect,
     VelocityMeter,
     MeshTextured,
-    MeshNormalMapped
+    MeshNormalMapped,
+    MeshVertexColoured
 };
 
 enum LMMaterialID

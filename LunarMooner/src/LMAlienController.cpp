@@ -33,6 +33,7 @@ source distribution.
 #include <xygine/Entity.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/util/Vector.hpp>
+#include <xygine/components/Model.hpp>
 
 using namespace lm;
 
@@ -78,6 +79,12 @@ void AlienController::entityUpdate(xy::Entity& entity, float dt)
     {
         position.x -= m_playArea.width;
         entity.setPosition(position);
+    }
+
+    auto model = entity.getComponent<xy::Model>();
+    if (model)
+    {
+        model->rotate(xy::Model::Axis::Y, 100.f * dt);
     }
 }
 
