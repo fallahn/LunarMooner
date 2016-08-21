@@ -207,6 +207,7 @@ void MenuBackgroundState::setup()
     auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 200.f, 50.f);
     lc->setDepth(100.f);
     lc->setDiffuseColour({ 255u, 235u, 185u });
+    //lc->enableShadowCasting(true);
 
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(1160.f, 340.f);

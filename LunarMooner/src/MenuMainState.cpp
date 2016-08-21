@@ -155,6 +155,33 @@ void MenuMainState::buildMenu()
         getContext().renderWindow.close();
     });
     m_uiContainer.addControl(button);
+
+
+#ifdef _DEBUG_
+
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button->setText("Test Hop");
+    button->setAlignment(xy::UI::Alignment::Centre);
+    button->setPosition(180.f, 40.f);
+    button->addCallback([this]()
+    {
+        close();
+        requestStackPush(States::ID::PlanetHopping);
+    });
+    m_uiContainer.addControl(button);
+
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button->setText("Test Dodge");
+    button->setAlignment(xy::UI::Alignment::Centre);
+    button->setPosition(180.f, 100.f);
+    button->addCallback([this]()
+    {
+        close();
+        requestStackPush(States::ID::RockDodging);
+    });
+    m_uiContainer.addControl(button);
+
+#endif //_DEBUG_
 }
 
 void MenuMainState::close(bool clear)

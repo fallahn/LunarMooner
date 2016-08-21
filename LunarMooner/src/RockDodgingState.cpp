@@ -25,38 +25,46 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_SHADER_IDS_HPP_
-#define LM_SHADER_IDS_HPP_
+#include <RockDodgingState.hpp>
 
-#include <xygine/shaders/Default.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 
-#include <string>
-
-enum LMShaderID
+RockDodgingState::RockDodgingState(xy::StateStack& stack, Context context)
+    : xy::State(stack, context)
 {
-    Prepass = xy::Shader::Count,
-    NormalMapPlanet,
-    NormalMapGame,
-    WaterEffect,
-    VelocityMeter,
-    MeshTextured,
-    MeshNormalMapped,
-    MeshVertexColoured,
-    Shadow
-};
+    m_loadingSprite.setTexture(m_textureResource.get("assets/images/ui/loading.png"));
+    m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
+    m_loadingSprite.setPosition(m_loadingSprite.getOrigin());
 
-enum LMMaterialID
+    launchLoadingScreen();
+
+    quitLoadingScreen();
+}
+
+//public
+bool RockDodgingState::update(float dt)
 {
-    PlayerShip = 0,
-    MotherShip,
-    DeadDoofer
-};
+    return false;
+}
 
-enum LMModelID
+bool RockDodgingState::handleEvent(const sf::Event& evt)
 {
-    PlayerModel = 0,
-    MothershipModel,
-    DeadDooferModel
-};
+    return false;
+}
 
-#endif //LM_SHADER_IDS_HPP_
+void RockDodgingState::handleMessage(const xy::Message& msg)
+{
+
+}
+
+void RockDodgingState::draw()
+{
+
+}
+
+//private
+void RockDodgingState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
+{
+    m_loadingSprite.rotate(1440.f * dt);
+    rw.draw(m_loadingSprite);
+}

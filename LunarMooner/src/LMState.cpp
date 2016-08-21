@@ -136,6 +136,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 
     m_resources.shaderResource.preload(LMShaderID::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
     m_resources.shaderResource.preload(LMShaderID::MeshVertexColoured, DEFERRED_VERTCOLOURED_VERTEX, DEFERRED_VERTCOLOURED_FRAGMENT);
+    m_resources.shaderResource.preload(LMShaderID::Shadow, SHADOW_VERTEX, SHADOW_FRAGMENT);
 
     initSounds();
     initParticles();
@@ -147,8 +148,6 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     profile.enable(playerCount == 1);
 
     xy::Stats::clear();
-    m_reportText.setFont(m_resources.fontResource.get("report_text"));
-    m_reportText.setPosition(20.f, 860.f);
 
     m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
 
@@ -377,8 +376,6 @@ bool LunarMoonerState::update(float dt)
     m_collisionWorld.update();
     m_meshRenderer.update();
     m_overlay.update(dt);
-
-    m_reportText.setString(xy::Stats::getString());
 
     return true;
 }
@@ -773,6 +770,8 @@ void LunarMoonerState::initMeshes()
     auto& playerMat = m_resources.materialResource.add(LMMaterialID::PlayerShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
     playerMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/ship_diffuse.png") });
     playerMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    playerMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(LMShaderID::Shadow));
+    //playerMat.getRenderPass(xy::RenderPass::ShadowMap)->setCullFace(xy::CullFace::Front); //the model has no back faces!
 
     auto& shipMat = m_resources.materialResource.add(LMMaterialID::MotherShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
     shipMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/mothership_diffuse.png") });
@@ -780,8 +779,6 @@ void LunarMoonerState::initMeshes()
 
     auto& dooferMat = m_resources.materialResource.add(LMMaterialID::DeadDoofer, m_resources.shaderResource.get(LMShaderID::MeshVertexColoured));
     dooferMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-
-    //TODO preload other meshes, and materials
 
     //add drawable to scene
     auto md = m_meshRenderer.createDrawable(m_messageBus);

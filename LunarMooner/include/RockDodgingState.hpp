@@ -25,38 +25,39 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_SHADER_IDS_HPP_
-#define LM_SHADER_IDS_HPP_
+#ifndef LM_ROCK_DODGER_HPP_
+#define LM_ROCK_DODGER_HPP_
 
-#include <xygine/shaders/Default.hpp>
+#include <StateIds.hpp>
 
-#include <string>
+#include <xygine/State.hpp>
+#include <xygine/Resource.hpp>
+#include <xygine/mesh/MaterialResource.hpp>
+#include <xygine/ShaderResource.hpp>
 
-enum LMShaderID
+#include <SFML/Graphics/Sprite.hpp>
+
+class RockDodgingState final : public xy::State
 {
-    Prepass = xy::Shader::Count,
-    NormalMapPlanet,
-    NormalMapGame,
-    WaterEffect,
-    VelocityMeter,
-    MeshTextured,
-    MeshNormalMapped,
-    MeshVertexColoured,
-    Shadow
+public:
+    RockDodgingState(xy::StateStack&, Context);
+    ~RockDodgingState() = default;
+
+    bool update(float) override;
+    void draw() override;
+    bool handleEvent(const sf::Event&) override;
+    void handleMessage(const xy::Message&) override;
+
+    xy::StateID stateID() const override { return States::RockDodging; }
+
+private:
+
+    xy::TextureResource m_textureResource;
+    xy::MaterialResource m_materialResource;
+    xy::ShaderResource m_shaderResource;
+
+    sf::Sprite m_loadingSprite;
+    void updateLoadingScreen(float, sf::RenderWindow&) override;
 };
 
-enum LMMaterialID
-{
-    PlayerShip = 0,
-    MotherShip,
-    DeadDoofer
-};
-
-enum LMModelID
-{
-    PlayerModel = 0,
-    MothershipModel,
-    DeadDooferModel
-};
-
-#endif //LM_SHADER_IDS_HPP_
+#endif //LM_ROCK_DODGER_HPP_
