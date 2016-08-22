@@ -45,7 +45,7 @@ namespace lm
     class PlayerController final : public xy::Component
     {
     public:
-        explicit PlayerController(xy::MessageBus&, const MothershipController*, const std::vector<sf::Vector2f>&);
+        PlayerController(xy::MessageBus&, const MothershipController*, const std::vector<sf::Vector2f>&);
         ~PlayerController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }

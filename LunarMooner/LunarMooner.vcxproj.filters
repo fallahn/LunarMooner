@@ -219,6 +219,12 @@
     <ClInclude Include="include\RockDodgingState.hpp">
       <Filter>Header Files\rock dodger</Filter>
     </ClInclude>
+    <ClInclude Include="include\PHPlayerController.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PHOrbitComponent.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -364,6 +370,12 @@
     </ClCompile>
     <ClCompile Include="src\RockDodgingState.cpp">
       <Filter>Source Files\rock dodger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PHPlayerController.cpp">
+      <Filter>Source Files\planet hopper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PHOrbitComponent.cpp">
+      <Filter>Source Files\planet hopper</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

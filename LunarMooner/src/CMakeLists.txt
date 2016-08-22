@@ -43,6 +43,8 @@ SET(LM_SRC
   ${LM_DIR}/MenuWeaponSelect.cpp
   ${LM_DIR}/OLAchievementTag.cpp
   ${LM_DIR}/OLOverlay.cpp
+  ${LM_DIR}/PHOrbitComponent.cpp
+  ${LM_DIR}/PHPlayerController.cpp
   ${LM_DIR}/PlanetHoppingState.cpp
   ${LM_DIR}/PlayerProfile.cpp
   ${LM_DIR}/RockDodgingState.cpp
