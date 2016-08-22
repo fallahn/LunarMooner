@@ -41,6 +41,7 @@ namespace lm
         {
             Alien,
             Ammo,
+            Body,
             Bounds,
             Bullet,            
             Mothership,
@@ -73,6 +74,8 @@ namespace lm
 
         float getInnerRadius() const { return m_innerRadius; }
         float getOuterRadius() const { return m_outerRadius; }
+
+        sf::Vector2f getCentre() const { auto bounds = globalBounds(); return{ bounds.left + (bounds.width / 2.f), bounds.top + (bounds.height / 2.f) }; }
 
     private:
         xy::Entity* m_entity;

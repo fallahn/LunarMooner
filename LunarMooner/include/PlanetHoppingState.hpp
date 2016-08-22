@@ -29,11 +29,13 @@ source distribution.
 #define LM_PLANET_HOPPER_HPP_
 
 #include <StateIds.hpp>
+#include <LMCollisionWorld.hpp>
 
 #include <xygine/State.hpp>
 #include <xygine/Resource.hpp>
 #include <xygine/mesh/MaterialResource.hpp>
 #include <xygine/ShaderResource.hpp>
+#include <xygine/Scene.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
 
@@ -55,6 +57,14 @@ private:
     xy::TextureResource m_textureResource;
     xy::MaterialResource m_materialResource;
     xy::ShaderResource m_shaderResource;
+
+    xy::MessageBus& m_messageBus;
+    xy::Scene m_scene;
+    lm::CollisionWorld m_collisionWorld;
+
+
+    void buildScene();
+    xy::Entity* addBody(const sf::Vector2f&, float);
 
     sf::Sprite m_loadingSprite;
     void updateLoadingScreen(float, sf::RenderWindow&) override;
