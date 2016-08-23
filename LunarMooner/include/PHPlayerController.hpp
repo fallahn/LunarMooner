@@ -56,7 +56,10 @@ namespace ph
         sf::Vector2f m_velocity;
         xy::Entity* m_entity;
 
+        bool m_inOrbit;
+
         sf::Vector3f getManifold(const sf::FloatRect&);
+        void kill();
     };
 }
 

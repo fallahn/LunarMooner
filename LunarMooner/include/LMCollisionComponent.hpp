@@ -45,6 +45,7 @@ namespace lm
             Bounds,
             Bullet,            
             Mothership,
+            Gravity,
             Player,
             Shield,
             Tower            
