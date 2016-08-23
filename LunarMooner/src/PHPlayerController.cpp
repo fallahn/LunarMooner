@@ -27,6 +27,7 @@ source distribution.
 
 #include <PHPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
+#include <CommandIDs.hpp>
 
 #include <xygine/Entity.hpp>
 #include <xygine/util/Vector.hpp>
@@ -40,8 +41,9 @@ namespace
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb)
-    : xy::Component(mb, this),
-    m_entity(nullptr)
+    : xy::Component (mb, this),
+    m_entity        (nullptr),
+    m_inOrbit       (true)
 {
     m_velocity = xy::Util::Vector::normalise({ 1.f, 0.87f });
 }
@@ -49,7 +51,7 @@ PlayerController::PlayerController(xy::MessageBus& mb)
 //public
 void PlayerController::entityUpdate(xy::Entity& ent, float dt)
 {
-    ent.move(m_velocity * speed * dt);
+    if(!m_inOrbit) ent.move(m_velocity * speed * dt);
 }
 
 void PlayerController::onStart(xy::Entity& e)
@@ -64,10 +66,29 @@ void PlayerController::collisionCallback(lm::CollisionComponent* cc)
     {
     case lm::CollisionComponent::ID::Bounds:
     {
-        auto manifold = getManifold(cc->globalBounds());
-        sf::Vector2f normal(manifold.x, manifold.y);
-        m_entity->move(normal * manifold.z);
-        m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+        //bool die = false;
+
+        //if (!m_inOrbit)
+        //{
+        //    die = true;
+        //}
+        //else
+        //{
+        //    //use inner radius check
+        //    auto collisionComponent = m_entity->getComponent<lm::CollisionComponent>();
+        //    XY_ASSERT(collisionComponent, "missing player collision component");
+
+        //    auto collisionDirection = collisionComponent->getCentre() - cc->getCentre();
+        //    float distSqr = xy::Util::Vector::lengthSquared(collisionDirection);
+        //    float minDistSqr = (collisionComponent->getInnerRadius() * collisionComponent->getInnerRadius()) + (cc->getInnerRadius() * cc->getInnerRadius());
+
+        //    die = (distSqr < minDistSqr);
+        //}
+
+        //if (die)
+        {
+            kill();
+        }
     }
         break;
     case lm::CollisionComponent::ID::Body:
@@ -83,10 +104,7 @@ void PlayerController::collisionCallback(lm::CollisionComponent* cc)
         if (distSqr < minDistSqr)
         {
             //collision
-            float penetration = std::sqrt(minDistSqr - distSqr);
-            sf::Vector2f normal = xy::Util::Vector::normalise(collisionDirection);
-            m_entity->move(normal * penetration);
-            m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+            kill();
         }
     }
         break;
@@ -118,4 +136,13 @@ sf::Vector3f PlayerController::getManifold(const sf::FloatRect& worldRect)
     }
 
     return manifold;
+}
+
+void PlayerController::kill()
+{
+    m_entity->destroy();
+    auto msg = sendMessage<LMGameEvent>(GameEvent);
+    msg->type = LMGameEvent::PlayerDied;
+    msg->posX = m_entity->getWorldPosition().x;
+    msg->posY = m_entity->getWorldPosition().y;
 }

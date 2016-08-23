@@ -25,43 +25,44 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_PLANET_HOPPER_HPP_
-#define LM_PLANET_HOPPER_HPP_
+#ifndef PH_GAME_CONTROLLER_HPP_
+#define PH_GAME_CONTROLLER_HPP_
 
-#include <StateIds.hpp>
-#include <LMCollisionWorld.hpp>
-#include <ResourceCollection.hpp>
+#include <xygine/components/Component.hpp>
 
-#include <xygine/State.hpp>
-#include <xygine/Scene.hpp>
-
-#include <SFML/Graphics/Sprite.hpp>
-
-class PlanetHoppingState final : public xy::State
+namespace xy
 {
-public:
-    PlanetHoppingState(xy::StateStack&, Context);
-    ~PlanetHoppingState() = default;
+    class Scene;
+}
 
-    bool update(float) override;
-    void draw() override;
-    bool handleEvent(const sf::Event&) override;
-    void handleMessage(const xy::Message&) override;
+namespace lm
+{
+    class CollisionWorld;
+}
 
-    xy::StateID stateID() const override { return States::PlanetHopping; }
+struct ResourceCollection;
+namespace ph
+{
+    class GameController final : public xy::Component
+    {
+    public:
+        GameController(xy::MessageBus&, ResourceCollection&, xy::Scene&, lm::CollisionWorld&);
+        ~GameController() = default;
 
-private:
+        xy::Component::Type type() const override { return xy::Component::Type::Script; }
+        void entityUpdate(xy::Entity&, float) override;
 
-    ResourceCollection m_resources;
+    private:
+        ResourceCollection& m_resources;
+        xy::Scene& m_scene;
+        lm::CollisionWorld& m_collisionWorld;
 
-    xy::MessageBus& m_messageBus;
-    xy::Scene m_scene;
-    lm::CollisionWorld m_collisionWorld;
+        sf::Vector2f m_spawnPosition;
+        void spawnPlayer();
+        void buildScene();
+        xy::Entity* addBody(const sf::Vector2f&, float);
+        void addMessageHandlers();
+    };
+}
 
-    void buildScene();
-
-    sf::Sprite m_loadingSprite;
-    void updateLoadingScreen(float, sf::RenderWindow&) override;
-};
-
-#endif //LM_PLANET_HOPPER_HPP_
+#endif //PH_GAME_CONTROLLER_HPP_

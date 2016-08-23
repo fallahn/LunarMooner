@@ -225,6 +225,9 @@
     <ClInclude Include="include\PHOrbitComponent.hpp">
       <Filter>Header Files\planet hopper</Filter>
     </ClInclude>
+    <ClInclude Include="include\PHGameController.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -375,6 +378,9 @@
       <Filter>Source Files\planet hopper</Filter>
     </ClCompile>
     <ClCompile Include="src\PHOrbitComponent.cpp">
+      <Filter>Source Files\planet hopper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PHGameController.cpp">
       <Filter>Source Files\planet hopper</Filter>
     </ClCompile>
   </ItemGroup>

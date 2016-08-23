@@ -30,6 +30,13 @@ source distribution.
 
 #include <xygine/components/Component.hpp>
 
+#include <SFML/Graphics/Transformable.hpp>
+
+namespace lm
+{
+    class CollisionComponent;
+}
+
 namespace ph
 {
     class OrbitComponent final : public xy::Component
@@ -40,10 +47,26 @@ namespace ph
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity&, float) override;
+        void onStart(xy::Entity&) override;
+
+        float getRadius() const { return m_radius; }
+        float getInfluenceRadius() const { return m_influenceRadius; }
+
+        void collisionCallback(lm::CollisionComponent*);
+
+        void removeParent();
 
     private:
         float m_radius;
         float m_influenceRadius;
+
+        sf::Uint64 m_parentID; //currently orbiting...
+        sf::Uint64 m_lastParentID; //previously orbiting
+
+        xy::Entity* m_entity;
+        float m_rotationSpeed;
+
+        void setParent(const xy::Entity&);
     };
 }
 
