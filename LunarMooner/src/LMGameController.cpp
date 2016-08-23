@@ -699,7 +699,7 @@ void GameController::spawnPlayer()
         //entity->addComponent(lc);
         entity->addComponent(model);
         entity->addCommandCategories(LMCommandID::Player);
-        auto playerEntity = m_scene.addEntity(entity, xy::Scene::FrontFront);
+        m_scene.addEntity(entity, xy::Scene::FrontFront);
 
 
         mh.id = xy::Message::UIMessage;

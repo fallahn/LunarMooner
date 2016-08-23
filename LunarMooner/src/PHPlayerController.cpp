@@ -27,7 +27,7 @@ source distribution.
 
 #include <PHPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
-#include <CommandIDs.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
 #include <xygine/util/Vector.hpp>
