@@ -45,7 +45,7 @@ namespace lm
         CollisionWorld(const CollisionWorld&) = delete;
         CollisionWorld& operator = (const CollisionWorld&) = delete;
 
-        CollisionComponent::Ptr addComponent(xy::MessageBus&, sf::FloatRect, CollisionComponent::ID);
+        CollisionComponent::Ptr addComponent(xy::MessageBus&, sf::FloatRect, CollisionComponent::ID, bool = false);
 
         void update();
 

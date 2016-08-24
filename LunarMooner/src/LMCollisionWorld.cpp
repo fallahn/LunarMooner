@@ -35,12 +35,10 @@ CollisionWorld::CollisionWorld(const xy::Scene& scene)
 : m_scene(scene){}
 
 //public
-CollisionComponent::Ptr CollisionWorld::addComponent(xy::MessageBus& mb, sf::FloatRect area, CollisionComponent::ID id)
+CollisionComponent::Ptr CollisionWorld::addComponent(xy::MessageBus& mb, sf::FloatRect area, CollisionComponent::ID id, bool isCollider)
 {
     auto cc = xy::Component::create<CollisionComponent>(mb, area, id);
-    //wow this is a horrible hack. we should make this a function param
-    if (id == CollisionComponent::ID::Player || id == CollisionComponent::ID::Bullet 
-        || id == CollisionComponent::ID::Gravity || id == CollisionComponent::ID::Bounds)
+    if (isCollider)
     {
         m_colliders.push_back(cc.get());
     }
