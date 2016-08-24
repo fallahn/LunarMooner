@@ -76,7 +76,7 @@ void GameController::spawnPlayer()
 {
     auto controller = xy::Component::create<ph::PlayerController>(getMessageBus());
 
-    auto playerCollision = m_collisionWorld.addComponent(getMessageBus(), playerSize, lm::CollisionComponent::ID::Player);
+    auto playerCollision = m_collisionWorld.addComponent(getMessageBus(), playerSize, lm::CollisionComponent::ID::Player, true);
     lm::CollisionComponent::Callback callback = std::bind(&ph::PlayerController::collisionCallback, controller.get(), std::placeholders::_1);
     playerCollision->setCallback(callback);
 
@@ -88,7 +88,7 @@ void GameController::spawnPlayer()
     drawable->getDrawable().setFillColor(sf::Color::Red);
 
     auto orbit = xy::Component::create<OrbitComponent>(getMessageBus(), playerSize.width / 2.f);
-    auto ccOrbit = m_collisionWorld.addComponent(getMessageBus(), playerSize, lm::CollisionComponent::ID::Gravity);
+    auto ccOrbit = m_collisionWorld.addComponent(getMessageBus(), playerSize, lm::CollisionComponent::ID::Gravity, true);
     callback = std::bind(&OrbitComponent::collisionCallback, orbit.get(), std::placeholders::_1);
     ccOrbit->setCallback(callback);
 
@@ -112,22 +112,22 @@ void GameController::buildScene()
 
     auto ct = m_collisionWorld.addComponent(getMessageBus(),
     { {},{ xy::DefaultSceneSize.x + ((boundsOffset + boundsMargin) * 2.f), boundsOffset } },
-        lm::CollisionComponent::ID::Bounds); //top
+        lm::CollisionComponent::ID::Bounds, true); //top
     auto qt = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ct->localBounds());
 
     auto cb = m_collisionWorld.addComponent(getMessageBus(),
     { { 0.f, xy::DefaultSceneSize.y + boundsOffset + (boundsMargin * 2.f) },{ xy::DefaultSceneSize.x + ((boundsOffset + boundsMargin) * 2.f), boundsOffset } },
-        lm::CollisionComponent::ID::Bounds); //bottom
+        lm::CollisionComponent::ID::Bounds, true); //bottom
     auto qb = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), cb->localBounds());
 
     auto cl = m_collisionWorld.addComponent(getMessageBus(),
     { { 0.f, boundsOffset },{ boundsOffset, xy::DefaultSceneSize.y + (boundsMargin * 2.f) } },
-        lm::CollisionComponent::ID::Bounds); //left
+        lm::CollisionComponent::ID::Bounds, true); //left
     auto ql = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), cl->localBounds());
 
     auto cr = m_collisionWorld.addComponent(getMessageBus(),
     { { xy::DefaultSceneSize.x + boundsOffset + (boundsMargin * 2.f), boundsOffset },{ boundsOffset, xy::DefaultSceneSize.y + (boundsMargin * 2.f) } },
-        lm::CollisionComponent::ID::Bounds); //right
+        lm::CollisionComponent::ID::Bounds, true); //right
     auto qr = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), cr->localBounds());
 
     auto ent = xy::Entity::create(getMessageBus());
@@ -278,7 +278,7 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     drawable->getDrawable().setOutlineColor({ 0, 120, 255, 30 });
 
     const auto influenceRad = orbit->getInfluenceRadius();
-    auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity);
+    auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
     /*auto callback = std::bind(&OrbitComponent::collisionCallback, orbit.get(), std::placeholders::_1);
     ccLarge->setCallback(callback);*/
 

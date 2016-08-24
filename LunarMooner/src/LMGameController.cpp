@@ -638,7 +638,7 @@ void GameController::spawnPlayer()
             m_mothership->getComponent<MothershipController>(), m_terrain->getChain());
         playerController->setSize(playerSize);
 
-        auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, playerSize }, CollisionComponent::ID::Player);
+        auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, playerSize }, CollisionComponent::ID::Player, true);
         CollisionComponent::Callback cb = std::bind(&PlayerController::collisionCallback, playerController.get(), _1);
         collision->setCallback(cb);
 
@@ -887,7 +887,7 @@ void GameController::createTerrain()
     };
 
     //walls
-    auto collision = m_collisionWorld.addComponent(getMessageBus(), sizes[0], lm::CollisionComponent::ID::Bounds);
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), sizes[0], lm::CollisionComponent::ID::Bounds, true);
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[0]);
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
@@ -895,7 +895,7 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left - 40.f, 0.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[0], lm::CollisionComponent::ID::Bounds);
+    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[0], lm::CollisionComponent::ID::Bounds, true);
     qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[0]);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
@@ -903,7 +903,7 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left + alienArea.width, 0.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds);
+    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds, true);
     qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[1]);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
@@ -911,7 +911,7 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left, -40.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds);
+    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds, true);
     qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[1]);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
@@ -1031,7 +1031,7 @@ void GameController::spawnBullet(const sf::Vector2f& position, LMDirection direc
     
     auto controller = xy::Component::create<BulletController>(getMessageBus(), direction);
 
-    auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, size }, CollisionComponent::ID::Bullet);
+    auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, size }, CollisionComponent::ID::Bullet, true);
     CollisionComponent::Callback cb = std::bind(&BulletController::collisionCallback, controller.get(), _1);
     collision->setCallback(cb);
 
