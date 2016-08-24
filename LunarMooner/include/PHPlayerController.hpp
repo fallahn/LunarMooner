@@ -50,6 +50,9 @@ namespace ph
         void entityUpdate(xy::Entity&, float) override;
         void onStart(xy::Entity&) override;
 
+        void leaveOrbit(const sf::Vector2f&);
+        const sf::Vector2f& getVelocity() const { return m_velocity; }
+
         void collisionCallback(lm::CollisionComponent*);
 
     private:

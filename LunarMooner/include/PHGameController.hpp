@@ -58,6 +58,7 @@ namespace ph
         lm::CollisionWorld& m_collisionWorld;
 
         sf::Vector2f m_spawnPosition;
+        bool m_playerSpawned;
         void spawnPlayer();
         void buildScene();
         xy::Entity* addBody(const sf::Vector2f&, float);

@@ -27,11 +27,15 @@ source distribution.
 
 #include <PlanetHoppingState.hpp>
 #include <PHGameController.hpp>
+#include <PHPlayerController.hpp>
+#include <PHOrbitComponent.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/components/SoundPlayer.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Event.hpp>
 
 PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     : xy::State     (stack, context),
@@ -65,6 +69,25 @@ bool PlanetHoppingState::update(float dt)
 
 bool PlanetHoppingState::handleEvent(const sf::Event& evt)
 {
+    if (evt.type == sf::Event::KeyReleased)
+    {
+        switch (evt.key.code)
+        {
+        default:break;
+        case sf::Keyboard::Space:
+        {
+            xy::Command cmd;
+            cmd.category = LMCommandID::Player;
+            cmd.action = [](xy::Entity& entity, float)
+            {
+                entity.getComponent<ph::PlayerController>()->leaveOrbit(entity.getComponent<ph::OrbitComponent>()->removeParent());
+            };
+            m_scene.sendCommand(cmd);
+        }
+            break;
+        }
+    }
+
     return false;
 }
 
