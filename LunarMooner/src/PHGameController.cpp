@@ -47,19 +47,20 @@ using namespace ph;
 namespace
 {
     const float boundsOffset = 40.f;
-    const float boundsMargin = boundsOffset;
+    const float boundsMargin = (boundsOffset * 2.f);
 
     const sf::Vector2f playerStart(100.f, xy::DefaultSceneSize.y / 2.f);
-    const sf::FloatRect playerSize({ -10.f, -10.f }, { 20.f, 20.f });
+    const sf::FloatRect playerSize({ -20.f, -20.f }, { 40.f, 40.f });
 
     const float masterRadius = 140.f; //for start / end planets
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw)
-    : xy::Component(mb, this),
-    m_resources(rc),
-    m_scene(scene),
-    m_collisionWorld(cw)
+    : xy::Component     (mb, this),
+    m_resources         (rc),
+    m_scene             (scene),
+    m_collisionWorld    (cw),
+    m_playerSpawned     (false)
 {
     buildScene();
     addMessageHandlers();
@@ -68,12 +69,14 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
 //public
 void GameController::entityUpdate(xy::Entity&, float)
 {
-
+    spawnPlayer(); //this way multiple death events in a frame still onyl spawn a single player
 }
 
 //private
 void GameController::spawnPlayer()
 {
+    if (m_playerSpawned) return;
+    
     auto controller = xy::Component::create<ph::PlayerController>(getMessageBus());
 
     auto playerCollision = m_collisionWorld.addComponent(getMessageBus(), playerSize, lm::CollisionComponent::ID::Player, true);
@@ -100,7 +103,10 @@ void GameController::spawnPlayer()
     ent->addComponent(orbit);
     ent->addComponent(ccOrbit);
     ent->setPosition(m_spawnPosition);
+    ent->addCommandCategories(LMCommandID::Player);
     m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);
+
+    m_playerSpawned = true;
 }
 
 void GameController::buildScene()
@@ -306,7 +312,7 @@ void GameController::addMessageHandlers()
         {
         default: break;
         case LMGameEvent::PlayerDied:
-            spawnPlayer();
+            m_playerSpawned = false;
             break;
         }
     };

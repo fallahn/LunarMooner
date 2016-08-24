@@ -32,12 +32,13 @@ source distribution.
 #include <xygine/Entity.hpp>
 #include <xygine/util/Vector.hpp>
 #include <xygine/Assert.hpp>
+#include <xygine/Reports.hpp>
 
 using namespace ph;
 
 namespace
 {
-    const float speed = 500.f;
+    const float speed = 1000.f;
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb)
@@ -45,13 +46,28 @@ PlayerController::PlayerController(xy::MessageBus& mb)
     m_entity        (nullptr),
     m_inOrbit       (true)
 {
-    m_velocity = xy::Util::Vector::normalise({ 1.f, 0.87f });
+    m_velocity = xy::Util::Vector::normalise({ 0.f, 0.87f });
+
+    xy::Component::MessageHandler mh;
+    mh.id = GameEvent;
+    mh.action = [this](xy::Component*, const xy::Message& msg)
+    {
+        const auto& msgData = msg.getData<LMGameEvent>();
+        if (msgData.type == LMGameEvent::EnteredOrbit)
+        {
+            m_inOrbit = true;
+            LOG("Entered orbit", xy::Logger::Type::Info);
+        }
+    };
+    addMessageHandler(mh);
 }
 
 //public
 void PlayerController::entityUpdate(xy::Entity& ent, float dt)
 {
     if(!m_inOrbit) ent.move(m_velocity * speed * dt);
+
+    REPORT("X pos", std::to_string(ent.getWorldPosition().x));
 }
 
 void PlayerController::onStart(xy::Entity& e)
@@ -60,35 +76,20 @@ void PlayerController::onStart(xy::Entity& e)
     XY_ASSERT(m_entity, "Invalid entity instance");
 }
 
+void PlayerController::leaveOrbit(const sf::Vector2f& newVelocity)
+{
+    if (!m_inOrbit) return;
+    m_velocity = xy::Util::Vector::normalise(newVelocity);
+    m_inOrbit = false;
+}
+
 void PlayerController::collisionCallback(lm::CollisionComponent* cc)
 {
     switch (cc->getID())
     {
     case lm::CollisionComponent::ID::Bounds:
     {
-        //bool die = false;
-
-        //if (!m_inOrbit)
-        //{
-        //    die = true;
-        //}
-        //else
-        //{
-        //    //use inner radius check
-        //    auto collisionComponent = m_entity->getComponent<lm::CollisionComponent>();
-        //    XY_ASSERT(collisionComponent, "missing player collision component");
-
-        //    auto collisionDirection = collisionComponent->getCentre() - cc->getCentre();
-        //    float distSqr = xy::Util::Vector::lengthSquared(collisionDirection);
-        //    float minDistSqr = (collisionComponent->getInnerRadius() * collisionComponent->getInnerRadius()) + (cc->getInnerRadius() * cc->getInnerRadius());
-
-        //    die = (distSqr < minDistSqr);
-        //}
-
-        //if (die)
-        {
-            kill();
-        }
+        kill();
     }
         break;
     case lm::CollisionComponent::ID::Body:

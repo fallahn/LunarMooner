@@ -28,9 +28,11 @@ source distribution.
 #ifndef PH_ORBIT_COMPONENT_HPP_
 #define PH_ORBIT_COMPONENT_HPP_
 
+#include <CommandIds.hpp>
+
 #include <xygine/components/Component.hpp>
 
-#include <SFML/Graphics/Transformable.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace lm
 {
@@ -54,7 +56,7 @@ namespace ph
 
         void collisionCallback(lm::CollisionComponent*);
 
-        void removeParent();
+        sf::Vector2f removeParent();
 
     private:
         float m_radius;
@@ -65,6 +67,8 @@ namespace ph
 
         xy::Entity* m_entity;
         float m_rotationSpeed;
+        sf::Vector2f m_parentPosition;
+        LMDirection m_rotation; //right is clockwise, because that's the side of the cockpit it would appear on
 
         void setParent(const xy::Entity&);
     };
