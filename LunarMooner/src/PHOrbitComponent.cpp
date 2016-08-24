@@ -41,7 +41,7 @@ namespace
 OrbitComponent::OrbitComponent(xy::MessageBus& mb, float radius)
     :xy::Component      (mb, this),
     m_radius            (radius),
-    m_influenceRadius   (radius * 2.3f),
+    m_influenceRadius   (radius * 1.9f),
     m_parentID          (0),
     m_lastParentID      (0),
     m_entity            (nullptr),

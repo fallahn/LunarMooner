@@ -52,7 +52,7 @@ namespace
     const sf::Vector2f playerStart(100.f, xy::DefaultSceneSize.y / 2.f);
     const sf::FloatRect playerSize({ -10.f, -10.f }, { 20.f, 20.f });
 
-    const float masterRadius = 100.f; //for start / end planets
+    const float masterRadius = 140.f; //for start / end planets
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw)
@@ -144,7 +144,7 @@ void GameController::buildScene()
 
 
     //starting planet
-    const float startOffset = masterRadius * 2.f;
+    const float startOffset = masterRadius * 1.6f;
     auto startBody = addBody({ startOffset, xy::Util::Random::value(startOffset, xy::DefaultSceneSize.y - startOffset) }, masterRadius);
     startBody->update(0.f);
 
@@ -173,7 +173,7 @@ void GameController::buildScene()
             }
         }
     }
-    //remove overlapping bodies, but keep nearby so that they orbit each other   
+    //mvoe and remove overlapping bodies 
     for (auto body : bodies)
     {
         //move bodies in from far edges
@@ -198,21 +198,65 @@ void GameController::buildScene()
                 {
                     body->move(0.f, -moveDistance);
                 }
+                body->update(0.f); //update bounds
+                bounds = body->globalBounds();
             }
         };
         checkMaster(body, startBody);
         checkMaster(body, endBody);
 
+        //move bodies apart
         for (auto other : bodies)
         {
             other->update(0.f);
             if (body != other &&
                 bounds.intersects(other->globalBounds()))
             {
+                if (body->getWorldPosition().y < xy::DefaultSceneSize.y / 2.f)
+                {
+                    //move down
+                    body->move(0.f, xy::DefaultSceneSize.y / 4.f);
+                    if (body->getWorldPosition().y > xy::DefaultSceneSize.y)
+                    {
+                        body->move(0.f, -(bounds.height * 0.75f));
+                    }
+                }
+                else
+                {
+                    //move up
+                    body->move(0.f, -(xy::DefaultSceneSize.y / 4.f));
+                    if (body->getWorldPosition().y < 0)
+                    {
+                        body->move(0.f, bounds.height * 0.75f);
+                    }                  
+                }
+                body->update(0.f); //recalc bounds after moving
+                bounds = body->globalBounds();
+            }
+        }
+    }
+
+    //remove any still overlapping
+    for (auto body : bodies)
+    {
+        body->update(0.f);
+        for (auto other : bodies)
+        {
+            other->update(0.f);
+            if (body != other && !other->destroyed() &&
+                (body->globalBounds().intersects(other->globalBounds())
+                    || body->globalBounds().contains(other->getWorldPosition())))
+            {
                 body->destroy();
-                LOG("buns", xy::Logger::Type::Info);
+                LOG("Destroyed Body", xy::Logger::Type::Info);
                 break;
             }
+        }
+        if (startBody->globalBounds().intersects(body->globalBounds())
+            || endBody->globalBounds().intersects(body->globalBounds()))
+        {
+            body->destroy();
+            LOG("Destroyed Body", xy::Logger::Type::Info);
         }
     }
 
