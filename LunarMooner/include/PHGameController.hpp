@@ -52,6 +52,8 @@ namespace ph
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity&, float) override;
 
+        void spawnPlayer();
+
     private:
         ResourceCollection& m_resources;
         xy::Scene& m_scene;
@@ -59,7 +61,7 @@ namespace ph
 
         sf::Vector2f m_spawnPosition;
         bool m_playerSpawned;
-        void spawnPlayer();
+
         void buildScene();
         xy::Entity* addBody(const sf::Vector2f&, float);
         void addMessageHandlers();
