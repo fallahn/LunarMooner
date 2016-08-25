@@ -1,0 +1,41 @@
+{
+  "Editor": {
+    "EmitterPosition": "0, 0",
+    "BackgroundColour": 255,
+    "EnableMovement": false
+  },
+  "ReleaseCount": 1,
+  "Delay": 0.0,
+  "Duration": -1.0,
+  "Texture": "",
+  "Colour": -1,
+  "BlendMode": "Add",
+  "ParticleSize": "2, 2",
+  "ParticlePosition": "0, 0",
+  "FollowParent": false,
+  "Lifetime": 1.5,
+  "InitialVelocity": "0, -50",
+  "RandomInitialVelocities": [
+    "-5, -7",
+    "-1, -6",
+    "8, -2"
+  ],
+  "EmitRate": 10.0,
+  "RandomInitialPositions": [],
+  "Affectors": [
+    {
+      "Type": "Force",
+      "Data": [
+        50.0,
+        -100.0
+      ]
+    },
+    {
+      "Type": "Scale",
+      "Data": [
+        10.0,
+        10.0
+      ]
+    }
+  ]
+}

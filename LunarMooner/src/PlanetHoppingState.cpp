@@ -33,6 +33,7 @@ source distribution.
 
 #include <xygine/App.hpp>
 #include <xygine/components/SoundPlayer.hpp>
+#include <xygine/components/ParticleController.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -50,10 +51,16 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     launchLoadingScreen();
 
     m_scene.setView(context.defaultView);
-    m_scene.drawDebug(true);
+    //m_scene.drawDebug(true);
     //TODO post processes
 
     buildScene();
+
+    tmpTxt.setFont(m_resources.fontResource.get("temptext"));
+    tmpTxt.setFillColor(sf::Color(120, 120, 255));
+    tmpTxt.setString("Space: Launch from orbit or respawn - A/D: Steer");
+    tmpTxt.setPosition(10.f, 10.f);
+    tmpTxt.setCharacterSize(16);
 
     quitLoadingScreen();
 }
@@ -115,6 +122,10 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
             m_scene.sendCommand(cmd);
         }
             break;
+        case sf::Keyboard::BackSpace:
+            /*requestStackPop();
+            requestStackPush(States::PlanetHopping);*/
+            break;
         }
     }
 
@@ -141,8 +152,10 @@ void PlanetHoppingState::handleMessage(const xy::Message& msg)
 void PlanetHoppingState::draw()
 {
     auto& rw = getContext().renderWindow;
-
     rw.draw(m_scene);
+
+    rw.setView(rw.getDefaultView());
+    rw.draw(tmpTxt);
 }
 
 //private
@@ -150,11 +163,39 @@ void PlanetHoppingState::buildScene()
 {
     auto gameController = xy::Component::create<ph::GameController>(m_messageBus, m_resources, m_scene, m_collisionWorld);
     //auto soundPlayer = xy::Component::create<xy::SoundPlayer>(m_messageBus, m_resources.soundResource);
+
+
+    //TODO move particle init to own function
+    auto particleController = xy::Component::create<xy::ParticleController>(m_messageBus);
+    xy::Component::MessageHandler handler;
+    handler.id = LMMessageId::GameEvent;
+    handler.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        auto component = dynamic_cast<xy::ParticleController*>(c);
+        auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::PlayerDied:
+            component->fire(LMParticleID::LargeExplosion, { msgData.posX, msgData.posY });
+            component->fire(LMParticleID::SmallExplosion, { msgData.posX, msgData.posY });
+            break;
+        }
+    };
+    particleController->addMessageHandler(handler);
+
     auto entity = xy::Entity::create(m_messageBus);
+    auto pc = entity->addComponent(particleController);
+    xy::ParticleSystem::Definition pd;
+    pd.loadFromFile("assets/particles/small_explosion.xyp", m_resources.textureResource);
+    pc->addDefinition(LMParticleID::SmallExplosion, pd);
+
+    pd.loadFromFile("assets/particles/large_explosion.xyp", m_resources.textureResource);
+    pc->addDefinition(LMParticleID::LargeExplosion, pd);
+    
     entity->addComponent(gameController);
-    //entity->addComponent(soundPlayer);
     entity->addCommandCategories(LMCommandID::GameController);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }
 
 void PlanetHoppingState::updateLoadingScreen(float dt, sf::RenderWindow& rw)

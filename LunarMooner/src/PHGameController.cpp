@@ -40,6 +40,8 @@ source distribution.
 #include <xygine/util/Random.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
 #include <xygine/components/SpriteBatch.hpp>
+#include <xygine/components/AnimatedDrawable.hpp>
+#include <xygine/components/ParticleSystem.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -64,7 +66,7 @@ namespace
         { 48.f, 0.f, 28.f, 32.f },
         { 62.f, 0.f, 36.f, 52.f }
     };
-    const std::size_t debrisCount = 5u;
+    const std::size_t debrisCount = 8u;
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw)
@@ -169,6 +171,30 @@ void GameController::buildScene()
 
     //ending planet
     auto endBody = addBody({ xy::DefaultSceneSize.x - startOffset, xy::Util::Random::value(startOffset, xy::DefaultSceneSize.y - startOffset) }, masterRadius);
+    
+    auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_01.png"));
+    drawable->loadAnimationData("assets/images/game/doofer_01.xya");
+    drawable->playAnimation(1);
+    drawable->setScale({ 1.6f, 1.6f });
+    
+    xy::ParticleSystem::Definition pd;
+    pd.loadFromFile("assets/particles/smoke.xyp", m_resources.textureResource);
+    auto ps1 = pd.createSystem(getMessageBus());
+    ps1->setPosition({ 10.f, -20.f });
+    ps1->start();
+
+    auto ps2 = pd.createSystem(getMessageBus());
+    ps2->setPosition({ -25, -34.f });
+    ps2->start();
+
+    auto ps3 = pd.createSystem(getMessageBus());
+    ps3->setPosition({ -15, 24.f });
+    ps3->start();
+
+    endBody->addComponent(drawable);
+    endBody->addComponent(ps1);
+    endBody->addComponent(ps2);
+    endBody->addComponent(ps3);
     endBody->update(0.f);
 
     //create intermediate bodies - evenly distribute this by repeating 4 times
@@ -291,15 +317,14 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
     drawable->getDrawable().setRadius(radius);
     drawable->getDrawable().setOrigin(radius, radius);
+    drawable->getDrawable().setFillColor({ 120, 120, 120 });
 
     auto orbit = xy::Component::create<OrbitComponent>(getMessageBus(), radius);
     drawable->getDrawable().setOutlineThickness(orbit->getInfluenceRadius() - radius);
-    drawable->getDrawable().setOutlineColor({ 0, 120, 255, 30 });
+    drawable->getDrawable().setOutlineColor({ 0, 120, 255, 10 });
 
     const auto influenceRad = orbit->getInfluenceRadius();
     auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
-    /*auto callback = std::bind(&OrbitComponent::collisionCallback, orbit.get(), std::placeholders::_1);
-    ccLarge->setCallback(callback);*/
 
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
 

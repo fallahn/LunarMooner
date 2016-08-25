@@ -36,6 +36,7 @@ source distribution.
 #include <xygine/Scene.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 class PlanetHoppingState final : public xy::State
 {
@@ -57,6 +58,8 @@ private:
     xy::MessageBus& m_messageBus;
     xy::Scene m_scene;
     lm::CollisionWorld m_collisionWorld;
+
+    sf::Text tmpTxt;
 
     void buildScene();
 

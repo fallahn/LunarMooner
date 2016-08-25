@@ -38,7 +38,7 @@ using namespace ph;
 
 namespace
 {
-    const float rcsStrength = 130.f;
+    const float rcsStrength = 530.f;
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb)
@@ -48,7 +48,7 @@ PlayerController::PlayerController(xy::MessageBus& mb)
     m_input         (0)
 {
     //need to set the initial velocity so we're rotating in the correct direction
-    m_velocity.y = 400.f;
+    m_velocity.y = 300.f;
     
     xy::Component::MessageHandler mh;
     mh.id = GameEvent;
@@ -72,11 +72,15 @@ void PlayerController::entityUpdate(xy::Entity& ent, float dt)
         ent.move(m_velocity * dt);
         if (m_input & InputFlags::Left)
         {
-            ent.move(m_rightVector * rcsStrength * dt);
+            //ent.move(m_rightVector * rcsStrength * dt);
+            m_velocity += (m_rightVector * dt);
+            m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
         if (m_input & InputFlags::Right)
         {
-            ent.move(-m_rightVector * rcsStrength * dt);
+            //ent.move(-m_rightVector * rcsStrength * dt);
+            m_velocity += (-m_rightVector * dt);
+            m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
     }
     m_input = 0;
@@ -94,7 +98,7 @@ void PlayerController::leaveOrbit(const sf::Vector2f& newVelocity)
 {
     if (!m_inOrbit) return;
     m_velocity = newVelocity;
-    m_rightVector = xy::Util::Vector::normalise({ newVelocity.y, -newVelocity.x });
+    m_rightVector = xy::Util::Vector::normalise({ newVelocity.y, -newVelocity.x }) * rcsStrength;
     m_inOrbit = false;
 }
 
