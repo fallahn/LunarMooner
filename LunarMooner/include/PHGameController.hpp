@@ -65,6 +65,8 @@ namespace ph
         void buildScene();
         xy::Entity* addBody(const sf::Vector2f&, float);
         void addMessageHandlers();
+
+        void spawnDebris();
     };
 }
 

@@ -28,6 +28,7 @@ source distribution.
 #include <LMAlienController.hpp>
 #include <LMPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
+#include <PHPlayerController.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
@@ -115,12 +116,40 @@ void AlienController::collisionCallback(CollisionComponent* cc)
         sf::Vector2f normal(manifold.x, manifold.y);
 
         m_entity->move(normal * manifold.z);
-        auto playerVel = cc->getParentEntity().getComponent<PlayerController>()->getVelocity();
+        
+        //this is confused by having different player controllers in different game modes
+        sf::Vector2f playerVel;
+        if (auto player = cc->getParentEntity().getComponent<lm::PlayerController>())
+        {
+            playerVel = player->getVelocity();
+        }
+        else if (auto player = cc->getParentEntity().getComponent<ph::PlayerController>())
+        {
+            playerVel = player->getVelocity();
+        }
+
         m_velocity += xy::Util::Vector::normalise(playerVel);
         m_velocity /= 2.f;
 
         m_speed += xy::Util::Vector::length(playerVel);
         m_speed /= 2.f;
+    }
+        break;
+    case CollisionComponent::ID::Gravity:
+        //stay away from planets in hopping mode
+    {
+        const auto collision = m_entity->getComponent<CollisionComponent>();
+        const float minDistSquared = (cc->getInnerRadius() * cc->getInnerRadius()) + (collision->getInnerRadius() * collision->getInnerRadius());
+        auto direction = collision->getCentre() - cc->getCentre();
+        const float distSquared = xy::Util::Vector::lengthSquared(direction);
+
+        if (distSquared < minDistSquared)
+        {
+            auto normal = xy::Util::Vector::normalise(direction);
+            m_entity->move(normal * std::sqrt(minDistSquared - distSquared));
+            m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+        }
+
     }
         break;
     }

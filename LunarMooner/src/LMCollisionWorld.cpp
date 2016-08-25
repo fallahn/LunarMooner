@@ -59,16 +59,19 @@ void CollisionWorld::update()
         const auto collidees = m_scene.queryQuadTree(ca->globalBounds());
         for (auto c : collidees)
         {
-            auto cbs = c->getEntity()->getComponents<CollisionComponent>();
-            if (!c->destroyed())
+            if (auto entity = c->getEntity())
             {
-                for (const auto cb : cbs)
+                auto cbs = entity->getComponents<CollisionComponent>();
+                if (!c->destroyed())
                 {
-                    if(ca->globalBounds().intersects(cb->globalBounds()))
+                    for (const auto cb : cbs)
                     {
-                        ca->addCollider(cb);
-                        cb->addCollider(ca);
-                        //break;
+                        if (ca->globalBounds().intersects(cb->globalBounds()))
+                        {
+                            ca->addCollider(cb);
+                            cb->addCollider(ca);
+                            //break;
+                        }
                     }
                 }
             }
