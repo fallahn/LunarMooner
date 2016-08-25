@@ -51,15 +51,24 @@ namespace ph
         void onStart(xy::Entity&) override;
 
         void leaveOrbit(const sf::Vector2f&);
+        void moveLeft() { m_input |= 0x1; }
+        void moveRight() { m_input |= 0x2; }
         const sf::Vector2f& getVelocity() const { return m_velocity; }
 
         void collisionCallback(lm::CollisionComponent*);
 
     private:
         sf::Vector2f m_velocity;
+        sf::Vector2f m_rightVector;
         xy::Entity* m_entity;
 
         bool m_inOrbit;
+        sf::Uint8 m_input;
+        enum InputFlags
+        {
+            Left = 0x1,
+            Right = 0x2
+        };
 
         sf::Vector3f getManifold(const sf::FloatRect&);
         void kill();

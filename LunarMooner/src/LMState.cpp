@@ -59,6 +59,7 @@ source distribution.
 
 namespace
 {
+    //TODO move to own file so we can keymap to other parts of the game
     const sf::Keyboard::Key keyStart = sf::Keyboard::Return;
     const sf::Keyboard::Key keyLeft = sf::Keyboard::A;
     const sf::Keyboard::Key keyRight = sf::Keyboard::D;

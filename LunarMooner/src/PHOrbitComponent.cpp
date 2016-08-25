@@ -37,18 +37,25 @@ using namespace ph;
 namespace
 {
     const float maxRotation = 256.f;
-    const float rotationMultiplier = 4.f;
+    const float rotationMultiplier = 1.8f;// 4.f;
+
+    LMDirection pointSide(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Vector2f& c)
+    {
+        float value = ((b.x - a.x) * (c.y - a.y)) - ((c.x - a.x) * (b.y - a.y));
+        return (value > 0) ? LMDirection::Right : LMDirection::Left;
+    }
 }
 
 OrbitComponent::OrbitComponent(xy::MessageBus& mb, float radius)
-    :xy::Component      (mb, this),
-    m_radius            (radius),
-    m_influenceRadius   (radius * 2.1f),
-    m_parentID          (0),
-    m_lastParentID      (0),
-    m_entity            (nullptr),
-    m_rotationSpeed     (0.f),
-    m_rotation          (LMDirection::Right)
+    :xy::Component          (mb, this),
+    m_radius                (radius),
+    m_influenceRadius       (radius * 3.7f),
+    m_parentID              (0),
+    m_lastParentID          (0),
+    m_entity                (nullptr),
+    m_rotationSpeed         (0.f),
+    m_targetRotationSpeed   (0.f),
+    m_rotation              (LMDirection::Right)
 {
 
 }
@@ -59,6 +66,16 @@ void OrbitComponent::entityUpdate(xy::Entity& entity, float dt)
     if (m_parentID)
     {
         entity.rotate(m_rotationSpeed * dt);
+
+        //smooth speed transition
+        if (m_rotationSpeed < (m_targetRotationSpeed - dt))
+        {
+            m_rotationSpeed += dt;
+        }
+        else if (m_rotationSpeed > (m_targetRotationSpeed + dt))
+        {
+            m_rotationSpeed -= dt;
+        }
     }
 }
 
@@ -100,13 +117,11 @@ void OrbitComponent::collisionCallback(lm::CollisionComponent* cc)
                             }
 
                             //see which direction we're coming from
-                            if
-                            (
-                                ((direction.x < 0) && (otherPosition.y > position.y)) ||
-                                ((direction.y > 0) && (otherPosition.x > position.x)) ||
-                                ((direction.x > 0) && (otherPosition.y < position.y)) ||
-                                ((direction.y < 0) && (otherPosition.x < position.x))
-                            )m_rotation = LMDirection::Left;
+                            m_rotation = pointSide(position, position + player->getVelocity(), otherPosition);
+                            m_rotationSpeed = xy::Util::Vector::length(player->getVelocity()) / xy::Util::Vector::length(direction);
+                            m_rotationSpeed *= xy::Util::Const::radToDeg;
+
+                            (m_rotation == LMDirection::Right) ? xy::Logger::log("Right", xy::Logger::Type::Info) : xy::Logger::log("Left", xy::Logger::Type::Info);
                         }
                         //switch to new parent
                         setParent(cc->getParentEntity());
@@ -123,14 +138,20 @@ sf::Vector2f OrbitComponent::removeParent()
 {
     //look at which way we're rotating
     auto position = m_entity->getWorldPosition();
-    auto parentDir = position - m_parentPosition;
-    sf::Vector2f retVal = (m_rotation == LMDirection::Right) 
-        ? sf::Vector2f(-parentDir.y, parentDir.x) : sf::Vector2f(parentDir.y, -parentDir.x);
+    auto parentDir = m_parentPosition - position;
+    sf::Vector2f retVal(parentDir.y, -parentDir.x);/* = (m_rotation == LMDirection::Left)
+        ? sf::Vector2f(parentDir.y, -parentDir.x) : sf::Vector2f(parentDir.y, -parentDir.x);*/
     
+    //using the current rotation speed work out the linear velocity (v = r x w)
+    const float radius = xy::Util::Vector::length(parentDir);
+    const float radsPerSec = m_rotationSpeed * xy::Util::Const::degToRad;
+    retVal = xy::Util::Vector::normalise(retVal) * (radius * radsPerSec);
+
     m_lastParentID = m_parentID;
     m_parentID = 0;
 
     m_entity->setOrigin(0.f, 0.f);
+    m_entity->setRotation(0.f);
     m_entity->setPosition(position);
 
     LOG("Left orbit", xy::Logger::Type::Info);
@@ -149,13 +170,16 @@ void OrbitComponent::setParent(const xy::Entity& entity)
 
     //set up properties for motion
     m_parentPosition = entity.getWorldPosition();
-    m_entity->setOrigin(m_entity->getWorldPosition() - m_parentPosition);
-    m_entity->move(-m_entity->getOrigin());
-    //m_entity->setRotation(0.f);
+    m_entity->setOrigin(m_parentPosition - m_entity->getWorldPosition());
+    m_entity->setWorldPosition(m_parentPosition);
     
-    //TODO calculate which direction this should be
-    m_rotationSpeed = (maxRotation - xy::Util::Vector::length(m_entity->getOrigin())) * rotationMultiplier;
-    if (m_rotation == LMDirection::Left) m_rotationSpeed = -m_rotationSpeed;
+    
+    m_targetRotationSpeed = (maxRotation - xy::Util::Vector::length(m_entity->getOrigin())) * rotationMultiplier;
+    if (m_rotation == LMDirection::Left)
+    {
+        m_rotationSpeed = -m_rotationSpeed;
+        m_targetRotationSpeed = -m_targetRotationSpeed;
+    }
 
     auto msg = sendMessage<LMGameEvent>(GameEvent);
     msg->type = LMGameEvent::EnteredOrbit;

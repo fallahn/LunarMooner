@@ -39,7 +39,6 @@ source distribution.
 #include <xygine/util/Random.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
 
-#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 
 using namespace ph;
@@ -47,12 +46,14 @@ using namespace ph;
 namespace
 {
     const float boundsOffset = 40.f;
-    const float boundsMargin = (boundsOffset * 2.f);
+    const float boundsMargin = (boundsOffset * 4.f);
 
     const sf::Vector2f playerStart(100.f, xy::DefaultSceneSize.y / 2.f);
-    const sf::FloatRect playerSize({ -20.f, -20.f }, { 40.f, 40.f });
+    const sf::FloatRect playerSize({ -15.f, -15.f }, { 30.f, 30.f });
 
-    const float masterRadius = 140.f; //for start / end planets
+    const float masterRadius = 110.f; //for start / end planets
+    const float minBodySize = 10.f;
+    const float maxBodySize = 45.f;
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw)
@@ -69,10 +70,9 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
 //public
 void GameController::entityUpdate(xy::Entity&, float)
 {
-    spawnPlayer(); //this way multiple death events in a frame still onyl spawn a single player
+    
 }
 
-//private
 void GameController::spawnPlayer()
 {
     if (m_playerSpawned) return;
@@ -85,8 +85,8 @@ void GameController::spawnPlayer()
 
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), playerSize);
 
-    auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
-    drawable->getDrawable().setSize({ playerSize.width, playerSize.height });
+    auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
+    drawable->getDrawable().setRadius(playerSize.width / 2.f);
     drawable->getDrawable().setOrigin(playerSize.width / 2.f, playerSize.height / 2.f);
     drawable->getDrawable().setFillColor(sf::Color::Red);
 
@@ -109,6 +109,7 @@ void GameController::spawnPlayer()
     m_playerSpawned = true;
 }
 
+//private
 void GameController::buildScene()
 {
     //set bounds
@@ -174,7 +175,7 @@ void GameController::buildScene()
             for (auto i = 0u; i < 3u; ++i)
             {
                 auto body = addBody({ xy::Util::Random::value(startX, endX), xy::Util::Random::value(startY, endY) },
-                    xy::Util::Random::value(10.f, 60.f));
+                    xy::Util::Random::value(minBodySize, maxBodySize));
                 bodies.push_back(body);
             }
         }
@@ -267,7 +268,7 @@ void GameController::buildScene()
     }
 
     //create player
-    m_spawnPosition = startBody->getWorldPosition() + sf::Vector2f((masterRadius * 1.4f), 0.f);
+    m_spawnPosition = startBody->getWorldPosition() + sf::Vector2f((masterRadius * 1.6f), 0.f);
     spawnPlayer();
 }
 

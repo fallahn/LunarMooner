@@ -67,6 +67,7 @@ namespace ph
 
         xy::Entity* m_entity;
         float m_rotationSpeed;
+        float m_targetRotationSpeed;
         sf::Vector2f m_parentPosition;
         LMDirection m_rotation; //right is clockwise, because that's the side of the cockpit it would appear on
 

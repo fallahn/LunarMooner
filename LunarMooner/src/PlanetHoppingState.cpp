@@ -61,6 +61,28 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
 //public
 bool PlanetHoppingState::update(float dt)
 {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    {
+        xy::Command cmd;
+        cmd.category = LMCommandID::Player;
+        cmd.action = [](xy::Entity& entity, float)
+        {
+            entity.getComponent<ph::PlayerController>()->moveLeft();
+        };
+        m_scene.sendCommand(cmd);
+    }
+    
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    {
+        xy::Command cmd;
+        cmd.category = LMCommandID::Player;
+        cmd.action = [](xy::Entity& entity, float)
+        {
+            entity.getComponent<ph::PlayerController>()->moveRight();
+        };
+        m_scene.sendCommand(cmd);
+    }
+
     m_collisionWorld.update();
     m_scene.update(dt);
     
@@ -81,6 +103,14 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
             cmd.action = [](xy::Entity& entity, float)
             {
                 entity.getComponent<ph::PlayerController>()->leaveOrbit(entity.getComponent<ph::OrbitComponent>()->removeParent());
+            };
+            m_scene.sendCommand(cmd);
+
+            //do this second so we don't launch the player on spawn
+            cmd.category = LMCommandID::GameController;
+            cmd.action = [](xy::Entity& entity, float)
+            {
+                entity.getComponent<ph::GameController>()->spawnPlayer();
             };
             m_scene.sendCommand(cmd);
         }
@@ -119,10 +149,11 @@ void PlanetHoppingState::draw()
 void PlanetHoppingState::buildScene()
 {
     auto gameController = xy::Component::create<ph::GameController>(m_messageBus, m_resources, m_scene, m_collisionWorld);
-    auto soundPlayer = xy::Component::create<xy::SoundPlayer>(m_messageBus, m_resources.soundResource);
+    //auto soundPlayer = xy::Component::create<xy::SoundPlayer>(m_messageBus, m_resources.soundResource);
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(gameController);
-    entity->addComponent(soundPlayer);
+    //entity->addComponent(soundPlayer);
+    entity->addCommandCategories(LMCommandID::GameController);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 }
 
