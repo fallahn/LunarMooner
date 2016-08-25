@@ -31,6 +31,7 @@ source distribution.
 #include <PHOrbitComponent.hpp>
 #include <PHPlayerController.hpp>
 #include <CommandIds.hpp>
+#include <LMAlienController.hpp>
 
 #include <xygine/Scene.hpp>
 #include <xygine/Entity.hpp>
@@ -38,6 +39,7 @@ source distribution.
 #include <xygine/util/Vector.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>
+#include <xygine/components/SpriteBatch.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -49,11 +51,20 @@ namespace
     const float boundsMargin = (boundsOffset * 4.f);
 
     const sf::Vector2f playerStart(100.f, xy::DefaultSceneSize.y / 2.f);
-    const sf::FloatRect playerSize({ -15.f, -15.f }, { 30.f, 30.f });
+    const sf::FloatRect playerSize({ -18.f, -18.f }, { 36.f, 36.f });
 
     const float masterRadius = 110.f; //for start / end planets
     const float minBodySize = 10.f;
     const float maxBodySize = 45.f;
+
+    const std::array<sf::FloatRect, 4u> debrisSizes =
+    {
+        sf::FloatRect(0.f, 0.f, 40.f, 38.f),
+        { 20.f, 0.f, 56.f, 60.f },
+        { 48.f, 0.f, 28.f, 32.f },
+        { 62.f, 0.f, 36.f, 52.f }
+    };
+    const std::size_t debrisCount = 5u;
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw)
@@ -64,6 +75,7 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
     m_playerSpawned     (false)
 {
     buildScene();
+    spawnDebris();
     addMessageHandlers();
 }
 
@@ -318,4 +330,46 @@ void GameController::addMessageHandlers()
         }
     };
     addMessageHandler(mh);
+}
+
+void GameController::spawnDebris()
+{
+    auto sb = xy::Component::create<xy::SpriteBatch>(getMessageBus());
+    sb->setTexture(&m_resources.textureResource.get("assets/images/game/debris.png"));
+    auto entity = xy::Entity::create(getMessageBus());
+    auto* spriteBatch = entity->addComponent(sb);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
+    
+    std::function<void(const sf::Vector2f&)> spawn = [this, spriteBatch](const sf::Vector2f& position)
+    {
+        auto size = debrisSizes[xy::Util::Random::value(0, debrisSizes.size() - 1)];
+
+        auto drawable = spriteBatch->addSprite(getMessageBus());
+        drawable->setTextureRect(size);
+
+        auto controller = xy::Component::create<lm::AlienController>(getMessageBus(), sf::FloatRect({}, xy::DefaultSceneSize));
+
+        auto collision = m_collisionWorld.addComponent(getMessageBus(), { { 0.f, 0.f },{ size.width, size.height } }, lm::CollisionComponent::ID::Alien);
+        lm::CollisionComponent::Callback cb = std::bind(&lm::AlienController::collisionCallback, controller.get(), std::placeholders::_1);
+        collision->setCallback(cb);
+
+        auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect({ 0.f, 0.f }, { size.width, size.height }));
+
+        auto entity = xy::Entity::create(getMessageBus());
+        entity->addComponent(drawable);
+        entity->addComponent(controller);
+        entity->addComponent(collision);
+        entity->addComponent(qtc);
+        entity->setPosition(position);
+        entity->addCommandCategories(LMCommandID::Alien);
+
+        m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    };
+
+    for (auto i = 0u; i < debrisCount; ++i)
+    {
+        auto position = sf::Vector2f(xy::Util::Random::value(0.f, xy::DefaultSceneSize.x),
+            xy::Util::Random::value(0.f, xy::DefaultSceneSize.y));
+        spawn(position);
+    }
 }

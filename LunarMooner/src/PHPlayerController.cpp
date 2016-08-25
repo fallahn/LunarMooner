@@ -38,7 +38,7 @@ using namespace ph;
 
 namespace
 {
-    const float rcsStrength = 200.f;
+    const float rcsStrength = 130.f;
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb)
@@ -103,6 +103,7 @@ void PlayerController::collisionCallback(lm::CollisionComponent* cc)
     switch (cc->getID())
     {
     case lm::CollisionComponent::ID::Bounds:
+    case lm::CollisionComponent::ID::Alien:
     {
         kill();
     }
