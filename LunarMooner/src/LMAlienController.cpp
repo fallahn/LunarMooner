@@ -41,6 +41,7 @@ using namespace lm;
 namespace
 {
     const float maxVelocity = 100.f;
+    const float maxSpeedSqr = 1.f;
 }
 
 AlienController::AlienController(xy::MessageBus& mb, const sf::FloatRect& playArea)
@@ -82,8 +83,15 @@ void AlienController::entityUpdate(xy::Entity& entity, float dt)
         entity.setPosition(position);
     }
 
-    auto model = entity.getComponent<xy::Model>();
-    if (model)
+    //cap speed
+    //if (xy::Util::Vector::lengthSquared(m_velocity) > maxSpeedSqr)
+    //{
+    //    m_velocity *= 0.95f;
+    //}
+    if (m_speed > maxVelocity) m_speed *= 0.95f;
+
+    //if a dead doofer   
+    if (auto model = entity.getComponent<xy::Model>())
     {
         model->rotate(xy::Model::Axis::Y, 100.f * dt);
     }
@@ -145,9 +153,13 @@ void AlienController::collisionCallback(CollisionComponent* cc)
 
         if (distSquared < minDistSquared)
         {
-            auto normal = xy::Util::Vector::normalise(direction);
-            m_entity->move(normal * std::sqrt(minDistSquared - distSquared));
-            m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+            //auto dist = std::sqrt(distSquared);
+            //auto normal = direction / dist; //recycle the sqrt instead of using normalise func!
+            //m_entity->move(normal * ((cc->getInnerRadius() + collision->getInnerRadius()) - dist));
+            //m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
+
+            //m_velocity += normal * std::sqrt(minDistSquared - distSquared) * 0.001f;
+            m_velocity = xy::Util::Vector::normalise(m_velocity + direction * 0.01f);
         }
 
     }

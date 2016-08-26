@@ -38,7 +38,7 @@ using namespace ph;
 
 namespace
 {
-    const float rcsStrength = 530.f;
+    const float rcsStrength = 230.f;
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb)
@@ -48,7 +48,7 @@ PlayerController::PlayerController(xy::MessageBus& mb)
     m_input         (0)
 {
     //need to set the initial velocity so we're rotating in the correct direction
-    m_velocity.y = 300.f;
+    m_velocity.y = 400.f;
     
     xy::Component::MessageHandler mh;
     mh.id = GameEvent;
@@ -72,13 +72,11 @@ void PlayerController::entityUpdate(xy::Entity& ent, float dt)
         ent.move(m_velocity * dt);
         if (m_input & InputFlags::Left)
         {
-            //ent.move(m_rightVector * rcsStrength * dt);
             m_velocity += (m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
         if (m_input & InputFlags::Right)
         {
-            //ent.move(-m_rightVector * rcsStrength * dt);
             m_velocity += (-m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
@@ -166,4 +164,6 @@ void PlayerController::kill()
     msg->type = LMGameEvent::PlayerDied;
     msg->posX = m_entity->getWorldPosition().x;
     msg->posY = m_entity->getWorldPosition().y;
+
+    LOG("Player Died!", xy::Logger::Type::Info);
 }

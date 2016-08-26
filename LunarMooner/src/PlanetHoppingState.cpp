@@ -162,8 +162,6 @@ void PlanetHoppingState::draw()
 void PlanetHoppingState::buildScene()
 {
     auto gameController = xy::Component::create<ph::GameController>(m_messageBus, m_resources, m_scene, m_collisionWorld);
-    //auto soundPlayer = xy::Component::create<xy::SoundPlayer>(m_messageBus, m_resources.soundResource);
-
 
     //TODO move particle init to own function
     auto particleController = xy::Component::create<xy::ParticleController>(m_messageBus);

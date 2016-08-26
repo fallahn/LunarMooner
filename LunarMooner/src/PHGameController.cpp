@@ -50,7 +50,7 @@ using namespace ph;
 namespace
 {
     const float boundsOffset = 40.f;
-    const float boundsMargin = (boundsOffset * 4.f);
+    const float boundsMargin = (boundsOffset * 8.f);
 
     const sf::Vector2f playerStart(100.f, xy::DefaultSceneSize.y / 2.f);
     const sf::FloatRect playerSize({ -18.f, -18.f }, { 36.f, 36.f });
@@ -62,9 +62,9 @@ namespace
     const std::array<sf::FloatRect, 4u> debrisSizes =
     {
         sf::FloatRect(0.f, 0.f, 40.f, 38.f),
-        { 20.f, 0.f, 56.f, 60.f },
-        { 48.f, 0.f, 28.f, 32.f },
-        { 62.f, 0.f, 36.f, 52.f }
+        { 40.f, 0.f, 56.f, 60.f },
+        { 96.f, 0.f, 28.f, 32.f },
+        { 124.f, 0.f, 36.f, 52.f }
     };
     const std::size_t debrisCount = 8u;
 }
@@ -360,7 +360,7 @@ void GameController::addMessageHandlers()
 void GameController::spawnDebris()
 {
     auto sb = xy::Component::create<xy::SpriteBatch>(getMessageBus());
-    sb->setTexture(&m_resources.textureResource.get("assets/images/game/debris.png"));
+    sb->setTexture(&m_resources.textureResource.get("assets/images/game/debris_large.png"));
     auto entity = xy::Entity::create(getMessageBus());
     auto* spriteBatch = entity->addComponent(sb);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
