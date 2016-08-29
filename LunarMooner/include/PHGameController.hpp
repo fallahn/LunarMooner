@@ -33,6 +33,7 @@ source distribution.
 namespace xy
 {
     class Scene;
+    class MeshRenderer;
 }
 
 namespace lm
@@ -46,7 +47,7 @@ namespace ph
     class GameController final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, ResourceCollection&, xy::Scene&, lm::CollisionWorld&);
+        GameController(xy::MessageBus&, ResourceCollection&, xy::Scene&, lm::CollisionWorld&, xy::MeshRenderer&);
         ~GameController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -58,6 +59,7 @@ namespace ph
         ResourceCollection& m_resources;
         xy::Scene& m_scene;
         lm::CollisionWorld& m_collisionWorld;
+        xy::MeshRenderer& m_meshRenderer;
 
         sf::Vector2f m_spawnPosition;
         bool m_playerSpawned;

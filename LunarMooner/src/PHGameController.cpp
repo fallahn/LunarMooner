@@ -42,6 +42,9 @@ source distribution.
 #include <xygine/components/SpriteBatch.hpp>
 #include <xygine/components/AnimatedDrawable.hpp>
 #include <xygine/components/ParticleSystem.hpp>
+#include <xygine/mesh/MeshRenderer.hpp>
+#include <xygine/mesh/SphereBuilder.hpp>
+#include <xygine/components/Model.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -53,11 +56,11 @@ namespace
     const float boundsMargin = (boundsOffset * 8.f);
 
     const sf::Vector2f playerStart(100.f, xy::DefaultSceneSize.y / 2.f);
-    const sf::FloatRect playerSize({ -18.f, -18.f }, { 36.f, 36.f });
+    const sf::FloatRect playerSize({ -10.f, -10.f }, { 20.f, 20.f });
 
-    const float masterRadius = 110.f; //for start / end planets
-    const float minBodySize = 10.f;
-    const float maxBodySize = 45.f;
+    const float masterRadius = 100.f; //for start / end planets
+    const float minBodySize = 20.f;
+    const float maxBodySize = 25.f;
 
     const std::array<sf::FloatRect, 4u> debrisSizes =
     {
@@ -69,11 +72,12 @@ namespace
     const std::size_t debrisCount = 8u;
 }
 
-GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw)
+GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw, xy::MeshRenderer& mr)
     : xy::Component     (mb, this),
     m_resources         (rc),
     m_scene             (scene),
     m_collisionWorld    (cw),
+    m_meshRenderer      (mr),
     m_playerSpawned     (false)
 {
     buildScene();
@@ -126,6 +130,10 @@ void GameController::spawnPlayer()
 //private
 void GameController::buildScene()
 {
+    //preload mesh
+    xy::SphereBuilder sb(1.f, 10); //we'll scale per entity
+    m_meshRenderer.loadModel(0, sb); //TODO proper enum for mesh IDs
+    
     //set bounds
     m_scene.setSize({
         { -(boundsOffset + boundsMargin), -(boundsOffset + boundsMargin) },
@@ -317,16 +325,19 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
     drawable->getDrawable().setRadius(radius);
     drawable->getDrawable().setOrigin(radius, radius);
-    drawable->getDrawable().setFillColor({ 120, 120, 120 });
+    drawable->getDrawable().setFillColor({ 120, 220, 120 });
 
     auto orbit = xy::Component::create<OrbitComponent>(getMessageBus(), radius);
     drawable->getDrawable().setOutlineThickness(orbit->getInfluenceRadius() - radius);
-    drawable->getDrawable().setOutlineColor({ 0, 120, 255, 10 });
+    drawable->getDrawable().setOutlineColor({ 0, 120, 255, 30 });
 
     const auto influenceRad = orbit->getInfluenceRadius();
     auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
 
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
+
+    auto model = m_meshRenderer.createModel(0, getMessageBus());
+    model->setScale({ radius, radius, radius });
 
     auto ent = xy::Entity::create(getMessageBus());
     ent->addComponent(ccSmall);
@@ -334,6 +345,7 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     ent->addComponent(orbit);
     ent->addComponent(ccLarge);
     ent->addComponent(qtc);
+    ent->addComponent(model);
     ent->setPosition(position);
 
     return m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);

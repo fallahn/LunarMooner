@@ -34,6 +34,7 @@ source distribution.
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
+#include <xygine/mesh/MeshRenderer.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -58,6 +59,7 @@ private:
     xy::MessageBus& m_messageBus;
     xy::Scene m_scene;
     lm::CollisionWorld m_collisionWorld;
+    xy::MeshRenderer m_meshRenderer;
 
     sf::Text tmpTxt;
 
