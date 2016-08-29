@@ -49,7 +49,7 @@ namespace
 OrbitComponent::OrbitComponent(xy::MessageBus& mb, float radius)
     :xy::Component          (mb, this),
     m_radius                (radius),
-    m_influenceRadius       (radius * 3.7f),
+    m_influenceRadius       (0.f),
     m_parentID              (0),
     m_lastParentID          (0),
     m_entity                (nullptr),
@@ -57,7 +57,8 @@ OrbitComponent::OrbitComponent(xy::MessageBus& mb, float radius)
     m_targetRotationSpeed   (0.f),
     m_rotation              (LMDirection::Right)
 {
-
+    m_influenceRadius = radius + 100.f;
+    LOG(std::to_string(m_influenceRadius), xy::Logger::Type::Info);
 }
 
 //public

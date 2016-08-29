@@ -42,7 +42,8 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     : xy::State     (stack, context),
     m_messageBus    (context.appInstance.getMessageBus()),
     m_scene         (m_messageBus),
-    m_collisionWorld(m_scene)
+    m_collisionWorld(m_scene),
+    m_meshRenderer({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene)
 {
     m_loadingSprite.setTexture(m_resources.textureResource.get("assets/images/ui/loading.png"));
     m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
@@ -53,6 +54,14 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
     //TODO post processes
+
+    m_scene.setAmbientColour({ 76, 70, 72 });
+    m_scene.getSkyLight().setIntensity(0.4f);
+    m_scene.getSkyLight().setDiffuseColour({ 255, 255, 100 });
+    m_scene.getSkyLight().setSpecularColour({ 120, 255, 58 });
+    m_scene.getSkyLight().setDirection({ 0.2f, 0.4f, -0.1f });
+
+    m_meshRenderer.setView(context.defaultView);
 
     buildScene();
 
@@ -92,6 +101,7 @@ bool PlanetHoppingState::update(float dt)
 
     m_collisionWorld.update();
     m_scene.update(dt);
+    m_meshRenderer.update();
     
     return false;
 }
@@ -135,6 +145,7 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
 void PlanetHoppingState::handleMessage(const xy::Message& msg)
 {
     m_scene.handleMessage(msg);
+    m_meshRenderer.handleMessage(msg);
 
     if (msg.id == xy::Message::UIMessage)
     {
@@ -144,6 +155,7 @@ void PlanetHoppingState::handleMessage(const xy::Message& msg)
         default: break;
         case xy::Message::UIEvent::ResizedWindow:
             m_scene.setView(getContext().defaultView);
+            m_meshRenderer.setView(getContext().defaultView);
             break;
         }
     }
@@ -153,6 +165,7 @@ void PlanetHoppingState::draw()
 {
     auto& rw = getContext().renderWindow;
     rw.draw(m_scene);
+    rw.draw(m_meshRenderer);
 
     rw.setView(rw.getDefaultView());
     rw.draw(tmpTxt);
@@ -161,7 +174,7 @@ void PlanetHoppingState::draw()
 //private
 void PlanetHoppingState::buildScene()
 {
-    auto gameController = xy::Component::create<ph::GameController>(m_messageBus, m_resources, m_scene, m_collisionWorld);
+    auto gameController = xy::Component::create<ph::GameController>(m_messageBus, m_resources, m_scene, m_collisionWorld, m_meshRenderer);
 
     //TODO move particle init to own function
     auto particleController = xy::Component::create<xy::ParticleController>(m_messageBus);

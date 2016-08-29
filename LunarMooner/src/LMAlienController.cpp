@@ -88,7 +88,7 @@ void AlienController::entityUpdate(xy::Entity& entity, float dt)
     //{
     //    m_velocity *= 0.95f;
     //}
-    if (m_speed > maxVelocity) m_speed *= 0.95f;
+    if (m_speed > maxVelocity) m_speed *= 0.995f;
 
     //if a dead doofer   
     if (auto model = entity.getComponent<xy::Model>())
