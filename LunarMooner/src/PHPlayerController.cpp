@@ -102,16 +102,7 @@ void PlayerController::leaveOrbit(const sf::Vector2f& newVelocity)
 
 void PlayerController::collisionCallback(lm::CollisionComponent* cc)
 {
-    switch (cc->getID())
-    {
-    case lm::CollisionComponent::ID::Bounds:
-    case lm::CollisionComponent::ID::Alien:
-    {
-        kill();
-    }
-        break;
-    case lm::CollisionComponent::ID::Body:
-        //use inner radius check
+    std::function<bool()> innerCollision = [this, cc]()->bool
     {
         auto collisionComponent = m_entity->getComponent<lm::CollisionComponent>();
         XY_ASSERT(collisionComponent, "missing player collision component");
@@ -120,12 +111,20 @@ void PlayerController::collisionCallback(lm::CollisionComponent* cc)
         float distSqr = xy::Util::Vector::lengthSquared(collisionDirection);
         float minDistSqr = (collisionComponent->getInnerRadius() * collisionComponent->getInnerRadius()) + (cc->getInnerRadius() * cc->getInnerRadius());
 
-        if (distSqr < minDistSqr)
-        {
-            //collision
-            kill();
-        }
+        return (distSqr < minDistSqr);
+    };
+    
+    switch (cc->getID())
+    {
+    case lm::CollisionComponent::ID::Bounds:   
+    {
+        kill();
     }
+        break;
+    case lm::CollisionComponent::ID::Body:
+    case lm::CollisionComponent::ID::Alien:
+        //use inner radius check
+        if (innerCollision()) kill();
         break;
     }
     

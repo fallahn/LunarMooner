@@ -187,6 +187,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\OLOverlay.hpp" />
     <ClInclude Include="include\PHGameController.hpp" />
     <ClInclude Include="include\PHOrbitComponent.hpp" />
+    <ClInclude Include="include\PHPlanetRotation.hpp" />
     <ClInclude Include="include\PHPlayerController.hpp" />
     <ClInclude Include="include\PlanetHoppingState.hpp" />
     <ClInclude Include="include\PlayerProfile.hpp" />

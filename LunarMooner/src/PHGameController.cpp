@@ -32,6 +32,7 @@ source distribution.
 #include <PHPlayerController.hpp>
 #include <CommandIds.hpp>
 #include <LMAlienController.hpp>
+#include <PHPlanetRotation.hpp>
 
 #include <xygine/Scene.hpp>
 #include <xygine/Entity.hpp>
@@ -42,9 +43,10 @@ source distribution.
 #include <xygine/components/SpriteBatch.hpp>
 #include <xygine/components/AnimatedDrawable.hpp>
 #include <xygine/components/ParticleSystem.hpp>
+#include <xygine/components/Model.hpp>
 #include <xygine/mesh/MeshRenderer.hpp>
 #include <xygine/mesh/SphereBuilder.hpp>
-#include <xygine/components/Model.hpp>
+#include <xygine/mesh/shaders/DeferredRenderer.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -60,7 +62,7 @@ namespace
 
     const float masterRadius = 100.f; //for start / end planets
     const float minBodySize = 20.f;
-    const float maxBodySize = 25.f;
+    const float maxBodySize = 30.f;
 
     const std::array<sf::FloatRect, 4u> debrisSizes =
     {
@@ -70,6 +72,30 @@ namespace
         { 124.f, 0.f, 36.f, 52.f }
     };
     const std::size_t debrisCount = 8u;
+
+    namespace Mesh
+    {
+        enum ID
+        {
+            Planet
+        };
+    }
+    namespace Material
+    {
+        enum ID
+        {
+            DesertPlanet,
+            LavaPlanet,
+            End
+        };
+    }
+    namespace Shader
+    {
+        enum ID
+        {
+            TexturedSmooth
+        };
+    }
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw, xy::MeshRenderer& mr)
@@ -80,6 +106,7 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
     m_meshRenderer      (mr),
     m_playerSpawned     (false)
 {
+    loadMeshes();
     buildScene();
     spawnDebris();
     addMessageHandlers();
@@ -128,12 +155,30 @@ void GameController::spawnPlayer()
 }
 
 //private
+void GameController::loadMeshes()
+{
+    //preload meshes
+    xy::SphereBuilder sb(1.f, 10, true); //we'll scale per entity
+    m_meshRenderer.loadModel(Mesh::Planet, sb);
+
+    //preload shaders
+    m_resources.shaderResource.preload(Shader::TexturedSmooth, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
+
+    //preload materials
+    auto& desertPlanet = m_resources.materialResource.add(Material::DesertPlanet, m_resources.shaderResource.get(Shader::TexturedSmooth));
+    desertPlanet.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    desertPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/dust_planet.png") });
+    m_resources.textureResource.setFallbackColour(sf::Color::Black);
+    desertPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("no_mask") });
+
+    auto& lavaPlanet = m_resources.materialResource.add(Material::LavaPlanet, m_resources.shaderResource.get(Shader::TexturedSmooth));
+    lavaPlanet.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    lavaPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_diffuse.png") });
+    lavaPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
+}
+
 void GameController::buildScene()
 {
-    //preload mesh
-    xy::SphereBuilder sb(1.f, 10); //we'll scale per entity
-    m_meshRenderer.loadModel(0, sb); //TODO proper enum for mesh IDs
-    
     //set bounds
     m_scene.setSize({
         { -(boundsOffset + boundsMargin), -(boundsOffset + boundsMargin) },
@@ -188,15 +233,15 @@ void GameController::buildScene()
     xy::ParticleSystem::Definition pd;
     pd.loadFromFile("assets/particles/smoke.xyp", m_resources.textureResource);
     auto ps1 = pd.createSystem(getMessageBus());
-    ps1->setPosition({ 10.f, -20.f });
+    ps1->setPosition({ 30.f, -20.f });
     ps1->start();
 
     auto ps2 = pd.createSystem(getMessageBus());
-    ps2->setPosition({ -25, -34.f });
+    ps2->setPosition({ -45, -54.f });
     ps2->start();
 
     auto ps3 = pd.createSystem(getMessageBus());
-    ps3->setPosition({ -15, 24.f });
+    ps3->setPosition({ -15, 64.f });
     ps3->start();
 
     endBody->addComponent(drawable);
@@ -325,19 +370,23 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(getMessageBus());
     drawable->getDrawable().setRadius(radius);
     drawable->getDrawable().setOrigin(radius, radius);
-    drawable->getDrawable().setFillColor({ 120, 220, 120 });
+    drawable->getDrawable().setFillColor(sf::Color::Transparent);
 
     auto orbit = xy::Component::create<OrbitComponent>(getMessageBus(), radius);
     drawable->getDrawable().setOutlineThickness(orbit->getInfluenceRadius() - radius);
-    drawable->getDrawable().setOutlineColor({ 0, 120, 255, 30 });
+    drawable->getDrawable().setOutlineColor({ 0, 120, 255, 20 });
 
     const auto influenceRad = orbit->getInfluenceRadius();
     auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
 
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
 
-    auto model = m_meshRenderer.createModel(0, getMessageBus());
+    auto model = m_meshRenderer.createModel(Mesh::Planet, getMessageBus());
     model->setScale({ radius, radius, radius });
+    model->setRotation({ xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f) });
+    model->setBaseMaterial(m_resources.materialResource.get(radius > 50? Material::LavaPlanet : Material::DesertPlanet));
+
+    auto rotator = xy::Component::create<PlanetRotation>(getMessageBus());
 
     auto ent = xy::Entity::create(getMessageBus());
     ent->addComponent(ccSmall);
@@ -346,6 +395,7 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     ent->addComponent(ccLarge);
     ent->addComponent(qtc);
     ent->addComponent(model);
+    ent->addComponent(rotator);
     ent->setPosition(position);
 
     return m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);
