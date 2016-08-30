@@ -25,52 +25,35 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef PH_GAME_CONTROLLER_HPP_
-#define PH_GAME_CONTROLLER_HPP_
+#ifndef PH_PLANET_ROTATION_HPP_
+#define PH_PLANET_ROTATION_HPP_
 
 #include <xygine/components/Component.hpp>
+#include <xygine/components/Model.hpp>
+#include <xygine/Entity.hpp>
 
-namespace xy
-{
-    class Scene;
-    class MeshRenderer;
-}
-
-namespace lm
-{
-    class CollisionWorld;
-}
-
-struct ResourceCollection;
 namespace ph
 {
-    class GameController final : public xy::Component
+    class PlanetRotation final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, ResourceCollection&, xy::Scene&, lm::CollisionWorld&, xy::MeshRenderer&);
-        ~GameController() = default;
+        explicit PlanetRotation(xy::MessageBus& mb) : xy::Component(mb, this), m_model(nullptr) {}
+        ~PlanetRotation() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
-        void entityUpdate(xy::Entity&, float) override;
-
-        void spawnPlayer();
+        void entityUpdate(xy::Entity& entity, float dt) override
+        {
+            m_model->rotate(xy::Model::Axis::Y, 4.f * dt);
+        }
+        void onDelayedStart(xy::Entity& e) override
+        {
+            m_model = e.getComponent<xy::Model>();
+            XY_ASSERT(m_model, "Model component not found");
+        }
 
     private:
-        ResourceCollection& m_resources;
-        xy::Scene& m_scene;
-        lm::CollisionWorld& m_collisionWorld;
-        xy::MeshRenderer& m_meshRenderer;
-
-        sf::Vector2f m_spawnPosition;
-        bool m_playerSpawned;
-
-        void loadMeshes();
-        void buildScene();
-        xy::Entity* addBody(const sf::Vector2f&, float);
-        void addMessageHandlers();
-
-        void spawnDebris();
+        xy::Model* m_model;
     };
 }
 
-#endif //PH_GAME_CONTROLLER_HPP_
+#endif //PH_PLANET_ROTATION_HPP_

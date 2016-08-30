@@ -228,6 +228,9 @@
     <ClInclude Include="include\PHGameController.hpp">
       <Filter>Header Files\planet hopper</Filter>
     </ClInclude>
+    <ClInclude Include="include\PHPlanetRotation.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

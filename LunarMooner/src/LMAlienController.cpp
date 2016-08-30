@@ -84,10 +84,6 @@ void AlienController::entityUpdate(xy::Entity& entity, float dt)
     }
 
     //cap speed
-    //if (xy::Util::Vector::lengthSquared(m_velocity) > maxSpeedSqr)
-    //{
-    //    m_velocity *= 0.95f;
-    //}
     if (m_speed > maxVelocity) m_speed *= 0.995f;
 
     //if a dead doofer   
@@ -104,11 +100,17 @@ void AlienController::onStart(xy::Entity& entity)
 
 void AlienController::collisionCallback(CollisionComponent* cc)
 {
+    std::function<bool(const sf::Vector2f&, const lm::CollisionComponent*)> innerCollision = [this, cc](const sf::Vector2f& direction, const lm::CollisionComponent* collision)->bool
+    {
+        const float minDistSquared = (cc->getInnerRadius() * cc->getInnerRadius()) + (collision->getInnerRadius() * collision->getInnerRadius());      
+        const float distSquared = xy::Util::Vector::lengthSquared(direction);
+        return (distSquared < minDistSquared);
+    };  
+    
     switch (cc->getID())
     {
     default: break;
-    case CollisionComponent::ID::Bullet:
-    
+    case CollisionComponent::ID::Bullet:   
     {
         auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
         msg->type = LMGameEvent::AlienDied;
@@ -119,39 +121,47 @@ void AlienController::collisionCallback(CollisionComponent* cc)
     }
         break;
     case CollisionComponent::ID::Player:
-    {
-        auto manifold = getManifold(cc->globalBounds());
-        sf::Vector2f normal(manifold.x, manifold.y);
-
-        m_entity->move(normal * manifold.z);
-        
+    {      
         //this is confused by having different player controllers in different game modes
         sf::Vector2f playerVel;
         if (auto player = cc->getParentEntity().getComponent<lm::PlayerController>())
         {
             playerVel = player->getVelocity();
-        }
+
+            auto manifold = getManifold(cc->globalBounds());
+            sf::Vector2f normal(manifold.x, manifold.y);
+
+            m_entity->move(normal * manifold.z);
+
+            m_velocity += xy::Util::Vector::normalise(playerVel);
+            m_velocity /= 2.f;
+
+            m_speed += xy::Util::Vector::length(playerVel);
+            m_speed /= 2.f;
+
+        }// planet hopping mode
         else if (auto player = cc->getParentEntity().getComponent<ph::PlayerController>())
         {
             playerVel = player->getVelocity();
+
+            const auto collision = m_entity->getComponent<CollisionComponent>();
+            auto direction = collision->getCentre() - cc->getCentre();
+            if (innerCollision(direction, collision))
+            {
+                m_velocity += xy::Util::Vector::normalise(playerVel);
+                m_velocity /= 2.f;
+
+                m_speed += xy::Util::Vector::length(playerVel);
+                m_speed /= 2.f;
+            }
         }
-
-        m_velocity += xy::Util::Vector::normalise(playerVel);
-        m_velocity /= 2.f;
-
-        m_speed += xy::Util::Vector::length(playerVel);
-        m_speed /= 2.f;
     }
         break;
     case CollisionComponent::ID::Gravity:
         //stay away from planets in hopping mode
-    {
         const auto collision = m_entity->getComponent<CollisionComponent>();
-        const float minDistSquared = (cc->getInnerRadius() * cc->getInnerRadius()) + (collision->getInnerRadius() * collision->getInnerRadius());
         auto direction = collision->getCentre() - cc->getCentre();
-        const float distSquared = xy::Util::Vector::lengthSquared(direction);
-
-        if (distSquared < minDistSquared)
+        if(innerCollision(direction, collision))
         {
             //auto dist = std::sqrt(distSquared);
             //auto normal = direction / dist; //recycle the sqrt instead of using normalise func!
@@ -161,8 +171,6 @@ void AlienController::collisionCallback(CollisionComponent* cc)
             //m_velocity += normal * std::sqrt(minDistSquared - distSquared) * 0.001f;
             m_velocity = xy::Util::Vector::normalise(m_velocity + direction * 0.01f);
         }
-
-    }
         break;
     }
 }

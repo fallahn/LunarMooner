@@ -29,11 +29,14 @@ source distribution.
 #include <PHGameController.hpp>
 #include <PHPlayerController.hpp>
 #include <PHOrbitComponent.hpp>
+#include <BGStarfield.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/components/SoundPlayer.hpp>
 #include <xygine/components/ParticleController.hpp>
+#include <xygine/components/MeshDrawable.hpp>
+#include <xygine/PostChromeAb.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -53,15 +56,20 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
 
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
-    //TODO post processes
+    auto pp = xy::PostProcess::create<xy::PostChromeAb>(false);
+    m_scene.addPostProcess(pp);
 
-    m_scene.setAmbientColour({ 76, 70, 72 });
-    m_scene.getSkyLight().setIntensity(0.4f);
+    m_scene.setAmbientColour({ 26, 20, 22 });
+    m_scene.getSkyLight().setIntensity(0.6f);
     m_scene.getSkyLight().setDiffuseColour({ 255, 255, 100 });
-    m_scene.getSkyLight().setSpecularColour({ 120, 255, 58 });
-    m_scene.getSkyLight().setDirection({ 0.2f, 0.4f, -0.1f });
+    m_scene.getSkyLight().setSpecularColour({ 250, 255, 158 });
+    m_scene.getSkyLight().setDirection({ 0.2f, 0.4f, -0.4f });
 
-    m_meshRenderer.setView(context.defaultView);
+    //m_meshRenderer.setView(context.defaultView);
+    auto meshDrawable = m_meshRenderer.createDrawable(m_messageBus);
+    auto entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(meshDrawable);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 
     buildScene();
 
@@ -154,7 +162,7 @@ void PlanetHoppingState::handleMessage(const xy::Message& msg)
         {
         default: break;
         case xy::Message::UIEvent::ResizedWindow:
-            m_scene.setView(getContext().defaultView);
+            //m_scene.setView(getContext().defaultView);
             m_meshRenderer.setView(getContext().defaultView);
             break;
         }
@@ -165,7 +173,7 @@ void PlanetHoppingState::draw()
 {
     auto& rw = getContext().renderWindow;
     rw.draw(m_scene);
-    rw.draw(m_meshRenderer);
+    //rw.draw(m_meshRenderer);
 
     rw.setView(rw.getDefaultView());
     rw.draw(tmpTxt);
@@ -207,6 +215,12 @@ void PlanetHoppingState::buildScene()
     entity->addComponent(gameController);
     entity->addCommandCategories(LMCommandID::GameController);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+
+    auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
+    background->setVelocity({ 1.f, 0.f });
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(background);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 }
 
 void PlanetHoppingState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
