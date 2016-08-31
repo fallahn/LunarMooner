@@ -6,6 +6,7 @@ SET(LM_SRC
   ${LM_DIR}/DemoPlayer.cpp
   ${LM_DIR}/DemoRecorder.cpp
   ${LM_DIR}/Game.cpp
+  ${LM_DIR}/GameMessage.cpp
   ${LM_DIR}/GameOverState.cpp
   ${LM_DIR}/LMAlienController.cpp
   ${LM_DIR}/LMAsteroidController.cpp

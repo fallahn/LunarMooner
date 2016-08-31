@@ -54,6 +54,7 @@ namespace ph
         void entityUpdate(xy::Entity&, float) override;
 
         void spawnPlayer();
+        bool gameEnded() const;
 
     private:
         ResourceCollection& m_resources;
@@ -64,11 +65,16 @@ namespace ph
         sf::Vector2f m_spawnPosition;
         bool m_playerSpawned;
 
+        sf::Uint64 m_targetUID;
+        sf::Clock m_targetClock;
+        sf::Uint64 m_currentParent;
+        float m_lastOrbitTime;
+
         void buildScene();
         xy::Entity* addBody(const sf::Vector2f&, float);
         void addMessageHandlers();
-
         void spawnDebris();
+        void showMessage(const std::string&, const std::string&);
     };
 }
 
