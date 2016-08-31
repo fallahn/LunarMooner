@@ -369,7 +369,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_soundCache.insert(std::make_pair(LMSoundID::RoundCountEnd, m_resources.soundResource.get("assets/sound/fx/score_count_end.wav")));
     m_soundCache.insert(std::make_pair(LMSoundID::RoundCountLoop, m_resources.soundResource.get("assets/sound/fx/score_count_loop.wav")));
 
-    m_resources.shaderResource.preload(LMShaderID::VelocityMeter, xy::Shader::Default::vertex, lm::velocityFrag);
+    m_resources.shaderResource.preload(Shader::VelocityMeter, xy::Shader::Default::vertex, lm::velocityFrag);
 
     //create sprite batch for aliens
     auto sprBatch = xy::Component::create<xy::SpriteBatch>(getMessageBus());
@@ -677,12 +677,12 @@ void GameController::spawnPlayer()
         lc->setDiffuseColour({ 255u, 185u, 135u });
         lc->setIntensity(1.1f);*/
 
-        auto model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
+        auto model = m_meshRenderer.createModel(Mesh::Player, getMessageBus());
         model->rotate(xy::Model::Axis::Y, 180.f);
         model->rotate(xy::Model::Axis::X, 90.f);
         model->setPosition({ 25.f, 66.f, 0.f });
         model->setScale({ 1.05f, 1.05f, 1.05f });
-        model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
+        model->setBaseMaterial(m_resources.materialResource.get(Material::Player));
 
         auto entity = xy::Entity::create(getMessageBus());
         entity->setPosition(spawnPos);
@@ -757,7 +757,7 @@ void GameController::createMothership()
         break;
     }
 
-    auto model = m_meshRenderer.createModel(LMModelID::MothershipModel, getMessageBus());
+    auto model = m_meshRenderer.createModel(Mesh::MotherShip, getMessageBus());
     model->rotate(xy::Model::Axis::Y, 180.f);
     model->rotate(xy::Model::Axis::X, 95.f);
 
@@ -766,7 +766,7 @@ void GameController::createMothership()
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sf::FloatRect(0.f, 0.f, bounds.width, bounds.height));
 
     model->setPosition({ bounds.width / 2.f, (bounds.height / 2.f), 0.f });
-    model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::MotherShip));
+    model->setBaseMaterial(m_resources.materialResource.get(Material::MotherShip));
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(drawable); //TODO this is a kludge to get entity bounds - need to fix this
@@ -779,12 +779,12 @@ void GameController::createMothership()
 
     m_mothership = m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
 
-    model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
+    model = m_meshRenderer.createModel(Mesh::Player, getMessageBus());
     model->rotate(xy::Model::Axis::Y, 180.f);
     model->rotate(xy::Model::Axis::X, 90.f);
     model->setPosition({ 0.f, 24.f, 0.f });
     model->setScale({ 1.05f, 1.05f, 1.05f });
-    model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
+    model->setBaseMaterial(m_resources.materialResource.get(Material::Player));
 
     entity = xy::Entity::create(getMessageBus());    
     entity->setPosition(bounds.width / 2.f, bounds.height / 2.f /*+ 10.f*/);
@@ -802,7 +802,7 @@ namespace
         drawable->playAnimation(HumanController::Wave);
         drawable->setMaskMap(rc.textureResource.get("assets/images/game/doofer_01_mask.png"));
         drawable->setNormalMap(rc.textureResource.get("assets/images/game/doofer_01_normal.png"));
-        drawable->setShader(rc.shaderResource.get(LMShaderID::NormalMapGame));
+        drawable->setShader(rc.shaderResource.get(Shader::NormalMapGame));
 
         auto bounds = drawable->localBounds();
         drawable->setOrigin(bounds.width / 2.f, bounds.height / 2.f);
@@ -935,7 +935,7 @@ void GameController::createTerrain()
     //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus());
     terrain->init("assets/maps", m_resources.textureResource);
-    terrain->setShader(&m_resources.shaderResource.get(LMShaderID::NormalMapGame));
+    terrain->setShader(&m_resources.shaderResource.get(Shader::NormalMapGame));
 
     entity = xy::Entity::create(getMessageBus());
     entity->setPosition(alienArea.left, xy::DefaultSceneSize.y - 320.f); //TODO fix these numbers
@@ -1104,13 +1104,13 @@ void GameController::createUI()
     static const sf::Vector2f maxVelocity(200.f, 200.f);
 
     //velocity meter
-    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), maxVelocity, m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
+    auto speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), maxVelocity, m_resources.textureResource, m_resources.shaderResource.get(Shader::VelocityMeter));
     auto entity = xy::Entity::create(getMessageBus());
     m_uiComponents[0].speedMeter = entity->addComponent(speedMeter);
     entity->setPosition(padding, speedHeight);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
     //for player two
-    speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), maxVelocity, m_resources.textureResource, m_resources.shaderResource.get(LMShaderID::VelocityMeter));
+    speedMeter = xy::Component::create<SpeedMeter>(getMessageBus(), maxVelocity, m_resources.textureResource, m_resources.shaderResource.get(Shader::VelocityMeter));
     entity = xy::Entity::create(getMessageBus());
     m_uiComponents[1].speedMeter = entity->addComponent(speedMeter);
     entity->setPosition(alienArea.left + alienArea.width + padding, speedHeight);
@@ -1381,12 +1381,12 @@ void GameController::addDelayedRespawn()
         auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
         msg->type = LMStateEvent::RoundBegin;
 
-        auto model = m_meshRenderer.createModel(LMModelID::PlayerModel, getMessageBus());
+        auto model = m_meshRenderer.createModel(Mesh::Player, getMessageBus());
         model->rotate(xy::Model::Axis::Y, 180.f);
         model->rotate(xy::Model::Axis::X, 90.f);
         model->setPosition({ 0.f, 24.f, 0.f });
         model->setScale({ 1.05f, 1.05f, 1.05f });
-        model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::PlayerShip));
+        model->setBaseMaterial(m_resources.materialResource.get(Material::Player));
 
         auto entity = xy::Entity::create(getMessageBus());
         auto bounds = m_mothership->getComponent<xy::SfDrawableComponent<sf::CircleShape>>()->getDrawable().getGlobalBounds();
@@ -1629,9 +1629,9 @@ void GameController::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
         //drawable->loadAnimationData("assets/images/game/doofer_dead.xya");
         //drawable->playAnimation(0);
 
-        auto model = m_meshRenderer.createModel(LMModelID::DeadDooferModel, getMessageBus());
+        auto model = m_meshRenderer.createModel(Mesh::DeadDoofer, getMessageBus());
         model->setScale({ 0.2f, 0.2f, 0.2f });
-        model->setBaseMaterial(m_resources.materialResource.get(LMMaterialID::DeadDoofer));
+        model->setBaseMaterial(m_resources.materialResource.get(Material::DeadDoofer));
 
         auto controller = xy::Component::create<AlienController>(getMessageBus(), alienArea);
         controller->setVelocity(vel);

@@ -68,10 +68,10 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 
     //m_scene.drawDebug(true);
 
-    m_shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
-    m_shaderResource.preload(LMShaderID::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
+    m_shaderResource.preload(Shader::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);
+    m_shaderResource.preload(Shader::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
 
-    m_normalMapShader = &m_shaderResource.get(LMShaderID::NormalMapPlanet);
+    m_normalMapShader = &m_shaderResource.get(Shader::NormalMapPlanet);
     m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
 
     setup();
@@ -152,7 +152,7 @@ void MenuBackgroundState::setup()
     auto rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1400.f,
         m_textureResource.get("assets/images/background/roid.png"), m_textureResource.get("assets/images/background/sphere_normal.png"));
     rb->flipDirection();
-    rb->setShader(m_shaderResource.get(LMShaderID::NormalMapPlanet));
+    rb->setShader(m_shaderResource.get(Shader::NormalMapPlanet));
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(rb);
     entity->setPosition(1280.f, 280.f);
@@ -165,7 +165,7 @@ void MenuBackgroundState::setup()
     planet->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal_02.png"));
     planet->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse_02.png"));
     planet->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
-    planet->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
+    planet->setPrepassShader(m_shaderResource.get(Shader::Prepass));
     planet->setNormalShader(*m_normalMapShader);
     planet->setRotationVelocity({ -0.005f, 0.006f });
     planet->setTextureOffset({ 0.65f, 1.2f });
@@ -180,7 +180,7 @@ void MenuBackgroundState::setup()
     //roid belts - in between planets
     rb = xy::Component::create<lm::RoidBelt>(m_messageBus, 1000.f,
         m_textureResource.get("assets/images/background/roid.png"), m_textureResource.get("assets/images/background/sphere_normal.png"));
-    rb->setShader(m_shaderResource.get(LMShaderID::NormalMapPlanet));
+    rb->setShader(m_shaderResource.get(Shader::NormalMapPlanet));
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(rb);
     entity->setPosition(1300.f, 300.f);
@@ -193,7 +193,7 @@ void MenuBackgroundState::setup()
     moon->setDetailNormal(m_textureResource.get("assets/images/background/moon_normal_02.png"));
     moon->setDiffuseTexture(m_textureResource.get("assets/images/background/moon_diffuse_02.png"));
     moon->setMaskTexture(m_textureResource.get("assets/images/background/moon_mask.png"));
-    moon->setPrepassShader(m_shaderResource.get(LMShaderID::Prepass));
+    moon->setPrepassShader(m_shaderResource.get(Shader::Prepass));
     moon->setNormalShader(*m_normalMapShader);
 
     entity = xy::Entity::create(m_messageBus);
