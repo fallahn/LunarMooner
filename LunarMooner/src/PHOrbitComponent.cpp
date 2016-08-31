@@ -58,7 +58,7 @@ OrbitComponent::OrbitComponent(xy::MessageBus& mb, float radius)
     m_rotation              (LMDirection::Right)
 {
     m_influenceRadius = radius + 100.f;
-    LOG(std::to_string(m_influenceRadius), xy::Logger::Type::Info);
+    //LOG(std::to_string(m_influenceRadius), xy::Logger::Type::Info);
 }
 
 //public
@@ -140,8 +140,7 @@ sf::Vector2f OrbitComponent::removeParent()
     //look at which way we're rotating
     auto position = m_entity->getWorldPosition();
     auto parentDir = m_parentPosition - position;
-    sf::Vector2f retVal(parentDir.y, -parentDir.x);/* = (m_rotation == LMDirection::Left)
-        ? sf::Vector2f(parentDir.y, -parentDir.x) : sf::Vector2f(parentDir.y, -parentDir.x);*/
+    sf::Vector2f retVal(parentDir.y, -parentDir.x);
     
     //using the current rotation speed work out the linear velocity (v = r x w)
     const float radius = xy::Util::Vector::length(parentDir);
@@ -155,7 +154,7 @@ sf::Vector2f OrbitComponent::removeParent()
     m_entity->setRotation(0.f);
     m_entity->setPosition(position);
 
-    LOG("Left orbit", xy::Logger::Type::Info);
+    //LOG("Left orbit", xy::Logger::Type::Info);
     return retVal;
 }
 
@@ -164,7 +163,7 @@ void OrbitComponent::setParent(const xy::Entity& entity)
 {
     //only orbit bigger objects
     if (entity.getComponent<OrbitComponent>()->getInfluenceRadius() < m_influenceRadius) return;
-    LOG("Setting orbit parent to: " + std::to_string(entity.getUID()), xy::Logger::Type::Info);
+    //LOG("Setting orbit parent to: " + std::to_string(entity.getUID()), xy::Logger::Type::Info);
     
     if (m_parentID) m_lastParentID = m_parentID;
     m_parentID = entity.getUID();
@@ -184,4 +183,5 @@ void OrbitComponent::setParent(const xy::Entity& entity)
 
     auto msg = sendMessage<LMGameEvent>(GameEvent);
     msg->type = LMGameEvent::EnteredOrbit;
+    msg->value = static_cast<sf::Int32>(entity.getUID());
 }

@@ -28,6 +28,8 @@ source distribution.
 #ifndef PH_PLAYER_CONTROLLER_HPP_
 #define PH_PLAYER_CONTROLLER_HPP_
 
+#include <CommandIds.hpp>
+
 #include <xygine/components/Component.hpp>
 
 #include <SFML/System/Vector2.hpp>
@@ -51,8 +53,8 @@ namespace ph
         void onStart(xy::Entity&) override;
 
         void leaveOrbit(const sf::Vector2f&);
-        void moveLeft() { m_input |= 0x1; }
-        void moveRight() { m_input |= 0x2; }
+        void moveLeft() { m_input |= LMInputFlags::SteerLeft; }
+        void moveRight() { m_input |= LMInputFlags::SteerRight; }
         const sf::Vector2f& getVelocity() const { return m_velocity; }
 
         void collisionCallback(lm::CollisionComponent*);
@@ -64,11 +66,6 @@ namespace ph
 
         bool m_inOrbit;
         sf::Uint8 m_input;
-        enum InputFlags
-        {
-            Left = 0x1,
-            Right = 0x2
-        };
 
         sf::Vector3f getManifold(const sf::FloatRect&);
         void kill();

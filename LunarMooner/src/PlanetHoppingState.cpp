@@ -32,6 +32,7 @@ source distribution.
 #include <BGStarfield.hpp>
 #include <CommandIds.hpp>
 #include <LMShaderIds.hpp>
+#include <LMPostBlur.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/components/SoundPlayer.hpp>
@@ -42,6 +43,11 @@ source distribution.
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
+
+namespace
+{
+#include "KeyMappings.inl"
+}
 
 PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     : xy::State     (stack, context),
@@ -58,7 +64,9 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
 
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
-    auto pp = xy::PostProcess::create<xy::PostChromeAb>(false);
+    auto pp = xy::PostProcess::create<lm::PostBlur>();
+    m_scene.addPostProcess(pp); 
+    pp = xy::PostProcess::create<xy::PostChromeAb>(false);
     m_scene.addPostProcess(pp);
 
     loadMeshes();
@@ -71,7 +79,8 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
 //public
 bool PlanetHoppingState::update(float dt)
 {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    if (sf::Keyboard::isKeyPressed(keyLeft)
+        || sf::Keyboard::isKeyPressed(altKeyLeft))
     {
         xy::Command cmd;
         cmd.category = LMCommandID::Player;
@@ -82,7 +91,8 @@ bool PlanetHoppingState::update(float dt)
         m_scene.sendCommand(cmd);
     }
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    if (sf::Keyboard::isKeyPressed(keyRight)
+        || sf::Keyboard::isKeyPressed(altKeyRight))
     {
         xy::Command cmd;
         cmd.category = LMCommandID::Player;
@@ -107,7 +117,7 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         switch (evt.key.code)
         {
         default:break;
-        case sf::Keyboard::Space:
+        case keyFire:
         {
             xy::Command cmd;
             cmd.category = LMCommandID::Player;
@@ -119,17 +129,30 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
 
             //do this second so we don't launch the player on spawn
             cmd.category = LMCommandID::GameController;
-            cmd.action = [](xy::Entity& entity, float)
+            cmd.action = [this](xy::Entity& entity, float)
             {
-                entity.getComponent<ph::GameController>()->spawnPlayer();
+                auto gc = entity.getComponent<ph::GameController>();
+
+                if (gc->gameEnded())
+                {
+                    requestStackPop();
+                }
+                else
+                {
+                    gc->spawnPlayer();
+                }
             };
             m_scene.sendCommand(cmd);
         }
             break;
-        case sf::Keyboard::BackSpace:
-            /*requestStackPop();
-            requestStackPush(States::PlanetHopping);*/
+        case sf::Keyboard::P:
+            requestStackPush(States::ID::Pause);
             break;
+#ifdef _DEBUG_
+        case sf::Keyboard::BackSpace:
+            requestStackPop();            
+            break;
+#endif //_DEBUG_
         }
     }
 

@@ -34,6 +34,7 @@ source distribution.
 #include <LMAlienController.hpp>
 #include <PHPlanetRotation.hpp>
 #include <LMShaderIds.hpp>
+#include <GameMessage.hpp>
 
 #include <xygine/Scene.hpp>
 #include <xygine/Entity.hpp>
@@ -46,6 +47,7 @@ source distribution.
 #include <xygine/components/ParticleSystem.hpp>
 #include <xygine/components/Model.hpp>
 #include <xygine/mesh/MeshRenderer.hpp>
+#include <xygine/Reports.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -71,6 +73,8 @@ namespace
         { 124.f, 0.f, 36.f, 52.f }
     };
     const std::size_t debrisCount = 8u;
+
+    const float targetOrbitTime = 2.f; //time in seconds to orbit for to get a round end
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw, xy::MeshRenderer& mr)
@@ -79,7 +83,10 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
     m_scene             (scene),
     m_collisionWorld    (cw),
     m_meshRenderer      (mr),
-    m_playerSpawned     (false)
+    m_playerSpawned     (false),
+    m_targetUID         (0u),
+    m_currentParent     (0u),
+    m_lastOrbitTime     (0.f)
 {
     buildScene();
     spawnDebris();
@@ -89,7 +96,21 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
 //public
 void GameController::entityUpdate(xy::Entity&, float)
 {
+    //REPORT("Current Parent", std::to_string(m_currentParent));
+    //REPORT("Target", std::to_string(m_targetUID));
     
+    //check we're in orbit around target
+    if (m_currentParent == m_targetUID)
+    {
+        const float time = m_targetClock.getElapsedTime().asSeconds();
+        if (m_lastOrbitTime < targetOrbitTime
+            && time > targetOrbitTime)
+        {
+            showMessage("Success!", "Press Fire to Continue");
+        }
+        m_lastOrbitTime = time;
+        //LOG("buns", xy::Logger::Type::Info);
+    }
 }
 
 void GameController::spawnPlayer()
@@ -126,6 +147,16 @@ void GameController::spawnPlayer()
     m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);
 
     m_playerSpawned = true;
+
+    auto msg = sendMessage<LMGameEvent>(LMMessageId::GameEvent);
+    msg->type = LMGameEvent::PlayerSpawned;
+    msg->posX = m_spawnPosition.x;
+    msg->posY = m_spawnPosition.y;
+}
+
+bool GameController::gameEnded() const
+{
+    return (m_currentParent == m_targetUID && m_lastOrbitTime > targetOrbitTime);
 }
 
 //private
@@ -176,6 +207,7 @@ void GameController::buildScene()
 
     //ending planet
     auto endBody = addBody({ xy::DefaultSceneSize.x - startOffset, xy::Util::Random::value(startOffset, xy::DefaultSceneSize.y - startOffset) }, masterRadius);
+    m_targetUID = endBody->getUID();
     
     auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_01.png"));
     drawable->loadAnimationData("assets/images/game/doofer_01.xya");
@@ -310,9 +342,11 @@ void GameController::buildScene()
         }
     }
 
-    //create player
+    //setup player
     m_spawnPosition = startBody->getWorldPosition() + sf::Vector2f((masterRadius * 1.6f), 0.f);
-    spawnPlayer();
+
+    //show a message
+    showMessage("Get To The Next Moon!", "Press Fire to Start");
 }
 
 xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
@@ -365,6 +399,18 @@ void GameController::addMessageHandlers()
         default: break;
         case LMGameEvent::PlayerDied:
             m_playerSpawned = false;
+            showMessage("You Died.", "Press Fire to Continue");
+            break;
+        case LMGameEvent::EnteredOrbit:
+            m_currentParent = data.value;
+            if (m_currentParent == m_targetUID)
+            {
+                //we're in orbit around the target planet!
+                m_targetClock.restart();
+            }
+            break;
+        case LMGameEvent::LeftOrbit:
+            m_currentParent = 0;
             break;
         }
     };
@@ -411,4 +457,36 @@ void GameController::spawnDebris()
             xy::Util::Random::value(0.f, xy::DefaultSceneSize.y));
         spawn(position);
     }
+}
+
+void GameController::showMessage(const std::string& lineOne, const std::string& lineTwo)
+{
+    auto displayMsg = xy::Component::create<GameMessage>(getMessageBus(), m_resources.fontResource.get("PHGC_420"), lineOne);
+    xy::Component::MessageHandler handler;
+    handler.id = GameEvent;
+    handler.action = [](xy::Component* c, const xy::Message& msg)
+    {
+        const auto& data = msg.getData<LMGameEvent>();
+        switch (data.type)
+        {
+        default: break;
+        case LMGameEvent::PlayerSpawned:
+            dynamic_cast<GameMessage*>(c)->clear();
+            break;
+        }
+    };
+    displayMsg->addMessageHandler(handler);
+
+    auto topEnt = xy::Entity::create(getMessageBus());
+    topEnt->addComponent(displayMsg);
+    topEnt->setPosition(xy::DefaultSceneSize / 2.f);
+    topEnt->move(0.f, -60.f);
+
+    displayMsg = xy::Component::create<GameMessage>(getMessageBus(), m_resources.fontResource.get("PHGC_450"), lineTwo, 60u);
+    auto bottomEnt = xy::Entity::create(getMessageBus());
+    bottomEnt->addComponent(displayMsg);
+    bottomEnt->setPosition(0.f, 120.f);
+
+    topEnt->addChild(bottomEnt);
+    m_scene.addEntity(topEnt, xy::Scene::Layer::UI);
 }

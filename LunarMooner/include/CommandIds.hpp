@@ -99,7 +99,8 @@ struct LMGameEvent
         CollectibleDied,
         EmpFired,
         WeaponCharged,
-        EnteredOrbit
+        EnteredOrbit,
+        LeftOrbit
     }type;
     float posX = 0.f; //<holds time remaining on level change
     float posY = 0.f; //<holds difficulty on level change

@@ -231,6 +231,9 @@
     <ClInclude Include="include\PHPlanetRotation.hpp">
       <Filter>Header Files\planet hopper</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameMessage.hpp">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -386,5 +389,13 @@
     <ClCompile Include="src\PHGameController.cpp">
       <Filter>Source Files\planet hopper</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameMessage.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\KeyMappings.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

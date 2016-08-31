@@ -70,12 +70,12 @@ void PlayerController::entityUpdate(xy::Entity& ent, float dt)
     if (!m_inOrbit)
     {
         ent.move(m_velocity * dt);
-        if (m_input & InputFlags::Left)
+        if (m_input & LMInputFlags::SteerLeft)
         {
             m_velocity += (m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
-        if (m_input & InputFlags::Right)
+        if (m_input & LMInputFlags::SteerRight)
         {
             m_velocity += (-m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
@@ -98,6 +98,11 @@ void PlayerController::leaveOrbit(const sf::Vector2f& newVelocity)
     m_velocity = newVelocity;
     m_rightVector = xy::Util::Vector::normalise({ newVelocity.y, -newVelocity.x }) * rcsStrength;
     m_inOrbit = false;
+
+    auto msg = sendMessage<LMGameEvent>(GameEvent);
+    msg->type = LMGameEvent::LeftOrbit;
+    msg->posX = m_entity->getWorldPosition().x;
+    msg->posY = m_entity->getWorldPosition().y;
 }
 
 void PlayerController::collisionCallback(lm::CollisionComponent* cc)
