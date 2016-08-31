@@ -64,7 +64,6 @@ namespace ph
         sf::Vector2f m_spawnPosition;
         bool m_playerSpawned;
 
-        void loadMeshes();
         void buildScene();
         xy::Entity* addBody(const sf::Vector2f&, float);
         void addMessageHandlers();

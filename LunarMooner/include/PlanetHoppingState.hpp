@@ -37,7 +37,6 @@ source distribution.
 #include <xygine/mesh/MeshRenderer.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 class PlanetHoppingState final : public xy::State
 {
@@ -61,8 +60,8 @@ private:
     lm::CollisionWorld m_collisionWorld;
     xy::MeshRenderer m_meshRenderer;
 
-    sf::Text tmpTxt;
-
+    void loadMeshes();
+    void loadParticles();
     void buildScene();
 
     sf::Sprite m_loadingSprite;

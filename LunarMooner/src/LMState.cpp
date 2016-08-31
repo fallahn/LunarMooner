@@ -126,18 +126,18 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     }
 
     //precache ALL shaders first
-    m_resources.shaderResource.preload(LMShaderID::NormalMapGame, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
-    m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_directionalLight.intensity", 0.4f);
-    m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_directionalLightDirection", sf::Glsl::Vec3(0.25f, 0.5f, -1.f));
-    m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_ambientColour", sf::Glsl::Vec3(0.06f, 0.06f, 0.02f));
-    m_resources.shaderResource.get(LMShaderID::NormalMapGame).setUniform("u_directionalLight.diffuseColour", sf::Glsl::Vec4(1.f, 0.8f, 0.7f, 1.f));
-    m_resources.shaderResource.preload(LMShaderID::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
-    m_resources.shaderResource.get(LMShaderID::NormalMapPlanet).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
-    m_resources.shaderResource.preload(LMShaderID::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    
+    m_resources.shaderResource.preload(Shader::NormalMapGame, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED_ILLUM);
+    m_resources.shaderResource.get(Shader::NormalMapGame).setUniform("u_directionalLight.intensity", 0.4f);
+    m_resources.shaderResource.get(Shader::NormalMapGame).setUniform("u_directionalLightDirection", sf::Glsl::Vec3(0.25f, 0.5f, -1.f));
+    m_resources.shaderResource.get(Shader::NormalMapGame).setUniform("u_ambientColour", sf::Glsl::Vec3(0.06f, 0.06f, 0.02f));
+    m_resources.shaderResource.get(Shader::NormalMapGame).setUniform("u_directionalLight.diffuseColour", sf::Glsl::Vec4(1.f, 0.8f, 0.7f, 1.f));
+    m_resources.shaderResource.preload(Shader::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
+    m_resources.shaderResource.get(Shader::NormalMapPlanet).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+    m_resources.shaderResource.preload(Shader::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    
 
-    m_resources.shaderResource.preload(LMShaderID::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
-    m_resources.shaderResource.preload(LMShaderID::MeshVertexColoured, DEFERRED_VERTCOLOURED_VERTEX, DEFERRED_VERTCOLOURED_FRAGMENT);
-    m_resources.shaderResource.preload(LMShaderID::Shadow, SHADOW_VERTEX, SHADOW_FRAGMENT);
+    m_resources.shaderResource.preload(Shader::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
+    m_resources.shaderResource.preload(Shader::MeshVertexColoured, DEFERRED_VERTCOLOURED_VERTEX, DEFERRED_VERTCOLOURED_FRAGMENT);
+    m_resources.shaderResource.preload(Shader::Shadow, SHADOW_VERTEX, SHADOW_FRAGMENT);
 
     initSounds();
     initParticles();
@@ -338,8 +338,8 @@ bool LunarMoonerState::update(float dt)
     }
     
     //update lights
-    auto& normalMapPlanetShader = m_resources.shaderResource.get(LMShaderID::NormalMapPlanet);
-    auto& normalMapGameShader = m_resources.shaderResource.get(LMShaderID::NormalMapGame);
+    auto& normalMapPlanetShader = m_resources.shaderResource.get(Shader::NormalMapPlanet);
+    auto& normalMapGameShader = m_resources.shaderResource.get(Shader::NormalMapGame);
     auto lights = m_scene.getVisibleLights(m_scene.getVisibleArea());
     auto i = 0u;
     for (; i < lights.size() && i < xy::Shader::NormalMapped::MaxPointLights; ++i)
@@ -760,25 +760,25 @@ void LunarMoonerState::initMeshes()
     m_scene.getSkyLight().setDirection({ 0.25f, 0.5f, -1.f });
 
     xy::IQMBuilder ib("assets/models/player_ship.iqm");
-    m_meshRenderer.loadModel(LMModelID::PlayerModel, ib);
+    m_meshRenderer.loadModel(Mesh::Player, ib);
 
     xy::IQMBuilder ib2("assets/models/mothership.iqm");
-    m_meshRenderer.loadModel(LMModelID::MothershipModel, ib2);
+    m_meshRenderer.loadModel(Mesh::MotherShip, ib2);
 
     xy::IQMBuilder ib3("assets/models/corpse.iqm");
-    m_meshRenderer.loadModel(LMModelID::DeadDooferModel, ib3);
+    m_meshRenderer.loadModel(Mesh::DeadDoofer, ib3);
 
-    auto& playerMat = m_resources.materialResource.add(LMMaterialID::PlayerShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
+    auto& playerMat = m_resources.materialResource.add(Material::Player, m_resources.shaderResource.get(Shader::MeshTextured));
     playerMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/ship_diffuse.png") });
     playerMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    playerMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(LMShaderID::Shadow));
+    playerMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
     //playerMat.getRenderPass(xy::RenderPass::ShadowMap)->setCullFace(xy::CullFace::Front); //the model has no back faces!
 
-    auto& shipMat = m_resources.materialResource.add(LMMaterialID::MotherShip, m_resources.shaderResource.get(LMShaderID::MeshTextured));
+    auto& shipMat = m_resources.materialResource.add(Material::MotherShip, m_resources.shaderResource.get(Shader::MeshTextured));
     shipMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/mothership_diffuse.png") });
     shipMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
 
-    auto& dooferMat = m_resources.materialResource.add(LMMaterialID::DeadDoofer, m_resources.shaderResource.get(LMShaderID::MeshVertexColoured));
+    auto& dooferMat = m_resources.materialResource.add(Material::DeadDoofer, m_resources.shaderResource.get(Shader::MeshVertexColoured));
     dooferMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
 
     //add drawable to scene
@@ -974,8 +974,8 @@ void LunarMoonerState::buildBackground()
     moon->setDetailNormal(m_resources.textureResource.get("assets/images/background/moon_normal_02.png"));
     moon->setDiffuseTexture(m_resources.textureResource.get("assets/images/background/moon_diffuse_02.png"));
     moon->setMaskTexture(m_resources.textureResource.get("assets/images/background/moon_mask.png"));
-    moon->setPrepassShader(m_resources.shaderResource.get(LMShaderID::Prepass));
-    moon->setNormalShader(m_resources.shaderResource.get(LMShaderID::NormalMapPlanet));
+    moon->setPrepassShader(m_resources.shaderResource.get(Shader::Prepass));
+    moon->setNormalShader(m_resources.shaderResource.get(Shader::NormalMapPlanet));
     moon->setRotationVelocity({ 0.f, 0.009f });
 
     entity = xy::Entity::create(m_messageBus);

@@ -33,6 +33,7 @@ source distribution.
 #include <CommandIds.hpp>
 #include <LMAlienController.hpp>
 #include <PHPlanetRotation.hpp>
+#include <LMShaderIds.hpp>
 
 #include <xygine/Scene.hpp>
 #include <xygine/Entity.hpp>
@@ -45,8 +46,6 @@ source distribution.
 #include <xygine/components/ParticleSystem.hpp>
 #include <xygine/components/Model.hpp>
 #include <xygine/mesh/MeshRenderer.hpp>
-#include <xygine/mesh/SphereBuilder.hpp>
-#include <xygine/mesh/shaders/DeferredRenderer.hpp>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
@@ -72,30 +71,6 @@ namespace
         { 124.f, 0.f, 36.f, 52.f }
     };
     const std::size_t debrisCount = 8u;
-
-    namespace Mesh
-    {
-        enum ID
-        {
-            Planet
-        };
-    }
-    namespace Material
-    {
-        enum ID
-        {
-            DesertPlanet,
-            LavaPlanet,
-            End
-        };
-    }
-    namespace Shader
-    {
-        enum ID
-        {
-            TexturedSmooth
-        };
-    }
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw, xy::MeshRenderer& mr)
@@ -106,7 +81,6 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
     m_meshRenderer      (mr),
     m_playerSpawned     (false)
 {
-    loadMeshes();
     buildScene();
     spawnDebris();
     addMessageHandlers();
@@ -155,28 +129,6 @@ void GameController::spawnPlayer()
 }
 
 //private
-void GameController::loadMeshes()
-{
-    //preload meshes
-    xy::SphereBuilder sb(1.f, 10, true); //we'll scale per entity
-    m_meshRenderer.loadModel(Mesh::Planet, sb);
-
-    //preload shaders
-    m_resources.shaderResource.preload(Shader::TexturedSmooth, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
-
-    //preload materials
-    auto& desertPlanet = m_resources.materialResource.add(Material::DesertPlanet, m_resources.shaderResource.get(Shader::TexturedSmooth));
-    desertPlanet.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    desertPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/dust_planet.png") });
-    m_resources.textureResource.setFallbackColour(sf::Color::Black);
-    desertPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("no_mask") });
-
-    auto& lavaPlanet = m_resources.materialResource.add(Material::LavaPlanet, m_resources.shaderResource.get(Shader::TexturedSmooth));
-    lavaPlanet.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    lavaPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_diffuse.png") });
-    lavaPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
-}
-
 void GameController::buildScene()
 {
     //set bounds
@@ -346,7 +298,7 @@ void GameController::buildScene()
                     || body->globalBounds().contains(other->getWorldPosition())))
             {
                 body->destroy();
-                LOG("Destroyed Body", xy::Logger::Type::Info);
+                //LOG("Destroyed Body", xy::Logger::Type::Info);
                 break;
             }
         }
@@ -354,7 +306,7 @@ void GameController::buildScene()
             || endBody->globalBounds().intersects(body->globalBounds()))
         {
             body->destroy();
-            LOG("Destroyed Body", xy::Logger::Type::Info);
+            //LOG("Destroyed Body", xy::Logger::Type::Info);
         }
     }
 

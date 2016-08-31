@@ -29,34 +29,46 @@ source distribution.
 #define LM_SHADER_IDS_HPP_
 
 #include <xygine/shaders/Default.hpp>
+#include <xygine/mesh/shaders/DeferredRenderer.hpp>
 
 #include <string>
 
-enum LMShaderID
+namespace Mesh
 {
-    Prepass = xy::Shader::Count,
-    NormalMapPlanet,
-    NormalMapGame,
-    WaterEffect,
-    VelocityMeter,
-    MeshTextured,
-    MeshNormalMapped,
-    MeshVertexColoured,
-    Shadow
-};
-
-enum LMMaterialID
+    enum ID
+    {
+        Player,
+        MotherShip,
+        DeadDoofer,
+        Planet
+    };
+}
+namespace Material
 {
-    PlayerShip = 0,
-    MotherShip,
-    DeadDoofer
-};
-
-enum LMModelID
+    enum ID
+    {
+        Player,
+        MotherShip,
+        DeadDoofer,
+        DesertPlanet,
+        LavaPlanet,
+        End
+    };
+}
+namespace Shader
 {
-    PlayerModel = 0,
-    MothershipModel,
-    DeadDooferModel
-};
+    enum ID
+    {
+        Prepass = xy::Shader::Count,
+        NormalMapPlanet,
+        NormalMapGame,
+        WaterEffect,
+        VelocityMeter,
+        MeshTextured,
+        MeshNormalMapped,
+        MeshVertexColoured,
+        Shadow
+    };
+}
 
 #endif //LM_SHADER_IDS_HPP_
