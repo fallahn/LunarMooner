@@ -70,12 +70,12 @@ void PlayerController::entityUpdate(xy::Entity& ent, float dt)
     if (!m_inOrbit)
     {
         ent.move(m_velocity * dt);
-        if (m_input & LMInputFlags::SteerLeft)
+        if (m_input & LMInputFlags::SteerRight)
         {
             m_velocity += (m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
-        if (m_input & LMInputFlags::SteerRight)
+        if (m_input & LMInputFlags::SteerLeft)
         {
             m_velocity += (-m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
@@ -121,6 +121,7 @@ void PlayerController::collisionCallback(lm::CollisionComponent* cc)
     
     switch (cc->getID())
     {
+    default: break;
     case lm::CollisionComponent::ID::Bounds:   
     {
         kill();
