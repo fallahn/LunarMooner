@@ -60,6 +60,9 @@ private:
     lm::CollisionWorld m_collisionWorld;
     xy::MeshRenderer m_meshRenderer;
 
+    bool m_useController;
+    sf::Uint8 m_input;
+
     void loadMeshes();
     void loadParticles();
     void buildScene();

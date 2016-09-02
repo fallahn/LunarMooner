@@ -40,6 +40,7 @@ source distribution.
 #include <xygine/components/MeshDrawable.hpp>
 #include <xygine/PostChromeAb.hpp>
 #include <xygine/mesh/SphereBuilder.hpp>
+#include <xygine/Reports.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -54,13 +55,17 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     m_messageBus    (context.appInstance.getMessageBus()),
     m_scene         (m_messageBus),
     m_collisionWorld(m_scene),
-    m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene)
+    m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene),
+    m_useController (false),
+    m_input         (0)
 {
     m_loadingSprite.setTexture(m_resources.textureResource.get("assets/images/ui/loading.png"));
     m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
     m_loadingSprite.setPosition(m_loadingSprite.getOrigin());
 
     launchLoadingScreen();
+
+    xy::Stats::clear();
 
     m_scene.setView(context.defaultView);
     //m_scene.drawDebug(true);
@@ -73,35 +78,23 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     loadParticles();
     buildScene();
 
+    m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
+
     quitLoadingScreen();
 }
 
 //public
 bool PlanetHoppingState::update(float dt)
 {
-    if (sf::Keyboard::isKeyPressed(keyLeft)
-        || sf::Keyboard::isKeyPressed(altKeyLeft))
-    {
-        xy::Command cmd;
-        cmd.category = LMCommandID::Player;
-        cmd.action = [](xy::Entity& entity, float)
-        {
-            entity.getComponent<ph::PlayerController>()->moveLeft();
-        };
-        m_scene.sendCommand(cmd);
-    }
+    if (m_useController) parseControllerInput(m_input);
     
-    if (sf::Keyboard::isKeyPressed(keyRight)
-        || sf::Keyboard::isKeyPressed(altKeyRight))
+    xy::Command cmd;
+    cmd.category = LMCommandID::Player;
+    cmd.action = [this](xy::Entity& entity, float)
     {
-        xy::Command cmd;
-        cmd.category = LMCommandID::Player;
-        cmd.action = [](xy::Entity& entity, float)
-        {
-            entity.getComponent<ph::PlayerController>()->moveRight();
-        };
-        m_scene.sendCommand(cmd);
-    }
+        entity.getComponent<ph::PlayerController>()->setInput(m_input);
+    };
+    m_scene.sendCommand(cmd);
 
     m_collisionWorld.update();
     m_scene.update(dt);
@@ -112,50 +105,98 @@ bool PlanetHoppingState::update(float dt)
 
 bool PlanetHoppingState::handleEvent(const sf::Event& evt)
 {
-    if (evt.type == sf::Event::KeyReleased)
+    //in its own function so both keyb/joy events may call it
+    std::function<void()> fire = [this]()
     {
-        switch (evt.key.code)
+        xy::Command cmd;
+        cmd.category = LMCommandID::Player;
+        cmd.action = [](xy::Entity& entity, float)
+        {
+            entity.getComponent<ph::PlayerController>()->leaveOrbit(entity.getComponent<ph::OrbitComponent>()->removeParent());
+        };
+        m_scene.sendCommand(cmd);
+
+        //do this second so we don't launch the player on spawn
+        cmd.category = LMCommandID::GameController;
+        cmd.action = [this](xy::Entity& entity, float)
+        {
+            auto gc = entity.getComponent<ph::GameController>();
+
+            if (gc->gameEnded())
+            {
+                requestStackPop();
+            }
+            else
+            {
+                gc->spawnPlayer();
+            }
+        };
+        m_scene.sendCommand(cmd);
+    };
+    
+    switch (evt.type)
+    {
+    case sf::Event::JoystickConnected:
+        m_useController = (evt.joystickConnect.joystickId == 0 &&
+            getContext().appInstance.getGameSettings().controllerEnabled);
+        break;
+    case sf::Event::JoystickDisconnected:
+        if (evt.joystickConnect.joystickId == 0) m_useController = false;
+        break;
+    case sf::Event::JoystickButtonReleased:
+        if (!m_useController || evt.joystickButton.joystickId != 0) break;
+        switch (evt.joystickButton.button)
         {
         default:break;
-        case keyFire:
-        {
-            xy::Command cmd;
-            cmd.category = LMCommandID::Player;
-            cmd.action = [](xy::Entity& entity, float)
-            {
-                entity.getComponent<ph::PlayerController>()->leaveOrbit(entity.getComponent<ph::OrbitComponent>()->removeParent());
-            };
-            m_scene.sendCommand(cmd);
-
-            //do this second so we don't launch the player on spawn
-            cmd.category = LMCommandID::GameController;
-            cmd.action = [this](xy::Entity& entity, float)
-            {
-                auto gc = entity.getComponent<ph::GameController>();
-
-                if (gc->gameEnded())
-                {
-                    requestStackPop();
-                }
-                else
-                {
-                    gc->spawnPlayer();
-                }
-            };
-            m_scene.sendCommand(cmd);
+        case buttonA:
+            fire();
+            break;
+        case buttonStart:
+            requestStackPush(States::ID::Pause);
+            break;
         }
+        break;
+    case sf::Event::KeyPressed:
+        switch (evt.key.code)
+        {
+        default: break;
+        case keyLeft:
+        case altKeyLeft:
+            m_input &= ~LMInputFlags::SteerLeft;
+            break;
+        case keyRight:
+        case altKeyRight:
+            m_input &= ~LMInputFlags::SteerRight;
             break;
         case sf::Keyboard::P:
             requestStackPush(States::ID::Pause);
             break;
+        }
+        break;
+    case sf::Event::KeyReleased:
+    {
+        switch (evt.key.code)
+        {
+        default:break;
+        case keyLeft:
+        case altKeyLeft:
+            m_input |= LMInputFlags::SteerLeft;
+            break;
+        case keyRight:
+        case altKeyRight:
+            m_input |= LMInputFlags::SteerRight;
+            break;
+        case keyFire:
+            fire();
+        break;
 #ifdef _DEBUG_
         case sf::Keyboard::BackSpace:
-            requestStackPop();            
+            requestStackPop();
             break;
 #endif //_DEBUG_
         }
     }
-
+    }
     return false;
 }
 
@@ -173,6 +214,12 @@ void PlanetHoppingState::handleMessage(const xy::Message& msg)
         case xy::Message::UIEvent::ResizedWindow:
             //m_scene.setView(getContext().defaultView);
             m_meshRenderer.setView(getContext().defaultView);
+            break;
+        case xy::Message::UIEvent::RequestControllerDisable:
+            m_useController = false;
+            break;
+        case xy::Message::UIEvent::RequestControllerEnable:
+            m_useController = true;
             break;
         }
     }

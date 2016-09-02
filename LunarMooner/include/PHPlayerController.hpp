@@ -55,6 +55,7 @@ namespace ph
         void leaveOrbit(const sf::Vector2f&);
         void moveLeft() { m_input |= LMInputFlags::SteerLeft; }
         void moveRight() { m_input |= LMInputFlags::SteerRight; }
+        void setInput(const sf::Uint8 ip) { m_input = ip; }
         const sf::Vector2f& getVelocity() const { return m_velocity; }
 
         void collisionCallback(lm::CollisionComponent*);

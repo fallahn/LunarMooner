@@ -51,4 +51,65 @@ const sf::Uint32 buttonBack = 6u;
 const sf::Uint32 buttonStart = 7u;
 const float joyDeadZone = 25.f;
 
+static void parseControllerInput(sf::Uint8& inputFlags)
+{
+    //we need to convert the analogue input
+    //to out own 'Pressed / Released' events
+    static bool lastJoyLeft = false;
+    static bool lastJoyRight = false;
+    static bool lastPovLeft = false;
+    static bool lastPovRight = false;
+    static bool lastThrust = false;
+
+    //joystick direction handling    
+    std::function<void(bool&, bool&, float)> parse = [&inputFlags](bool& lastLeft, bool& lastRight, float xVal)
+    {
+        bool left = false;
+        bool right = false;
+
+        if (xVal < -joyDeadZone)
+        {
+            left = true;
+        }
+        else if (xVal > joyDeadZone)
+        {
+            right = true;
+        }
+
+        if (lastLeft != left)
+        {
+            (left) ?
+                inputFlags |= LMInputFlags::SteerLeft :
+                inputFlags &= ~LMInputFlags::SteerLeft;
+        }
+        if (lastRight != right)
+        {
+            (right) ?
+                inputFlags |= LMInputFlags::SteerRight :
+                inputFlags &= ~LMInputFlags::SteerRight;
+        }
+        lastLeft = left;
+        lastRight = right;
+    };
+
+    float xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
+    parse(lastJoyLeft, lastJoyRight, xValue);
+
+    //dpad
+    xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
+    parse(lastPovLeft, lastPovRight, xValue);
+
+    //xbox triggers
+    float zValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Z);
+    bool thrust = (zValue < -joyDeadZone || zValue > joyDeadZone);
+    if (lastThrust != thrust)
+    {
+        (thrust) ?
+            inputFlags |= LMInputFlags::Thrust :
+            inputFlags &= ~LMInputFlags::Thrust;
+
+    }
+    lastThrust = thrust;
+}
+
 #endif //KEYMAP_INL_
