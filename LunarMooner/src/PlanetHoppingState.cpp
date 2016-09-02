@@ -136,6 +136,7 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
     
     switch (evt.type)
     {
+    default: break;
     case sf::Event::JoystickConnected:
         m_useController = (evt.joystickConnect.joystickId == 0 &&
             getContext().appInstance.getGameSettings().controllerEnabled);
