@@ -70,7 +70,6 @@ private:
     lm::Overlay m_overlay;
 
     bool m_useController;
-    //void parseControllerInput();
     
     void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon);
     void initSounds();
