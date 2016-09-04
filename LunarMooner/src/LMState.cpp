@@ -272,8 +272,8 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
         case LMStateEvent::GameOver:
             requestStackPush(States::ID::GameOver);
             break;
-        //case LMStateEvent::RoundEnd:
-        case LMStateEvent::SummaryFinished:
+        case LMStateEvent::RoundEnd:
+        //case LMStateEvent::SummaryFinished:
             if (m_playerCount == 1)
             {
                 //in single player launch mini game
@@ -387,67 +387,6 @@ namespace
     const float moonWidth = 570.f;
     const float gameMusicVolume = 30.f;
 }
-
-//void LunarMoonerState::parseControllerInput()
-//{
-//    //we need to convert the analogue input
-//    //to out own 'Pressed / Released' events
-//    static bool lastJoyLeft = false;
-//    static bool lastJoyRight = false;
-//    static bool lastPovLeft = false;
-//    static bool lastPovRight = false;
-//    static bool lastThrust = false;    
-//    
-//    //joystick direction handling    
-//    std::function<void(bool&, bool&, float)> parse = [this](bool& lastLeft, bool& lastRight, float xVal)
-//    {
-//        bool left = false;
-//        bool right = false;
-//        
-//        if (xVal < -joyDeadZone)
-//        {
-//            left = true;
-//        }
-//        else if (xVal > joyDeadZone)
-//        {
-//            right = true;
-//        }
-//
-//        if (lastLeft != left)
-//        {
-//            (left) ?
-//                m_inputFlags |= LMInputFlags::SteerLeft :
-//                m_inputFlags &= ~LMInputFlags::SteerLeft;
-//        }
-//        if (lastRight != right)
-//        {
-//            (right) ?
-//                m_inputFlags |= LMInputFlags::SteerRight :
-//                m_inputFlags &= ~LMInputFlags::SteerRight;
-//        }
-//        lastLeft = left;
-//        lastRight = right;
-//    };
-//
-//    float xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
-//    parse(lastJoyLeft, lastJoyRight, xValue);
-//
-//    //dpad
-//    xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
-//    parse(lastPovLeft, lastPovRight, xValue);
-//
-//    //xbox triggers
-//    float zValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Z);
-//    bool thrust = (zValue < -joyDeadZone || zValue > joyDeadZone);
-//    if (lastThrust != thrust)
-//    {
-//        (thrust) ?
-//            m_inputFlags |= LMInputFlags::Thrust :
-//            m_inputFlags &= ~LMInputFlags::Thrust;
-//            
-//    }
-//    lastThrust = thrust;
-//}
 
 void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level, lm::SpecialWeapon weapon)
 {
