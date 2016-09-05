@@ -255,7 +255,7 @@ void GameController::buildScene()
             }
         }
     }
-    //mvoe and remove overlapping bodies 
+    //move and remove overlapping bodies 
     for (auto body : bodies)
     {
         //move bodies in from far edges
@@ -341,6 +341,7 @@ void GameController::buildScene()
             //LOG("Destroyed Body", xy::Logger::Type::Info);
         }
     }
+    m_collisionWorld.flush();
 
     //setup player
     m_spawnPosition = startBody->getWorldPosition() + sf::Vector2f((masterRadius * 1.6f), 0.f);
@@ -399,7 +400,7 @@ void GameController::addMessageHandlers()
         default: break;
         case LMGameEvent::PlayerDied:
             m_playerSpawned = false;
-            showMessage("You Died.", "Press Fire to Continue");
+            showMessage("You Died", "Press Fire to Continue");
             break;
         case LMGameEvent::EnteredOrbit:
             m_currentParent = data.value;

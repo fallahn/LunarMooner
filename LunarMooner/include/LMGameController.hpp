@@ -79,6 +79,9 @@ namespace lm
 
         void setDifficulty(xy::Difficulty);
 
+        const PlayerState& getPlayerState(const std::size_t i) const { return m_playerStates[i]; }
+        void setPlayerState(const PlayerState& state, std::size_t i) { m_playerStates[i] = state; }
+
     private:
         DemoRecorder m_demoRecorder;
         DemoPlayer m_demoPlayer;

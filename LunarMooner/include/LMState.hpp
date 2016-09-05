@@ -56,6 +56,7 @@ public:
     xy::StateID stateID() const { return (m_playerCount == 1) ? States::SinglePlayer : States::MultiPlayer; }
 private:
     sf::Uint8 m_playerCount;
+
     xy::Scene m_scene;
     xy::MessageBus& m_messageBus;
 
@@ -70,6 +71,7 @@ private:
     lm::Overlay m_overlay;
 
     bool m_useController;
+    bool m_pendingLevelChange;
     
     void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon);
     void initSounds();
