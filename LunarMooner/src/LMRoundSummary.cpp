@@ -69,7 +69,7 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, ResourceCollecti
     
     if (!doScores)
     {
-        m_mainText.setString("You Died!");
+        m_mainText.setString("You Died");
         m_mainText.setCharacterSize(80u);
         xy::Util::Position::centreOrigin(m_mainText);
         m_mainText.setPosition(960.f, 440.f);

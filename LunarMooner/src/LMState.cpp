@@ -284,6 +284,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             {
                 //in single player launch mini game
                 //TODO alternate types
+                requestStackPop();
                 requestStackPush(States::ID::PlanetHopping);
                 m_pendingLevelChange = false;
 
@@ -421,13 +422,20 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level
 
     for (auto i = 0; i < playerCount; ++i)
     {
-        gameController->addPlayer(level, weapon);
+        gameController->addPlayer(resumeState ? playerState.level - 1 : level, weapon);
     }
 
     //if we're resuming a game get the current profile
     if (resumeState)
     {
-        gameController->setPlayerState(playerState, 0);
+        auto state = gameController->getPlayerState(0);
+        state.ammo = playerState.ammo;
+        state.level = playerState.level;
+        state.lives = playerState.lives;
+        state.score = playerState.score;
+        state.previousScore = state.score;
+        
+        gameController->setPlayerState(state, 0);
         resumeState = false;
     }
 

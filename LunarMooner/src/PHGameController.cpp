@@ -400,6 +400,7 @@ void GameController::addMessageHandlers()
         default: break;
         case LMGameEvent::PlayerDied:
             m_playerSpawned = false;
+            m_currentParent = 0;
             showMessage("You Died", "Press Fire to Continue");
             break;
         case LMGameEvent::EnteredOrbit:
