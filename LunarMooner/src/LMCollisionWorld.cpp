@@ -48,11 +48,7 @@ CollisionComponent::Ptr CollisionWorld::addComponent(xy::MessageBus& mb, sf::Flo
 
 void CollisionWorld::update()
 {
-    m_colliders.erase(std::remove_if(m_colliders.begin(), m_colliders.end(), 
-        [](const CollisionComponent* cp)
-    {
-        return cp->destroyed(); 
-    }), m_colliders.end());
+    flush();
 
     for (auto ca : m_colliders)
     {
@@ -77,4 +73,13 @@ void CollisionWorld::update()
             }
         }
     }
+}
+
+void CollisionWorld::flush()
+{
+    m_colliders.erase(std::remove_if(m_colliders.begin(), m_colliders.end(),
+        [](const CollisionComponent* cp)
+    {
+        return cp->destroyed();
+    }), m_colliders.end());
 }

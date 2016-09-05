@@ -48,6 +48,7 @@ namespace lm
         CollisionComponent::Ptr addComponent(xy::MessageBus&, sf::FloatRect, CollisionComponent::ID, bool = false);
 
         void update();
+        void flush();
 
     private:
         std::vector<CollisionComponent*> m_colliders;

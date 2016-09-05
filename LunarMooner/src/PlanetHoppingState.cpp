@@ -96,8 +96,8 @@ bool PlanetHoppingState::update(float dt)
     };
     m_scene.sendCommand(cmd);
 
-    m_collisionWorld.update();
     m_scene.update(dt);
+    m_collisionWorld.update();
     m_meshRenderer.update();
     
     return false;
@@ -125,6 +125,7 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
             if (gc->gameEnded())
             {
                 requestStackPop();
+                requestStackPush(States::ID::SinglePlayer);
             }
             else
             {

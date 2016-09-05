@@ -52,7 +52,6 @@ public:
     xy::StateID stateID() const override { return States::PlanetHopping; }
 
 private:
-
     ResourceCollection m_resources;
 
     xy::MessageBus& m_messageBus;

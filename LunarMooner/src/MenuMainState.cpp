@@ -165,8 +165,8 @@ void MenuMainState::buildMenu()
     button->setPosition(180.f, 40.f);
     button->addCallback([this]()
     {
-        //close();
-        requestStackPush(States::ID::PlanetHopping, true);
+       close();
+        requestStackPush(States::ID::PlanetHopping);
     });
     m_uiContainer.addControl(button);
 

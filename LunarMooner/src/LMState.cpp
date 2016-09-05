@@ -57,9 +57,15 @@ source distribution.
 
 #include <SFML/Window/Event.hpp>
 
+#include <LMPlayerState.hpp>
+
 namespace
 {
 #include "KeyMappings.inl"
+
+    lm::GameController* currentController = nullptr;
+    bool resumeState = false;
+    lm::PlayerState playerState;
 }
 
 LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::Uint8 playerCount, PlayerProfile& profile)
@@ -72,7 +78,8 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_prevInputFlags    (0),
     m_collisionWorld    (m_scene),
     m_overlay           (m_messageBus, m_resources, m_scene),
-    m_useController     (false)
+    m_useController     (false),
+    m_pendingLevelChange(false)
 {
     XY_ASSERT(playerCount > 0, "Need at least one player");
 
@@ -266,26 +273,42 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
 
     if (msg.id == LMMessageId::StateEvent)
     {
-        auto& msgData = msg.getData<LMStateEvent>();
+        const auto& msgData = msg.getData<LMStateEvent>();
         switch (msgData.type)
         {
         case LMStateEvent::GameOver:
             requestStackPush(States::ID::GameOver);
             break;
-        case LMStateEvent::RoundEnd:
-        //case LMStateEvent::SummaryFinished:
-            if (m_playerCount == 1)
+        case LMStateEvent::SummaryFinished:
+            if (m_playerCount == 1 && m_pendingLevelChange)
             {
                 //in single player launch mini game
-                requestStackPush(States::ID::PlanetHopping, true);
+                //TODO alternate types
+                requestStackPush(States::ID::PlanetHopping);
+                m_pendingLevelChange = false;
+
+                //save the state for resumption
+                playerState = currentController->getPlayerState(0);
+                resumeState = true;
             }
             break;
         default:break;
         }
     }
+    else if (msg.id == LMMessageId::GameEvent)
+    {
+        const auto& msgData = msg.getData<LMGameEvent>();
+        switch (msgData.type)
+        {
+        default: break;
+        case LMGameEvent::LevelChanged:
+            m_pendingLevelChange = true;
+            break;
+        }
+    }
     else if (msg.id == xy::Message::UIMessage)
     {
-        auto& msgData = msg.getData<xy::Message::UIEvent>();
+        const auto& msgData = msg.getData<xy::Message::UIEvent>();
         switch (msgData.type)
         {
         default: break;
@@ -400,10 +423,18 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level
     {
         gameController->addPlayer(level, weapon);
     }
+
+    //if we're resuming a game get the current profile
+    if (resumeState)
+    {
+        gameController->setPlayerState(playerState, 0);
+        resumeState = false;
+    }
+
     gameController->start();
 
     auto entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(gameController);
+    currentController = entity->addComponent(gameController);
     entity->addCommandCategories(LMCommandID::GameController);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 }
