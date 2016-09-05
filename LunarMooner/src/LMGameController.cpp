@@ -1170,6 +1170,7 @@ void GameController::swapPlayerState()
         //everyone is dead! request end game
         auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
         msg->type = LMStateEvent::GameOver;
+        LOG("Loop counted " + std::to_string(count) + " players dead", xy::Logger::Type::Info);
         return;
     }
 
@@ -1369,12 +1370,14 @@ void GameController::restartRound()
 
 void GameController::addDelayedRespawn()
 {
+    LOG("Added delayed spawn", xy::Logger::Type::Info);
     m_pendingDelayedEvents.emplace_back();
     auto& de = m_pendingDelayedEvents.back();
     de.id = EventID::SpawnPlayer;
     de.time = 1.f;
     de.action = [this]()
     {
+        LOG("Spawning player...", xy::Logger::Type::Info);
         swapPlayerState();
         m_spawnReady = true;
 

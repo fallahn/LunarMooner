@@ -177,7 +177,7 @@ void AlienController::collisionCallback(CollisionComponent* cc)
 
 void AlienController::setVelocity(const sf::Vector2f& vel)
 {
-    m_velocity = xy::Util::Vector::normalise(vel);
+    m_velocity = (xy::Util::Vector::lengthSquared(vel) > 0) ?  xy::Util::Vector::normalise(vel) : vel;
 }
 
 //private
