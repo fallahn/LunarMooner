@@ -70,6 +70,8 @@ namespace ph
         sf::Uint64 m_currentParent;
         float m_lastOrbitTime;
 
+        bool m_gameEnded;
+
         void buildScene();
         xy::Entity* addBody(const sf::Vector2f&, float);
         void addMessageHandlers();

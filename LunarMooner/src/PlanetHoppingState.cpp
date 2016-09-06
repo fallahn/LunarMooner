@@ -81,17 +81,20 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     m_useController = sf::Joystick::isConnected(0) && context.appInstance.getGameSettings().controllerEnabled;
 
     quitLoadingScreen();
+    LOG("State Loaded", xy::Logger::Type::Info);
 }
 
 //public
 bool PlanetHoppingState::update(float dt)
 {
+    //LOG("Start update", xy::Logger::Type::Info);
     if (m_useController) parseControllerInput(m_input);
     
     xy::Command cmd;
     cmd.category = LMCommandID::Player;
     cmd.action = [this](xy::Entity& entity, float)
     {
+        if (entity.destroyed()) return;
         entity.getComponent<ph::PlayerController>()->setInput(m_input);
     };
     m_scene.sendCommand(cmd);
@@ -100,6 +103,8 @@ bool PlanetHoppingState::update(float dt)
     m_collisionWorld.update();
     m_meshRenderer.update();
     
+    //LOG("End update", xy::Logger::Type::Info);
+
     return false;
 }
 
