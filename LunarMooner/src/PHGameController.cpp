@@ -87,7 +87,8 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
     m_playerSpawned     (false),
     m_targetUID         (0u),
     m_currentParent     (0u),
-    m_lastOrbitTime     (0.f)
+    m_lastOrbitTime     (0.f),
+    m_gameEnded         (false)
 {
     buildScene();
     spawnDebris();
@@ -109,6 +110,7 @@ void GameController::entityUpdate(xy::Entity&, float)
             && time > targetOrbitTime)
         {
             showMessage("Success!", "Press Fire to Continue");
+            m_gameEnded = true;
         }
         m_lastOrbitTime = time;
         //LOG("buns", xy::Logger::Type::Info);
@@ -158,7 +160,7 @@ void GameController::spawnPlayer()
 
 bool GameController::gameEnded() const
 {
-    return (m_currentParent == m_targetUID && m_lastOrbitTime > targetOrbitTime);
+    return m_gameEnded;
 }
 
 //private
@@ -400,10 +402,17 @@ void GameController::addMessageHandlers()
         switch (data.type)
         {
         default: break;
+        case LMGameEvent::TimerExpired:
+            m_gameEnded = true;
+            showMessage("Time's Up!", "Press Fire to Continue");
+            break;
         case LMGameEvent::PlayerDied:
+            if (!m_gameEnded)
+            {
+                showMessage("You Died", "Press Fire to Continue");
+            }
             m_playerSpawned = false;
-            m_currentParent = 0;
-            showMessage("You Died", "Press Fire to Continue");
+            m_currentParent = 0;           
             break;
         case LMGameEvent::EnteredOrbit:
             m_currentParent = data.value;

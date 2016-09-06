@@ -80,6 +80,10 @@ ClockDisplay::ClockDisplay(const sf::Texture& t)
     m_vertices[idx++].texCoords = m_digits[Digit::Colon].coords[1];
     m_vertices[idx++].texCoords = m_digits[Digit::Colon].coords[2];
     m_vertices[idx].texCoords = m_digits[Digit::Colon].coords[3];
+
+    //set the local bounds
+    m_localBounds.width = size.x * 5.f;
+    m_localBounds.height = size.y;
 }
 
 //public 

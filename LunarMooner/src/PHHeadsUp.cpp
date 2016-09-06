@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <PHHeadsUp.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/util/Position.hpp>
 
@@ -34,26 +35,48 @@ source distribution.
 using namespace ph;
 
 HeadsUpDisplay::HeadsUpDisplay(xy::MessageBus& mb, ResourceCollection& rc)
-    : xy::Component(mb, this),
-    m_clock(rc.textureResource.get("assets/images/game/console/nixie_sheet.png")),
-    m_time(90.f)
+    : xy::Component (mb, this),
+    m_started       (false),
+    m_clock         (rc.textureResource.get("assets/images/game/console/nixie_sheet.png")),
+    m_time          (60.f)
 {
-    //TODO position clock centre top
+    m_clock.setTime(m_time);
+    m_clock.setOrigin(m_clock.getLocalBounds().width / 2.f, 0.f);
+    m_clock.setPosition(xy::DefaultSceneSize.x / 2.f, 20.f);
+
+    xy::Component::MessageHandler mh;
+    mh.id = GameEvent;
+    mh.action = [this](xy::Component*, const xy::Message& msg)
+    {
+        const auto data = msg.getData<LMGameEvent>();
+        switch (data.type)
+        {
+        default: break;
+        case LMGameEvent::PlayerSpawned:
+            m_started = true;
+            break;
+        }
+    };
+    addMessageHandler(mh);
 }
 
 //public
 void HeadsUpDisplay::entityUpdate(xy::Entity&, float dt)
 {
-    float lastTime = m_time;
-    m_time = std::max(0.f, m_time - dt);
-
-    //TODO raise event if time expired
-    if (m_time == 0 && lastTime > 0)
+    if (m_started)
     {
+        float lastTime = m_time;
+        m_time = std::max(0.f, m_time - dt);
 
+        //raise event if time expired
+        if (m_time == 0 && lastTime > 0)
+        {
+            auto msg = sendMessage<LMGameEvent>(GameEvent);
+            msg->type = LMGameEvent::TimerExpired;
+        }
+
+        m_clock.setTime(m_time);
     }
-
-    m_clock.setTime(m_time);
 }
 
 //private

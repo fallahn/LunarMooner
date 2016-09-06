@@ -58,10 +58,16 @@ PlayerController::PlayerController(xy::MessageBus& mb)
     mh.action = [this](xy::Component*, const xy::Message& msg)
     {
         const auto& msgData = msg.getData<LMGameEvent>();
-        if (msgData.type == LMGameEvent::EnteredOrbit)
+        switch(msgData.type)
         {
+        default: break;
+        case LMGameEvent::EnteredOrbit:
             m_inOrbit = true;
             LOG("Entered orbit", xy::Logger::Type::Info);
+            break;
+        case LMGameEvent::TimerExpired:
+            kill();
+            break;
         }
     };
     addMessageHandler(mh);

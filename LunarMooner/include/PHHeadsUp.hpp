@@ -48,6 +48,8 @@ namespace ph
 
     private:
 
+        bool m_started;
+
         lm::ClockDisplay m_clock;
         float m_time;
 

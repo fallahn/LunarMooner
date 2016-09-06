@@ -54,6 +54,8 @@ namespace lm
 
         void setTime(float); //time in seconds
 
+        const sf::FloatRect& getLocalBounds() const { return m_localBounds; }
+
     private:
         enum Digit
         {
@@ -78,6 +80,7 @@ namespace lm
         std::array<Quad, Digit::Count> m_digits;
 
         const sf::Texture& m_texture;
+        sf::FloatRect m_localBounds;
 
         std::array<sf::Vertex, 20u> m_vertices;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
