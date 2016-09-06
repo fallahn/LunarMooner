@@ -74,6 +74,7 @@ namespace ph
         xy::Entity* addBody(const sf::Vector2f&, float);
         void addMessageHandlers();
         void spawnDebris();
+        void buildUI();
         void showMessage(const std::string&, const std::string&);
     };
 }

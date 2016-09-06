@@ -25,30 +25,39 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef STATE_IDS_HPP_
-#define STATE_IDS_HPP_
+#include <PHHeadsUp.hpp>
 
-namespace States
+#include <xygine/util/Position.hpp>
+
+#include <SFML/Graphics/RenderTarget.hpp>
+
+using namespace ph;
+
+HeadsUpDisplay::HeadsUpDisplay(xy::MessageBus& mb, ResourceCollection& rc)
+    : xy::Component(mb, this),
+    m_clock(rc.textureResource.get("assets/images/game/console/nixie_sheet.png")),
+    m_time(90.f)
 {
-    enum ID
-    {
-        None = 0,
-        MenuMain,
-        MenuOptions,
-        PausedOptions,
-        SinglePlayer,
-        MultiPlayer,
-        GameOver,
-        Pause,
-        HighScoresEnd,
-        HighScoresMenu,
-        MenuBackground,
-        MenuAchievement,
-        MenuWeapon,
-        PlanetHopping,
-        RockDodging,
-        Intro
-    };
+    //TODO position clock centre top
 }
 
-#endif //STATE_IDS_HPP_
+//public
+void HeadsUpDisplay::entityUpdate(xy::Entity&, float dt)
+{
+    float lastTime = m_time;
+    m_time = std::max(0.f, m_time - dt);
+
+    //TODO raise event if time expired
+    if (m_time == 0 && lastTime > 0)
+    {
+
+    }
+
+    m_clock.setTime(m_time);
+}
+
+//private
+void HeadsUpDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
+{
+    rt.draw(m_clock);
+}

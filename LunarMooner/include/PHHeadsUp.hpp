@@ -25,30 +25,34 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef STATE_IDS_HPP_
-#define STATE_IDS_HPP_
+#ifndef PH_HEADS_UP_HPP_
+#define PH_HEADS_UP_HPP_
 
-namespace States
+#include <LMClockDisplay.hpp>
+#include <ResourceCollection.hpp>
+
+#include <xygine/components/Component.hpp>
+
+#include <SFML/Graphics/Drawable.hpp>
+
+namespace ph
 {
-    enum ID
+    class HeadsUpDisplay final : public xy::Component, public sf::Drawable
     {
-        None = 0,
-        MenuMain,
-        MenuOptions,
-        PausedOptions,
-        SinglePlayer,
-        MultiPlayer,
-        GameOver,
-        Pause,
-        HighScoresEnd,
-        HighScoresMenu,
-        MenuBackground,
-        MenuAchievement,
-        MenuWeapon,
-        PlanetHopping,
-        RockDodging,
-        Intro
+    public:
+        HeadsUpDisplay(xy::MessageBus&, ResourceCollection&);
+        HeadsUpDisplay() = default;
+
+        xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
+        void entityUpdate(xy::Entity&, float) override;
+
+    private:
+
+        lm::ClockDisplay m_clock;
+        float m_time;
+
+        void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
 
-#endif //STATE_IDS_HPP_
+#endif //PH_HEADS_UP_HPP_

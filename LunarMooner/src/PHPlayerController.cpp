@@ -34,6 +34,8 @@ source distribution.
 #include <xygine/Assert.hpp>
 #include <xygine/Reports.hpp>
 
+#include <SFML/Graphics/RenderTarget.hpp>
+
 using namespace ph;
 
 namespace
@@ -49,6 +51,7 @@ PlayerController::PlayerController(xy::MessageBus& mb)
 {
     //need to set the initial velocity so we're rotating in the correct direction
     m_velocity.y = 400.f;
+    m_rightVector.x = m_velocity.y;
     
     xy::Component::MessageHandler mh;
     mh.id = GameEvent;
@@ -65,11 +68,11 @@ PlayerController::PlayerController(xy::MessageBus& mb)
 }
 
 //public
-void PlayerController::entityUpdate(xy::Entity& ent, float dt)
+void PlayerController::entityUpdate(xy::Entity& entity, float dt)
 {
     if (!m_inOrbit)
     {
-        ent.move(m_velocity * dt);
+        entity.move(m_velocity * dt);
         if (m_input & LMInputFlags::SteerRight)
         {
             m_velocity += (m_rightVector * dt);
@@ -82,8 +85,6 @@ void PlayerController::entityUpdate(xy::Entity& ent, float dt)
         }
     }
     m_input = 0;
-
-    REPORT("X pos", std::to_string(ent.getWorldPosition().x));
 }
 
 void PlayerController::onStart(xy::Entity& e)
