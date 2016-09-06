@@ -35,6 +35,7 @@ source distribution.
 #include <PHPlanetRotation.hpp>
 #include <LMShaderIds.hpp>
 #include <GameMessage.hpp>
+#include <PHHeadsUp.hpp>
 
 #include <xygine/Scene.hpp>
 #include <xygine/Entity.hpp>
@@ -90,6 +91,7 @@ GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::S
 {
     buildScene();
     spawnDebris();
+    buildUI();
     addMessageHandlers();
 }
 
@@ -363,29 +365,29 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     drawable->getDrawable().setOutlineThickness(orbit->getInfluenceRadius() - radius);
     drawable->getDrawable().setOutlineColor({ 0, 120, 255, 20 });
 
-    const auto influenceRad = orbit->getInfluenceRadius();
-    auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
+const auto influenceRad = orbit->getInfluenceRadius();
+auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
 
-    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
+auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
 
-    auto model = m_meshRenderer.createModel(Mesh::Planet, getMessageBus());
-    model->setScale({ radius, radius, radius });
-    model->setRotation({ xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f) });
-    model->setBaseMaterial(m_resources.materialResource.get(radius > 50? Material::LavaPlanet : Material::DesertPlanet));
+auto model = m_meshRenderer.createModel(Mesh::Planet, getMessageBus());
+model->setScale({ radius, radius, radius });
+model->setRotation({ xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f) });
+model->setBaseMaterial(m_resources.materialResource.get(radius > 50 ? Material::LavaPlanet : Material::DesertPlanet));
 
-    auto rotator = xy::Component::create<PlanetRotation>(getMessageBus());
+auto rotator = xy::Component::create<PlanetRotation>(getMessageBus());
 
-    auto ent = xy::Entity::create(getMessageBus());
-    ent->addComponent(ccSmall);
-    ent->addComponent(drawable);
-    ent->addComponent(orbit);
-    ent->addComponent(ccLarge);
-    ent->addComponent(qtc);
-    ent->addComponent(model);
-    ent->addComponent(rotator);
-    ent->setPosition(position);
+auto ent = xy::Entity::create(getMessageBus());
+ent->addComponent(ccSmall);
+ent->addComponent(drawable);
+ent->addComponent(orbit);
+ent->addComponent(ccLarge);
+ent->addComponent(qtc);
+ent->addComponent(model);
+ent->addComponent(rotator);
+ent->setPosition(position);
 
-    return m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);
+return m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);
 }
 
 void GameController::addMessageHandlers()
@@ -426,7 +428,7 @@ void GameController::spawnDebris()
     auto entity = xy::Entity::create(getMessageBus());
     auto* spriteBatch = entity->addComponent(sb);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
-    
+
     std::function<void(const sf::Vector2f&)> spawn = [this, spriteBatch](const sf::Vector2f& position)
     {
         auto size = debrisSizes[xy::Util::Random::value(0, debrisSizes.size() - 1)];
@@ -459,6 +461,14 @@ void GameController::spawnDebris()
             xy::Util::Random::value(0.f, xy::DefaultSceneSize.y));
         spawn(position);
     }
+}
+
+void GameController::buildUI()
+{
+    auto hud = xy::Component::create<HeadsUpDisplay>(getMessageBus(), m_resources);
+    auto entity = xy::Entity::create(getMessageBus());
+    entity->addComponent(hud);
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }
 
 void GameController::showMessage(const std::string& lineOne, const std::string& lineTwo)

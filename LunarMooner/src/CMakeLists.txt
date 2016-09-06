@@ -8,6 +8,7 @@ SET(LM_SRC
   ${LM_DIR}/Game.cpp
   ${LM_DIR}/GameMessage.cpp
   ${LM_DIR}/GameOverState.cpp
+  ${LM_DIR}/IntroState.cpp
   ${LM_DIR}/LMAlienController.cpp
   ${LM_DIR}/LMAsteroidController.cpp
   ${LM_DIR}/LMBulletController.cpp
@@ -45,6 +46,7 @@ SET(LM_SRC
   ${LM_DIR}/OLAchievementTag.cpp
   ${LM_DIR}/OLOverlay.cpp
   ${LM_DIR}/PHGameController.cpp
+  ${LM_DIR}/PHHeadsUp.cpp
   ${LM_DIR}/PHOrbitComponent.cpp
   ${LM_DIR}/PHPlayerController.cpp
   ${LM_DIR}/PlanetHoppingState.cpp

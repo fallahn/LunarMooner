@@ -234,6 +234,12 @@
     <ClInclude Include="include\GameMessage.hpp">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="include\PHHeadsUp.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IntroState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -391,6 +397,12 @@
     </ClCompile>
     <ClCompile Include="src\GameMessage.cpp">
       <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PHHeadsUp.cpp">
+      <Filter>Source Files\planet hopper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntroState.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

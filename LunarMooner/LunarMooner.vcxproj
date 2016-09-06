@@ -144,6 +144,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\DemoPlayer.hpp" />
     <ClInclude Include="include\DemoRecorder.hpp" />
     <ClInclude Include="include\GameMessage.hpp" />
+    <ClInclude Include="include\IntroState.hpp" />
     <ClInclude Include="include\LMClockDisplay.hpp" />
     <ClInclude Include="include\LMCoolDownMeter.hpp" />
     <ClInclude Include="include\LMCounterDisplay.hpp" />
@@ -187,6 +188,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\MenuPauseState.hpp" />
     <ClInclude Include="include\OLOverlay.hpp" />
     <ClInclude Include="include\PHGameController.hpp" />
+    <ClInclude Include="include\PHHeadsUp.hpp" />
     <ClInclude Include="include\PHOrbitComponent.hpp" />
     <ClInclude Include="include\PHPlanetRotation.hpp" />
     <ClInclude Include="include\PHPlayerController.hpp" />
@@ -205,6 +207,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\DemoPlayer.cpp" />
     <ClCompile Include="src\DemoRecorder.cpp" />
     <ClCompile Include="src\GameMessage.cpp" />
+    <ClCompile Include="src\IntroState.cpp" />
     <ClCompile Include="src\LMClockDisplay.cpp" />
     <ClCompile Include="src\LMCoolDownMeter.cpp" />
     <ClCompile Include="src\LMCounterDisplay.cpp" />
@@ -244,6 +247,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\MenuPauseState.cpp" />
     <ClCompile Include="src\OLOverlay.cpp" />
     <ClCompile Include="src\PHGameController.cpp" />
+    <ClCompile Include="src\PHHeadsUp.cpp" />
     <ClCompile Include="src\PHOrbitComponent.cpp" />
     <ClCompile Include="src\PHPlayerController.cpp" />
     <ClCompile Include="src\PlanetHoppingState.cpp" />

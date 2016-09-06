@@ -38,6 +38,7 @@ source distribution.
 #include <MenuBackgroundState.hpp>
 #include <PlanetHoppingState.hpp>
 #include <RockDodgingState.hpp>
+#include <IntroState.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -112,8 +113,11 @@ void Game::draw()
 void Game::initialise()
 {
     registerStates();
+#ifdef _DEBUG_
     m_stateStack.pushState(States::ID::MenuBackground);
-
+#else
+    m_stateStack.pushState(States::ID::Intro);
+#endif //_DEBUG_
     getRenderWindow().setKeyRepeatEnabled(false);
 
     m_profile.load();
@@ -143,4 +147,5 @@ void Game::registerStates()
     m_stateStack.registerState<MenuWeaponState>(States::ID::MenuWeapon, m_menuTextures, m_menuFonts, m_profile);
     m_stateStack.registerState<PlanetHoppingState>(States::PlanetHopping);
     m_stateStack.registerState<RockDodgingState>(States::RockDodging);
+    m_stateStack.registerState<IntroState>(States::ID::Intro);
 }
