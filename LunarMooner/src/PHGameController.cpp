@@ -459,21 +459,7 @@ void GameController::addMessageHandlers()
             break;
         case LMGameEvent::LeftOrbit:
             m_currentParent = 0;
-            /*TODO - move this somewhere so it happens earlier
-            remove beam drawable if applicable
-            */
-            {
-                xy::Command cmd;
-                cmd.category = LMCommandID::Player;
-                cmd.action = [this](xy::Entity& entity, float dt)
-                {
-                    if (auto beam = entity.getComponent<BeamDrawable>())
-                    {
-                        beam->destroy();
-                    }                    
-                };
-                m_scene.sendCommand(cmd);
-            }
+            
             break;
         }
     };
