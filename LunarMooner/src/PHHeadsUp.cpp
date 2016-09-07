@@ -55,6 +55,23 @@ HeadsUpDisplay::HeadsUpDisplay(xy::MessageBus& mb, ResourceCollection& rc)
         case LMGameEvent::PlayerSpawned:
             m_started = true;
             break;
+        case LMGameEvent::PlayerDied:
+            m_started = false;
+            break;
+        }
+    };
+    addMessageHandler(mh);
+
+    mh.id = StateEvent;
+    mh.action = [this](xy::Component*, const xy::Message& msg)
+    {
+        const auto data = msg.getData<LMStateEvent>();
+        switch (data.type)
+        {
+        default: break;
+        case LMStateEvent::RoundEnd:
+            m_started = false;
+            break;
         }
     };
     addMessageHandler(mh);

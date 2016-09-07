@@ -27,6 +27,7 @@ source distribution.
 
 #include <PHPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
+#include <PHBeamDrawable.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
@@ -110,6 +111,11 @@ void PlayerController::leaveOrbit(const sf::Vector2f& newVelocity)
     msg->type = LMGameEvent::LeftOrbit;
     msg->posX = m_entity->getWorldPosition().x;
     msg->posY = m_entity->getWorldPosition().y;
+
+    if (auto beam = m_entity->getComponent<BeamDrawable>())
+    {
+        beam->destroy();
+    }
 }
 
 void PlayerController::collisionCallback(lm::CollisionComponent* cc)
