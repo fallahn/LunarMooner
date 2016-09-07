@@ -71,7 +71,7 @@ private:
     lm::Overlay m_overlay;
 
     bool m_useController;
-    bool m_pendingLevelChange;
+    std::size_t m_levelChangeCount;
     
     void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon);
     void initSounds();

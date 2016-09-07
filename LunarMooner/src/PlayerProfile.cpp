@@ -323,6 +323,13 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                 //reset game XP
                 m_potentialXP = 0;
                 break;
+            case LMStateEvent::RoundEnd:
+                if (msgData.stateID == States::ID::PlanetHopping)
+                {
+                    m_potentialXP += msgData.value; //time remaining in seconds
+                    awardXP(); //because we don't get levelchanged / game over in bonus round
+                }
+                break;
             case LMStateEvent::GameOver:
                 awardXP(); //because we won't get a level change event when we're all dead
                 break;                

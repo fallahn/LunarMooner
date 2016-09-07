@@ -28,6 +28,8 @@ source distribution.
 #ifndef COMMAND_IDS_HPP_
 #define COMMAND_IDS_HPP_
 
+#include <StateIds.hpp>
+
 #include <xygine/MessageBus.hpp>
 
 enum LMCommandID
@@ -123,6 +125,7 @@ struct LMStateEvent
         SwitchedPlayer
     }type;
     sf::Int32 value = -1;
+    xy::StateID stateID = States::ID::SinglePlayer;
 };
 
 struct LMAchievementEvent

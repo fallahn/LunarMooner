@@ -57,8 +57,6 @@ source distribution.
 
 #include <SFML/Window/Event.hpp>
 
-#include <LMPlayerState.hpp>
-
 namespace
 {
 #include "KeyMappings.inl"
@@ -66,6 +64,8 @@ namespace
     lm::GameController* currentController = nullptr;
     bool resumeState = false;
     lm::PlayerState playerState;
+
+    const std::size_t levelsBeforeBonus = 2;
 }
 
 LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::Uint8 playerCount, PlayerProfile& profile)
@@ -79,7 +79,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_collisionWorld    (m_scene),
     m_overlay           (m_messageBus, m_resources, m_scene),
     m_useController     (false),
-    m_pendingLevelChange(false)
+    m_levelChangeCount  (0)
 {
     XY_ASSERT(playerCount > 0, "Need at least one player");
 
@@ -139,6 +139,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
 
     auto msg = m_messageBus.post<LMStateEvent>(LMMessageId::StateEvent);
     msg->type = LMStateEvent::GameStart;
+    msg->stateID = (playerCount == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
 
     quitLoadingScreen();
 }
@@ -280,13 +281,13 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             requestStackPush(States::ID::GameOver);
             break;
         case LMStateEvent::SummaryFinished:
-            if (m_playerCount == 1 && m_pendingLevelChange)
+            if (m_playerCount == 1 && m_levelChangeCount == levelsBeforeBonus)
             {
                 //in single player launch mini game
                 //TODO alternate types
                 requestStackPop();
                 requestStackPush(States::ID::PlanetHopping);
-                m_pendingLevelChange = false;
+                m_levelChangeCount = 0;
 
                 //save the state for resumption
                 playerState = currentController->getPlayerState(0);
@@ -303,7 +304,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
         {
         default: break;
         case LMGameEvent::LevelChanged:
-            m_pendingLevelChange = true;
+            m_levelChangeCount++;
             break;
         }
     }
