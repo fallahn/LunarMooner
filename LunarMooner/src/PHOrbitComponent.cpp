@@ -172,8 +172,7 @@ void OrbitComponent::setParent(const xy::Entity& entity)
     m_parentPosition = entity.getWorldPosition();
     m_entity->setOrigin(m_parentPosition - m_entity->getWorldPosition());
     m_entity->setWorldPosition(m_parentPosition);
-    
-    
+       
     m_targetRotationSpeed = (maxRotation - xy::Util::Vector::length(m_entity->getOrigin())) * rotationMultiplier;
     if (m_rotation == LMDirection::Left)
     {

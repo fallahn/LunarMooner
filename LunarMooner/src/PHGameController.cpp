@@ -36,6 +36,7 @@ source distribution.
 #include <LMShaderIds.hpp>
 #include <GameMessage.hpp>
 #include <PHHeadsUp.hpp>
+#include <PHBeamDrawable.hpp>
 
 #include <xygine/Scene.hpp>
 #include <xygine/Entity.hpp>
@@ -75,7 +76,9 @@ namespace
     };
     const std::size_t debrisCount = 8u;
 
-    const float targetOrbitTime = 2.f; //time in seconds to orbit for to get a round end
+    const float targetOrbitTime = 2.f; //time in seconds to orbit final moon for, to get a round end
+
+    HeadsUpDisplay* hud = nullptr;
 }
 
 GameController::GameController(xy::MessageBus& mb, ResourceCollection& rc, xy::Scene& scene, lm::CollisionWorld& cw, xy::MeshRenderer& mr)
@@ -111,9 +114,14 @@ void GameController::entityUpdate(xy::Entity&, float)
         {
             showMessage("Success!", "Press Fire to Continue");
             m_gameEnded = true;
+
+            auto msg = sendMessage<LMStateEvent>(StateEvent);
+            msg->type = LMStateEvent::RoundEnd;
+            msg->stateID = States::ID::PlanetHopping;
+            XY_ASSERT(hud, "HUD pointer not assigned");
+            msg->value = static_cast<sf::Int32>(hud->getTime());
         }
         m_lastOrbitTime = time;
-        //LOG("buns", xy::Logger::Type::Info);
     }
 }
 
@@ -212,12 +220,7 @@ void GameController::buildScene()
     //ending planet
     auto endBody = addBody({ xy::DefaultSceneSize.x - startOffset, xy::Util::Random::value(startOffset, xy::DefaultSceneSize.y - startOffset) }, masterRadius);
     m_targetUID = endBody->getUID();
-    
-    auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_01.png"));
-    drawable->loadAnimationData("assets/images/game/doofer_01.xya");
-    drawable->playAnimation(1);
-    drawable->setScale({ 1.6f, 1.6f });
-    
+        
     xy::ParticleSystem::Definition pd;
     pd.loadFromFile("assets/particles/smoke.xyp", m_resources.textureResource);
     auto ps1 = pd.createSystem(getMessageBus());
@@ -232,7 +235,6 @@ void GameController::buildScene()
     ps3->setPosition({ -15, 64.f });
     ps3->start();
 
-    endBody->addComponent(drawable);
     endBody->addComponent(ps1);
     endBody->addComponent(ps2);
     endBody->addComponent(ps3);
@@ -347,6 +349,21 @@ void GameController::buildScene()
     }
     m_collisionWorld.flush();
 
+    //spawn a few doofers - TODO mark these so we know we can pick them up
+    for (auto b : bodies)
+    {
+        if (xy::Util::Random::value(0, 2) == 0)
+        {
+            auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_01.png"));
+            drawable->loadAnimationData("assets/images/game/doofer_01.xya");
+            drawable->playAnimation(1);
+            drawable->setOrigin(drawable->getFrameSize().x / 2.f, static_cast<float>(drawable->getFrameSize().y));
+            b->addComponent(drawable);
+
+            m_populatedPlanetIDs.push_back(b->getUID());
+        }
+    }
+
     //setup player
     m_spawnPosition = startBody->getWorldPosition() + sf::Vector2f((masterRadius * 1.6f), 0.f);
 
@@ -421,9 +438,42 @@ void GameController::addMessageHandlers()
                 //we're in orbit around the target planet!
                 m_targetClock.restart();
             }
+
+            /*TODO
+            check if planet has doofer
+            if it does send message to player retreiving
+            orbit radius and using it to make 'beam' drawable
+            
+            */
+            if(std::find(m_populatedPlanetIDs.begin(), m_populatedPlanetIDs.end(), data.value) != m_populatedPlanetIDs.end())
+            {
+                xy::Command cmd;
+                cmd.category = LMCommandID::Player;
+                cmd.action = [this](xy::Entity& entity, float dt) 
+                {
+                    auto beam = xy::Component::create<BeamDrawable>(getMessageBus());
+                    entity.addComponent(beam);
+                };
+                m_scene.sendCommand(cmd);
+            }
             break;
         case LMGameEvent::LeftOrbit:
             m_currentParent = 0;
+            /*TODO - move this somewhere so it happens earlier
+            remove beam drawable if applicable
+            */
+            {
+                xy::Command cmd;
+                cmd.category = LMCommandID::Player;
+                cmd.action = [this](xy::Entity& entity, float dt)
+                {
+                    if (auto beam = entity.getComponent<BeamDrawable>())
+                    {
+                        beam->destroy();
+                    }                    
+                };
+                m_scene.sendCommand(cmd);
+            }
             break;
         }
     };
@@ -474,9 +524,9 @@ void GameController::spawnDebris()
 
 void GameController::buildUI()
 {
-    auto hud = xy::Component::create<HeadsUpDisplay>(getMessageBus(), m_resources);
+    auto display = xy::Component::create<HeadsUpDisplay>(getMessageBus(), m_resources);
     auto entity = xy::Entity::create(getMessageBus());
-    entity->addComponent(hud);
+    hud = entity->addComponent(display);
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }
 

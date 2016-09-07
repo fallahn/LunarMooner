@@ -446,18 +446,21 @@ void GameController::entityUpdate(xy::Entity&, float dt)
         {
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownWarning;
+            msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
         }
         else if (oldTime > 11 &&
             m_playerStates[m_currentPlayer].timeRemaining <= 11)
         {
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownStarted;
+            msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
         }
         else if (oldTime > 6 &&
             m_playerStates[m_currentPlayer].timeRemaining <= 6)
         {
             auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::CountDownInProgress;
+            msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
         }
         else if (oldTime > 1 &&
             m_playerStates[m_currentPlayer].timeRemaining <= 1)
@@ -1170,6 +1173,7 @@ void GameController::swapPlayerState()
         //everyone is dead! request end game
         auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
         msg->type = LMStateEvent::GameOver;
+        msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
         LOG("Loop counted " + std::to_string(count) + " players dead", xy::Logger::Type::Info);
         return;
     }
@@ -1183,6 +1187,7 @@ void GameController::swapPlayerState()
             auto msg = sendMessage<LMStateEvent>(LMMessageId::StateEvent);
             msg->type = LMStateEvent::SwitchedPlayer;
             msg->value = m_currentPlayer;
+            msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
         }
 
         restorePlayerState();
@@ -1383,6 +1388,7 @@ void GameController::addDelayedRespawn()
 
         auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
         msg->type = LMStateEvent::RoundBegin;
+        msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
 
         auto model = m_meshRenderer.createModel(Mesh::Player, getMessageBus());
         model->rotate(xy::Model::Axis::Y, 180.f);
@@ -1619,6 +1625,7 @@ void GameController::showRoundSummary(bool doScores)
 
     auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
     msg->type = LMStateEvent::RoundEnd;
+    msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
 }
 
 void GameController::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)

@@ -102,8 +102,6 @@ bool PlanetHoppingState::update(float dt)
     m_scene.update(dt);
     m_collisionWorld.update();
     m_meshRenderer.update();
-    
-    //LOG("End update", xy::Logger::Type::Info);
 
     return false;
 }
@@ -198,7 +196,8 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         break;
 #ifdef _DEBUG_
         case sf::Keyboard::BackSpace:
-            requestStackPop();
+            requestStackClear();
+            requestStackPush(States::ID::MenuBackground);
             break;
 #endif //_DEBUG_
         }
@@ -238,7 +237,7 @@ void PlanetHoppingState::draw()
     rw.draw(m_scene);
     //rw.draw(m_meshRenderer);
 
-    rw.setView(rw.getDefaultView());
+    rw.setView(getContext().defaultView);
 }
 
 //private

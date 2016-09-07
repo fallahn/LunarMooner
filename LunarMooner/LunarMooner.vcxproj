@@ -187,6 +187,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\MenuOptionState.hpp" />
     <ClInclude Include="include\MenuPauseState.hpp" />
     <ClInclude Include="include\OLOverlay.hpp" />
+    <ClInclude Include="include\PHBeamDrawable.hpp" />
     <ClInclude Include="include\PHGameController.hpp" />
     <ClInclude Include="include\PHHeadsUp.hpp" />
     <ClInclude Include="include\PHOrbitComponent.hpp" />
@@ -246,6 +247,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\MenuOptionState.cpp" />
     <ClCompile Include="src\MenuPauseState.cpp" />
     <ClCompile Include="src\OLOverlay.cpp" />
+    <ClCompile Include="src\PHBeamDrawable.cpp" />
     <ClCompile Include="src\PHGameController.cpp" />
     <ClCompile Include="src\PHHeadsUp.cpp" />
     <ClCompile Include="src\PHOrbitComponent.cpp" />

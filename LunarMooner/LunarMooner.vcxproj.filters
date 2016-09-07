@@ -240,6 +240,9 @@
     <ClInclude Include="include\IntroState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PHBeamDrawable.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -403,6 +406,9 @@
     </ClCompile>
     <ClCompile Include="src\IntroState.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PHBeamDrawable.cpp">
+      <Filter>Source Files\planet hopper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

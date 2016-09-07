@@ -41,10 +41,12 @@ namespace ph
     {
     public:
         HeadsUpDisplay(xy::MessageBus&, ResourceCollection&);
-        HeadsUpDisplay() = default;
+        ~HeadsUpDisplay() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
         void entityUpdate(xy::Entity&, float) override;
+
+        float getTime() const { return m_time; }
 
     private:
 

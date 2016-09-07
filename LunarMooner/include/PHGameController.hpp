@@ -72,6 +72,8 @@ namespace ph
 
         bool m_gameEnded;
 
+        std::vector<sf::Uint64> m_populatedPlanetIDs;
+
         void buildScene();
         xy::Entity* addBody(const sf::Vector2f&, float);
         void addMessageHandlers();
