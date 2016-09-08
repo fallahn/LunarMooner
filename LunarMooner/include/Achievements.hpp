@@ -51,6 +51,9 @@ enum AchievementID
     Rank30,
     Rank40,
     Rank50,
+    NoManLeftBehind,
+    WellTravelled,
+    SeatOfYourPants,
     Count
 };
 
@@ -73,7 +76,10 @@ static const std::array<std::string, AchievementID::Count> achievementNames =
     "Rank 20 - Get 12,100 XP",
     "Rank 30 - Get 25,950 XP",
     "Rank 40 - Get 44,700 XP",
-    "Rank 50 - Get 68,450 XP"
+    "Rank 50 - Get 68,450 XP",
+    "No Man Left Behind - Rescue All Men And Escape Without Dying In Orbiter Bonus Round",
+    "Well Travelled - Visit Each Planet At Least Once Without Dying In Orbiter Bonus Round",
+    "Seat Of Your Pants - Complete Orbiter Bonus Round With 1 Second Remaining"
 };
 
 //to get to next level the increase is current level * 50 + 100

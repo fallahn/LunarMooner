@@ -326,6 +326,7 @@ void GameController::buildScene()
     }
 
     //remove any still overlapping
+    auto bodyCount = bodies.size();
     for (auto body : bodies)
     {
         body->update(0.f);
@@ -336,7 +337,9 @@ void GameController::buildScene()
                 (body->globalBounds().intersects(other->globalBounds())
                     || body->globalBounds().contains(other->getWorldPosition())))
             {
-                body->destroy();
+                body->setPosition(-1000.f, -1000.f);
+                body->addCommandCategories(LMCommandID::TerrainObject); //use this as for delayed destroy command
+                bodyCount--;
                 //LOG("Destroyed Body", xy::Logger::Type::Info);
                 break;
             }
@@ -344,16 +347,19 @@ void GameController::buildScene()
         if (startBody->globalBounds().intersects(body->globalBounds())
             || endBody->globalBounds().intersects(body->globalBounds()))
         {
-            body->destroy();
+            body->setPosition(-1000.f, -1000.f);
+            body->addCommandCategories(LMCommandID::TerrainObject);
+            bodyCount--;
             //LOG("Destroyed Body", xy::Logger::Type::Info);
         }
     }
     m_collisionWorld.flush();
 
     //spawn a few doofers
+    std::size_t dooferCount = 0;
     for (auto b : bodies)
     {
-        if (xy::Util::Random::value(0, 2) == 0 && ! b->destroyed())
+        if (xy::Util::Random::value(0, 2) == 0 && b->getWorldPosition().y > 0)
         {
             auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_01.png"));
             drawable->loadAnimationData("assets/images/game/doofer_01.xya");
@@ -366,9 +372,15 @@ void GameController::buildScene()
             b->addComponent(controller);
             
             m_populatedPlanetIDs.push_back(b->getUID());
-            LOG("Spawned Doofer", xy::Logger::Type::Info);
+            //LOG("Spawned Doofer", xy::Logger::Type::Info);
+            dooferCount++;
         }
     }
+
+    auto msg = sendMessage<LMStateEvent>(StateEvent);
+    msg->stateID = States::ID::PlanetHopping;
+    msg->type = LMStateEvent::GameStart;
+    msg->value = (dooferCount << 16) | bodyCount;
 
     //setup player
     m_spawnPosition = startBody->getWorldPosition() + sf::Vector2f((masterRadius * 1.6f), 0.f);
@@ -437,6 +449,15 @@ void GameController::addMessageHandlers()
             m_playerSpawned = false;
             m_currentParent = 0;           
             break;
+        case LMGameEvent::PlayerSpawned:
+            //clean up scene
+        {
+            xy::Command cmd;
+            cmd.category = LMCommandID::TerrainObject;
+            cmd.action = [](xy::Entity& entity, float) {entity.destroy(); };
+            m_scene.sendCommand(cmd);
+        }
+            break;
         case LMGameEvent::EnteredOrbit:
             m_currentParent = data.value;
             if (m_currentParent == m_targetUID)
@@ -466,7 +487,9 @@ void GameController::addMessageHandlers()
             
             break;
         case LMGameEvent::HumanRescued:
-            //TODO remove planet ID?
+            //remove from populated planets
+            m_populatedPlanetIDs.erase(std::find(std::begin(m_populatedPlanetIDs), std::end(m_populatedPlanetIDs), m_currentParent));
+            //display a little message
             hud->addTag("+XP", { data.posX, data.posY });
             break;
         }

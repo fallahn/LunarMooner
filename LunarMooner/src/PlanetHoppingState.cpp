@@ -57,7 +57,8 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     m_collisionWorld(m_scene),
     m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene),
     m_useController (false),
-    m_input         (0)
+    m_input         (0),
+    m_overlay       (m_messageBus, m_resources, m_scene)
 {
     m_loadingSprite.setTexture(m_resources.textureResource.get("assets/images/ui/loading.png"));
     m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
@@ -73,6 +74,8 @@ PlanetHoppingState::PlanetHoppingState(xy::StateStack& stack, Context context)
     m_scene.addPostProcess(pp); 
     pp = xy::PostProcess::create<xy::PostChromeAb>(false);
     m_scene.addPostProcess(pp);
+
+    m_overlay.setView(context.defaultView);
 
     loadMeshes();
     loadParticles();
@@ -102,6 +105,7 @@ bool PlanetHoppingState::update(float dt)
     m_scene.update(dt);
     m_collisionWorld.update();
     m_meshRenderer.update();
+    m_overlay.update(dt);
 
     return false;
 }
@@ -209,6 +213,7 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
 void PlanetHoppingState::handleMessage(const xy::Message& msg)
 {
     m_scene.handleMessage(msg);
+    m_overlay.handleMessage(msg);
     m_meshRenderer.handleMessage(msg);
 
     if (msg.id == xy::Message::UIMessage)
@@ -218,8 +223,9 @@ void PlanetHoppingState::handleMessage(const xy::Message& msg)
         {
         default: break;
         case xy::Message::UIEvent::ResizedWindow:
-            //m_scene.setView(getContext().defaultView);
-            m_meshRenderer.setView(getContext().defaultView);
+            m_scene.setView(getContext().defaultView);
+            m_overlay.setView(getContext().defaultView);
+            //m_meshRenderer.setView(getContext().defaultView);
             break;
         case xy::Message::UIEvent::RequestControllerDisable:
             m_useController = false;
@@ -236,6 +242,7 @@ void PlanetHoppingState::draw()
     auto& rw = getContext().renderWindow;
     rw.draw(m_scene);
     //rw.draw(m_meshRenderer);
+    rw.draw(m_overlay);
 
     rw.setView(getContext().defaultView);
 }
