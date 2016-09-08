@@ -243,6 +243,9 @@
     <ClInclude Include="include\PHBeamDrawable.hpp">
       <Filter>Header Files\planet hopper</Filter>
     </ClInclude>
+    <ClInclude Include="include\PHHumanController.hpp">
+      <Filter>Header Files\planet hopper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -408,6 +411,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PHBeamDrawable.cpp">
+      <Filter>Source Files\planet hopper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PHHumanController.cpp">
       <Filter>Source Files\planet hopper</Filter>
     </ClCompile>
   </ItemGroup>

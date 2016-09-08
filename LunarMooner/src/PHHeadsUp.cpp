@@ -36,6 +36,7 @@ using namespace ph;
 
 HeadsUpDisplay::HeadsUpDisplay(xy::MessageBus& mb, ResourceCollection& rc)
     : xy::Component (mb, this),
+    m_resources     (rc),
     m_started       (false),
     m_clock         (rc.textureResource.get("assets/images/game/console/nixie_sheet.png")),
     m_time          (60.f)
@@ -94,10 +95,45 @@ void HeadsUpDisplay::entityUpdate(xy::Entity&, float dt)
 
         m_clock.setTime(m_time);
     }
+
+    //update and clear out any tags
+    for (auto& t : m_tags) t.update(dt);
+
+    m_tags.erase(std::remove_if(std::begin(m_tags), std::end(m_tags),
+        [](const Tag& t) {return t.transparency == 0; }), std::end(m_tags));
+}
+
+void HeadsUpDisplay::addTag(const std::string& msg, const sf::Vector2f& position)
+{
+    m_tags.emplace_back(msg, m_resources.fontResource.get("tag_font"));
+    auto& tag = m_tags.back();
+    tag.text.setPosition(position);
+    tag.text.setFillColor(sf::Color::Red);
 }
 
 //private
 void HeadsUpDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
+    for (const auto& t : m_tags) rt.draw(t.text);
     rt.draw(m_clock);
+}
+
+
+////----Tags-----////
+HeadsUpDisplay::Tag::Tag(const std::string& str, sf::Font& font)
+    : transparency(1.f)
+{
+    text.setFont(font);
+    text.setString(str);
+    xy::Util::Position::centreOrigin(text);
+}
+
+void HeadsUpDisplay::Tag::update(float dt)
+{
+    auto colour = text.getFillColor();
+    transparency = std::max(0.f, transparency - (dt * 0.5f));
+    colour.a = static_cast<sf::Uint8>(255.f * transparency);
+    text.setFillColor(colour);
+
+    text.move(0.f, -300.f * dt);
 }

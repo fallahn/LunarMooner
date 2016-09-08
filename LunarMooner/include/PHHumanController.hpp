@@ -25,53 +25,36 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef PH_HEADS_UP_HPP_
-#define PH_HEADS_UP_HPP_
-
-#include <LMClockDisplay.hpp>
-#include <ResourceCollection.hpp>
+#ifndef PH_HUMAN_CONTROLLER_HPP_
+#define PH_HUMAN_CONTROLLER_HPP_
 
 #include <xygine/components/Component.hpp>
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Text.hpp>
+namespace xy
+{
+    class AnimatedDrawable;
+}
 
 namespace ph
 {
-    class HeadsUpDisplay final : public xy::Component, public sf::Drawable
+    class HumanController final : public xy::Component
     {
     public:
-        HeadsUpDisplay(xy::MessageBus&, ResourceCollection&);
-        ~HeadsUpDisplay() = default;
+        HumanController(xy::MessageBus&, xy::AnimatedDrawable&);
+        ~HumanController() = default;
 
-        xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
+        xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity&, float) override;
-
-        float getTime() const { return m_time; }
-
-        void addTag(const std::string&, const sf::Vector2f&);
+        void onStart(xy::Entity&) override;
 
     private:
-
-        struct Tag final
-        {
-            Tag(const std::string&, sf::Font&);
-            void update(float);
-
-            sf::Text text;
-            float transparency;
-        };
-        std::vector<Tag> m_tags;
-
-        ResourceCollection& m_resources;
-
-        bool m_started;
-
-        lm::ClockDisplay m_clock;
-        float m_time;
-
-        void draw(sf::RenderTarget&, sf::RenderStates) const override;
+        xy::AnimatedDrawable& m_sprite;
+        float m_transparency;
+        std::size_t m_waveTableIndex;
+        xy::Entity* m_entity;
+        bool m_rescued;
+        bool m_hasOrbiter;
     };
 }
 
-#endif //PH_HEADS_UP_HPP_
+#endif // PH_HUMAN_CONTROLLER_HPP_

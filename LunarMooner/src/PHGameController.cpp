@@ -37,6 +37,7 @@ source distribution.
 #include <GameMessage.hpp>
 #include <PHHeadsUp.hpp>
 #include <PHBeamDrawable.hpp>
+#include <PHHumanController.hpp>
 
 #include <xygine/Scene.hpp>
 #include <xygine/Entity.hpp>
@@ -349,18 +350,23 @@ void GameController::buildScene()
     }
     m_collisionWorld.flush();
 
-    //spawn a few doofers - TODO mark these so we know we can pick them up
+    //spawn a few doofers
     for (auto b : bodies)
     {
-        if (xy::Util::Random::value(0, 2) == 0)
+        if (xy::Util::Random::value(0, 2) == 0 && ! b->destroyed())
         {
             auto drawable = xy::Component::create<xy::AnimatedDrawable>(getMessageBus(), m_resources.textureResource.get("assets/images/game/doofer_01.png"));
             drawable->loadAnimationData("assets/images/game/doofer_01.xya");
             drawable->playAnimation(1);
             drawable->setOrigin(drawable->getFrameSize().x / 2.f, static_cast<float>(drawable->getFrameSize().y));
+            
+            auto controller = xy::Component::create<HumanController>(getMessageBus(), *drawable);
+            
             b->addComponent(drawable);
-
+            b->addComponent(controller);
+            
             m_populatedPlanetIDs.push_back(b->getUID());
+            LOG("Spawned Doofer", xy::Logger::Type::Info);
         }
     }
 
@@ -439,11 +445,9 @@ void GameController::addMessageHandlers()
                 m_targetClock.restart();
             }
 
-            /*TODO
+            /*
             check if planet has doofer
-            if it does send message to player retreiving
-            orbit radius and using it to make 'beam' drawable
-            
+            if it does send message to player 
             */
             if(std::find(m_populatedPlanetIDs.begin(), m_populatedPlanetIDs.end(), data.value) != m_populatedPlanetIDs.end())
             {
@@ -460,6 +464,10 @@ void GameController::addMessageHandlers()
         case LMGameEvent::LeftOrbit:
             m_currentParent = 0;
             
+            break;
+        case LMGameEvent::HumanRescued:
+            //TODO remove planet ID?
+            hud->addTag("+XP", { data.posX, data.posY });
             break;
         }
     };

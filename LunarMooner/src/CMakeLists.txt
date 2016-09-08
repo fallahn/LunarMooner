@@ -48,6 +48,7 @@ SET(LM_SRC
   ${LM_DIR}/PHBeamDrawable.cpp
   ${LM_DIR}/PHGameController.cpp
   ${LM_DIR}/PHHeadsUp.cpp
+  ${LM_DIR}/PHHumanController.cpp
   ${LM_DIR}/PHOrbitComponent.cpp
   ${LM_DIR}/PHPlayerController.cpp
   ${LM_DIR}/PlanetHoppingState.cpp
