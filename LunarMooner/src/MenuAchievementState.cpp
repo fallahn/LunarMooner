@@ -99,7 +99,7 @@ namespace
 {
     const sf::Vector2f circlePos(460.f, 150.f);
     const sf::Vector2f textPos(510.f, 150.f);
-    const float rowSpace = 40.f;
+    const float rowSpace = 30.f;
 }
 
 //private
@@ -125,6 +125,7 @@ void MenuAchievementState::buildMenu(const sf::Font& font)
         t.setFont(font);
         t.setPosition(textPos.x, textPos.y + (i * rowSpace));
         t.setString(achievementNames[i]);
+        t.setCharacterSize(26u);
     }    
     
     label = xy::UI::create<xy::UI::Label>(font);

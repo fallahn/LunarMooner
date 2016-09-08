@@ -31,6 +31,7 @@ source distribution.
 #include <StateIds.hpp>
 #include <LMCollisionWorld.hpp>
 #include <ResourceCollection.hpp>
+#include <OLOverlay.hpp>
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
@@ -61,6 +62,8 @@ private:
 
     bool m_useController;
     sf::Uint8 m_input;
+
+    lm::Overlay m_overlay;
 
     void loadMeshes();
     void loadParticles();

@@ -46,6 +46,9 @@ namespace
 
     int bulletsFired = 0;
     int livesLost = 0;
+    int dooferCount = 0;//number of doofers at the start of a round
+    int planetCount = 0;//number of planets in orbit round
+    std::vector<sf::Uint64> countedPlanets;
 
     const int alienXP = 1;
     const int collectXP = alienXP;
@@ -158,6 +161,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
         default: break;
         case LMGameEvent::PlayerDied:
             //count lives lost for Survivor
+            //and no man left behind
             livesLost++;
             break;
         case LMGameEvent::AlienDied:
@@ -215,6 +219,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
             }
 
             m_potentialXP += rescueXP;
+            dooferCount--;
             break;
         case LMGameEvent::LevelChanged:
             //Long Haul
@@ -306,6 +311,19 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
             //count bullets for pacifist achievement
             bulletsFired++;
             break;
+        case LMGameEvent::EnteredOrbit:
+            //count planets for Well Travelled achievement
+            if (std::find(std::begin(countedPlanets), std::end(countedPlanets), msgData.value) != std::end(countedPlanets))
+            {
+                countedPlanets.push_back(msgData.value);
+                if (!countedPlanets.size() == planetCount &&
+                    !m_achievements[AchievementID::WellTravelled].unlocked)
+                {
+                    m_achievements[AchievementID::WellTravelled].unlocked = true;
+                    raiseAchievementMessage(AchievementID::WellTravelled);
+                }
+            }
+            break;
         }
     }
         break;
@@ -322,12 +340,34 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
                 livesLost = 0;
                 //reset game XP
                 m_potentialXP = 0;
+                //how many doofers and planets were spawned in orbit mode
+                dooferCount = msgData.value >> 16;
+                planetCount = msgData.value & 0x0000FFFF;
+                //clear counted planets
+                countedPlanets.clear();
                 break;
             case LMStateEvent::RoundEnd:
                 if (msgData.stateID == States::ID::PlanetHopping)
                 {
                     m_potentialXP += msgData.value; //time remaining in seconds
                     awardXP(); //because we don't get levelchanged / game over in bonus round
+                    
+                    //seat of your pants achievement
+                    if (msgData.value == 1 && !m_achievements[AchievementID::SeatOfYourPants].unlocked)
+                    {
+                        m_achievements[AchievementID::SeatOfYourPants].unlocked = true;
+                        raiseAchievementMessage(AchievementID::SeatOfYourPants);
+                    }
+
+                    //no man left behind achievement
+                    if (dooferCount == 0 && livesLost == 0)
+                    {
+                        if (!m_achievements[AchievementID::NoManLeftBehind].unlocked)
+                        {
+                            m_achievements[AchievementID::NoManLeftBehind].unlocked = true;
+                            raiseAchievementMessage(AchievementID::NoManLeftBehind);
+                        }
+                    }
                 }
                 break;
             case LMStateEvent::GameOver:
