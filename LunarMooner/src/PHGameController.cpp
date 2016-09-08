@@ -58,8 +58,9 @@ using namespace ph;
 
 namespace
 {
+    //changing these affects wrapOffset in PHPlayerController
     const float boundsOffset = 40.f;
-    const float boundsMargin = (boundsOffset * 8.f);
+    const float boundsMargin = (boundsOffset * 4.f);
 
     const sf::Vector2f playerStart(100.f, xy::DefaultSceneSize.y / 2.f);
     const sf::FloatRect playerSize({ -10.f, -10.f }, { 20.f, 20.f });
@@ -488,7 +489,11 @@ void GameController::addMessageHandlers()
             break;
         case LMGameEvent::HumanRescued:
             //remove from populated planets
-            m_populatedPlanetIDs.erase(std::find(std::begin(m_populatedPlanetIDs), std::end(m_populatedPlanetIDs), m_currentParent));
+            auto it = std::find(std::begin(m_populatedPlanetIDs), std::end(m_populatedPlanetIDs), m_currentParent);
+            if (it != m_populatedPlanetIDs.end())
+            {
+                m_populatedPlanetIDs.erase(it);
+            }
             //display a little message
             hud->addTag("+XP", { data.posX, data.posY });
             break;

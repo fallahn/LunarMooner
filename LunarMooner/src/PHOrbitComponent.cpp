@@ -122,7 +122,7 @@ void OrbitComponent::collisionCallback(lm::CollisionComponent* cc)
                             m_rotationSpeed = xy::Util::Vector::length(player->getVelocity()) / xy::Util::Vector::length(direction);
                             m_rotationSpeed *= xy::Util::Const::radToDeg;
 
-                            (m_rotation == LMDirection::Right) ? xy::Logger::log("Right", xy::Logger::Type::Info) : xy::Logger::log("Left", xy::Logger::Type::Info);
+                            //(m_rotation == LMDirection::Right) ? xy::Logger::log("Right", xy::Logger::Type::Info) : xy::Logger::log("Left", xy::Logger::Type::Info);
                         }
                         //switch to new parent
                         setParent(cc->getParentEntity());

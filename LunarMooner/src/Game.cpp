@@ -40,6 +40,8 @@ source distribution.
 #include <RockDodgingState.hpp>
 #include <IntroState.hpp>
 
+#include <xygine/util/String.hpp>
+
 #include <SFML/Window/Event.hpp>
 
 
@@ -60,7 +62,25 @@ Game::Game()
     : m_stateStack  ({ getRenderWindow(), *this }),
     m_profile       (getMessageBus())
 {
-
+    //register a couple of console commands for loading game modes
+    xy::Console::addCommand("play", [this](const std::string& param)
+    {
+        auto p = xy::Util::String::toLower(param);
+        if (p == "rescue")
+        {
+            m_stateStack.clearStates();
+            m_stateStack.pushState(States::ID::SinglePlayer);
+        }
+        else if (p == "orbit")
+        {
+            m_stateStack.clearStates();
+            m_stateStack.pushState(States::ID::PlanetHopping);
+        }
+        else
+        {
+            xy::Console::print(param + " not a valid game mode. Game modes are rescue or orbit");
+        }
+    });
 }
 
 //private
