@@ -37,7 +37,7 @@ using namespace ph;
 
 namespace
 {
-    const float beamWidth = 12.f;
+    const float beamWidth = 22.f;
     const float beamOffset = 0.f;
     const sf::Color beamColour = { 0, 250, 250, 140 };
 }

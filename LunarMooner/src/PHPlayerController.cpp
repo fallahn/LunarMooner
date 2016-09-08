@@ -42,6 +42,8 @@ using namespace ph;
 namespace
 {
     const float rcsStrength = 230.f;
+    //TODO sadly this is tied to the bounds size - the boundsMargin + (boundsOffset / 2) - see PHGamecontroller
+    const float wrapOffset = 180.f; 
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb)
@@ -86,17 +88,18 @@ void PlayerController::entityUpdate(xy::Entity& entity, float dt)
     if (!m_inOrbit)
     {
         entity.move(m_velocity * dt);
-        if (m_input & LMInputFlags::SteerRight)
+        if (m_input & LMInputFlags::SteerLeft)
         {
             m_velocity += (m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
-        if (m_input & LMInputFlags::SteerLeft)
+        if (m_input & LMInputFlags::SteerRight)
         {
             m_velocity += (-m_rightVector * dt);
             m_rightVector = xy::Util::Vector::normalise({ m_velocity.y, -m_velocity.x })* rcsStrength;
         }
     }
+    //REPORT("Input", std::to_string(m_input));
     m_input = 0;
 }
 
@@ -143,7 +146,28 @@ void PlayerController::collisionCallback(lm::CollisionComponent* cc)
     default: break;
     case lm::CollisionComponent::ID::Bounds:   
     {
-        kill();
+        //kill();
+        if (m_inOrbit) return;
+        auto pos = m_entity->getWorldPosition();
+        if (pos.x > xy::DefaultSceneSize.x)
+        {
+            pos.x = (xy::DefaultSceneSize.x - pos.x) + wrapOffset;          
+        }
+        else if (pos.x < 0)
+        {
+            pos.x = (xy::DefaultSceneSize.x - pos.x) - wrapOffset;
+        }
+
+        if (pos.y > xy::DefaultSceneSize.y)
+        {
+            pos.y = (xy::DefaultSceneSize.y - pos.y) + wrapOffset;
+        }
+        else if (pos.y < 0)
+        {
+            pos.y = (xy::DefaultSceneSize.y - pos.y) - wrapOffset;
+        }
+        m_entity->setWorldPosition(pos);
+        REPORT("Position", std::to_string(pos.x) + ", " + std::to_string(pos.y));
     }
         break;
     case lm::CollisionComponent::ID::Body:

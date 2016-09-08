@@ -171,11 +171,11 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         default: break;
         case keyLeft:
         case altKeyLeft:
-            m_input &= ~LMInputFlags::SteerLeft;
+            m_input |= LMInputFlags::SteerLeft;
             break;
         case keyRight:
         case altKeyRight:
-            m_input &= ~LMInputFlags::SteerRight;
+            m_input |= LMInputFlags::SteerRight;
             break;
         case sf::Keyboard::P:
             requestStackPush(States::ID::Pause);
@@ -189,11 +189,11 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         default:break;
         case keyLeft:
         case altKeyLeft:
-            m_input |= LMInputFlags::SteerLeft;
+            m_input &= ~LMInputFlags::SteerLeft;
             break;
         case keyRight:
         case altKeyRight:
-            m_input |= LMInputFlags::SteerRight;
+            m_input &= ~LMInputFlags::SteerRight;
             break;
         case keyFire:
             fire();
