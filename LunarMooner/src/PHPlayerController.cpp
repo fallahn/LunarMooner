@@ -66,6 +66,12 @@ PlayerController::PlayerController(xy::MessageBus& mb)
             m_inOrbit = true;
             LOG("Entered orbit", xy::Logger::Type::Info);
             break;
+        case LMGameEvent::HumanRescued:
+            if (auto beam = m_entity->getComponent<BeamDrawable>())
+            {
+                beam->destroy();
+            }
+            break;
         case LMGameEvent::TimerExpired:
             kill();
             break;
