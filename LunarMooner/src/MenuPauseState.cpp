@@ -160,7 +160,7 @@ void MenuPauseState::buildMenu(const sf::Font& font)
     button->setPosition(centreX, 775.f);
     button->addCallback([this]()
     {
-        getContext().renderWindow.close();
+        xy::App::quit();
     });
     m_uiContainer.addControl(button);
 }
