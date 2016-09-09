@@ -42,7 +42,8 @@ enum LMCommandID
     UI = 0x20,
     Item = 0x40,
     DropShip = 0x80,
-    TerrainObject = 0x100
+    TerrainObject = 0x100,
+    Background = 0x200
 };
 
 enum LMInputFlags

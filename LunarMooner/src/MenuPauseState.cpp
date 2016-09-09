@@ -124,7 +124,7 @@ void MenuPauseState::buildMenu(const sf::Font& font)
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Continue");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(centreX, 475.f);
+    button->setPosition(centreX, 425.f);
     button->addCallback([this]()
     {
         close();
@@ -134,7 +134,7 @@ void MenuPauseState::buildMenu(const sf::Font& font)
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Options");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(centreX, 575.f);
+    button->setPosition(centreX, 525.f);
     button->addCallback([this]()
     {
         close();
@@ -145,7 +145,7 @@ void MenuPauseState::buildMenu(const sf::Font& font)
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Quit to Main");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(centreX, 675.f);
+    button->setPosition(centreX, 625.f);
     button->addCallback([this]()
     {
         close();
@@ -157,7 +157,7 @@ void MenuPauseState::buildMenu(const sf::Font& font)
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Exit to Desktop");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(centreX, 775.f);
+    button->setPosition(centreX, 725.f);
     button->addCallback([this]()
     {
         xy::App::quit();

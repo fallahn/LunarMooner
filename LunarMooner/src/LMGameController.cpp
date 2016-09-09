@@ -906,13 +906,14 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left + alienArea.width, 0.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
-    collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds, true);
+    //top / bottom
+    /*collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds, true);
     qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[1]);
     entity = xy::Entity::create(getMessageBus());
     entity->addComponent(collision);
     entity->addComponent(qtc);
     entity->setPosition(alienArea.left, -40.f);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);*/
 
     collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds, true);
     qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[1]);

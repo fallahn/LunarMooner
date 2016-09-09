@@ -165,7 +165,9 @@ void ScoreDisplay::draw(sf::RenderTarget& rt, sf::RenderStates states) const
     {
         rt.draw(s, states);
     }
-    rt.draw(m_activePlayerSprite, sf::BlendAdd);
+    states.blendMode = sf::BlendAdd;
+    rt.draw(m_activePlayerSprite, states);
+    states.blendMode = sf::BlendAlpha;
 
     if(m_showMessage) rt.draw(m_messageText, states);
 
