@@ -148,7 +148,7 @@ void NukeEffect::entityUpdate(xy::Entity& entity, float dt)
 
         //shake entity
         m_offsetIndex = (m_offsetIndex + 1) % offsetCount;
-        entity.setPosition(basePosition + (m_offsets[m_offsetIndex] * m_currentAlpha));
+        entity.setPosition(basePosition.x + (m_offsets[m_offsetIndex].x * m_currentAlpha), entity.getPosition().y);
     }
 }
 

@@ -122,6 +122,8 @@ void GameController::entityUpdate(xy::Entity&, float)
             msg->stateID = States::ID::PlanetHopping;
             XY_ASSERT(hud, "HUD pointer not assigned");
             msg->value = static_cast<sf::Int32>(hud->getTime());
+
+
         }
         m_lastOrbitTime = time;
     }

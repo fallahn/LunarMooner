@@ -60,6 +60,11 @@ namespace
 
     //applied with shielded collisions
     const float damping = 0.65f;
+
+    //distance to top of screen before camera starts to follow
+    const float topMargin = 100.f;
+    //max distance into space before thrust has no effect
+    const float maxSkyDistance = -xy::DefaultSceneSize.y;
 }
 
 PlayerController::PlayerController(xy::MessageBus& mb, const MothershipController* ms, const std::vector<sf::Vector2f>& terrain)
@@ -482,6 +487,8 @@ sf::Vector3f PlayerController::getManifold(const sf::FloatRect& worldRect)
 
 void PlayerController::flyingState(xy::Entity& entity, float dt)
 {
+    auto entityYPos = entity.getPosition().y;
+    
     //apply gravity every frame
     m_velocity += gravity;
 
@@ -496,7 +503,8 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
         m_velocity -= thrustX;
     }
 
-    if (m_inputFlags & LMInputFlags::Thrust)
+    if ((m_inputFlags & LMInputFlags::Thrust)
+        && entityYPos > maxSkyDistance)
     {
         m_velocity += thrustUp;
     }
@@ -509,7 +517,7 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
     entity.move(m_velocity * dt);
 
     //if our position < someval vertically, move the camera & background
-    if (entity.getPosition().y < 100.f)
+    if (entityYPos < topMargin)
     {
         xy::Command cmd;
         cmd.category = LMCommandID::Background;
