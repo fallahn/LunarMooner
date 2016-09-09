@@ -113,15 +113,21 @@ void GameOverState::buildMenu(const sf::Font& font)
 
     auto label = xy::UI::create<xy::UI::Label>(font);
     label->setAlignment(xy::UI::Alignment::Centre);
-    label->setPosition(centreX, 400.f);
+    label->setPosition(centreX, 340.f);
     label->setString("GAME OVER");
     m_uiContainer.addControl(label);
     
     m_scoreLabel = xy::UI::create<xy::UI::Label>(font);
     m_scoreLabel->setAlignment(xy::UI::Alignment::Centre);
-    m_scoreLabel->setPosition(centreX, 460.f);
+    m_scoreLabel->setPosition(centreX, 400.f);
     m_scoreLabel->setString("Your Score:");
     m_uiContainer.addControl(m_scoreLabel);
+
+    label = xy::UI::create<xy::UI::Label>(font);
+    label->setAlignment(xy::UI::Alignment::Centre);
+    label->setPosition(centreX, 460.f);
+    label->setString("CONGRATULATIONS!");
+    m_uiContainer.addControl(label);
 
     auto textbox = xy::UI::create<xy::UI::TextBox>(font);
     textbox->setAlignment(xy::UI::Alignment::Centre);

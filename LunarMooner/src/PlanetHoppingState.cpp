@@ -178,6 +178,8 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
             m_input |= LMInputFlags::SteerRight;
             break;
         case sf::Keyboard::P:
+        case sf::Keyboard::Pause:
+        case sf::Keyboard::Escape:
             requestStackPush(States::ID::Pause);
             break;
         }

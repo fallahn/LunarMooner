@@ -98,7 +98,7 @@ namespace
     //aliens per level
     const std::array<sf::Uint8, 10u> alienCounts =
     {
-        12, 14, 14, 18, 18, 21, 21, 24, 26, 28
+        6, 10, 14, 18, 18, 21, 21, 24, 26, 28
     };
 
     const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
