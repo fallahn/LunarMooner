@@ -80,8 +80,6 @@ Starfield::Starfield(xy::MessageBus& mb, xy::TextureResource& tr)
         star.depth = xy::Util::Random::value(1.f, 6.f);
         star.setScale(star.depth, star.depth);
     }
-
-
 }
 
 //public

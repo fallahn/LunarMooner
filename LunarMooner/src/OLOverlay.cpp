@@ -59,7 +59,7 @@ void Overlay::update(float dt)
 
 void Overlay::handleMessage(const xy::Message& msg)
 {
-    const static std::function<void(const std::string&)> displayTag = 
+    const std::function<void(const std::string&)> displayTag = 
         [this](const std::string& text)
     {
         auto tag = xy::Component::create<lm::AchievementTag>(m_messageBus, m_resources.fontResource, text);

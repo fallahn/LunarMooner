@@ -376,7 +376,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     sprBatch->setTexture(&rc.textureResource.get("assets/images/game/debris.png"));
     auto ent = xy::Entity::create(getMessageBus());
     m_alienBatch = ent->addComponent(sprBatch);
-    m_scene.addEntity(ent, xy::Scene::Layer::BackMiddle);
+    m_scene.addEntity(ent, xy::Scene::Layer::BackFront);
 }
 
 //public
@@ -868,7 +868,7 @@ void GameController::spawnAlien(const sf::Vector2f& position)
     entity->setPosition(position);
     entity->addCommandCategories(LMCommandID::Alien);
 
-    m_aliens.push_back(m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle));
+    m_aliens.push_back(m_scene.addEntity(entity, xy::Scene::Layer::BackFront));
 }
 
 void GameController::spawnAliens()
