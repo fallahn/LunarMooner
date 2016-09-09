@@ -340,7 +340,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                     controller->setSpeed(easySpeed);
                     m_cooldownTime = easyCoolDown;
                     break;
-                case xy::Difficulty::Medium:
+                case xy::Difficulty::Normal:
                     controller->setSpeed(mediumSpeed);
                     m_cooldownTime = mediumCoolDown;
                     break;
@@ -553,7 +553,7 @@ void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
     state.alienCount = alienCounts[level];
     state.timeRemaining = roundTimes[level];
     //adjust for game difficulty
-    if (m_difficulty == xy::Difficulty::Medium)
+    if (m_difficulty == xy::Difficulty::Normal)
     {
         state.timeRemaining -= mediumPenalty;
     }
@@ -595,7 +595,7 @@ void GameController::setDifficulty(xy::Difficulty difficulty)
     case xy::Difficulty::Easy:
         m_cooldownTime = easyCoolDown;
         break;
-    case xy::Difficulty::Medium:
+    case xy::Difficulty::Normal:
         m_cooldownTime = mediumCoolDown;
         break;
     case xy::Difficulty::Hard:
@@ -752,7 +752,7 @@ void GameController::createMothership()
     case xy::Difficulty::Easy:
         controller->setSpeed(easySpeed);
         break;
-    case xy::Difficulty::Medium:
+    case xy::Difficulty::Normal:
         controller->setSpeed(mediumSpeed);
         break;
     case xy::Difficulty::Hard:
@@ -1260,7 +1260,7 @@ void GameController::restorePlayerState()
         if (ps.level <= roundTimes.size())
         {
             ps.timeRemaining = roundTimes[ps.level - 1];
-            if (m_difficulty == xy::Difficulty::Medium)
+            if (m_difficulty == xy::Difficulty::Normal)
             {
                 ps.timeRemaining -= mediumPenalty;
             }
@@ -1272,7 +1272,7 @@ void GameController::restorePlayerState()
         else //2 seconds fewer for each level above 10
         {
             ps.timeRemaining = roundTimes.back() - ((ps.level - 10) * 2.f);
-            if (m_difficulty == xy::Difficulty::Medium)
+            if (m_difficulty == xy::Difficulty::Normal)
             {
                 ps.timeRemaining -= mediumPenalty;
             }

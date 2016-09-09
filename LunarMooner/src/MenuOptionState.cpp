@@ -209,7 +209,7 @@ void MenuOptionState::buildMenu(const sf::Font& font)
     difficultySelection->setPosition(152.f, 434.f);
     difficultySelection->move(windowOffset);
     difficultySelection->addItem("Easy", static_cast<int>(xy::Difficulty::Easy));
-    difficultySelection->addItem("Medium", static_cast<int>(xy::Difficulty::Medium));
+    difficultySelection->addItem("Normal", static_cast<int>(xy::Difficulty::Normal));
     difficultySelection->addItem("Hard", static_cast<int>(xy::Difficulty::Hard));
     difficultySelection->selectItem(0);
     difficultySelection->setCallback([this](const xy::UI::Selection* s)
