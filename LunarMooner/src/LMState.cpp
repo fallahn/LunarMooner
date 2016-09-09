@@ -210,6 +210,8 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
             m_inputFlags |= LMInputFlags::Special;
             break;
         case sf::Keyboard::P:
+        case sf::Keyboard::Pause:
+        case sf::Keyboard::Escape:
             requestStackPush(States::ID::Pause);
             break;
         default:break;

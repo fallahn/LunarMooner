@@ -84,6 +84,7 @@ bool MenuPauseState::handleEvent(const sf::Event& evt)
         default: break;
         case sf::Keyboard::P:
         case sf::Keyboard::Escape:
+        case sf::Keyboard::Pause:
             close();
             break;
         }
@@ -142,7 +143,7 @@ void MenuPauseState::buildMenu(const sf::Font& font)
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Quit");
+    button->setText("Quit to Main");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 675.f);
     button->addCallback([this]()
@@ -150,6 +151,16 @@ void MenuPauseState::buildMenu(const sf::Font& font)
         close();
         requestStackClear();
         requestStackPush(States::ID::MenuBackground);
+    });
+    m_uiContainer.addControl(button);
+
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button->setText("Exit to Desktop");
+    button->setAlignment(xy::UI::Alignment::Centre);
+    button->setPosition(centreX, 775.f);
+    button->addCallback([this]()
+    {
+        getContext().renderWindow.close();
     });
     m_uiContainer.addControl(button);
 }
