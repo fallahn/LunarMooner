@@ -49,6 +49,7 @@ source distribution.
 namespace
 {
     const float maxMusicVol = 35.f;
+    const std::string version = "0.1." + std::string(__TIME__) + __DATE__;
 }
 
 MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
@@ -73,6 +74,11 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 
     m_normalMapShader = &m_shaderResource.get(Shader::NormalMapPlanet);
     m_normalMapShader->setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+
+    m_versionText.setPosition(20.f, xy::DefaultSceneSize.y - 40.f);
+    m_versionText.setString(version);
+    m_versionText.setCharacterSize(26u);
+    m_versionText.setFont(m_fontResource.get("version_font"));
 
     setup();
 
@@ -119,7 +125,8 @@ void MenuBackgroundState::draw()
 {
     auto& rw = getContext().renderWindow;
     rw.draw(m_scene);
-    //rw.setView(getContext().defaultView);
+    rw.setView(getContext().defaultView);
+    rw.draw(m_versionText);
 }
 
 bool MenuBackgroundState::handleEvent(const sf::Event&)

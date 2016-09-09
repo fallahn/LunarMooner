@@ -36,6 +36,7 @@ source distribution.
 #include <xygine/ShaderResource.hpp>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 namespace xy
 {
@@ -64,12 +65,15 @@ private:
 
     xy::TextureResource m_textureResource;
     xy::ShaderResource m_shaderResource;
+    xy::FontResource m_fontResource;
     xy::SoundResource m_soundResource;
     std::vector<std::string> m_musicFiles;
 
     sf::Shader* m_normalMapShader;
 
     void setup();
+
+    sf::Text m_versionText;
 
     sf::Sprite m_loadingSprite;
     void updateLoadingScreen(float, sf::RenderWindow&) override;

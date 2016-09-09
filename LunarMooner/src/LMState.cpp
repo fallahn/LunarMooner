@@ -920,13 +920,14 @@ void LunarMoonerState::buildBackground()
     };
     fw->addMessageHandler(mh);
 
-    auto entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(ne);
-    entity->addComponent(nukeAudio);
-    entity->addComponent(finalWarning);
-    entity->setPosition(xy::DefaultSceneSize / 2.f);
-    m_scene.setActiveCamera(entity->addComponent(camera));
-    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+    auto camEntity = xy::Entity::create(m_messageBus);
+    camEntity->addComponent(ne);
+    camEntity->addComponent(nukeAudio);
+    camEntity->addComponent(finalWarning);
+    camEntity->setPosition(xy::DefaultSceneSize / 2.f);
+    camEntity->addCommandCategories(LMCommandID::Background);
+    m_scene.setActiveCamera(camEntity->addComponent(camera));
+    m_scene.addEntity(camEntity, xy::Scene::Layer::FrontFront);
   
     //background
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
@@ -934,7 +935,9 @@ void LunarMoonerState::buildBackground()
     auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea, m_resources.textureResource.get("assets/images/game/console/panel.png"));
 
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
+    m_scene.getLayer(xy::Scene::Layer::BackRear).addCommandCategories(LMCommandID::Background);
     m_scene.getLayer(xy::Scene::Layer::UI).addComponent(scoreMask);
+    m_scene.getLayer(xy::Scene::Layer::UI).addCommandCategories(LMCommandID::Background);
 
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
     moon->setBaseNormal(m_resources.textureResource.get("assets/images/background/sphere_normal.png"));
@@ -945,10 +948,10 @@ void LunarMoonerState::buildBackground()
     moon->setNormalShader(m_resources.shaderResource.get(Shader::NormalMapPlanet));
     moon->setRotationVelocity({ 0.f, 0.009f });
 
-    entity = xy::Entity::create(m_messageBus);
+    auto entity = xy::Entity::create(m_messageBus);
     entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), xy::DefaultSceneSize.y / 2.f);
     entity->addComponent(moon);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
     //background lighting
     auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f, 250.f);
@@ -959,6 +962,7 @@ void LunarMoonerState::buildBackground()
     entity = xy::Entity::create(m_messageBus);
     entity->setPosition(alienArea.left + alienArea.width, xy::DefaultSceneSize.y / 2.f);
     entity->addComponent(lc);
+
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 }
 

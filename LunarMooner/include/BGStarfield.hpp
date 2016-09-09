@@ -56,6 +56,7 @@ namespace lm
         sf::FloatRect globalBounds() const override { return m_bounds; }
 
         void setVelocity(const sf::Vector2f&);
+        void setSpeedRatio(float v) { m_speedRatio = std::abs(v); }
 
     private:
 
@@ -73,6 +74,7 @@ namespace lm
             }
         };
         std::vector<Star> m_stars;
+        float m_speedRatio;
 
         sf::Vector2f m_position;
         sf::Vector2f m_velocity;

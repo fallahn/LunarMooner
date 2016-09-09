@@ -57,6 +57,7 @@ namespace
 
 Starfield::Starfield(xy::MessageBus& mb, xy::TextureResource& tr)
     : xy::Component     (mb, this),
+    m_speedRatio        (1.f),
     m_velocity          (1.f, 0.f),
     m_starTexture       (&tr.get("assets/images/background/star.png"))
 {
@@ -86,12 +87,12 @@ Starfield::Starfield(xy::MessageBus& mb, xy::TextureResource& tr)
 //public
 void Starfield::entityUpdate(xy::Entity&, float dt)
 {
-    m_position += m_velocity * dt * backgroundSpeed;    
+    m_position += m_velocity * dt * backgroundSpeed * m_speedRatio;    
     
     m_vertices.clear();
     for (auto& s : m_stars)
     {
-        s.move(m_velocity * starSpeed * dt * s.depth);
+        s.move(m_velocity * starSpeed * m_speedRatio * dt * s.depth);
 
         auto pos = s.getPosition();
         if (pos.x < -10.f)

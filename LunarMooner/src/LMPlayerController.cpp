@@ -31,10 +31,12 @@ source distribution.
 #include <LMAsteroidController.hpp>
 #include <LMAlienController.hpp>
 #include <LMPlayerDrawable.hpp>
+#include <BGStarfield.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
 
 #include <xygine/Entity.hpp>
+#include <xygine/Scene.hpp>
 #include <xygine/util/Vector.hpp>
 #include <xygine/util/Rectangle.hpp>
 #include <xygine/Reports.hpp>
@@ -279,7 +281,9 @@ void PlayerController::collisionCallback(CollisionComponent* cc)
 
         m_entity->move(normal * manifold.z);
         m_velocity = xy::Util::Vector::reflect(m_velocity, normal);
-        m_velocity *= damping;
+        m_velocity *= 0.3f;// damping;
+        //auto force = normal * manifold.z * 0.9f;// damping;
+        //m_velocity += force;
     }
         break;
     case CollisionComponent::ID::Mothership:
@@ -503,6 +507,26 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
 
     //move ship
     entity.move(m_velocity * dt);
+
+    //if our position < someval vertically, move the camera & background
+    if (entity.getPosition().y < 100.f)
+    {
+        xy::Command cmd;
+        cmd.category = LMCommandID::Background;
+        cmd.action = [this](xy::Entity& e, float dt)
+        {
+            e.move(0.f, m_velocity.y * dt);
+
+            //REPORT("Speed", std::to_string(m_velocity.y));
+
+            if (auto stars = e.getComponent<Starfield>())
+            {
+                stars->setVelocity({ 0.f, m_velocity.y });
+                stars->setSpeedRatio(m_velocity.y / 400.f);
+            }
+        };
+        entity.getScene()->sendCommand(cmd);
+    }
 
     //see if we're near the gound and do a collision check
     auto position = entity.getPosition();
