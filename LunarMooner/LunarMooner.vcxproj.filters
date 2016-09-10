@@ -246,6 +246,9 @@
     <ClInclude Include="include\PHHumanController.hpp">
       <Filter>Header Files\planet hopper</Filter>
     </ClInclude>
+    <ClInclude Include="include\TutorialState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -415,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="src\PHHumanController.cpp">
       <Filter>Source Files\planet hopper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TutorialState.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

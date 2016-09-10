@@ -47,6 +47,7 @@ namespace States
         MenuWeapon,
         PlanetHopping,
         RockDodging,
+        Tutorial,
         Intro
     };
 }
