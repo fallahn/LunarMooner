@@ -54,4 +54,5 @@ SET(LM_SRC
   ${LM_DIR}/PlanetHoppingState.cpp
   ${LM_DIR}/PlayerProfile.cpp
   ${LM_DIR}/RockDodgingState.cpp
+  ${LM_DIR}/TutorialState.cpp
   ${LM_DIR}/UIWeaponSelect.cpp)

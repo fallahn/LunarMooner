@@ -448,6 +448,8 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level
     currentController = entity->addComponent(gameController);
     entity->addCommandCategories(LMCommandID::GameController);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+
+    //requestStackPush(States::ID::Tutorial);
 }
 
 void LunarMoonerState::initSounds()

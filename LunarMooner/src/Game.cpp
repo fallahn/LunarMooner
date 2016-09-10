@@ -39,6 +39,7 @@ source distribution.
 #include <PlanetHoppingState.hpp>
 #include <RockDodgingState.hpp>
 #include <IntroState.hpp>
+#include <TutorialState.hpp>
 
 #include <xygine/util/String.hpp>
 
@@ -168,4 +169,5 @@ void Game::registerStates()
     m_stateStack.registerState<PlanetHoppingState>(States::PlanetHopping);
     m_stateStack.registerState<RockDodgingState>(States::RockDodging);
     m_stateStack.registerState<IntroState>(States::ID::Intro);
+    m_stateStack.registerState<TutorialState>(States::ID::Tutorial, States::ID::SinglePlayer);
 }
