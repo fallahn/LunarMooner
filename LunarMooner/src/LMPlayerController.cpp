@@ -62,7 +62,7 @@ namespace
     const float damping = 0.65f;
 
     //distance to top of screen before camera starts to follow
-    const float topMargin = 100.f;
+    const float topMargin = 80.f;
     //max distance into space before thrust has no effect
     const float maxSkyDistance = -xy::DefaultSceneSize.y;
 }

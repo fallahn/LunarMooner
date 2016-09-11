@@ -140,6 +140,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     auto msg = m_messageBus.post<LMStateEvent>(LMMessageId::StateEvent);
     msg->type = LMStateEvent::GameStart;
     msg->stateID = (playerCount == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
+    msg->value = resumeState ? playerState.level - 1 : level;
 
     quitLoadingScreen();
 }
@@ -287,13 +288,20 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             {
                 //in single player launch mini game
                 //TODO alternate types
-                requestStackPop();
+                requestStackClear();
                 requestStackPush(States::ID::PlanetHopping);
                 m_levelChangeCount = 0;
 
                 //save the state for resumption
                 playerState = currentController->getPlayerState(0);
                 resumeState = true;
+            }
+            break;
+        case LMStateEvent::GameStart:
+            if (msgData.stateID == States::ID::SinglePlayer
+                /*&& msgData.value == 1*/) //TODO enable this and check if tutorial is enabled in options
+            {
+                requestStackPush(States::ID::Tutorial);
             }
             break;
         default:break;

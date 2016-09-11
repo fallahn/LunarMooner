@@ -55,4 +55,5 @@ SET(LM_SRC
   ${LM_DIR}/PlayerProfile.cpp
   ${LM_DIR}/RockDodgingState.cpp
   ${LM_DIR}/TutorialState.cpp
+  ${LM_DIR}/TutorialTip.cpp
   ${LM_DIR}/UIWeaponSelect.cpp)
