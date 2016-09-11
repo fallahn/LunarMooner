@@ -200,6 +200,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\RockDodgingState.hpp" />
     <ClInclude Include="include\StateIds.hpp" />
     <ClInclude Include="include\TutorialState.hpp" />
+    <ClInclude Include="include\TutorialTip.hpp" />
     <ClInclude Include="include\UIWeaponSelect.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +260,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\PlayerProfile.cpp" />
     <ClCompile Include="src\RockDodgingState.cpp" />
     <ClCompile Include="src\TutorialState.cpp" />
+    <ClCompile Include="src\TutorialTip.cpp" />
     <ClCompile Include="src\UIWeaponSelect.cpp" />
   </ItemGroup>
   <ItemGroup>

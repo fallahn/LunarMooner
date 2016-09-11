@@ -55,6 +55,7 @@ namespace
     //this is rather bad design...
     const bool imFalse = false;
     const bool imTrue = true;
+    const xy::StateID sp = States::ID::SinglePlayer;
 }
 
 const float Game::MaxVolume = 100.f;
@@ -169,5 +170,5 @@ void Game::registerStates()
     m_stateStack.registerState<PlanetHoppingState>(States::PlanetHopping);
     m_stateStack.registerState<RockDodgingState>(States::RockDodging);
     m_stateStack.registerState<IntroState>(States::ID::Intro);
-    m_stateStack.registerState<TutorialState>(States::ID::Tutorial, States::ID::SinglePlayer);
+    m_stateStack.registerState<TutorialState>(States::ID::Tutorial, sp, m_menuFonts);
 }

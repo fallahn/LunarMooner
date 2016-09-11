@@ -25,49 +25,53 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_TUTORIAL_STATE_HPP_
-#define LM_TUTORIAL_STATE_HPP_
+#ifndef LM_TUTORIAL_TIP_HPP_
+#define LM_TUTORIAL_TIP_HPP_
 
-#include <StateIds.hpp>
-#include <TutorialTip.hpp>
+#include <xygine/ShaderProperty.hpp>
 
-#include <xygine/State.hpp>
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/Transformable.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Text.hpp>
 
-#include <SFML/Graphics/Shader.hpp>
+#include <array>
 
-#include <functional>
-#include <vector>
-
-namespace xy
+namespace sf
 {
-    class FontResource;
+    class Font;
 }
 
-class TutorialState final : public xy::State
+namespace lm
 {
-public:
-    TutorialState(xy::StateStack&, Context, xy::StateID, xy::FontResource&);
-    ~TutorialState() = default;
+    class TutorialTip final : public sf::Drawable, public sf::Transformable, public xy::ShaderProperty
+    {
+    public:
+        explicit TutorialTip(sf::Font&);
+        ~TutorialTip() = default;
 
-    bool handleEvent(const sf::Event&) override;
-    void handleMessage(const xy::Message&) override;
-    bool update(float) override;
-    void draw() override;
+        void setString(const std::string&);
 
-    xy::StateID stateID() const override { return States::ID::Tutorial; }
+        bool update(float);
+        void reset();
+        void start();
 
-private:
+    private:
 
-    lm::TutorialTip m_testShape;
+        enum class State
+        {
+            Started,
+            Reset,
+            Finished
+        } m_state;
 
-    sf::Shader m_shader;
+        sf::CircleShape m_circle;
+        sf::Text m_text;
+        std::array<sf::Vertex, 6u> m_vertices;
 
-    bool m_active;
+        void draw(sf::RenderTarget&, sf::RenderStates) const override;
+    };
+}
 
-    std::function<void(const xy::Message&)> messageHandler;
-
-    void handleGameMessage(const xy::Message&);
-    void handleHopMesage(const xy::Message&);
-};
-
-#endif //LM_TUTORIAL_STATE_HPP_
+#endif //LM_TUTORIAL_TIP_HPP_
