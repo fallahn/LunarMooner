@@ -26,9 +26,11 @@ source distribution.
 *********************************************************************/
 
 #include <TutorialTip.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/Log.hpp>
 #include <xygine/util/Random.hpp>
+#include <xygine/MessageBus.hpp>
 
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -58,8 +60,10 @@ namespace
     };
 }
 
-TutorialTip::TutorialTip(sf::Font& font)
-    : m_state(State::Reset)
+TutorialTip::TutorialTip(sf::Font& font, xy::MessageBus& mb)
+    : m_messageBus  (mb),
+    m_state         (State::Reset),
+    m_alpha         (0.f)
 {
     //set up graphics colour properties etc    
     m_text.setFont(font);
@@ -94,7 +98,17 @@ bool TutorialTip::update(float dt)
     switch (m_state)
     {
     default: return false;
-    case State::Reset: return false;
+    case State::Reset: 
+        //fade out
+    {       
+        m_alpha = std::max(0.f, m_alpha - dt);
+
+        sf::Color colour(255, 255, 0, static_cast<sf::Uint8>(m_alpha * 255.f));
+        m_circle.setOutlineColor(colour);
+        for (auto& v : m_vertices) v.color = colour;
+        m_text.setFillColor(colour);
+    }
+        return false;
     case State::Started:
         //update animation
     {
@@ -110,13 +124,16 @@ bool TutorialTip::update(float dt)
             getShader()->setUniform("u_amount", std::max(1.f, scale.x / maxScale));
 
             sf::Uint8 alpha = xy::Util::Random::value(0, 1) * 255;
-            for (auto& v : m_vertices) v.color = { 255, 255, 0, alpha };
+            sf::Color colour(255, 255, 0, alpha);
+            for (auto& v : m_vertices) v.color = colour;
+            m_text.setFillColor(colour);
         }
         else
         {
             m_state = State::Finished;
             setShaderActive(false);
             for (auto& v : m_vertices) v.color = sf::Color::Yellow;
+            m_text.setFillColor(sf::Color::Yellow);
         }
     }
         return true;
@@ -130,11 +147,7 @@ void TutorialTip::reset()
 {
     if (m_state == State::Finished)
     {
-        //reset graphics
-        m_circle.setScale({});
-        m_text.setString({});
-        for (auto& v : m_vertices) v.color = sf::Color::Transparent;
-
+        m_alpha = 1.f;
         sf::Listener::setGlobalVolume(restoreVol);
 
         m_state = State::Reset;
@@ -145,6 +158,12 @@ void TutorialTip::start()
 {
     if (m_state == State::Reset)
     {
+        //reset graphics
+        m_circle.setScale({});
+        for (auto& v : m_vertices) v.color = sf::Color::Transparent;        
+        m_circle.setOutlineColor(sf::Color::Yellow);
+        m_text.setFillColor(sf::Color::Yellow);
+               
         //set drawable positions
         auto pos = getPosition();
         sf::Vector2f origin(0.f, (m_text.getLocalBounds().height / 2.f) + m_text.getLocalBounds().top);
@@ -187,6 +206,10 @@ void TutorialTip::start()
         sf::Listener::setGlobalVolume(0.f);
 
         setShaderActive(true);
+
+        auto msg = m_messageBus.post<LMStateEvent>(StateEvent);
+        msg->type = LMStateEvent::Tutorial;
+        msg->stateID = States::ID::Tutorial;
 
         m_state = State::Started;
     }

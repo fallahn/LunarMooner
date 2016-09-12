@@ -58,11 +58,13 @@ public:
 
 private:
 
-    lm::TutorialTip m_testShape;
+    lm::TutorialTip m_tip;
 
     sf::Shader m_shader;
 
     bool m_active;
+
+    std::vector<bool> m_tutTipUsed;
 
     std::function<void(const xy::Message&)> messageHandler;
 

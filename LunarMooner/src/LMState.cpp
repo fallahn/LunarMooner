@@ -299,10 +299,13 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             break;
         case LMStateEvent::GameStart:
             if (msgData.stateID == States::ID::SinglePlayer
-                /*&& msgData.value == 1*/) //TODO enable this and check if tutorial is enabled in options
+                /*&& msgData.value == 1*/) //TODO check if tutorial is enabled in options
             {
                 requestStackPush(States::ID::Tutorial);
             }
+            break;
+        case LMStateEvent::Tutorial:
+            m_inputFlags = 0;
             break;
         default:break;
         }

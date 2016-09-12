@@ -70,7 +70,8 @@ enum LMMessageId
     StateEvent,
     MenuEvent,
     AchievementEvent,
-    RankEvent
+    RankEvent,
+    TutorialEvent
 };
 
 struct LMGameEvent
@@ -123,7 +124,8 @@ struct LMStateEvent
         CountDownStarted,
         CountDownInProgress,
         CountDownWarning,
-        SwitchedPlayer
+        SwitchedPlayer,
+        Tutorial
     }type;
     sf::Int32 value = -1;
     xy::StateID stateID = States::ID::SinglePlayer;
@@ -148,6 +150,24 @@ struct LMMenuEvent
 {
     sf::Uint32 playerId = 0u;
     sf::Uint32 score = 0u;
+};
+
+struct LMTutorialEvent
+{
+    enum
+    {
+        FirstLaunch = 0,
+        LandingPad,
+        RescueSurvivors,
+        FireLaser,
+        CollectShield,
+        CollectAmmo,
+        Docking,
+        UnlockXP,
+        Count
+    }action;
+    float posX = 0.f;
+    float posY = 0.f;
 };
 
 enum LMParticleID
