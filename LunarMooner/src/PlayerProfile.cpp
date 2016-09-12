@@ -316,7 +316,7 @@ void PlayerProfile::handleMessage(const xy::Message& msg)
             if (std::find(std::begin(countedPlanets), std::end(countedPlanets), msgData.value) != std::end(countedPlanets))
             {
                 countedPlanets.push_back(msgData.value);
-                if (!countedPlanets.size() == planetCount &&
+                if (countedPlanets.size() == planetCount &&
                     !m_achievements[AchievementID::WellTravelled].unlocked)
                 {
                     m_achievements[AchievementID::WellTravelled].unlocked = true;
