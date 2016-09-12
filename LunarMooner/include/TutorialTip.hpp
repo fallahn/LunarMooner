@@ -43,12 +43,17 @@ namespace sf
     class Font;
 }
 
+namespace xy
+{
+    class MessageBus;
+}
+
 namespace lm
 {
     class TutorialTip final : public sf::Drawable, public sf::Transformable, public xy::ShaderProperty
     {
     public:
-        explicit TutorialTip(sf::Font&);
+        TutorialTip(sf::Font&, xy::MessageBus&);
         ~TutorialTip() = default;
 
         void setString(const std::string&);
@@ -59,6 +64,8 @@ namespace lm
 
     private:
 
+        xy::MessageBus& m_messageBus;
+
         enum class State
         {
             Started,
@@ -66,6 +73,7 @@ namespace lm
             Finished
         } m_state;
 
+        float m_alpha;
         sf::CircleShape m_circle;
         sf::Text m_text;
         std::array<sf::Vertex, 6u> m_vertices;

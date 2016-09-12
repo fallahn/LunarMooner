@@ -232,12 +232,38 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
             }
             m_humans[index]->getComponent<HumanController>()->setDestination(pos);
 
+            auto tutMsg = sendMessage<LMTutorialEvent>(TutorialEvent);
+            tutMsg->action = LMTutorialEvent::RescueSurvivors;
+            auto position = m_humans[index]->getWorldPosition();
+            tutMsg->posX = position.x;
+            tutMsg->posY = position.y;
+
             m_playerStates[m_currentPlayer].score += msgData.value;
             m_scoreDisplay->showScore(msgData.value, m_player->getPosition());
         }
             break;
         case LMGameEvent::HumanPickedUp:
             m_playerStates[m_currentPlayer].ammo += ammoPerHuman;
+            {
+                auto tutMsg = sendMessage<LMTutorialEvent>(TutorialEvent);
+                tutMsg->action = LMTutorialEvent::FireLaser;
+                tutMsg->posX = msgData.posX;
+                tutMsg->posY = msgData.posY;
+
+                m_pendingDelayedEvents.emplace_back();
+                auto& de = m_pendingDelayedEvents.back();
+                de.id = EventID::TutorialTip;
+                de.time = 4.5f;
+                de.action = [this]()
+                {
+                    auto tutMsg = sendMessage<LMTutorialEvent>(TutorialEvent);
+                    tutMsg->action = LMTutorialEvent::Docking;
+                    auto position = m_mothership->getWorldPosition();
+                    auto bounds = m_mothership->globalBounds();
+                    tutMsg->posX = position.x + (bounds.width / 2.f);
+                    tutMsg->posY = position.y + (bounds.height / 2.f);
+                };
+            }
             break;
         case LMGameEvent::HumanRescued:
             addRescuedHuman();
@@ -584,6 +610,21 @@ void GameController::start()
 
     auto msg = getMessageBus().post<LMStateEvent>(LMMessageId::StateEvent);
     msg->type = LMStateEvent::RoundBegin;
+    msg->stateID = (m_playerStates.size() == 1) ? States::ID::SinglePlayer : States::ID::MultiPlayer;
+
+    m_pendingDelayedEvents.emplace_back();
+    auto& de = m_pendingDelayedEvents.back();
+    de.id = EventID::TutorialTip;
+    de.time = 0.5f;
+    de.action = [this]()
+    {
+        auto msg = getMessageBus().post<LMTutorialEvent>(TutorialEvent);
+        msg->action = LMTutorialEvent::FirstLaunch;
+        auto position = m_mothership->getWorldPosition();
+        auto bounds = m_mothership->globalBounds();
+        msg->posX = position.x + (bounds.width / 2.f);
+        msg->posY = position.y + (bounds.height / 2.f);
+    };
 }
 
 void GameController::setDifficulty(xy::Difficulty difficulty)
@@ -734,6 +775,20 @@ void GameController::spawnPlayer()
             sf::Uint32 speed = static_cast<sf::Uint32>(xy::Util::Math::round(10.f / m_playerStates[m_currentPlayer].timeRemaining));
             msg->value = speed;
         }
+
+        m_pendingDelayedEvents.emplace_back();
+        auto& de = m_pendingDelayedEvents.back();
+        de.id = EventID::TutorialTip;
+        de.time = 1.f;
+        de.action = [this]()
+        {
+            auto tutMessage = sendMessage<LMTutorialEvent>(TutorialEvent);
+            tutMessage->action = LMTutorialEvent::LandingPad;
+            const auto& platform = m_terrain->getPlatforms()[xy::Util::Random::value(0, m_terrain->getPlatforms().size() - 1)];
+            auto position = platform.position + (platform.size / 2.f);
+            tutMessage->posX = position.x;
+            tutMessage->posY = position.y;
+        };
     }
 }
 
@@ -1541,6 +1596,10 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
     auto entity = xy::Entity::create(getMessageBus());
     entity->setPosition(position);
 
+    auto msg = sendMessage<LMTutorialEvent>(TutorialEvent);
+    msg->posX = position.x;
+    msg->posY = position.y;
+
     if (type == CollisionComponent::ID::Shield)
     {
         //TODO cache animation file
@@ -1551,6 +1610,8 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
         fillColour = sf::Color::Cyan;
         bounds = drawable->globalBounds();
         entity->addComponent(drawable);
+
+        msg->action = LMTutorialEvent::CollectShield;
     }
     else
     {
@@ -1563,6 +1624,8 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
         drawable->getDrawable().setFillColor(fillColour);
         bounds = drawable->getDrawable().getLocalBounds();
         entity->addComponent(drawable);
+
+        msg->action = LMTutorialEvent::CollectAmmo;
     }
 
     auto collision = m_collisionWorld.addComponent(getMessageBus(), bounds, type);

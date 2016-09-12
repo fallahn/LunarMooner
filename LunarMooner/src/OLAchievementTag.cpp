@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <OLAchievementTag.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/Resource.hpp>
 #include <xygine/Entity.hpp>
@@ -80,6 +81,14 @@ void AchievementTag::entityUpdate(xy::Entity& entity, float dt)
         {
             m_inTime -= dt;
             entity.move(0.f, -moveSpeed * dt);
+
+            if (m_inTime < 0)
+            {
+                auto msg = sendMessage<LMTutorialEvent>(TutorialEvent);
+                msg->action = LMTutorialEvent::UnlockXP;
+                msg->posX = entity.getPosition().x - (tagSize.x / 2.f);
+                msg->posY = entity.getPosition().y + (tagSize.y / 2.f);
+            }
         }
         //hold
         else

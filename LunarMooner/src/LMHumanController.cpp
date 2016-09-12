@@ -80,6 +80,8 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
                 entity.destroy();
                 auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
                 msg->type = LMGameEvent::HumanPickedUp;
+                msg->posX = position.x;
+                msg->posY = position.y;
             }
         }
     }

@@ -117,7 +117,8 @@ namespace lm
         enum EventID
         {
             SpawnRoid = 1,
-            SpawnPlayer = 2
+            SpawnPlayer = 2,
+            TutorialTip = 3
         };
         struct DelayedEvent
         {

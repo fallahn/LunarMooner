@@ -29,6 +29,7 @@ source distribution.
 #include <CommandIds.hpp>
 
 #include <xygine/Resource.hpp>
+#include <xygine/App.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -59,7 +60,7 @@ namespace
 
 TutorialState::TutorialState(xy::StateStack& stack, Context context, xy::StateID parentID, xy::FontResource& fr)
     : xy::State (stack, context),
-    m_testShape (fr.get("tut_tip")),
+    m_tip       (fr.get("tut_tip"), context.appInstance.getMessageBus()),
     m_active    (false)
 {
     switch (parentID)
@@ -69,6 +70,11 @@ TutorialState::TutorialState(xy::StateStack& stack, Context context, xy::StateID
         break;
     case States::ID::SinglePlayer:
         messageHandler = std::bind(&TutorialState::handleGameMessage, this, std::placeholders::_1);
+
+        for (auto i = 0; i < LMTutorialEvent::Count; ++i)
+        {
+            m_tutTipUsed.push_back(false);
+        }
         break;
     case States::ID::PlanetHopping:
         messageHandler = std::bind(&TutorialState::handleHopMesage, this, std::placeholders::_1);
@@ -77,9 +83,8 @@ TutorialState::TutorialState(xy::StateStack& stack, Context context, xy::StateID
 
     m_shader.loadFromMemory(fragShader, sf::Shader::Fragment);
 
-    m_testShape.setPosition(xy::DefaultSceneSize / 2.f);
-    m_testShape.setShader(&m_shader);
-    m_testShape.setShaderActive(false);
+    m_tip.setShader(&m_shader);
+    m_tip.setShaderActive(false);
 }
 
 //public
@@ -91,7 +96,7 @@ bool TutorialState::handleEvent(const sf::Event& evt)
         {
         default: break;
         case keyFire:
-            m_testShape.reset();
+            m_tip.reset();
             break;
         }
     }
@@ -102,7 +107,7 @@ bool TutorialState::handleEvent(const sf::Event& evt)
         {
         default: break;
         case buttonA:
-            m_testShape.reset();
+            m_tip.reset();
             break;
         }
     }
@@ -117,9 +122,8 @@ void TutorialState::handleMessage(const xy::Message& msg)
 
 bool TutorialState::update(float dt)
 {
-    m_active = m_testShape.update(dt);
+    m_active = m_tip.update(dt);
     
-    //for(auto& t : things) t.update(dt);
     return !m_active;
 }
 
@@ -128,26 +132,49 @@ void TutorialState::draw()
     auto& rw = getContext().renderWindow;
     rw.setView(getContext().defaultView);
     
-    rw.draw(m_testShape);
-
-
-    //for(auto& t : things) rw.draw(t);
+    rw.draw(m_tip);
 }
 
 //private
 void TutorialState::handleGameMessage(const xy::Message& msg)
 {
-    if (msg.id == GameEvent)
+    if (msg.id == TutorialEvent)
     {
-        const auto& data = msg.getData<LMGameEvent>();
-        switch (data.type)
+        const auto& data = msg.getData<LMTutorialEvent>();
+        if (!m_tutTipUsed[data.action])
         {
-        default: break;
-        case LMGameEvent::PlayerLanded:
-            m_testShape.setPosition({ data.posX, data.posY });
-            m_testShape.setString("Buns, flaps and dicketry");
-            m_testShape.start();
-            break;
+            switch (data.action)
+            {
+            default: break;
+            case LMTutorialEvent::FirstLaunch:
+                m_tip.setString("Press Fire To Launch The Drop Ship");
+                break;
+            case LMTutorialEvent::LandingPad:
+                m_tip.setString("Land On A Pad Above Water\nUsing Thrust To Slow Your Descent");
+                break;
+            case LMTutorialEvent::RescueSurvivors:
+                m_tip.setString("Rescue The Survivors Before Time Runs Out!");
+                break;
+            case LMTutorialEvent::FireLaser:
+                m_tip.setString("Fire Lasers To Shoot The Debris");
+                break;
+            case LMTutorialEvent::CollectShield:
+                m_tip.setString("Collect These To Shield Your Ship");
+                break;
+            case LMTutorialEvent::CollectAmmo:
+                m_tip.setString("Collect These For More Ammunition");
+                break;
+            case LMTutorialEvent::Docking:
+                m_tip.setString("Match The Mothership Speed To Dock");
+                break;
+            case LMTutorialEvent::UnlockXP:
+                m_tip.setString("Earning XP Increases Rank and Unlocks New Weapons");
+                break;
+            }
+
+            m_tip.setPosition(data.posX, data.posY);
+            m_tip.start();
+            m_tutTipUsed[data.action] = true;
         }
     }
 }
