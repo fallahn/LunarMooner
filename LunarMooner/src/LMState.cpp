@@ -51,6 +51,7 @@ source distribution.
 #include <xygine/components/SoundPlayer.hpp>
 #include <xygine/components/MeshDrawable.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
+#include <xygine/KeyBinds.hpp>
 
 #include <xygine/mesh/IQMBuilder.hpp>
 #include <xygine/mesh/shaders/DeferredRenderer.hpp>
@@ -158,58 +159,68 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         if(evt.joystickConnect.joystickId == 0) m_useController = false;
         break;
     case sf::Event::KeyReleased:
-        switch (evt.key.code)
+        if (evt.key.code == xy::Input::getKey(xy::Input::Start))
         {
-        case keyStart:
             m_inputFlags &= ~LMInputFlags::Start;
-            break;
-        case keyLeft:
-        case altKeyLeft:
-            m_inputFlags &= ~LMInputFlags::SteerLeft;
-            break;
-        case keyRight:
-        case altKeyRight:
-            m_inputFlags &= ~LMInputFlags::SteerRight;
-            break;
-        case keyThrust:
-        case altKeyThrust:
-            m_inputFlags &= ~LMInputFlags::Thrust;
-            break;
-        case keyFire:
-            m_inputFlags &= ~LMInputFlags::Shoot;
-            break;
-        case keySpecial:
-        case altKeySpecial:
-            m_inputFlags &= ~LMInputFlags::Special;
-            break;
-        default:break;
         }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Left)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Left))
+        {
+            m_inputFlags &= ~LMInputFlags::SteerLeft;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Right)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Right))
+        {
+            m_inputFlags &= ~LMInputFlags::SteerRight;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Up)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Up))
+        {
+            m_inputFlags &= ~LMInputFlags::Thrust;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::ActionOne)) //fire button
+        {
+            m_inputFlags &= ~LMInputFlags::Shoot;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::ActionTwo)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::ActionTwo))
+        {
+            m_inputFlags &= ~LMInputFlags::Special;
+        }
+        
         break;
     case sf::Event::KeyPressed:
+        if (evt.key.code == xy::Input::getKey(xy::Input::Start))
+        {
+            m_inputFlags |= LMInputFlags::Start;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Left)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Left))
+        {
+            m_inputFlags |= LMInputFlags::SteerLeft;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Right)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Right))
+        {
+            m_inputFlags |= LMInputFlags::SteerRight;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Up)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Up))
+        {
+            m_inputFlags |= LMInputFlags::Thrust;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::ActionOne)) //fire button
+        {
+            m_inputFlags |= LMInputFlags::Shoot;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::ActionTwo)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::ActionTwo))
+        {
+            m_inputFlags |= LMInputFlags::Special;
+        }
+        
         switch (evt.key.code)
         {
-        case keyStart:
-            m_inputFlags |= LMInputFlags::Start;
-            break;
-        case keyLeft:
-        case altKeyLeft:
-            m_inputFlags |= LMInputFlags::SteerLeft;
-            break;
-        case keyRight:
-        case altKeyRight:
-            m_inputFlags |= LMInputFlags::SteerRight;
-            break;
-        case keyThrust:
-        case altKeyThrust:
-            m_inputFlags |= LMInputFlags::Thrust;
-            break;
-        case keyFire:
-            m_inputFlags |= LMInputFlags::Shoot;
-            break;
-        case keySpecial:
-        case altKeySpecial:
-            m_inputFlags |= LMInputFlags::Special;
-            break;
         case sf::Keyboard::P:
         case sf::Keyboard::Pause:
         case sf::Keyboard::Escape:
@@ -223,47 +234,80 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
     //controller input (default for x360 layout)
     case sf::Event::JoystickButtonPressed:
         if (!m_useController || evt.joystickButton.joystickId != 0) break;
-        switch (evt.joystickButton.button)
+        if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonA)
+            || evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonRB))
         {
-        case buttonA:
-        case buttonRB:
             m_inputFlags |= LMInputFlags::Shoot;
-            break;
-        case buttonB:
-            m_inputFlags |= LMInputFlags::Thrust;
-            break;
-        case buttonX:
-        case buttonLB:
-            m_inputFlags |= LMInputFlags::Special;
-            break;
-        case buttonStart:
-            //m_inputFlags |= LMInputFlags::Start;
-            //requestStackPush(States::ID::Pause);
-            break;
-        default: break;
         }
+        else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonB))
+        {
+            m_inputFlags |= LMInputFlags::Thrust;
+        }
+        else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonX)
+            || evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonLB))
+        {
+            m_inputFlags |= LMInputFlags::Special;
+        }
+
+        //switch (evt.joystickButton.button)
+        //{
+        //case buttonA:
+        //case buttonRB:
+        //    m_inputFlags |= LMInputFlags::Shoot;
+        //    break;
+        //case buttonB:
+        //    m_inputFlags |= LMInputFlags::Thrust;
+        //    break;
+        //case buttonX:
+        //case buttonLB:
+        //    m_inputFlags |= LMInputFlags::Special;
+        //    break;
+        //case buttonStart:
+        //    //m_inputFlags |= LMInputFlags::Start;
+        //    //requestStackPush(States::ID::Pause);
+        //    break;
+        //default: break;
+        //}
         break;
     case sf::Event::JoystickButtonReleased:
         if (!m_useController || evt.joystickButton.joystickId != 0) break;
-        switch (evt.joystickButton.button)
+        if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonA)
+            || evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonRB))
         {
-        default: break;
-        case buttonA:
-        case buttonRB:
             m_inputFlags &= ~LMInputFlags::Shoot;
-            break;
-        case buttonB:
-            m_inputFlags &= ~LMInputFlags::Thrust;
-            break;
-        case buttonX:
-        case buttonLB:
-            m_inputFlags &= ~LMInputFlags::Special;
-            break;
-        case buttonStart:
-            requestStackPush(States::ID::Pause);
-            //    m_inputFlags &= ~LMInputFlags::Start;
-            break;
         }
+        else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonB))
+        {
+            m_inputFlags &= ~LMInputFlags::Thrust;
+        }
+        else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonX)
+            || evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonLB))
+        {
+            m_inputFlags &= ~LMInputFlags::Special;
+        }
+        else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonStart))
+        {
+            requestStackPush(States::ID::Pause);
+        }
+        //switch (evt.joystickButton.button)
+        //{
+        //default: break;
+        //case buttonA:
+        //case buttonRB:
+        //    m_inputFlags &= ~LMInputFlags::Shoot;
+        //    break;
+        //case buttonB:
+        //    m_inputFlags &= ~LMInputFlags::Thrust;
+        //    break;
+        //case buttonX:
+        //case buttonLB:
+        //    m_inputFlags &= ~LMInputFlags::Special;
+        //    break;
+        //case buttonStart:
+        //    requestStackPush(States::ID::Pause);
+        //    //    m_inputFlags &= ~LMInputFlags::Start;
+        //    break;
+        //}
         break;
     default: break;
     }
@@ -459,8 +503,6 @@ void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level
     currentController = entity->addComponent(gameController);
     entity->addCommandCategories(LMCommandID::GameController);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
-
-    //requestStackPush(States::ID::Tutorial);
 }
 
 void LunarMoonerState::initSounds()

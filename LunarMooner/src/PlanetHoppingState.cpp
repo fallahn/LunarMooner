@@ -41,6 +41,7 @@ source distribution.
 #include <xygine/PostChromeAb.hpp>
 #include <xygine/mesh/SphereBuilder.hpp>
 #include <xygine/Reports.hpp>
+#include <xygine/KeyBinds.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -154,7 +155,7 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         break;
     case sf::Event::JoystickButtonReleased:
         if (!m_useController || evt.joystickButton.joystickId != 0) break;
-        switch (evt.joystickButton.button)
+        /*switch (evt.joystickButton.button)
         {
         default:break;
         case buttonA:
@@ -163,20 +164,31 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         case buttonStart:
             requestStackPush(States::ID::Pause);
             break;
+        }*/
+        if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonA))
+        {
+            fire();
+        }
+        else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonStart))
+        {
+            requestStackPush(States::ID::Pause);
         }
         break;
     case sf::Event::KeyPressed:
+        if (evt.key.code == xy::Input::getKey(xy::Input::Left)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Left))
+        {
+            m_input |= LMInputFlags::SteerLeft;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Right)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Right))
+        {
+            m_input |= LMInputFlags::SteerRight;
+        }
+
         switch (evt.key.code)
         {
         default: break;
-        case keyLeft:
-        case altKeyLeft:
-            m_input |= LMInputFlags::SteerLeft;
-            break;
-        case keyRight:
-        case altKeyRight:
-            m_input |= LMInputFlags::SteerRight;
-            break;
         case sf::Keyboard::P:
         case sf::Keyboard::Pause:
         case sf::Keyboard::Escape:
@@ -186,20 +198,24 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         break;
     case sf::Event::KeyReleased:
     {
+        if (evt.key.code == xy::Input::getKey(xy::Input::Left)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Left))
+        {
+            m_input &= ~LMInputFlags::SteerLeft;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Right)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Right))
+        {
+            m_input &= ~LMInputFlags::SteerRight;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::ActionOne))
+        {
+            fire();
+        }
+
         switch (evt.key.code)
         {
         default:break;
-        case keyLeft:
-        case altKeyLeft:
-            m_input &= ~LMInputFlags::SteerLeft;
-            break;
-        case keyRight:
-        case altKeyRight:
-            m_input &= ~LMInputFlags::SteerRight;
-            break;
-        case keyFire:
-            fire();
-        break;
 #ifdef _DEBUG_
         case sf::Keyboard::BackSpace:
             requestStackClear();

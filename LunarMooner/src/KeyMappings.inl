@@ -28,27 +28,27 @@ source distribution.
 #ifndef KEYMAP_INL_
 #define KEYMAP_INL_
 
-const sf::Keyboard::Key keyStart = sf::Keyboard::Return;
-const sf::Keyboard::Key keyLeft = sf::Keyboard::A;
-const sf::Keyboard::Key keyRight = sf::Keyboard::D;
-const sf::Keyboard::Key keyThrust = sf::Keyboard::W;
-const sf::Keyboard::Key keyFire = sf::Keyboard::Space;
-const sf::Keyboard::Key keySpecial = sf::Keyboard::LControl;
-
-const sf::Keyboard::Key altKeyLeft = sf::Keyboard::Left;
-const sf::Keyboard::Key altKeyRight = sf::Keyboard::Right;
-const sf::Keyboard::Key altKeyThrust = sf::Keyboard::Up;
-const sf::Keyboard::Key altKeySpecial = sf::Keyboard::RControl;
-
-//x360 controller mapping
-const sf::Uint32 buttonA = 0u;
-const sf::Uint32 buttonB = 1u;
-const sf::Uint32 buttonX = 2u;
-const sf::Uint32 buttonY = 3u;
-const sf::Uint32 buttonLB = 4u;
-const sf::Uint32 buttonRB = 5u;
-const sf::Uint32 buttonBack = 6u;
-const sf::Uint32 buttonStart = 7u;
+//const sf::Keyboard::Key keyStart = sf::Keyboard::Return;
+//const sf::Keyboard::Key keyLeft = sf::Keyboard::A;
+//const sf::Keyboard::Key keyRight = sf::Keyboard::D;
+//const sf::Keyboard::Key keyThrust = sf::Keyboard::W;
+//const sf::Keyboard::Key keyFire = sf::Keyboard::Space;
+//const sf::Keyboard::Key keySpecial = sf::Keyboard::LControl;
+//
+//const sf::Keyboard::Key altKeyLeft = sf::Keyboard::Left;
+//const sf::Keyboard::Key altKeyRight = sf::Keyboard::Right;
+//const sf::Keyboard::Key altKeyThrust = sf::Keyboard::Up;
+//const sf::Keyboard::Key altKeySpecial = sf::Keyboard::RControl;
+//
+////x360 controller mapping
+//const sf::Uint32 buttonA = 0u;
+//const sf::Uint32 buttonB = 1u;
+//const sf::Uint32 buttonX = 2u;
+//const sf::Uint32 buttonY = 3u;
+//const sf::Uint32 buttonLB = 4u;
+//const sf::Uint32 buttonRB = 5u;
+//const sf::Uint32 buttonBack = 6u;
+//const sf::Uint32 buttonStart = 7u;
 const float joyDeadZone = 25.f;
 
 static void parseControllerInput(sf::Uint8& inputFlags)
