@@ -30,6 +30,7 @@ source distribution.
 
 #include <xygine/Resource.hpp>
 #include <xygine/App.hpp>
+#include <xygine/KeyBinds.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -92,23 +93,17 @@ bool TutorialState::handleEvent(const sf::Event& evt)
 {
     if (evt.type == sf::Event::KeyReleased)
     {
-        switch (evt.key.code)
+        if (evt.key.code == xy::Input::getKey(xy::Input::ActionOne))
         {
-        default: break;
-        case keyFire:
             m_tip.reset();
-            break;
         }
     }
     //TODO asert controller is enabled
     else if (evt.type == sf::Event::JoystickButtonReleased)
     {
-        switch (evt.joystickButton.button)
+        if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonA))
         {
-        default: break;
-        case buttonA:
             m_tip.reset();
-            break;
         }
     }
     
