@@ -40,7 +40,8 @@ namespace Mesh
         Player,
         MotherShip,
         DeadDoofer,
-        Planet
+        Planet,
+        Moon
     };
 }
 namespace Material

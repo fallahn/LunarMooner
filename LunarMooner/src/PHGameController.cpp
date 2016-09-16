@@ -405,29 +405,29 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     drawable->getDrawable().setOutlineThickness(orbit->getInfluenceRadius() - radius);
     drawable->getDrawable().setOutlineColor({ 0, 120, 255, 20 });
 
-const auto influenceRad = orbit->getInfluenceRadius();
-auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
+    const auto influenceRad = orbit->getInfluenceRadius();
+    auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
 
-auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
+    auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
 
-auto model = m_meshRenderer.createModel(Mesh::Planet, getMessageBus());
-model->setScale({ radius, radius, radius });
-model->setRotation({ xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f) });
-model->setBaseMaterial(m_resources.materialResource.get(radius > 50 ? Material::LavaPlanet : Material::DesertPlanet));
+    auto model = m_meshRenderer.createModel((radius > 50) ? Mesh::Moon : Mesh::Planet, getMessageBus());
+    model->setScale({ radius, radius, radius });
+    model->setRotation({ xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f) });
+    model->setBaseMaterial(m_resources.materialResource.get(radius > 50 ? Material::LavaPlanet : Material::DesertPlanet));
 
-auto rotator = xy::Component::create<PlanetRotation>(getMessageBus());
+    auto rotator = xy::Component::create<PlanetRotation>(getMessageBus());
 
-auto ent = xy::Entity::create(getMessageBus());
-ent->addComponent(ccSmall);
-ent->addComponent(drawable);
-ent->addComponent(orbit);
-ent->addComponent(ccLarge);
-ent->addComponent(qtc);
-ent->addComponent(model);
-ent->addComponent(rotator);
-ent->setPosition(position);
+    auto ent = xy::Entity::create(getMessageBus());
+    ent->addComponent(ccSmall);
+    ent->addComponent(drawable);
+    ent->addComponent(orbit);
+    ent->addComponent(ccLarge);
+    ent->addComponent(qtc);
+    ent->addComponent(model);
+    ent->addComponent(rotator);
+    ent->setPosition(position);
 
-return m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);
+    return m_scene.addEntity(ent, xy::Scene::Layer::FrontMiddle);
 }
 
 void GameController::addMessageHandlers()
