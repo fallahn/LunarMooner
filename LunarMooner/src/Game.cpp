@@ -42,6 +42,7 @@ source distribution.
 #include <TutorialState.hpp>
 
 #include <xygine/util/String.hpp>
+#include <xygine/KeyBinds.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -143,6 +144,8 @@ void Game::initialise()
     getRenderWindow().setKeyRepeatEnabled(false);
 
     m_profile.load();
+
+    if (!xy::Input::load()) xy::Input::save();
 }
 
 void Game::finalise()

@@ -33,6 +33,12 @@ source distribution.
 #include <SFML/Config.hpp>
 
 #include <vector>
+#include <string>
+
+namespace
+{
+    const std::string defaultPath = "input.kbd";
+}
 
 namespace xy
 {
@@ -115,7 +121,10 @@ namespace xy
         given action, or xy::Input::Unbound if it is unbound.
         */
         static sf::Int32 getJoyButton(sf::Int32 action);
-
+        /*!
+        \brief Returns a string representation of the given sf::Keyboard::Key enum value
+        */
+        static std::string getKeyAsString(sf::Int32);
 
         /*!
         \brief Extends the number of keybinds availble.
@@ -160,13 +169,13 @@ namespace xy
         /*!
         \brief Saves the current keybinds to a file with the given name
         */
-        static void save(const std::string& path);
+        static void save(const std::string& path = defaultPath);
 
         /*!
         \brief Attempts to load keybinds from the given file path.
         \returns false if loading failed
         */
-        static bool load(const std::string&);
+        static bool load(const std::string& path = defaultPath);
 
     private:
 

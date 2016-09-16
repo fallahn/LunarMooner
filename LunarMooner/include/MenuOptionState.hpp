@@ -63,11 +63,16 @@ private:
     xy::MessageBus& m_messageBus;
     sf::Sprite m_cursorSprite;
 
-    xy::UI::Container m_uiContainer;
+    xy::UI::Container m_optionContainer;
+    xy::UI::Container m_inputContainer;
+    xy::UI::Container* m_activeContainer;
 
     bool m_pausedGame;
 
-    void buildMenu(const sf::Font&);
+    void buildOptionsMenu(const sf::Font&);
+    void buildControlMenu(const sf::Font&);
+
+    //void buildMenu(const sf::Font&);
     void close();
 };
 #endif //MENU_OPTION_STATE_HPP_
