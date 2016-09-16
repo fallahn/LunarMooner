@@ -40,6 +40,7 @@ source distribution.
 #include <xygine/components/MeshDrawable.hpp>
 #include <xygine/PostChromeAb.hpp>
 #include <xygine/mesh/SphereBuilder.hpp>
+#include <xygine/mesh/IQMBuilder.hpp>
 #include <xygine/Reports.hpp>
 #include <xygine/KeyBinds.hpp>
 
@@ -284,8 +285,13 @@ void PlanetHoppingState::loadMeshes()
     xy::SphereBuilder sb(1.f, 10, true); //we'll scale per entity
     m_meshRenderer.loadModel(Mesh::Planet, sb);
 
+    xy::IQMBuilder ib("assets/models/moon.iqm");
+    m_meshRenderer.loadModel(Mesh::Moon, ib);
+
     //preload shaders
     m_resources.shaderResource.preload(Shader::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
+    m_resources.shaderResource.preload(Shader::MeshNormalMapped, DEFERRED_TEXTURED_BUMPED_VERTEX, DEFERRED_TEXTURED_BUMPED_FRAGMENT);
+
 
     //preload materials
     auto& desertPlanet = m_resources.materialResource.add(Material::DesertPlanet, m_resources.shaderResource.get(Shader::MeshTextured));
@@ -294,10 +300,11 @@ void PlanetHoppingState::loadMeshes()
     m_resources.textureResource.setFallbackColour(sf::Color::Black);
     desertPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("no_mask") });
 
-    auto& lavaPlanet = m_resources.materialResource.add(Material::LavaPlanet, m_resources.shaderResource.get(Shader::MeshTextured));
+    auto& lavaPlanet = m_resources.materialResource.add(Material::LavaPlanet, m_resources.shaderResource.get(Shader::MeshNormalMapped));
     lavaPlanet.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    lavaPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_diffuse.png") });
-    lavaPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
+    lavaPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
+    //lavaPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
+    lavaPlanet.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
 }
 
 void PlanetHoppingState::loadParticles()
