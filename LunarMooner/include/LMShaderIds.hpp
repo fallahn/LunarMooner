@@ -52,7 +52,7 @@ namespace Material
         MotherShip,
         DeadDoofer,
         DesertPlanet,
-        LavaPlanet,
+        Moon,
         End
     };
 }

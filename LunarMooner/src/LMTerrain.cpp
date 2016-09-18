@@ -176,8 +176,6 @@ void Terrain::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 
 bool Terrain::load(const std::string& path, xy::TextureResource& tr)
 {
-
-
     //load / parse json file
     std::ifstream file(path);
     if (!file.good() || !xy::Util::File::validLength(file))

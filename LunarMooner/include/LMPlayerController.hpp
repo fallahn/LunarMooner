@@ -75,9 +75,11 @@ namespace lm
         xy::ParticleSystem* m_thrust;
         xy::ParticleSystem* m_rcsLeft;
         xy::ParticleSystem* m_rcsRight;
+        xy::ParticleSystem* m_rcsDown;
 
         xy::AudioSource* m_rcsEffectLeft;
         xy::AudioSource* m_rcsEffectRight;
+        xy::AudioSource* m_rcsEffectDown;
         xy::AudioSource* m_thrustEffect;
 
         float m_highestTerrainPoint;

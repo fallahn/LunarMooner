@@ -50,10 +50,11 @@ enum LMInputFlags
 {
     SteerLeft = 0x1,
     SteerRight = 0x2,
-    Thrust = 0x4,
-    Shoot = 0x8,
-    Start = 0x10,
-    Special = 0x20
+    ThrustUp = 0x4,
+    ThrustDown = 0x8,
+    Shoot = 0x10,
+    Start = 0x20,
+    Special = 0x40
 };
 
 enum class LMDirection
@@ -156,6 +157,8 @@ struct LMTutorialEvent
 {
     enum
     {
+        Opened = -2,
+        Closed = -1,
         FirstLaunch = 0,
         LandingPad,
         RescueSurvivors,
@@ -175,6 +178,7 @@ enum LMParticleID
     Thruster = 0,
     RcsLeft,
     RcsRight,
+    RcsDown,
     RoidTrail,
     SmallExplosion,
     LargeExplosion
@@ -212,7 +216,8 @@ enum LMSoundID
     AnnouncePlayerOne,
     AnnouncePlayerTwo,
     ChargeProgress,
-    ChargeComplete
+    ChargeComplete,
+    TutTip
 };
 
 #endif //COMMAND_IDS_HPP_

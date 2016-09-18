@@ -108,7 +108,7 @@ bool TutorialTip::update(float dt)
         for (auto& v : m_vertices) v.color = colour;
         m_text.setFillColor(colour);
     }
-        return false;
+    return false;
     case State::Started:
         //update animation
     {
@@ -136,7 +136,7 @@ bool TutorialTip::update(float dt)
             m_text.setFillColor(sf::Color::Yellow);
         }
     }
-        return true;
+    return true;
     case State::Finished:
         //check for continue
         return true;
@@ -148,9 +148,12 @@ void TutorialTip::reset()
     if (m_state == State::Finished)
     {
         m_alpha = 1.f;
-        sf::Listener::setGlobalVolume(restoreVol);
+        //sf::Listener::setGlobalVolume(restoreVol);
 
         m_state = State::Reset;
+
+        auto msg = m_messageBus.post<LMTutorialEvent>(TutorialEvent);
+        msg->action = LMTutorialEvent::Closed;
     }
 }
 
@@ -202,8 +205,8 @@ void TutorialTip::start()
         m_text.setPosition(pos);
 
 
-        restoreVol = sf::Listener::getGlobalVolume();
-        sf::Listener::setGlobalVolume(0.f);
+        //restoreVol = sf::Listener::getGlobalVolume();
+        //sf::Listener::setGlobalVolume(0.f);
 
         setShaderActive(true);
 

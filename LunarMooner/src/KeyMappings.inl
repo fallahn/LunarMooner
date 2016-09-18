@@ -28,27 +28,6 @@ source distribution.
 #ifndef KEYMAP_INL_
 #define KEYMAP_INL_
 
-//const sf::Keyboard::Key keyStart = sf::Keyboard::Return;
-//const sf::Keyboard::Key keyLeft = sf::Keyboard::A;
-//const sf::Keyboard::Key keyRight = sf::Keyboard::D;
-//const sf::Keyboard::Key keyThrust = sf::Keyboard::W;
-//const sf::Keyboard::Key keyFire = sf::Keyboard::Space;
-//const sf::Keyboard::Key keySpecial = sf::Keyboard::LControl;
-//
-//const sf::Keyboard::Key altKeyLeft = sf::Keyboard::Left;
-//const sf::Keyboard::Key altKeyRight = sf::Keyboard::Right;
-//const sf::Keyboard::Key altKeyThrust = sf::Keyboard::Up;
-//const sf::Keyboard::Key altKeySpecial = sf::Keyboard::RControl;
-//
-////x360 controller mapping
-//const sf::Uint32 buttonA = 0u;
-//const sf::Uint32 buttonB = 1u;
-//const sf::Uint32 buttonX = 2u;
-//const sf::Uint32 buttonY = 3u;
-//const sf::Uint32 buttonLB = 4u;
-//const sf::Uint32 buttonRB = 5u;
-//const sf::Uint32 buttonBack = 6u;
-//const sf::Uint32 buttonStart = 7u;
 const float joyDeadZone = 25.f;
 
 static void parseControllerInput(sf::Uint8& inputFlags)
@@ -62,7 +41,7 @@ static void parseControllerInput(sf::Uint8& inputFlags)
     static bool lastThrust = false;
 
     //joystick direction handling    
-    std::function<void(bool&, bool&, float)> parse = [&inputFlags](bool& lastLeft, bool& lastRight, float xVal)
+    std::function<void(bool&, bool&, float)> parseX = [&inputFlags](bool& lastLeft, bool& lastRight, float xVal)
     {
         bool left = false;
         bool right = false;
@@ -93,11 +72,42 @@ static void parseControllerInput(sf::Uint8& inputFlags)
     };
 
     float xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
-    parse(lastJoyLeft, lastJoyRight, xValue);
+    parseX(lastJoyLeft, lastJoyRight, xValue);
 
     //dpad
     xValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
-    parse(lastPovLeft, lastPovRight, xValue);
+    parseX(lastPovLeft, lastPovRight, xValue);
+
+
+
+    //repeat for Y axis
+    static bool lastJoyDown = false;
+    static bool lastPovDown = false;
+
+    //joystick direction handling    
+    std::function<void(bool&, float)> parseY = [&inputFlags](bool& lastDown, float yVal)
+    {
+        bool down = false;
+
+        if (yVal > joyDeadZone)
+        {
+            down = true;
+        }
+
+        if (lastDown != down)
+        {
+            (down) ?
+                inputFlags |= LMInputFlags::ThrustDown :
+                inputFlags &= ~LMInputFlags::ThrustDown;
+        }
+
+        lastDown = down;
+    };
+    float yValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
+    parseY(lastJoyDown, yValue);
+
+    yValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY);
+    parseY(lastPovDown, -yValue);
 
     //xbox triggers
     float zValue = sf::Joystick::getAxisPosition(0, sf::Joystick::Z);
@@ -105,8 +115,8 @@ static void parseControllerInput(sf::Uint8& inputFlags)
     if (lastThrust != thrust)
     {
         (thrust) ?
-            inputFlags |= LMInputFlags::Thrust :
-            inputFlags &= ~LMInputFlags::Thrust;
+            inputFlags |= LMInputFlags::ThrustUp :
+            inputFlags &= ~LMInputFlags::ThrustUp;
 
     }
     lastThrust = thrust;

@@ -224,24 +224,6 @@ void GameController::buildScene()
     //ending planet
     auto endBody = addBody({ xy::DefaultSceneSize.x - startOffset, xy::Util::Random::value(startOffset, xy::DefaultSceneSize.y - startOffset) }, masterRadius);
     m_targetUID = endBody->getUID();
-        
-    xy::ParticleSystem::Definition pd;
-    pd.loadFromFile("assets/particles/smoke.xyp", m_resources.textureResource);
-    auto ps1 = pd.createSystem(getMessageBus());
-    ps1->setPosition({ 30.f, -20.f });
-    ps1->start();
-
-    auto ps2 = pd.createSystem(getMessageBus());
-    ps2->setPosition({ -45, -54.f });
-    ps2->start();
-
-    auto ps3 = pd.createSystem(getMessageBus());
-    ps3->setPosition({ -15, 64.f });
-    ps3->start();
-
-    endBody->addComponent(ps1);
-    endBody->addComponent(ps2);
-    endBody->addComponent(ps3);
     endBody->update(0.f);
 
     //create intermediate bodies - evenly distribute this by repeating 4 times
@@ -403,7 +385,7 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
 
     auto orbit = xy::Component::create<OrbitComponent>(getMessageBus(), radius);
     drawable->getDrawable().setOutlineThickness(orbit->getInfluenceRadius() - radius);
-    drawable->getDrawable().setOutlineColor({ 0, 120, 255, 20 });
+    drawable->getDrawable().setOutlineColor({ 0, 12, 155, 10 });
 
     const auto influenceRad = orbit->getInfluenceRadius();
     auto ccLarge = m_collisionWorld.addComponent(getMessageBus(), { {-influenceRad, -influenceRad}, {influenceRad * 2.f, influenceRad * 2.f} }, lm::CollisionComponent::ID::Gravity, true);
@@ -413,7 +395,7 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
     auto model = m_meshRenderer.createModel((radius > 50) ? Mesh::Moon : Mesh::Planet, getMessageBus());
     model->setScale({ radius, radius, radius });
     model->setRotation({ xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f) });
-    model->setBaseMaterial(m_resources.materialResource.get(radius > 50 ? Material::LavaPlanet : Material::DesertPlanet));
+    model->setBaseMaterial(m_resources.materialResource.get(radius > 50 ? Material::Moon : Material::DesertPlanet));
 
     auto rotator = xy::Component::create<PlanetRotation>(getMessageBus());
 

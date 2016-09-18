@@ -156,16 +156,7 @@ bool PlanetHoppingState::handleEvent(const sf::Event& evt)
         break;
     case sf::Event::JoystickButtonReleased:
         if (!m_useController || evt.joystickButton.joystickId != 0) break;
-        /*switch (evt.joystickButton.button)
-        {
-        default:break;
-        case buttonA:
-            fire();
-            break;
-        case buttonStart:
-            requestStackPush(States::ID::Pause);
-            break;
-        }*/
+
         if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonA))
         {
             fire();
@@ -271,8 +262,8 @@ void PlanetHoppingState::loadMeshes()
 {
     m_scene.setAmbientColour({ 26, 20, 22 });
     m_scene.getSkyLight().setIntensity(0.6f);
-    m_scene.getSkyLight().setDiffuseColour({ 255, 255, 100 });
-    m_scene.getSkyLight().setSpecularColour({ 250, 255, 158 });
+    m_scene.getSkyLight().setDiffuseColour({ 255, 255, 200 });
+    m_scene.getSkyLight().setSpecularColour({ 255, 255, 250 });
     m_scene.getSkyLight().setDirection({ 0.2f, 0.4f, -0.4f });
 
     //m_meshRenderer.setView(context.defaultView);
@@ -300,11 +291,11 @@ void PlanetHoppingState::loadMeshes()
     m_resources.textureResource.setFallbackColour(sf::Color::Black);
     desertPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("no_mask") });
 
-    auto& lavaPlanet = m_resources.materialResource.add(Material::LavaPlanet, m_resources.shaderResource.get(Shader::MeshNormalMapped));
-    lavaPlanet.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    lavaPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
-    //lavaPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
-    lavaPlanet.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+    auto& moon = m_resources.materialResource.add(Material::Moon, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+    moon.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    moon.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
+    //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
+    moon.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
 }
 
 void PlanetHoppingState::loadParticles()

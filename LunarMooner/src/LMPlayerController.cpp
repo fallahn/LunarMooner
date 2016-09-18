@@ -78,8 +78,10 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
     m_thrust                (nullptr),
     m_rcsLeft               (nullptr),
     m_rcsRight              (nullptr),
+    m_rcsDown               (nullptr),
     m_rcsEffectLeft         (nullptr),
     m_rcsEffectRight        (nullptr),
+    m_rcsEffectDown         (nullptr),
     m_thrustEffect          (nullptr),
     m_highestTerrainPoint   (5000.f),
     m_terrain               (terrain)
@@ -133,6 +135,20 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
     };
     addMessageHandler(handler);
 
+    handler.id = LMMessageId::TutorialEvent;
+    handler.action = [this](xy::Component* c, const xy::Message& msg)
+    {
+        const auto& data = msg.getData<LMTutorialEvent>();
+        if (data.action == LMTutorialEvent::Opened)
+        {
+            m_rcsEffectLeft->pause();
+            m_rcsEffectRight->pause();
+            m_rcsEffectDown->pause();
+            m_thrustEffect->pause();
+        }
+    };
+    addMessageHandler(handler);
+
     //get the highest point so we only test
     //for collision past this
     for (const auto& p : m_terrain)
@@ -167,8 +183,10 @@ void PlayerController::onDelayedStart(xy::Entity& entity)
     m_thrust = entity.getComponent<xy::ParticleSystem>("thrust");
     m_rcsLeft = entity.getComponent<xy::ParticleSystem>("rcsLeft");
     m_rcsRight = entity.getComponent<xy::ParticleSystem>("rcsRight");
+    m_rcsDown = entity.getComponent<xy::ParticleSystem>("rcsDown");
     m_rcsEffectLeft = entity.getComponent<xy::AudioSource>("rcsEffectLeft");
     m_rcsEffectRight = entity.getComponent<xy::AudioSource>("rcsEffectRight");
+    m_rcsEffectDown = entity.getComponent<xy::AudioSource>("rcsEffectDown");
     m_thrustEffect = entity.getComponent<xy::AudioSource>("thrustEffect");
 }
 
@@ -198,7 +216,18 @@ void PlayerController::setInput(sf::Uint8 input)
             m_rcsEffectLeft->stop();
         }
         ///////////////////////////////////
-        if (input & LMInputFlags::Thrust)
+        if (input & LMInputFlags::ThrustDown)
+        {
+            m_rcsDown->start();
+            m_rcsEffectDown->play(true);
+        }
+        else
+        {
+            m_rcsDown->stop();
+            m_rcsEffectDown->stop();
+        }
+        ///////////////////////////////////
+        if (input & LMInputFlags::ThrustUp)
         {
             m_thrust->start();
             m_thrustEffect->play(true);
@@ -503,12 +532,16 @@ void PlayerController::flyingState(xy::Entity& entity, float dt)
         m_velocity -= thrustX;
     }
 
-    if ((m_inputFlags & LMInputFlags::Thrust)
+    if ((m_inputFlags & LMInputFlags::ThrustUp)
         && entityYPos > maxSkyDistance)
     {
         m_velocity += thrustUp;
     }
 
+    if (m_inputFlags & LMInputFlags::ThrustDown)
+    {
+        m_velocity -= thrustUp * 0.5f;
+    }
 
     //apply drag
     m_velocity.x *= 0.999f;
