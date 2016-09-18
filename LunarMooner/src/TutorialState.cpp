@@ -37,7 +37,7 @@ source distribution.
 
 namespace
 {
-#include "KeyMappings.inl"
+//#include "KeyMappings.inl"
 
     const std::string fragShader =
         "#version 120\n"
@@ -98,7 +98,7 @@ bool TutorialState::handleEvent(const sf::Event& evt)
             m_tip.reset();
         }
     }
-    //TODO asert controller is enabled
+    //TODO assert controller is enabled
     else if (evt.type == sf::Event::JoystickButtonReleased)
     {
         if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonA))
@@ -136,6 +136,9 @@ void TutorialState::handleGameMessage(const xy::Message& msg)
     if (msg.id == TutorialEvent)
     {
         const auto& data = msg.getData<LMTutorialEvent>();
+        if (data.action == LMTutorialEvent::Closed
+            || data.action == LMTutorialEvent::Opened) return;
+
         if (!m_tutTipUsed[data.action])
         {
             switch (data.action)
@@ -170,6 +173,11 @@ void TutorialState::handleGameMessage(const xy::Message& msg)
             m_tip.setPosition(data.posX, data.posY);
             m_tip.start();
             m_tutTipUsed[data.action] = true;
+
+            auto nmsg = getContext().appInstance.getMessageBus().post<LMTutorialEvent>(LMMessageId::TutorialEvent);
+            nmsg->action = LMTutorialEvent::Opened;
+            nmsg->posX = data.posX;
+            nmsg->posY = data.posY;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace ph
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity& entity, float dt) override
         {
-            m_model->rotate(xy::Model::Axis::Y, 40.f * dt);
+            m_model->rotate(xy::Model::Axis::Y, 4.f * dt);
         }
         void onDelayedStart(xy::Entity& e) override
         {

@@ -94,7 +94,7 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, ResourceCollecti
         mh.id = xy::Message::UIMessage;
         mh.action = [this](xy::Component* c, const xy::Message& msg)
         {
-            auto& msgData = msg.getData<xy::Message::UIEvent>();
+            const auto& msgData = msg.getData<xy::Message::UIEvent>();
             switch (msgData.type)
             {
             default: break;
@@ -118,6 +118,29 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, ResourceCollecti
             break;
             }
         };
+        addMessageHandler(mh);
+
+        //play / pause round count loop when showing tool tip
+        mh.id = LMMessageId::TutorialEvent;
+        mh.action = [this](xy::Component* c, const xy::Message& msg)
+        {
+            const auto& msgData = msg.getData<LMTutorialEvent>();
+            if (msgData.action == LMTutorialEvent::Opened)
+            {
+                if (m_countLoop.getStatus() == sf::SoundSource::Playing)
+                {
+                    m_countLoop.pause();
+                }
+            }
+            else if (msgData.action == LMTutorialEvent::Closed)
+            {
+                if (m_countLoop.getStatus() == sf::SoundSource::Paused)
+                {
+                    m_countLoop.play();
+                }
+            }
+        };
+        addMessageHandler(mh);
     }
 }
 

@@ -31,6 +31,7 @@ source distribution.
 #include <LMNukeDrawable.hpp>
 #include <CommandIds.hpp>
 #include <Game.hpp>
+#include <PHPlanetRotation.hpp>
 
 #include <BGScoreboardMask.hpp>
 #include <BGPlanetDrawable.hpp>
@@ -50,6 +51,7 @@ source distribution.
 #include <xygine/components/Camera.hpp>
 #include <xygine/components/SoundPlayer.hpp>
 #include <xygine/components/MeshDrawable.hpp>
+#include <xygine/components/Model.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 #include <xygine/KeyBinds.hpp>
 
@@ -67,6 +69,8 @@ namespace
     lm::PlayerState playerState;
 
     const std::size_t levelsBeforeBonus = 2;
+
+    bool tutorialComplete = false;
 }
 
 LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::Uint8 playerCount, PlayerProfile& profile)
@@ -122,6 +126,7 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_resources.shaderResource.preload(Shader::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    
 
     m_resources.shaderResource.preload(Shader::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
+    m_resources.shaderResource.preload(Shader::MeshNormalMapped, DEFERRED_TEXTURED_BUMPED_VERTEX, DEFERRED_TEXTURED_BUMPED_FRAGMENT);
     m_resources.shaderResource.preload(Shader::MeshVertexColoured, DEFERRED_VERTCOLOURED_VERTEX, DEFERRED_VERTCOLOURED_FRAGMENT);
     m_resources.shaderResource.preload(Shader::Shadow, SHADOW_VERTEX, SHADOW_FRAGMENT);
 
@@ -176,7 +181,12 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         else if (evt.key.code == xy::Input::getKey(xy::Input::Up)
             || evt.key.code == xy::Input::getAltKey(xy::Input::Up))
         {
-            m_inputFlags &= ~LMInputFlags::Thrust;
+            m_inputFlags &= ~LMInputFlags::ThrustUp;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Down)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Down))
+        {
+            m_inputFlags &= ~LMInputFlags::ThrustDown;
         }
         else if (evt.key.code == xy::Input::getKey(xy::Input::ActionOne)) //fire button
         {
@@ -207,7 +217,12 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         else if (evt.key.code == xy::Input::getKey(xy::Input::Up)
             || evt.key.code == xy::Input::getAltKey(xy::Input::Up))
         {
-            m_inputFlags |= LMInputFlags::Thrust;
+            m_inputFlags |= LMInputFlags::ThrustUp;
+        }
+        else if (evt.key.code == xy::Input::getKey(xy::Input::Down)
+            || evt.key.code == xy::Input::getAltKey(xy::Input::Down))
+        {
+            m_inputFlags |= LMInputFlags::ThrustDown;
         }
         else if (evt.key.code == xy::Input::getKey(xy::Input::ActionOne)) //fire button
         {
@@ -241,7 +256,7 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         }
         else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonB))
         {
-            m_inputFlags |= LMInputFlags::Thrust;
+            m_inputFlags |= LMInputFlags::ThrustUp;
         }
         else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonX)
             || evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonLB))
@@ -249,25 +264,6 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
             m_inputFlags |= LMInputFlags::Special;
         }
 
-        //switch (evt.joystickButton.button)
-        //{
-        //case buttonA:
-        //case buttonRB:
-        //    m_inputFlags |= LMInputFlags::Shoot;
-        //    break;
-        //case buttonB:
-        //    m_inputFlags |= LMInputFlags::Thrust;
-        //    break;
-        //case buttonX:
-        //case buttonLB:
-        //    m_inputFlags |= LMInputFlags::Special;
-        //    break;
-        //case buttonStart:
-        //    //m_inputFlags |= LMInputFlags::Start;
-        //    //requestStackPush(States::ID::Pause);
-        //    break;
-        //default: break;
-        //}
         break;
     case sf::Event::JoystickButtonReleased:
         if (!m_useController || evt.joystickButton.joystickId != 0) break;
@@ -278,7 +274,7 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         }
         else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonB))
         {
-            m_inputFlags &= ~LMInputFlags::Thrust;
+            m_inputFlags &= ~LMInputFlags::ThrustUp;
         }
         else if (evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonX)
             || evt.joystickButton.button == xy::Input::getJoyButton(xy::Input::ButtonLB))
@@ -289,25 +285,7 @@ bool LunarMoonerState::handleEvent(const sf::Event& evt)
         {
             requestStackPush(States::ID::Pause);
         }
-        //switch (evt.joystickButton.button)
-        //{
-        //default: break;
-        //case buttonA:
-        //case buttonRB:
-        //    m_inputFlags &= ~LMInputFlags::Shoot;
-        //    break;
-        //case buttonB:
-        //    m_inputFlags &= ~LMInputFlags::Thrust;
-        //    break;
-        //case buttonX:
-        //case buttonLB:
-        //    m_inputFlags &= ~LMInputFlags::Special;
-        //    break;
-        //case buttonStart:
-        //    requestStackPush(States::ID::Pause);
-        //    //    m_inputFlags &= ~LMInputFlags::Start;
-        //    break;
-        //}
+
         break;
     default: break;
     }
@@ -343,7 +321,8 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             break;
         case LMStateEvent::GameStart:
             if (msgData.stateID == States::ID::SinglePlayer
-                /*&& msgData.value == 1*/) //TODO check if tutorial is enabled in options
+                && msgData.value == 1
+                && !tutorialComplete) //TODO check if tutorial is enabled in options
             {
                 requestStackPush(States::ID::Tutorial);
             }
@@ -384,6 +363,16 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             break;
         }
     }
+    else if (msg.id == LMMessageId::TutorialEvent)
+    {
+        const auto& data = msg.getData<LMTutorialEvent>();
+        if (data.action == LMTutorialEvent::Count - 1)
+        {
+            //we've shown all the tips
+            tutorialComplete = true;
+        }
+    }
+
     m_overlay.handleMessage(msg);
 }
 
@@ -533,11 +522,13 @@ void LunarMoonerState::initSounds()
     soundPlayer->preCache(LMSoundID::AnnouncePlayerTwo, "assets/sound/speech/player_two.wav");
     soundPlayer->preCache(LMSoundID::ChargeComplete, "assets/sound/fx/charge_complete.wav", 2);
     soundPlayer->preCache(LMSoundID::ChargeProgress, "assets/sound/fx/charge_progress.wav", 2);
+    soundPlayer->preCache(LMSoundID::TutTip, "assets/sound/fx/tooltip.wav", 3);
 
     const auto& audioSettings = getContext().appInstance.getAudioSettings();
     soundPlayer->setMasterVolume((audioSettings.muted) ? 0.f : audioSettings.volume);
 
     soundPlayer->setChannelVolume(2, 0.25f);
+    soundPlayer->setChannelVolume(3, 0.4f);
 
     xy::Component::MessageHandler mh;
     mh.id = LMMessageId::GameEvent;
@@ -677,6 +668,29 @@ void LunarMoonerState::initSounds()
     };
     soundPlayer->addMessageHandler(mh);
 
+    mh.id = LMMessageId::TutorialEvent;
+    mh.action = [this](xy::Component* c, const xy::Message& msg)
+    {
+        const auto& data = msg.getData<LMTutorialEvent>();
+        xy::SoundPlayer* player = dynamic_cast<xy::SoundPlayer*>(c);
+
+        if (data.action == LMTutorialEvent::Closed)
+        {
+            //restore volume
+            player->setChannelMuted(0, false);
+            player->setChannelMuted(1, false);
+            player->setChannelMuted(2, false);
+        }
+        else if(data.action == LMTutorialEvent::Opened)
+        {
+            //mute all but channel 3
+            player->setChannelMuted(0, true);
+            player->setChannelMuted(1, true);
+            player->setChannelMuted(2, true);
+            player->playSound(LMSoundID::TutTip, data.posX, data.posY);
+        }
+    };
+    soundPlayer->addMessageHandler(mh);
 
     //game music
     auto gameMusic = xy::Component::create<xy::AudioSource>(m_messageBus, m_resources.soundResource);
@@ -781,6 +795,8 @@ void LunarMoonerState::initMeshes()
     m_scene.getSkyLight().setSpecularColour({ 120, 255, 58 });
     m_scene.getSkyLight().setDirection({ 0.25f, 0.5f, -1.f });
 
+    m_meshRenderer.setNearFarRatios(0.8f, 300.8f);
+
     xy::IQMBuilder ib("assets/models/player_ship.iqm");
     m_meshRenderer.loadModel(Mesh::Player, ib);
 
@@ -789,6 +805,9 @@ void LunarMoonerState::initMeshes()
 
     xy::IQMBuilder ib3("assets/models/corpse.iqm");
     m_meshRenderer.loadModel(Mesh::DeadDoofer, ib3);
+
+    xy::IQMBuilder ib4("assets/models/moon.iqm");
+    m_meshRenderer.loadModel(Mesh::Moon, ib4);
 
     auto& playerMat = m_resources.materialResource.add(Material::Player, m_resources.shaderResource.get(Shader::MeshTextured));
     playerMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/ship_diffuse.png") });
@@ -802,6 +821,12 @@ void LunarMoonerState::initMeshes()
 
     auto& dooferMat = m_resources.materialResource.add(Material::DeadDoofer, m_resources.shaderResource.get(Shader::MeshVertexColoured));
     dooferMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+
+    auto& moon = m_resources.materialResource.add(Material::Moon, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+    moon.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    moon.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
+    //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
+    moon.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
 
     //add drawable to scene
     auto md = m_meshRenderer.createDrawable(m_messageBus);
@@ -1003,9 +1028,17 @@ void LunarMoonerState::buildBackground()
     moon->setNormalShader(m_resources.shaderResource.get(Shader::NormalMapPlanet));
     moon->setRotationVelocity({ 0.f, 0.009f });
 
+    /*auto moon = m_meshRenderer.createModel(Mesh::Moon, m_messageBus);
+    moon->setScale({ moonWidth, moonWidth, moonWidth });
+    moon->setPosition({ 0.f, 0.f, -moonWidth });
+    moon->setBaseMaterial(m_resources.materialResource.get(Material::Moon));
+
+    auto rotation = xy::Component::create<ph::PlanetRotation>(m_messageBus);
+*/
     auto entity = xy::Entity::create(m_messageBus);
-    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), xy::DefaultSceneSize.y / 2.f);
+    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), (xy::DefaultSceneSize.y / 2.f)/* + moonWidth*/);
     entity->addComponent(moon);
+    //entity->addComponent(rotation);
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
     //background lighting

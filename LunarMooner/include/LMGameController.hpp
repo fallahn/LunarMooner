@@ -99,7 +99,7 @@ namespace lm
 
         std::map<sf::Int32, sf::SoundBuffer> m_soundCache;
 
-        std::array<xy::ParticleSystem::Definition, 4u> m_particleDefs;
+        std::array<xy::ParticleSystem::Definition, 5u> m_particleDefs;
         bool m_spawnReady;
         PlayerController* m_player;
         void spawnPlayer();

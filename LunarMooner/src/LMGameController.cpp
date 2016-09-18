@@ -388,6 +388,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_particleDefs[LMParticleID::Thruster].loadFromFile("assets/particles/thrust.xyp", m_resources.textureResource);
     m_particleDefs[LMParticleID::RcsLeft].loadFromFile("assets/particles/rcs_left.xyp", m_resources.textureResource);
     m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_resources.textureResource);
+    m_particleDefs[LMParticleID::RcsDown].loadFromFile("assets/particles/rcs_down.xyp", m_resources.textureResource);
     m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_resources.textureResource);
 
     m_soundCache.insert(std::make_pair(LMSoundID::Engine, m_resources.soundResource.get("assets/sound/fx/thrust.wav")));
@@ -695,6 +696,9 @@ void GameController::spawnPlayer()
         auto rcsRight = m_particleDefs[LMParticleID::RcsRight].createSystem(getMessageBus());
         rcsRight->setName("rcsRight");
 
+        auto rcsDown = m_particleDefs[LMParticleID::RcsDown].createSystem(getMessageBus());
+        rcsDown->setName("rcsDown");
+
         auto sfx1 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
         sfx1->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx1->setFadeInTime(0.1f);
@@ -710,11 +714,18 @@ void GameController::spawnPlayer()
         sfx2->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
         auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
-        sfx3->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
+        sfx3->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx3->setFadeInTime(0.1f);
         sfx3->setFadeOutTime(0.3f);
-        sfx3->setName("thrustEffect");
+        sfx3->setName("rcsEffectDown");
         sfx3->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+
+        auto sfx4 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
+        sfx4->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
+        sfx4->setFadeInTime(0.1f);
+        sfx4->setFadeOutTime(0.3f);
+        sfx4->setName("thrustEffect");
+        sfx4->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
         /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
         lc->setDepth(110.f);
@@ -737,9 +748,11 @@ void GameController::spawnPlayer()
         entity->addComponent(thrust);
         entity->addComponent(rcsLeft);
         entity->addComponent(rcsRight);
+        entity->addComponent(rcsDown);
         auto fx1 = entity->addComponent(sfx1);
         auto fx2 = entity->addComponent(sfx2);
         auto fx3 = entity->addComponent(sfx3);
+        auto fx4 = entity->addComponent(sfx4);
         //entity->addComponent(lc);
         entity->addComponent(model);
         entity->addCommandCategories(LMCommandID::Player);
@@ -747,7 +760,7 @@ void GameController::spawnPlayer()
 
 
         mh.id = xy::Message::UIMessage;
-        mh.action = [fx1, fx2, fx3, this](xy::Component*, const xy::Message& msg)
+        mh.action = [fx1, fx2, fx3, fx4, this](xy::Component*, const xy::Message& msg)
         {
             auto& msgData = msg.getData<xy::Message::UIEvent>();
             switch (msgData.type)
@@ -757,6 +770,7 @@ void GameController::spawnPlayer()
                 fx1->pause();
                 fx2->pause();
                 fx3->pause();
+                fx4->pause();
                 m_player->setInput(0);
                 break;
             }
@@ -1000,7 +1014,7 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left, xy::DefaultSceneSize.y - 320.f); //TODO fix these numbers
     m_terrain = entity->addComponent(terrain);
 
-    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
     //need to do this after adding to entity to get correct transforms
     updatePlatforms();
