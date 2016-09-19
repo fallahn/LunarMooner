@@ -39,7 +39,8 @@ namespace
 
 BulletController::BulletController(xy::MessageBus& mb, LMDirection direction)
     : xy::Component (mb, this),
-    m_entity        (nullptr)
+    m_entity        (nullptr),
+    m_speed         (speed)
 {
     switch (direction)
     {
@@ -62,7 +63,7 @@ BulletController::BulletController(xy::MessageBus& mb, LMDirection direction)
 //public
 void BulletController::entityUpdate(xy::Entity& entity, float dt)
 {
-    entity.move(m_velocity * speed * dt);
+    entity.move(m_velocity * m_speed * dt);
 }
 
 void BulletController::onStart(xy::Entity& entity)

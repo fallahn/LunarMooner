@@ -25,41 +25,34 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_ROCK_DODGER_HPP_
-#define LM_ROCK_DODGER_HPP_
+#ifndef RD_DISTANCE_DRAWABLE_HPP_
+#define RD_DISTANCE_DRAWABLE_HPP_
 
-#include <StateIds.hpp>
-#include <ResourceCollection.hpp>
-#include <LMCollisionWorld.hpp>
+#include <xygine/components/Component.hpp>
 
-#include <xygine/State.hpp>
-#include <xygine/Scene.hpp>
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
-#include <SFML/Graphics/Sprite.hpp>
-
-class RockDodgingState final : public xy::State
+namespace rd
 {
-public:
-    RockDodgingState(xy::StateStack&, Context);
-    ~RockDodgingState() = default;
+    class DistanceMeter final : public xy::Component, public sf::Drawable
+    {
+    public:
+        explicit DistanceMeter(xy::MessageBus&);
+        ~DistanceMeter() = default;
 
-    bool update(float) override;
-    void draw() override;
-    bool handleEvent(const sf::Event&) override;
-    void handleMessage(const xy::Message&) override;
+        xy::Component::Type type() const override { return xy::Component::Type::Drawable; }
+        void entityUpdate(xy::Entity&, float) override;
 
-    xy::StateID stateID() const override { return States::RockDodging; }
+        void setDistance(float);
 
-private:
-    xy::MessageBus& m_messageBus;
-    xy::Scene m_scene;
-    ResourceCollection m_resources;
-    lm::CollisionWorld m_collisionWorld;
+    private:
+        sf::CircleShape m_circleShape;
+        sf::RectangleShape m_rectangleShape;
 
-    void initGameController();
-    
-    sf::Sprite m_loadingSprite;
-    void updateLoadingScreen(float, sf::RenderWindow&) override;
-};
+        void draw(sf::RenderTarget&, sf::RenderStates) const override;
+    };
+}
 
-#endif //LM_ROCK_DODGER_HPP_
+#endif //RD_DISTANCE_DRAWABLE_HPP_

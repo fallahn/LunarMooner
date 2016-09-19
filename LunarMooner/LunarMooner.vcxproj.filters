@@ -252,6 +252,15 @@
     <ClInclude Include="include\TutorialTip.hpp">
       <Filter>Header Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="include\RDGameController.hpp">
+      <Filter>Header Files\rock dodger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RDPlayerController.hpp">
+      <Filter>Header Files\rock dodger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RDDistanceDrawable.hpp">
+      <Filter>Header Files\rock dodger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -427,6 +436,15 @@
     </ClCompile>
     <ClCompile Include="src\TutorialTip.cpp">
       <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RDPlayerController.cpp">
+      <Filter>Source Files\rock dodger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RDGameController.cpp">
+      <Filter>Source Files\rock dodger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RDDistanceDrawable.cpp">
+      <Filter>Source Files\rock dodger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

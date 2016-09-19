@@ -79,9 +79,14 @@ Game::Game()
             m_stateStack.clearStates();
             m_stateStack.pushState(States::ID::PlanetHopping);
         }
+        else if (p == "dodge")
+        {
+            m_stateStack.clearStates();
+            m_stateStack.pushState(States::ID::RockDodging);
+        }
         else
         {
-            xy::Console::print(param + " not a valid game mode. Game modes are rescue or orbit");
+            xy::Console::print(param + " not a valid game mode. Game modes are rescue, dodge or orbit");
         }
     });
 }
