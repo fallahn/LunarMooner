@@ -40,8 +40,8 @@ namespace
 }
 
 GameMessage::GameMessage(xy::MessageBus& mb, const sf::Font& font, const std::string& message, sf::Uint32 charSize)
-    : xy::Component(mb, this),
-    m_clear(false)
+    : xy::Component (mb, this),
+    m_clear         (false)
 {
     m_text.setFont(font);
     m_text.setString(message);

@@ -47,10 +47,13 @@ namespace lm
 
         void collisionCallback(CollisionComponent*);
 
+        void setSpeed(float speed) { m_speed = speed; }
+
     private:
 
         xy::Entity* m_entity;
         sf::Vector2f m_velocity;
+        float m_speed;
     };
 }
 

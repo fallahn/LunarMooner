@@ -25,41 +25,40 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_ROCK_DODGER_HPP_
-#define LM_ROCK_DODGER_HPP_
+#ifndef RD_PLAYER_CONTROLLER_HPP_
+#define RD_PLAYER_CONTROLLER_HPP_
 
-#include <StateIds.hpp>
-#include <ResourceCollection.hpp>
-#include <LMCollisionWorld.hpp>
+#include <xygine/components/Component.hpp>
 
-#include <xygine/State.hpp>
-#include <xygine/Scene.hpp>
-
-#include <SFML/Graphics/Sprite.hpp>
-
-class RockDodgingState final : public xy::State
+namespace lm
 {
-public:
-    RockDodgingState(xy::StateStack&, Context);
-    ~RockDodgingState() = default;
+    class CollisionComponent;
+}
 
-    bool update(float) override;
-    void draw() override;
-    bool handleEvent(const sf::Event&) override;
-    void handleMessage(const xy::Message&) override;
+namespace rd
+{
+    class PlayerController final : public xy::Component
+    {
+    public:
+        explicit PlayerController(xy::MessageBus&);
+        ~PlayerController() = default;
 
-    xy::StateID stateID() const override { return States::RockDodging; }
+        xy::Component::Type type() const override { return xy::Component::Type::Script; }
+        void entityUpdate(xy::Entity&, float) override;
 
-private:
-    xy::MessageBus& m_messageBus;
-    xy::Scene m_scene;
-    ResourceCollection m_resources;
-    lm::CollisionWorld m_collisionWorld;
+        void activate();
+        void end();
 
-    void initGameController();
-    
-    sf::Sprite m_loadingSprite;
-    void updateLoadingScreen(float, sf::RenderWindow&) override;
-};
+        float getSpeedRatio() const;
 
-#endif //LM_ROCK_DODGER_HPP_
+        void collisionCallback(lm::CollisionComponent*);
+
+    private:
+
+        sf::Vector2f m_velocity;
+        bool m_active;
+        std::function<void(xy::Entity&, float)> update;
+    };
+}
+
+#endif //RD_PLAYER_CONTROLLER_HPP_

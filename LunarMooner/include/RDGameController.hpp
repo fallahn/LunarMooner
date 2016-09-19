@@ -25,41 +25,54 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_ROCK_DODGER_HPP_
-#define LM_ROCK_DODGER_HPP_
+#ifndef RD_GAME_CONTROLLER_HPP_
+#define RD_GAME_CONTROLLER_HPP_
 
-#include <StateIds.hpp>
 #include <ResourceCollection.hpp>
-#include <LMCollisionWorld.hpp>
 
-#include <xygine/State.hpp>
-#include <xygine/Scene.hpp>
+#include <xygine/components/Component.hpp>
 
-#include <SFML/Graphics/Sprite.hpp>
-
-class RockDodgingState final : public xy::State
+namespace xy
 {
-public:
-    RockDodgingState(xy::StateStack&, Context);
-    ~RockDodgingState() = default;
+    class Scene;
+}
 
-    bool update(float) override;
-    void draw() override;
-    bool handleEvent(const sf::Event&) override;
-    void handleMessage(const xy::Message&) override;
+namespace lm
+{
+    class CollisionWorld;
+}
 
-    xy::StateID stateID() const override { return States::RockDodging; }
+namespace rd
+{
+    class GameController final : public xy::Component
+    {
+    public:
+        GameController(xy::MessageBus&, xy::Scene&, ResourceCollection&, lm::CollisionWorld&);
+        ~GameController() = default;
 
-private:
-    xy::MessageBus& m_messageBus;
-    xy::Scene m_scene;
-    ResourceCollection m_resources;
-    lm::CollisionWorld m_collisionWorld;
+        xy::Component::Type type() const override { return xy::Component::Type::Script; }
+        void entityUpdate(xy::Entity&, float) override;
 
-    void initGameController();
-    
-    sf::Sprite m_loadingSprite;
-    void updateLoadingScreen(float, sf::RenderWindow&) override;
-};
+        void fireLaser(const sf::Vector2f&);
+        bool gameEnded() const { return m_remainingTime < 0 && !m_roundStarted; }
 
-#endif //LM_ROCK_DODGER_HPP_
+    private:
+
+        xy::Scene& m_scene;
+        ResourceCollection& m_resources;
+        lm::CollisionWorld& m_collisionWorld;
+
+        float m_remainingTime;
+        bool m_roundStarted;
+
+        float m_spawnTime;
+
+        void buildBackground();
+
+        void spawnPlayer();
+        void spawnRock();
+        void spawnDoofer();
+    };
+}
+
+#endif //RD_GAME_CONTROLLER_HPP_
