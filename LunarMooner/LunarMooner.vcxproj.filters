@@ -261,6 +261,12 @@
     <ClInclude Include="include\RDDistanceDrawable.hpp">
       <Filter>Header Files\rock dodger</Filter>
     </ClInclude>
+    <ClInclude Include="include\RDRockPool.hpp">
+      <Filter>Header Files\rock dodger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RDRockController.hpp">
+      <Filter>Header Files\rock dodger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -444,6 +450,12 @@
       <Filter>Source Files\rock dodger</Filter>
     </ClCompile>
     <ClCompile Include="src\RDDistanceDrawable.cpp">
+      <Filter>Source Files\rock dodger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RDRockPool.cpp">
+      <Filter>Source Files\rock dodger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RDRockController.cpp">
       <Filter>Source Files\rock dodger</Filter>
     </ClCompile>
   </ItemGroup>

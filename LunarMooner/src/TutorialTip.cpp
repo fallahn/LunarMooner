@@ -45,7 +45,6 @@ namespace
     const float maxScale = 60.f;
     const float scaleGrowth = 180.f;
 
-    float restoreVol = 0.f;
     float elapsedTime = 0.f;
 
     const sf::Vector2f textPos(134.f, 100.f);

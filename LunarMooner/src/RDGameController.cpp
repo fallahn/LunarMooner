@@ -52,8 +52,8 @@ namespace
 
     DistanceMeter* distanceMeter = nullptr;
 
-    const float minSpawn = 1.f;
-    const float maxSpawn = 3.f;
+    const float minSpawn = 0.5f;
+    const float maxSpawn = 1.f;
 
     const sf::Vector2f bulletSize(80.f, 4.f);
 
@@ -65,6 +65,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, ResourceCol
     m_scene         (scene),
     m_resources     (rc),
     m_collisionWorld(cw),
+    m_rockPool      (m_collisionWorld, m_scene, mb),
     m_remainingTime (roundTime),
     m_roundStarted  (false),
     m_spawnTime     (xy::Util::Random::value(minSpawn, maxSpawn))
@@ -89,11 +90,18 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, ResourceCol
             m_roundStarted = false;
 
             {
-                auto gameMessage = xy::Component::create<GameMessage>(getMessageBus(), m_resources.fontResource.get("round end"), "Destination reached...", 48u);
+                auto gameMessage = xy::Component::create<GameMessage>(getMessageBus(), m_resources.fontResource.get("round end"), "Destination reached...", 58u);
                 auto entity = xy::Entity::create(getMessageBus());
                 entity->setPosition(xy::DefaultSceneSize / 2.f);
                 entity->addComponent(gameMessage);
                 entity->addCommandCategories(LMCommandID::UI);
+
+                gameMessage = xy::Component::create<GameMessage>(getMessageBus(), m_resources.fontResource.get("round end"), "Press Fire to Continue", 38u);
+                auto subEnt = xy::Entity::create(getMessageBus());
+                subEnt->move(0.f, 52.f);
+                subEnt->addComponent(gameMessage);
+                entity->addChild(subEnt);
+
                 m_scene.addEntity(entity, xy::Scene::Layer::UI);
             }
 
@@ -269,7 +277,7 @@ void GameController::spawnPlayer()
 
 void GameController::spawnRock()
 {
-
+    m_rockPool.spawn();
 }
 
 void GameController::spawnDoofer()
