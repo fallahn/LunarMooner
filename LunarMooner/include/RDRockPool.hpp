@@ -25,17 +25,16 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef RD_GAME_CONTROLLER_HPP_
-#define RD_GAME_CONTROLLER_HPP_
+#ifndef RD_ROCK_POOL_HPP_
+#define RD_ROCK_POOL_HPP_
 
-#include <ResourceCollection.hpp>
-#include <RDRockPool.hpp>
-
-#include <xygine/components/Component.hpp>
+#include <vector>
 
 namespace xy
 {
     class Scene;
+    class Entity;
+    class MessageBus;
 }
 
 namespace lm
@@ -45,37 +44,18 @@ namespace lm
 
 namespace rd
 {
-    class GameController final : public xy::Component
+    class RockPool final
     {
     public:
-        GameController(xy::MessageBus&, xy::Scene&, ResourceCollection&, lm::CollisionWorld&);
-        ~GameController() = default;
+        RockPool(lm::CollisionWorld&, xy::Scene&, xy::MessageBus&);
+        ~RockPool() = default;
 
-        xy::Component::Type type() const override { return xy::Component::Type::Script; }
-        void entityUpdate(xy::Entity&, float) override;
-
-        void fireLaser(const sf::Vector2f&);
-        bool gameEnded() const { return m_remainingTime < 0 && !m_roundStarted; }
+        void spawn();
 
     private:
 
-        xy::Scene& m_scene;
-        ResourceCollection& m_resources;
-        lm::CollisionWorld& m_collisionWorld;
-
-        RockPool m_rockPool;
-
-        float m_remainingTime;
-        bool m_roundStarted;
-
-        float m_spawnTime;
-
-        void buildBackground();
-
-        void spawnPlayer();
-        void spawnRock();
-        void spawnDoofer();
+        std::vector<xy::Entity*> m_pool;
     };
 }
 
-#endif //RD_GAME_CONTROLLER_HPP_
+#endif //RD_ROCK_POOL_HPP_

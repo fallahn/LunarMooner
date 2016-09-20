@@ -25,57 +25,40 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef RD_GAME_CONTROLLER_HPP_
-#define RD_GAME_CONTROLLER_HPP_
-
-#include <ResourceCollection.hpp>
-#include <RDRockPool.hpp>
+#ifndef RD_ROCK_CONTROLLER_HPP_
+#define RD_ROCK_CONTROLLER_HPP_
 
 #include <xygine/components/Component.hpp>
 
-namespace xy
-{
-    class Scene;
-}
-
 namespace lm
 {
-    class CollisionWorld;
+    class CollisionComponent;
 }
 
 namespace rd
 {
-    class GameController final : public xy::Component
+    class RockController final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, xy::Scene&, ResourceCollection&, lm::CollisionWorld&);
-        ~GameController() = default;
+        explicit RockController(xy::MessageBus&);
+        ~RockController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity&, float) override;
+        void onStart(xy::Entity&) override;
 
-        void fireLaser(const sf::Vector2f&);
-        bool gameEnded() const { return m_remainingTime < 0 && !m_roundStarted; }
+        bool alive() const { return m_alive; }
+        void spawn(const sf::Vector2f&);
+        void reset();
+
+        void collisionCallback(lm::CollisionComponent*);
 
     private:
+        xy::Entity* m_entity;
+        bool m_alive;
 
-        xy::Scene& m_scene;
-        ResourceCollection& m_resources;
-        lm::CollisionWorld& m_collisionWorld;
 
-        RockPool m_rockPool;
-
-        float m_remainingTime;
-        bool m_roundStarted;
-
-        float m_spawnTime;
-
-        void buildBackground();
-
-        void spawnPlayer();
-        void spawnRock();
-        void spawnDoofer();
     };
 }
 
-#endif //RD_GAME_CONTROLLER_HPP_
+#endif //RD_ROCK_CONTROLLER_HPP_

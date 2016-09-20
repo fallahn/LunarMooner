@@ -338,7 +338,7 @@ void PlanetHoppingState::buildScene()
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
-    background->setVelocity({ 1.f, 0.f });
+    background->setVelocity({ 0.4f, 0.7f });
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(background);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);

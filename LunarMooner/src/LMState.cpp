@@ -71,6 +71,8 @@ namespace
     const std::size_t levelsBeforeBonus = 2;
 
     bool tutorialComplete = false;
+
+    xy::StateID bonusState = States::ID::PlanetHopping;
 }
 
 LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::Uint8 playerCount, PlayerProfile& profile)
@@ -309,9 +311,10 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
             if (m_playerCount == 1 && m_levelChangeCount == levelsBeforeBonus)
             {
                 //in single player launch mini game
-                //TODO alternate types
+                bonusState = (bonusState == States::ID::PlanetHopping) ? States::ID::RockDodging : States::ID::PlanetHopping;
+
                 requestStackClear();
-                requestStackPush(States::ID::PlanetHopping);
+                requestStackPush(bonusState);
                 m_levelChangeCount = 0;
 
                 //save the state for resumption

@@ -56,6 +56,8 @@ SET(LM_SRC
   ${LM_DIR}/RDDistanceDrawable.cpp
   ${LM_DIR}/RDGameController.cpp
   ${LM_DIR}/RDPlayerController.cpp
+  ${LM_DIR}/RDRockController.cpp
+  ${LM_DIR}/RDRockPool.cpp
   ${LM_DIR}/RockDodgingState.cpp
   ${LM_DIR}/TutorialState.cpp
   ${LM_DIR}/TutorialTip.cpp
