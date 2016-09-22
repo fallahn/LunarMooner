@@ -40,7 +40,7 @@ namespace rd
     class RockController final : public xy::Component
     {
     public:
-        explicit RockController(xy::MessageBus&);
+        RockController(xy::MessageBus&, const sf::Vector2f&);
         ~RockController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -56,7 +56,7 @@ namespace rd
     private:
         xy::Entity* m_entity;
         bool m_alive;
-
+        sf::Vector2f m_homePosition;
 
     };
 }

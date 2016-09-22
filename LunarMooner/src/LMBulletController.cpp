@@ -35,6 +35,7 @@ using namespace lm;
 namespace
 {
     const float speed = 600.f;
+    const sf::FloatRect area({ -20.f, -20.f }, xy::DefaultSceneSize + sf::Vector2f(40.f, 40.f));
 }
 
 BulletController::BulletController(xy::MessageBus& mb, LMDirection direction)
@@ -64,6 +65,11 @@ BulletController::BulletController(xy::MessageBus& mb, LMDirection direction)
 void BulletController::entityUpdate(xy::Entity& entity, float dt)
 {
     entity.move(m_velocity * m_speed * dt);
+
+    if (!area.contains(entity.getWorldPosition()))
+    {
+        entity.destroy();
+    }
 }
 
 void BulletController::onStart(xy::Entity& entity)

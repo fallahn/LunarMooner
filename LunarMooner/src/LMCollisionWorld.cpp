@@ -62,6 +62,7 @@ void CollisionWorld::update()
                 {
                     for (const auto cb : cbs)
                     {
+                        if (ca == cb) continue;
                         if (ca->globalBounds().intersects(cb->globalBounds()))
                         {
                             ca->addCollider(cb);

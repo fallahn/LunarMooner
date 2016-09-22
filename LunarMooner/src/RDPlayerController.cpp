@@ -27,6 +27,7 @@ source distribution.
 
 #include <RDPlayerController.hpp>
 #include <LMCollisionComponent.hpp>
+#include <LMCollisionWorld.hpp>
 #include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>

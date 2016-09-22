@@ -48,12 +48,12 @@ namespace
 {
     const sf::FloatRect playerSize(0.f, 0.f, 120.f, 80.f);
     const sf::Vector2f spawnPosition(-playerSize.width, (xy::DefaultSceneSize.y - playerSize.height) / 2.f);
-    const float roundTime = 10.f;
+    const float roundTime = 90.f;
 
     DistanceMeter* distanceMeter = nullptr;
 
-    const float minSpawn = 0.5f;
-    const float maxSpawn = 1.f;
+    const float minSpawn = 0.25f;
+    const float maxSpawn = 0.75f;
 
     const sf::Vector2f bulletSize(80.f, 4.f);
 
@@ -85,6 +85,19 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, ResourceCol
         default: break;
         case LMStateEvent::RoundBegin:
             m_roundStarted = true;
+            {
+                xy::Command cmd;
+                cmd.category = LMCommandID::Player;
+                cmd.action = [this](xy::Entity& entity, float)
+                {
+                    auto playerCollision = m_collisionWorld.addComponent(getMessageBus(), playerSize, lm::CollisionComponent::ID::Player, true);
+                    lm::CollisionComponent::Callback callback = std::bind(&rd::PlayerController::collisionCallback, entity.getComponent<rd::PlayerController>(), std::placeholders::_1);
+                    playerCollision->setCallback(callback);
+                    entity.addComponent(playerCollision);
+                };
+
+                m_scene.sendCommand(cmd);
+            }
             break;
         case LMStateEvent::RoundEnd:
             m_roundStarted = false;
@@ -130,14 +143,17 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, ResourceCol
             else
             {
                 //go straight in to playing again
-                xy::Command cmd;
+                /*xy::Command cmd;
                 cmd.category = LMCommandID::Player;
                 cmd.action = [](xy::Entity& entity, float)
                 {
                     entity.getComponent<rd::PlayerController>()->activate();
                 };
-                m_scene.sendCommand(cmd);
+                m_scene.sendCommand(cmd);*/
             }
+            break;
+        case LMGameEvent::PlayerDied:
+            spawnPlayer();
             break;
         }
     };
@@ -251,10 +267,6 @@ void GameController::spawnPlayer()
 {
     auto controller = xy::Component::create<PlayerController>(getMessageBus());
 
-    auto playerCollision = m_collisionWorld.addComponent(getMessageBus(), playerSize, lm::CollisionComponent::ID::Player, true);
-    lm::CollisionComponent::Callback callback = std::bind(&rd::PlayerController::collisionCallback, controller.get(), std::placeholders::_1);
-    playerCollision->setCallback(callback);
-
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), playerSize);
 
     auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(getMessageBus());
@@ -262,7 +274,6 @@ void GameController::spawnPlayer()
 
     auto entity = xy::Entity::create(getMessageBus());
     entity->addComponent(controller);
-    entity->addComponent(playerCollision);
     entity->addComponent(qtc);
     entity->addComponent(drawable);
     entity->setWorldPosition(spawnPosition);

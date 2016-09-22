@@ -27,6 +27,7 @@ source distribution.
 
 #include <RDRockController.hpp>
 #include <LMCollisionComponent.hpp>
+#include <CommandIds.hpp>
 
 #include <xygine/Entity.hpp>
 
@@ -37,10 +38,11 @@ namespace
     const sf::Vector2f velocity(-800.f, 0.f);
 }
 
-RockController::RockController(xy::MessageBus& mb)
+RockController::RockController(xy::MessageBus& mb, const sf::Vector2f& homePosition)
     : xy::Component (mb, this),
     m_entity        (nullptr),
-    m_alive         (false)
+    m_alive         (false),
+    m_homePosition  (homePosition)
 {
 
 }
@@ -73,12 +75,13 @@ void RockController::spawn(const sf::Vector2f& position)
 
 void RockController::reset()
 {
-    m_entity->setPosition(2000.f, 500.f);
+    m_entity->setPosition(m_homePosition);
     m_alive = false;
 }
 
 void RockController::collisionCallback(lm::CollisionComponent* cc)
 {
+    LOG("Rock Collision " + std::to_string((int)cc->getID()), xy::Logger::Type::Info);
     if (m_alive)
     {
         switch (cc->getID())
@@ -86,16 +89,24 @@ void RockController::collisionCallback(lm::CollisionComponent* cc)
         default: break;
         case lm::CollisionComponent::ID::Bullet:
             reset();
+            cc->getParentEntity().destroy();
             //TODO raise message
             break;
         case lm::CollisionComponent::ID::Player:
             cc->getParentEntity().destroy();
-            //TODO raise player died message
+            
+            {
+                auto msg = sendMessage<LMGameEvent>(GameEvent);
+                msg->type = LMGameEvent::PlayerDied;
+                msg->posX = cc->getParentEntity().getWorldPosition().x;
+                msg->posY = cc->getParentEntity().getWorldPosition().y;
+            }
+
             break;
         case lm::CollisionComponent::ID::Tower:
             //we're using Tower for rocks because it won't get
             //killed by the bullet callback that way
-
+            reset();
             break;
         }
     }

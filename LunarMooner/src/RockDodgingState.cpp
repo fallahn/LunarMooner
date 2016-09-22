@@ -31,10 +31,12 @@ source distribution.
 #include <CommandIds.hpp>
 #include <GameMessage.hpp>
 #include <LMBulletController.hpp>
+#include <LMPostBlur.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/KeyBinds.hpp>
 #include <xygine/Command.hpp>
+#include <xygine/PostChromeAb.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -57,7 +59,12 @@ RockDodgingState::RockDodgingState(xy::StateStack& stack, Context context)
     launchLoadingScreen();
 
     m_scene.setView(context.defaultView);
-    //TODO post processes
+    //post processes
+    auto pp = xy::PostProcess::create<lm::PostBlur>();
+    m_scene.addPostProcess(pp);
+    pp = xy::PostProcess::create<xy::PostChromeAb>();
+    m_scene.addPostProcess(pp);
+
     //m_scene.drawDebug(true);
 
     //TODO cache resources
