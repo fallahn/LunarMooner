@@ -53,15 +53,17 @@ RockPool::RockPool(lm::CollisionWorld& cw, xy::Scene& scene, xy::MessageBus& mb)
     : m_pool    (poolSize)
 {
     //init pool
+    const float padding = maxSize;
     for (auto i = 0u; i < poolSize; ++i)
     {
         float size = xy::Util::Random::value(minSize, maxSize);
-        auto controller = xy::Component::create<RockController>(mb);
-        auto collision = cw.addComponent(mb, { {-size, -size}, {size *2.f, size * 2.f} }, lm::CollisionComponent::ID::Tower, true);
+        float homeSize = (maxSize * 2.f) * i + padding;
+        auto controller = xy::Component::create<RockController>(mb, sf::Vector2f(xy::DefaultSceneSize.x + homeSize, 0.f));
+        auto collision = cw.addComponent(mb, { {-size, -size}, {size *2.f, size * 2.f} }, lm::CollisionComponent::ID::Tower, false);
         lm::CollisionComponent::Callback callback = std::bind(&RockController::collisionCallback, controller.get(), std::placeholders::_1);
         collision->setCallback(callback);
 
-        auto qtc = xy::Component::create<xy::QuadTreeComponent>(mb, sf::FloatRect({ -size, -size },{ size *2.f, size * 2.f }));
+        auto qtc = xy::Component::create<xy::QuadTreeComponent>(mb, sf::FloatRect({ -size, -size },{ size * 2.f, size * 2.f }));
 
         auto drawable = xy::Component::create<xy::SfDrawableComponent<sf::CircleShape>>(mb);
         drawable->getDrawable().setRadius(size);
@@ -69,13 +71,13 @@ RockPool::RockPool(lm::CollisionWorld& cw, xy::Scene& scene, xy::MessageBus& mb)
         drawable->getDrawable().setFillColor(sf::Color::Red);
 
         auto entity = xy::Entity::create(mb);
-        entity->setPosition(2000.f, 500.f);
         entity->addComponent(controller);
         entity->addComponent(collision);
         entity->addComponent(qtc);
         entity->addComponent(drawable);
 
         m_pool[i] = scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
+        m_pool[i]->getComponent<RockController>()->reset();
     }
 }
 

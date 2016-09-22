@@ -43,6 +43,8 @@ namespace lm
         "const float amplitude = 0.009;\n"
         "const float reflectIntensity = 0.9;\n"
 
+        "const vec2 lightDir = normalize(vec2(-1.0, -1.0));\n"
+
         "void main()\n"
         "{\n"
         "    vec2 coord = gl_TexCoord[0].xy;\n"
@@ -54,15 +56,23 @@ namespace lm
         "        discard;\n"
         "    }\n"
 
-        "    coord.x += sin((coord.y + u_time) * waveCount) * amplitude * (coord.y - u_texOffset);\n"
-        "    coord.y += cos((coord.x + u_time) * waveCount) * amplitude * (coord.y - u_texOffset);\n"
+        "    vec2 offset = vec2("
+        "       sin((coord.y + u_time) * waveCount) * amplitude * (coord.y - u_texOffset),"
+        "       cos((coord.x + u_time) * waveCount) * amplitude * (coord.y - u_texOffset));\n"
+        /*"    coord.x += sin((coord.y + u_time) * waveCount) * amplitude * (coord.y - u_texOffset);\n"
+        "    coord.y += cos((coord.x + u_time) * waveCount) * amplitude * (coord.y - u_texOffset);\n"*/
+
+        "    coord += offset;\n"
 
         "    vec4 refractColour = texture2D(u_texture, coord);\n"
         "    refractColour.rgb *= gl_Color.rgb;\n"
 
-        "    float mixAmount = coord.y * reflectIntensity;\n"
+        "    float mixAmount = (coord.y < 0.93) ? coord.y * reflectIntensity : 1.0;\n"
         "    coord.y -= (coord.y - u_texOffset) * 2.0;\n"
         "    vec4 reflectColour = texture2D(u_texture, coord);\n"
+
+        "    float lightAmount = clamp(0.0, 1.0, dot(normalize(offset), lightDir));\n"
+        "    //reflectColour.rgb += vec3(1.0) * lightAmount;\n"
 
         "    gl_FragColor.rgb = mix(reflectColour.rgb, refractColour.rgb, mixAmount);// + vec3(dither * 5.0);\n"
         "    gl_FragColor.a = max(refractColour.a, gl_Color.a);\n"

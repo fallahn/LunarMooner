@@ -54,7 +54,6 @@ namespace rd
         void collisionCallback(lm::CollisionComponent*);
 
     private:
-
         sf::Vector2f m_velocity;
         bool m_active;
         std::function<void(xy::Entity&, float)> update;
