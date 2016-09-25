@@ -41,7 +41,8 @@ namespace Mesh
         MotherShip,
         DeadDoofer,
         Planet,
-        Moon
+        Moon,
+        RockWall01
     };
 }
 namespace Material
@@ -53,6 +54,7 @@ namespace Material
         DeadDoofer,
         DesertPlanet,
         Moon,
+        RockWall01,
         End
     };
 }

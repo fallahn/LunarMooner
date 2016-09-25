@@ -403,7 +403,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     sprBatch->setTexture(&rc.textureResource.get("assets/images/game/debris.png"));
     auto ent = xy::Entity::create(getMessageBus());
     m_alienBatch = ent->addComponent(sprBatch);
-    m_scene.addEntity(ent, xy::Scene::Layer::BackFront);
+    m_scene.addEntity(ent, xy::Scene::Layer::FrontFront);
 }
 
 //public
@@ -1004,6 +1004,22 @@ void GameController::createTerrain()
     entity->setPosition(550.f, 860.f);
     entity->addComponent(ps);
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);*/
+
+
+    //temp stuff to see how new models lay out
+    for (auto i = 0u; i < 3u; ++i)
+    {
+        auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, getMessageBus());
+        rockWall->setPosition({ 0.f, 0.f, -340.f + xy::Util::Random::value(-50.f, 50.f) });
+        rockWall->setScale({ 2.2f, xy::Util::Random::value(1.5f, 1.9f), 1.8f });
+        rockWall->rotate(xy::Model::Axis::Y, xy::Util::Random::value(-10.f, 10.f));
+        auto& material = m_resources.materialResource.get(Material::ID::RockWall01);
+        rockWall->setBaseMaterial(material);
+        entity = xy::Entity::create(getMessageBus());
+        entity->setPosition(alienArea.left + (rockWall->getMesh().getBoundingBox().asFloatRect().width / 2.f) + (i * 520.f), xy::DefaultSceneSize.y);
+        entity->addComponent(rockWall);
+        m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+    }
 
     //death zone at bottom
     auto terrain = xy::Component::create<Terrain>(getMessageBus());
