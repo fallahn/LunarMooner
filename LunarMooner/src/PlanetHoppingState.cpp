@@ -266,6 +266,8 @@ void PlanetHoppingState::loadMeshes()
     m_scene.getSkyLight().setSpecularColour({ 255, 255, 250 });
     m_scene.getSkyLight().setDirection({ 0.2f, 0.3f, -0.4f });
 
+    m_meshRenderer.setFOV(58.f);
+
     //m_meshRenderer.setView(context.defaultView);
     auto meshDrawable = m_meshRenderer.createDrawable(m_messageBus);
     auto entity = xy::Entity::create(m_messageBus);
