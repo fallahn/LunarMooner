@@ -798,7 +798,7 @@ void LunarMoonerState::initMeshes()
     m_scene.getSkyLight().setSpecularColour({ 120, 255, 58 });
     m_scene.getSkyLight().setDirection({ 0.25f, 0.5f, -1.f });
 
-    m_meshRenderer.setNearFarRatios(0.8f, 300.8f);
+    m_meshRenderer.setNearFarRatios(0.1f, 100.8f);
 
     xy::IQMBuilder ib("assets/models/player_ship.iqm");
     m_meshRenderer.loadModel(Mesh::Player, ib);
@@ -811,6 +811,9 @@ void LunarMoonerState::initMeshes()
 
     xy::IQMBuilder ib4("assets/models/moon.iqm");
     m_meshRenderer.loadModel(Mesh::Moon, ib4);
+
+    xy::IQMBuilder ib5("assets/models/rock_wall_01.iqm");
+    m_meshRenderer.loadModel(Mesh::RockWall01, ib5);
 
     auto& playerMat = m_resources.materialResource.add(Material::Player, m_resources.shaderResource.get(Shader::MeshTextured));
     playerMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/ship_diffuse.png") });
@@ -828,8 +831,15 @@ void LunarMoonerState::initMeshes()
     auto& moon = m_resources.materialResource.add(Material::Moon, m_resources.shaderResource.get(Shader::MeshNormalMapped));
     moon.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     moon.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
-    //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
+    //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/mask.png") });
     moon.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+
+    auto& rockwallMat = m_resources.materialResource.add(Material::RockWall01, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+    rockwallMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    rockwallMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
+    //rockwallMat.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/mask.png") });
+    rockwallMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
+    rockwallMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
 
     //add drawable to scene
     auto md = m_meshRenderer.createDrawable(m_messageBus);
@@ -1039,7 +1049,7 @@ void LunarMoonerState::buildBackground()
     auto rotation = xy::Component::create<ph::PlanetRotation>(m_messageBus);
 */
     auto entity = xy::Entity::create(m_messageBus);
-    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), (xy::DefaultSceneSize.y / 2.f)/* + moonWidth*/);
+    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), (xy::DefaultSceneSize.y / 2.f) - (moonWidth * 0.25f));
     entity->addComponent(moon);
     //entity->addComponent(rotation);
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);

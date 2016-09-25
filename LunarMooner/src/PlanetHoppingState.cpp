@@ -261,10 +261,10 @@ void PlanetHoppingState::draw()
 void PlanetHoppingState::loadMeshes()
 {
     m_scene.setAmbientColour({ 26, 20, 22 });
-    m_scene.getSkyLight().setIntensity(0.6f);
+    m_scene.getSkyLight().setIntensity(0.8f);
     m_scene.getSkyLight().setDiffuseColour({ 255, 255, 200 });
     m_scene.getSkyLight().setSpecularColour({ 255, 255, 250 });
-    m_scene.getSkyLight().setDirection({ 0.2f, 0.4f, -0.4f });
+    m_scene.getSkyLight().setDirection({ 0.2f, 0.3f, -0.4f });
 
     //m_meshRenderer.setView(context.defaultView);
     auto meshDrawable = m_meshRenderer.createDrawable(m_messageBus);
@@ -273,8 +273,8 @@ void PlanetHoppingState::loadMeshes()
     m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 
     //preload meshes
-    xy::SphereBuilder sb(1.f, 10, true); //we'll scale per entity
-    m_meshRenderer.loadModel(Mesh::Planet, sb);
+    //xy::SphereBuilder sb(1.f, 10, true); //we'll scale per entity
+    //m_meshRenderer.loadModel(Mesh::Planet, sb);
 
     xy::IQMBuilder ib("assets/models/moon.iqm");
     m_meshRenderer.loadModel(Mesh::Moon, ib);
@@ -285,17 +285,20 @@ void PlanetHoppingState::loadMeshes()
 
 
     //preload materials
-    auto& desertPlanet = m_resources.materialResource.add(Material::DesertPlanet, m_resources.shaderResource.get(Shader::MeshTextured));
+    auto& desertPlanet = m_resources.materialResource.add(Material::DesertPlanet, m_resources.shaderResource.get(Shader::MeshNormalMapped));
     desertPlanet.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    desertPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/dust_planet.png") });
-    m_resources.textureResource.setFallbackColour(sf::Color::Black);
-    desertPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("no_mask") });
+    desertPlanet.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
+    desertPlanet.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+    desertPlanet.addProperty({ "u_colour", sf::Color(237, 213, 133) });
+    //m_resources.textureResource.setFallbackColour(sf::Color::Black);
+    //desertPlanet.addProperty({ "u_maskMap", m_resources.textureResource.get("no_mask") });
 
     auto& moon = m_resources.materialResource.add(Material::Moon, m_resources.shaderResource.get(Shader::MeshNormalMapped));
     moon.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     moon.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
     //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
     moon.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+    moon.addProperty({ "u_colour", sf::Color::White });
 }
 
 void PlanetHoppingState::loadParticles()

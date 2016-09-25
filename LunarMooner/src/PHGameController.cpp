@@ -392,7 +392,7 @@ xy::Entity* GameController::addBody(const sf::Vector2f& position, float radius)
 
     auto qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), ccLarge->localBounds());
 
-    auto model = m_meshRenderer.createModel((radius > 50) ? Mesh::Moon : Mesh::Planet, getMessageBus());
+    auto model = m_meshRenderer.createModel(Mesh::Moon, getMessageBus());
     model->setScale({ radius, radius, radius });
     model->setRotation({ xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f), xy::Util::Random::value(1.f, 360.f) });
     model->setBaseMaterial(m_resources.materialResource.get(radius > 50 ? Material::Moon : Material::DesertPlanet));
