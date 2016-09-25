@@ -798,7 +798,8 @@ void LunarMoonerState::initMeshes()
     m_scene.getSkyLight().setSpecularColour({ 120, 255, 58 });
     m_scene.getSkyLight().setDirection({ 0.25f, 0.5f, -1.f });
 
-    m_meshRenderer.setNearFarRatios(0.1f, 100.8f);
+    m_meshRenderer.setNearFarRatios(0.2f, 10.8f);
+    m_meshRenderer.setFOV(50.f);
 
     xy::IQMBuilder ib("assets/models/player_ship.iqm");
     m_meshRenderer.loadModel(Mesh::Player, ib);
@@ -1032,26 +1033,26 @@ void LunarMoonerState::buildBackground()
     m_scene.getLayer(xy::Scene::Layer::UI).addComponent(scoreMask);
     m_scene.getLayer(xy::Scene::Layer::UI).addCommandCategories(LMCommandID::Background);
 
-    auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
+    /*auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
     moon->setBaseNormal(m_resources.textureResource.get("assets/images/background/sphere_normal.png"));
     moon->setDetailNormal(m_resources.textureResource.get("assets/images/background/moon_normal_02.png"));
     moon->setDiffuseTexture(m_resources.textureResource.get("assets/images/background/moon_diffuse_02.png"));
     moon->setMaskTexture(m_resources.textureResource.get("assets/images/background/moon_mask.png"));
     moon->setPrepassShader(m_resources.shaderResource.get(Shader::Prepass));
     moon->setNormalShader(m_resources.shaderResource.get(Shader::NormalMapPlanet));
-    moon->setRotationVelocity({ 0.f, 0.009f });
+    moon->setRotationVelocity({ 0.f, 0.009f });*/
 
-    /*auto moon = m_meshRenderer.createModel(Mesh::Moon, m_messageBus);
+    auto moon = m_meshRenderer.createModel(Mesh::Moon, m_messageBus);
     moon->setScale({ moonWidth, moonWidth, moonWidth });
-    moon->setPosition({ 0.f, 0.f, -moonWidth });
+    moon->setPosition({ 0.f, 0.f, -moonWidth * 2.f });
     moon->setBaseMaterial(m_resources.materialResource.get(Material::Moon));
 
     auto rotation = xy::Component::create<ph::PlanetRotation>(m_messageBus);
-*/
+
     auto entity = xy::Entity::create(m_messageBus);
-    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), (xy::DefaultSceneSize.y / 2.f) - (moonWidth * 0.25f));
+    entity->setPosition((xy::DefaultSceneSize.x / 2.f)/* - (moonWidth)*/, (xy::DefaultSceneSize.y / 2.f) /*+ (moonWidth * 0.25f)*/);
     entity->addComponent(moon);
-    //entity->addComponent(rotation);
+    entity->addComponent(rotation);
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
     //background lighting
