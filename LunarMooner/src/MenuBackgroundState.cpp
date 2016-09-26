@@ -43,6 +43,7 @@ source distribution.
 #include <xygine/shaders/NormalMapped.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/PostChromeAb.hpp>
+#include <xygine/Console.hpp>
 
 #include <SFML/Window/Mouse.hpp>
 
@@ -82,11 +83,22 @@ MenuBackgroundState::MenuBackgroundState(xy::StateStack& ss, Context context)
 
     setup();
 
+    xy::Console::addCommand("level_editor", [this](const std::string&)
+    {
+        requestStackClear();
+        requestStackPush(States::ID::LevelEditor);
+    }, this);
+
     quitLoadingScreen();
 
     auto msg = m_messageBus.post<xy::Message::UIEvent>(xy::Message::UIMessage);
     msg->type = xy::Message::UIEvent::RequestState;
     msg->stateID = States::ID::MenuMain;
+}
+
+MenuBackgroundState::~MenuBackgroundState()
+{
+    xy::Console::unregisterCommands(this);
 }
 
 //public

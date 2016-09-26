@@ -54,6 +54,7 @@ private:
 
     xy::MessageBus& m_messageBus;
 
+    void loadMeshes();
 };
 
 #endif //LM_EDITOR_STATE_HPP_
