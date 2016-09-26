@@ -47,7 +47,7 @@ class MenuBackgroundState final : public xy::State
 {
 public:
     MenuBackgroundState(xy::StateStack&, Context);
-    ~MenuBackgroundState() = default;
+    ~MenuBackgroundState();
 
     bool update(float) override;
     void draw() override;
