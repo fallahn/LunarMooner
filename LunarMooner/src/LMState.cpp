@@ -840,7 +840,7 @@ void LunarMoonerState::initMeshes()
     rockwallMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
     //rockwallMat.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/mask.png") });
     rockwallMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
-    rockwallMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+    //rockwallMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
 
     //add drawable to scene
     auto md = m_meshRenderer.createDrawable(m_messageBus);
@@ -1033,26 +1033,26 @@ void LunarMoonerState::buildBackground()
     m_scene.getLayer(xy::Scene::Layer::UI).addComponent(scoreMask);
     m_scene.getLayer(xy::Scene::Layer::UI).addCommandCategories(LMCommandID::Background);
 
-    /*auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
+    auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
     moon->setBaseNormal(m_resources.textureResource.get("assets/images/background/sphere_normal.png"));
     moon->setDetailNormal(m_resources.textureResource.get("assets/images/background/moon_normal_02.png"));
     moon->setDiffuseTexture(m_resources.textureResource.get("assets/images/background/moon_diffuse_02.png"));
     moon->setMaskTexture(m_resources.textureResource.get("assets/images/background/moon_mask.png"));
     moon->setPrepassShader(m_resources.shaderResource.get(Shader::Prepass));
     moon->setNormalShader(m_resources.shaderResource.get(Shader::NormalMapPlanet));
-    moon->setRotationVelocity({ 0.f, 0.009f });*/
+    moon->setRotationVelocity({ 0.f, 0.009f });
 
-    auto moon = m_meshRenderer.createModel(Mesh::Moon, m_messageBus);
+    /*auto moon = m_meshRenderer.createModel(Mesh::Moon, m_messageBus);
     moon->setScale({ moonWidth, moonWidth, moonWidth });
     moon->setPosition({ 0.f, 0.f, -moonWidth * 2.f });
     moon->setBaseMaterial(m_resources.materialResource.get(Material::Moon));
 
-    auto rotation = xy::Component::create<ph::PlanetRotation>(m_messageBus);
+    auto rotation = xy::Component::create<ph::PlanetRotation>(m_messageBus);*/
 
     auto entity = xy::Entity::create(m_messageBus);
-    entity->setPosition((xy::DefaultSceneSize.x / 2.f)/* - (moonWidth)*/, (xy::DefaultSceneSize.y / 2.f) /*+ (moonWidth * 0.25f)*/);
+    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), (xy::DefaultSceneSize.y / 2.f) - (moonWidth * 0.25f));
     entity->addComponent(moon);
-    entity->addComponent(rotation);
+    //entity->addComponent(rotation);
     m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
 
     //background lighting

@@ -173,11 +173,22 @@ void MenuMainState::buildMenu()
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
     button->setText("Test Dodge");
     button->setAlignment(xy::UI::Alignment::Centre);
-    button->setPosition(180.f, 100.f);
+    button->setPosition(180.f, 110.f);
     button->addCallback([this]()
     {
         close();
         requestStackPush(States::ID::RockDodging);
+    });
+    m_uiContainer.addControl(button);
+
+    button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
+    button->setText("Level Editor");
+    button->setAlignment(xy::UI::Alignment::Centre);
+    button->setPosition(180.f, 180.f);
+    button->addCallback([this]()
+    {
+        close();
+        requestStackPush(States::ID::LevelEditor);
     });
     m_uiContainer.addControl(button);
 

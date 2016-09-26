@@ -25,32 +25,35 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef STATE_IDS_HPP_
-#define STATE_IDS_HPP_
+#ifndef LM_EDITOR_STATE_HPP_
+#define LM_EDITOR_STATE_HPP_
 
-namespace States
+#include <StateIds.hpp>
+
+#include <xygine/State.hpp>
+
+namespace xy
 {
-    enum ID
-    {
-        None = 0,
-        MenuMain,
-        MenuOptions,
-        PausedOptions,
-        SinglePlayer,
-        MultiPlayer,
-        GameOver,
-        Pause,
-        HighScoresEnd,
-        HighScoresMenu,
-        MenuBackground,
-        MenuAchievement,
-        MenuWeapon,
-        PlanetHopping,
-        RockDodging,
-        Tutorial,
-        Intro,
-        LevelEditor
-    };
+    class MessageBus;
 }
 
-#endif //STATE_IDS_HPP_
+class EditorState final : public xy::State
+{
+public:
+    EditorState(xy::StateStack&, Context);
+    ~EditorState() = default;
+
+    bool handleEvent(const sf::Event&) override;
+    void handleMessage(const xy::Message&) override;
+    bool update(float) override;
+    void draw() override;
+
+    xy::StateID stateID() const override { return States::ID::LevelEditor; }
+
+private:
+
+    xy::MessageBus& m_messageBus;
+
+};
+
+#endif //LM_EDITOR_STATE_HPP_

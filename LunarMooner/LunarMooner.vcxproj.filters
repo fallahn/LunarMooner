@@ -49,6 +49,12 @@
     <Filter Include="Source Files\rock dodger">
       <UniqueIdentifier>{89bf50d5-ea54-4045-8329-95ff97a538d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\level editor">
+      <UniqueIdentifier>{e6ebd353-2da2-4f92-9a78-2ee1c99ee4a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\level editor">
+      <UniqueIdentifier>{2899e787-75c4-407b-9a34-76834333b778}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CommandIds.hpp">
@@ -267,6 +273,9 @@
     <ClInclude Include="include\RDRockController.hpp">
       <Filter>Header Files\rock dodger</Filter>
     </ClInclude>
+    <ClInclude Include="include\LevelEditorState.hpp">
+      <Filter>Header Files\level editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -457,6 +466,9 @@
     </ClCompile>
     <ClCompile Include="src\RDRockController.cpp">
       <Filter>Source Files\rock dodger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelEditorState.cpp">
+      <Filter>Source Files\level editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

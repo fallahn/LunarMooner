@@ -40,6 +40,7 @@ source distribution.
 #include <RockDodgingState.hpp>
 #include <IntroState.hpp>
 #include <TutorialState.hpp>
+#include <LevelEditorState.hpp>
 
 #include <xygine/util/String.hpp>
 #include <xygine/KeyBinds.hpp>
@@ -179,4 +180,5 @@ void Game::registerStates()
     m_stateStack.registerState<RockDodgingState>(States::RockDodging);
     m_stateStack.registerState<IntroState>(States::ID::Intro);
     m_stateStack.registerState<TutorialState>(States::ID::Tutorial, sp, m_menuFonts);
+    m_stateStack.registerState<EditorState>(States::ID::LevelEditor);
 }

@@ -145,6 +145,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\DemoRecorder.hpp" />
     <ClInclude Include="include\GameMessage.hpp" />
     <ClInclude Include="include\IntroState.hpp" />
+    <ClInclude Include="include\LevelEditorState.hpp" />
     <ClInclude Include="include\LMClockDisplay.hpp" />
     <ClInclude Include="include\LMCoolDownMeter.hpp" />
     <ClInclude Include="include\LMCounterDisplay.hpp" />
@@ -217,6 +218,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\DemoRecorder.cpp" />
     <ClCompile Include="src\GameMessage.cpp" />
     <ClCompile Include="src\IntroState.cpp" />
+    <ClCompile Include="src\LevelEditorState.cpp" />
     <ClCompile Include="src\LMClockDisplay.cpp" />
     <ClCompile Include="src\LMCoolDownMeter.cpp" />
     <ClCompile Include="src\LMCounterDisplay.cpp" />
