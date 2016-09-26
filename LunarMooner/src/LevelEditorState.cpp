@@ -25,32 +25,44 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef STATE_IDS_HPP_
-#define STATE_IDS_HPP_
+#include <LevelEditorState.hpp>
 
-namespace States
+#include <xygine/App.hpp>
+
+#include <SFML/Window/Event.hpp>
+
+namespace
 {
-    enum ID
-    {
-        None = 0,
-        MenuMain,
-        MenuOptions,
-        PausedOptions,
-        SinglePlayer,
-        MultiPlayer,
-        GameOver,
-        Pause,
-        HighScoresEnd,
-        HighScoresMenu,
-        MenuBackground,
-        MenuAchievement,
-        MenuWeapon,
-        PlanetHopping,
-        RockDodging,
-        Tutorial,
-        Intro,
-        LevelEditor
-    };
+
 }
 
-#endif //STATE_IDS_HPP_
+EditorState::EditorState(xy::StateStack& stack, Context context)
+    : xy::State     (stack, context),
+    m_messageBus    (context.appInstance.getMessageBus())
+{
+
+    context.renderWindow.setView(context.defaultView);
+}
+
+//public
+bool EditorState::handleEvent(const sf::Event & evt)
+{
+
+    return false;
+}
+
+void EditorState::handleMessage(const xy::Message& msg)
+{
+
+}
+
+bool EditorState::update(float dt)
+{
+    return false;
+}
+
+void EditorState::draw()
+{
+    auto& rw = getContext().renderWindow;
+
+}

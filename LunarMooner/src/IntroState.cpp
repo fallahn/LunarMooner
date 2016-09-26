@@ -83,7 +83,8 @@ IntroState::IntroState(xy::StateStack& stack, Context context)
 bool IntroState::handleEvent(const sf::Event & evt)
 {
     if (evt.type == sf::Event::KeyReleased
-        || evt.type == sf::Event::JoystickButtonReleased)
+        || evt.type == sf::Event::JoystickButtonReleased
+        || evt.type == sf::Event::MouseButtonReleased)
     {
         requestStackPop();
         requestStackPush(States::ID::MenuBackground);
