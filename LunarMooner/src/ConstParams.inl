@@ -25,59 +25,20 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_SHADER_IDS_HPP_
-#define LM_SHADER_IDS_HPP_
+#ifndef LM_CONST_PARAMS_INL_
+#define LM_CONST_PARAMS_INL_
 
-#include <xygine/shaders/Default.hpp>
-#include <xygine/mesh/shaders/DeferredRenderer.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Color.hpp>
 
-#include <string>
+const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
+const sf::Color SceneAmbientColour({ 76, 70, 72 });
+const float SceneLightIntensity = 0.6f;
+const sf::Color SceneDiffuseLight(255, 255, 200);
+const sf::Color SceneSpecularLight(250, 255, 248);
+const sf::Vector3f SceneLightDirection(0.25f, 0.5f, -1.f);
+const sf::Color SceneWaterColour(200, 200, 255);
+const float playerOffsetDepth = 0.f;// -60.f;
+const float groundOffset = 60.f;
 
-namespace Mesh
-{
-    enum ID
-    {
-        Player,
-        MotherShip,
-        DeadDoofer,
-        Planet,
-        Moon,
-        RockWall01,
-        RockIsland01,
-        RockIsland02,
-        Platform,
-        Ground
-    };
-}
-namespace Material
-{
-    enum ID
-    {
-        Player,
-        MotherShip,
-        DeadDoofer,
-        DesertPlanet,
-        Moon,
-        RockWall01,
-        Ground,
-        Platform,
-        End
-    };
-}
-namespace Shader
-{
-    enum ID
-    {
-        Prepass = xy::Shader::Count,
-        NormalMapPlanet,
-        NormalMapGame,
-        WaterEffect,
-        VelocityMeter,
-        MeshTextured,
-        MeshNormalMapped,
-        MeshVertexColoured,
-        Shadow
-    };
-}
-
-#endif //LM_SHADER_IDS_HPP_
+#endif

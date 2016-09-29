@@ -72,6 +72,8 @@ using namespace std::placeholders;
 
 namespace
 {
+#include "ConstParams.inl"
+    
     const sf::Vector2f playerSize(50.f, 80.f);
     const sf::Vector2f bulletSize(2.f, 24.f);
 
@@ -101,7 +103,6 @@ namespace
         6, 8, 10, 12, 12, 16, 16, 18, 18, 20
     };
 
-    const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
     const std::array<sf::FloatRect, 4u> alienSizes =
     {
         sf::FloatRect(0.f, 0.f, 20.f, 16.f),
