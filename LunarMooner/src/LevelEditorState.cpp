@@ -27,6 +27,9 @@ source distribution.
 
 #include <LevelEditorState.hpp>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 #include <LMShaderIds.hpp>
 #include <PHPlanetRotation.hpp>
 #include <BGStarfield.hpp>
@@ -48,7 +51,10 @@ source distribution.
 namespace
 {
 #include "ConstParams.inl"
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 
 #include <xygine/App.hpp>
 
@@ -62,6 +68,7 @@ namespace
 
 EditorState::EditorState(xy::StateStack& stack, Context context)
     : xy::State     (stack, context),
+<<<<<<< HEAD
 <<<<<<< HEAD
     m_messageBus    (context.appInstance.getMessageBus()),
     m_scene         (m_messageBus),
@@ -78,14 +85,25 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
     context.appInstance.setMouseCursorVisible(true);
 =======
     m_messageBus    (context.appInstance.getMessageBus())
+=======
+    m_messageBus    (context.appInstance.getMessageBus()),
+    m_scene         (m_messageBus),
+    m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene)
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 {
     launchLoadingScreen();
-    context.renderWindow.setView(context.defaultView);
+    m_scene.setView(context.defaultView);
 
     loadMeshes();
+    buildScene();
 
     quitLoadingScreen();
+<<<<<<< HEAD
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+
+    context.appInstance.setMouseCursorVisible(true);
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 }
 
 //public
@@ -98,6 +116,9 @@ bool EditorState::handleEvent(const sf::Event & evt)
 void EditorState::handleMessage(const xy::Message& msg)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     m_scene.handleMessage(msg);
     m_meshRenderer.handleMessage(msg);
 
@@ -113,18 +134,26 @@ void EditorState::handleMessage(const xy::Message& msg)
             break;
         }
     }
+<<<<<<< HEAD
 =======
 
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 }
 
 bool EditorState::update(float dt)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     m_scene.update(dt);
     m_meshRenderer.update();
 =======
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+    m_scene.update(dt);
+    m_meshRenderer.update();
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     return false;
 }
 
@@ -132,16 +161,23 @@ void EditorState::draw()
 {
     auto& rw = getContext().renderWindow;
 <<<<<<< HEAD
+<<<<<<< HEAD
     rw.draw(m_scene);
 =======
 
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+    rw.draw(m_scene);
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 }
 
 //private
 void EditorState::loadMeshes()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     m_scene.setAmbientColour(SceneAmbientColour);
     m_scene.getSkyLight().setIntensity(SceneLightIntensity);
     m_scene.getSkyLight().setDiffuseColour(SceneDiffuseLight);
@@ -214,6 +250,7 @@ void EditorState::buildScene()
     
     //rear walls
     for (auto i = 0u; i < 5u; ++i)
+<<<<<<< HEAD
     {
         auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, m_messageBus);
         rockWall->setPosition({ 0.f, 20.f, -960.f });
@@ -312,17 +349,106 @@ void EditorState::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
 =======
     //temp stuff to see how new models lay out
     /*for (auto i = 0u; i < 3u; ++i)
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     {
-        auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, getMessageBus());
-        rockWall->setPosition({ 0.f, 0.f, -340.f + xy::Util::Random::value(-50.f, 50.f) });
-        rockWall->setScale({ 2.2f, xy::Util::Random::value(1.5f, 1.9f), 1.8f });
-        rockWall->rotate(xy::Model::Axis::Y, xy::Util::Random::value(-10.f, 10.f));
+        auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, m_messageBus);
+        rockWall->setPosition({ 0.f, 20.f, -960.f });
+        rockWall->setScale({ 2.2f, xy::Util::Random::value(1.2f, 1.8f), 1.8f });
+
         auto& material = m_resources.materialResource.get(Material::ID::RockWall01);
         rockWall->setBaseMaterial(material);
-        entity = xy::Entity::create(getMessageBus());
-        entity->setPosition(alienArea.left + (rockWall->getMesh().getBoundingBox().asFloatRect().width / 2.f) + (i * 520.f), xy::DefaultSceneSize.y);
+
+        entity = xy::Entity::create(m_messageBus);
+        entity->setPosition(-80 + (rockWall->getMesh().getBoundingBox().asFloatRect().width / 2.f) + (i * 600.f), xy::DefaultSceneSize.y - groundOffset);
         entity->addComponent(rockWall);
         m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+<<<<<<< HEAD
     }*/
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+    }
+
+    //-----------------------------------------
+    auto rock = m_meshRenderer.createModel(Mesh::ID::RockIsland01, m_messageBus);
+    rock->setBaseMaterial(m_resources.materialResource.get(Material::ID::DeadDoofer));
+    rock->setPosition({ 0.f, 0.f, playerOffsetDepth });
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(rock);
+    entity->setPosition(500.f, xy::DefaultSceneSize.y - groundOffset);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
+
+    rock = m_meshRenderer.createModel(Mesh::ID::RockIsland02, m_messageBus);
+    rock->setBaseMaterial(m_resources.materialResource.get(Material::ID::DeadDoofer));
+    rock->setPosition({ 0.f, 0.f, playerOffsetDepth });
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(rock);
+    entity->setPosition(1200.f, xy::DefaultSceneSize.y - groundOffset);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
+
+    auto box = m_meshRenderer.createModel(Mesh::ID::Platform, m_messageBus);
+    box->setScale({ 300.f, 50.f, 120.f });
+    box->setBaseMaterial(m_resources.materialResource.get(Material::ID::Platform));
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(box);
+    entity->setPosition(900.f, 800.f);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
+
+    for (auto i = 0; i < 10; ++i)
+    {
+        spawnDeadGuy(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width),
+            xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height), 
+            {xy::Util::Random::value(-300.f, 200.f), xy::Util::Random::value(-200.f, 300.f)});
+    }
+    //----------------------------------------
+
+    auto meshRenderer = m_meshRenderer.createDrawable(m_messageBus);
+    //meshRenderer->enableWater(true);
+    //meshRenderer->setWaterColour(SceneWaterColour);
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(meshRenderer);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
+
+    auto bg = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(bg);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
+
+    //add a couple of panels just to mark where the UI would be
+    sf::Color c(117, 115, 99);
+    auto rect = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(m_messageBus);
+    rect->getDrawable().setSize({ alienArea.left, xy::DefaultSceneSize.y });
+    rect->getDrawable().setFillColor(c);
+    entity = xy::Entity::create(m_messageBus);
+    entity->addComponent(rect);
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
+
+    rect = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(m_messageBus);
+    rect->getDrawable().setSize({ alienArea.left, xy::DefaultSceneSize.y });
+    rect->getDrawable().setFillColor(c);
+    entity = xy::Entity::create(m_messageBus);
+    entity->setPosition(alienArea.left + alienArea.width, 0.f);
+    entity->addComponent(rect);
+    m_scene.addEntity(entity, xy::Scene::Layer::UI);
+}
+
+#include <LMAlienController.hpp>
+void EditorState::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
+{
+    if (alienArea.contains(x, y))
+    {
+        auto model = m_meshRenderer.createModel(Mesh::DeadDoofer, m_messageBus);
+        model->setScale({ 0.2f, 0.2f, 0.2f });
+        model->setBaseMaterial(m_resources.materialResource.get(Material::DeadDoofer));
+
+        auto controller = xy::Component::create<lm::AlienController>(m_messageBus, alienArea);
+        controller->setVelocity(vel);
+        auto entity = xy::Entity::create(m_messageBus);
+        entity->addComponent(model);
+        entity->addComponent(controller);
+        entity->setPosition(x, y);
+        m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    }
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 }

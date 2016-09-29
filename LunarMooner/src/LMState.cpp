@@ -456,6 +456,7 @@ void LunarMoonerState::draw()
 namespace
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     const float moonWidth = 570.f;
     const float gameMusicVolume = 30.f;
 #include "ConstParams.inl"
@@ -466,6 +467,11 @@ namespace
     const float moonWidth = 570.f;
     const float gameMusicVolume = 30.f;
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+    const float moonWidth = 570.f;
+    const float gameMusicVolume = 30.f;
+#include "ConstParams.inl"
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 }
 
 void LunarMoonerState::initGameController(sf::Uint8 playerCount, sf::Uint8 level, lm::SpecialWeapon weapon)
@@ -799,11 +805,15 @@ void LunarMoonerState::initParticles()
 void LunarMoonerState::initMeshes()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     m_scene.setAmbientColour(SceneAmbientColour);
     m_scene.getSkyLight().setIntensity(SceneLightIntensity);
     m_scene.getSkyLight().setDiffuseColour(SceneDiffuseLight);
     m_scene.getSkyLight().setSpecularColour(SceneSpecularLight);
     m_scene.getSkyLight().setDirection(SceneLightDirection);
+<<<<<<< HEAD
 =======
     m_scene.setAmbientColour({ 76, 70, 72 });
     m_scene.getSkyLight().setIntensity(0.4f);
@@ -811,6 +821,8 @@ void LunarMoonerState::initMeshes()
     m_scene.getSkyLight().setSpecularColour({ 120, 255, 58 });
     m_scene.getSkyLight().setDirection({ 0.25f, 0.5f, -1.f });
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 
     m_meshRenderer.setNearFarRatios(0.2f, 10.8f);
     m_meshRenderer.setFOV(50.f);

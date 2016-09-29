@@ -30,15 +30,22 @@ source distribution.
 
 #include <StateIds.hpp>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 #include <ResourceCollection.hpp>
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
 #include <xygine/mesh/MeshRenderer.hpp>
+<<<<<<< HEAD
 =======
 
 #include <xygine/State.hpp>
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+#include <xygine/State.hpp>
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 
 namespace xy
 {
@@ -62,10 +69,14 @@ private:
 
     xy::MessageBus& m_messageBus;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     xy::Scene m_scene;
     xy::MeshRenderer m_meshRenderer;
 
     ResourceCollection m_resources;
+<<<<<<< HEAD
 
     void loadMeshes();
     void buildScene();
@@ -74,6 +85,12 @@ private:
 
     void loadMeshes();
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+
+    void loadMeshes();
+    void buildScene();
+    void spawnDeadGuy(float, float, const sf::Vector2f&);
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 };
 
 #endif //LM_EDITOR_STATE_HPP_

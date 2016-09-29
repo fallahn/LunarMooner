@@ -137,10 +137,14 @@ namespace xy
             mouse position in UI space coordinates.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             This can be optionally overriden for controls composed of
 =======
             This can be optionallay overriden for controls composed of
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+            This can be optionally overriden for controls composed of
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
             complex shapes.
             */
             virtual bool contains(const sf::Vector2f& mousePos) const;

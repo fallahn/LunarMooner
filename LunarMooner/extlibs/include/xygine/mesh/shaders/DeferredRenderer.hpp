@@ -197,6 +197,9 @@ namespace xy
                 "}";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
                 const static std::string DeferredFragment =
                     "#if !defined(BUMP)\n" \
                     "in vec3 v_normalVector;\n"
@@ -260,6 +263,7 @@ namespace xy
                     "#endif\n"
                     "    fragOut[3].rgb = v_worldPosition;\n" \
                     "    fragOut[3].a = lineariseDepth(gl_FragCoord.z);\n" \
+<<<<<<< HEAD
 =======
             const static std::string DeferredFragment =
                 "#if !defined(BUMP)\n" \
@@ -325,6 +329,8 @@ namespace xy
                 "    fragOut[3].rgb = v_worldPosition;\n" \
                 "    fragOut[3].a = lineariseDepth(gl_FragCoord.z);\n" \
 >>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
+=======
+>>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
                 "}";
         }
     }
