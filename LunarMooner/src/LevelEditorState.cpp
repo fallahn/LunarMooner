@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <LevelEditorState.hpp>
+<<<<<<< HEAD
 #include <LMShaderIds.hpp>
 #include <PHPlanetRotation.hpp>
 #include <BGStarfield.hpp>
@@ -47,10 +48,21 @@ source distribution.
 namespace
 {
 #include "ConstParams.inl"
+=======
+
+#include <xygine/App.hpp>
+
+#include <SFML/Window/Event.hpp>
+
+namespace
+{
+
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
 }
 
 EditorState::EditorState(xy::StateStack& stack, Context context)
     : xy::State     (stack, context),
+<<<<<<< HEAD
     m_messageBus    (context.appInstance.getMessageBus()),
     m_scene         (m_messageBus),
     m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene)
@@ -64,6 +76,16 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
     quitLoadingScreen();
 
     context.appInstance.setMouseCursorVisible(true);
+=======
+    m_messageBus    (context.appInstance.getMessageBus())
+{
+    launchLoadingScreen();
+    context.renderWindow.setView(context.defaultView);
+
+    loadMeshes();
+
+    quitLoadingScreen();
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
 }
 
 //public
@@ -75,6 +97,7 @@ bool EditorState::handleEvent(const sf::Event & evt)
 
 void EditorState::handleMessage(const xy::Message& msg)
 {
+<<<<<<< HEAD
     m_scene.handleMessage(msg);
     m_meshRenderer.handleMessage(msg);
 
@@ -90,24 +113,35 @@ void EditorState::handleMessage(const xy::Message& msg)
             break;
         }
     }
+=======
+
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
 }
 
 bool EditorState::update(float dt)
 {
+<<<<<<< HEAD
     m_scene.update(dt);
     m_meshRenderer.update();
+=======
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
     return false;
 }
 
 void EditorState::draw()
 {
     auto& rw = getContext().renderWindow;
+<<<<<<< HEAD
     rw.draw(m_scene);
+=======
+
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
 }
 
 //private
 void EditorState::loadMeshes()
 {
+<<<<<<< HEAD
     m_scene.setAmbientColour(SceneAmbientColour);
     m_scene.getSkyLight().setIntensity(SceneLightIntensity);
     m_scene.getSkyLight().setDiffuseColour(SceneDiffuseLight);
@@ -275,4 +309,20 @@ void EditorState::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
         entity->setPosition(x, y);
         m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
     }
+=======
+    //temp stuff to see how new models lay out
+    /*for (auto i = 0u; i < 3u; ++i)
+    {
+        auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, getMessageBus());
+        rockWall->setPosition({ 0.f, 0.f, -340.f + xy::Util::Random::value(-50.f, 50.f) });
+        rockWall->setScale({ 2.2f, xy::Util::Random::value(1.5f, 1.9f), 1.8f });
+        rockWall->rotate(xy::Model::Axis::Y, xy::Util::Random::value(-10.f, 10.f));
+        auto& material = m_resources.materialResource.get(Material::ID::RockWall01);
+        rockWall->setBaseMaterial(material);
+        entity = xy::Entity::create(getMessageBus());
+        entity->setPosition(alienArea.left + (rockWall->getMesh().getBoundingBox().asFloatRect().width / 2.f) + (i * 520.f), xy::DefaultSceneSize.y);
+        entity->addComponent(rockWall);
+        m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+    }*/
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
 }

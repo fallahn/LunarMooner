@@ -29,11 +29,16 @@ source distribution.
 #define LM_EDITOR_STATE_HPP_
 
 #include <StateIds.hpp>
+<<<<<<< HEAD
 #include <ResourceCollection.hpp>
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
 #include <xygine/mesh/MeshRenderer.hpp>
+=======
+
+#include <xygine/State.hpp>
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
 
 namespace xy
 {
@@ -56,6 +61,7 @@ public:
 private:
 
     xy::MessageBus& m_messageBus;
+<<<<<<< HEAD
     xy::Scene m_scene;
     xy::MeshRenderer m_meshRenderer;
 
@@ -64,6 +70,10 @@ private:
     void loadMeshes();
     void buildScene();
     void spawnDeadGuy(float, float, const sf::Vector2f&);
+=======
+
+    void loadMeshes();
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
 };
 
 #endif //LM_EDITOR_STATE_HPP_

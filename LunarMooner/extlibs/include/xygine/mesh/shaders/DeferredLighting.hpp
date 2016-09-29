@@ -75,7 +75,10 @@ namespace xy
             
             static const std::string LightingFrag =
                 "#version 150\n"
+<<<<<<< HEAD
                 "//#define WATER\n"
+=======
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
                 "#define MAX_POINT_LIGHTS 8\n"
                 "struct PointLight\n"
                 "{\n"
@@ -210,8 +213,11 @@ namespace xy
                 "    return texture(u_reflectMap, coord).rgb;\n"
                 "}\n"
 
+<<<<<<< HEAD
 //#include "Water.inl"
 
+=======
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
                 "void main()\n"
                 "{\n"
                 "    vec3 fragPosition = texture(u_positionMap, v_texCoord).xyz;\n"
@@ -256,12 +262,17 @@ namespace xy
                 "    illumination.g = blendOverlay(blendedColour.g, illumination.g);\n"
                 "    illumination.b = blendOverlay(blendedColour.b, illumination.b);\n"
                 "    blendedColour += illumination;\n"*/
+<<<<<<< HEAD
 
                 "    blendedColour += texture(u_illuminationMap, v_texCoord).rgb * (2.0 - u_skyLight.intensity);\n"
                 "#if defined (WATER)\n"
                 "    blendedColour = calcWater(blendedColour, fragPosition);\n"
                 "#endif\n"
 
+=======
+                
+                "    blendedColour += texture(u_illuminationMap, v_texCoord).rgb * (2.0 - u_skyLight.intensity);\n"
+>>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
                 "    fragOut = vec4(blendedColour, diffuse.a);//vec4(vec3(texture(u_depthMaps, vec3(v_texCoord, 1.0)).r), 1.0);//\n"
                 "}";
         }
