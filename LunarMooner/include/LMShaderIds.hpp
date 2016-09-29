@@ -42,7 +42,11 @@ namespace Mesh
         DeadDoofer,
         Planet,
         Moon,
-        RockWall01
+        RockWall01,
+        RockIsland01,
+        RockIsland02,
+        Platform,
+        Ground
     };
 }
 namespace Material
@@ -55,6 +59,8 @@ namespace Material
         DesertPlanet,
         Moon,
         RockWall01,
+        Ground,
+        Platform,
         End
     };
 }

@@ -475,5 +475,8 @@
     <None Include="src\KeyMappings.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="src\ConstParams.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
