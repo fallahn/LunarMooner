@@ -276,14 +276,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\UIWeaponSelect.cpp" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <None Include="src\ConstParams.inl" />
-=======
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
-    <None Include="src\ConstParams.inl" />
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     <None Include="src\KeyMappings.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

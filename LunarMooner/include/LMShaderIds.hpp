@@ -42,21 +42,11 @@ namespace Mesh
         DeadDoofer,
         Planet,
         Moon,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
         RockWall01,
         RockIsland01,
         RockIsland02,
         Platform,
         Ground
-<<<<<<< HEAD
-=======
-        RockWall01
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     };
 }
 namespace Material
@@ -69,16 +59,8 @@ namespace Material
         DesertPlanet,
         Moon,
         RockWall01,
-<<<<<<< HEAD
-<<<<<<< HEAD
         Ground,
         Platform,
-=======
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
-        Ground,
-        Platform,
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
         End
     };
 }

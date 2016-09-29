@@ -475,17 +475,8 @@
     <None Include="src\KeyMappings.inl">
       <Filter>Header Files</Filter>
     </None>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <None Include="src\ConstParams.inl">
       <Filter>Header Files</Filter>
     </None>
-=======
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
-    <None Include="src\ConstParams.inl">
-      <Filter>Header Files</Filter>
-    </None>
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
   </ItemGroup>
 </Project>

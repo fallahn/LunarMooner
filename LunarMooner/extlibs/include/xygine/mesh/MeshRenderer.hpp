@@ -42,14 +42,7 @@ source distribution.
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
-<<<<<<< HEAD
-<<<<<<< HEAD
 #include <SFML/System/Clock.hpp>
-=======
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
-#include <SFML/System/Clock.hpp>
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 
 #include <glm/mat4x4.hpp>
 
@@ -199,15 +192,7 @@ namespace xy
 
         MeshResource m_meshResource;
         MaterialResource m_materialResource;
-<<<<<<< HEAD
-<<<<<<< HEAD
         //ShaderResource m_shaderResource;
-=======
-        ShaderResource m_shaderResource;
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
-        //ShaderResource m_shaderResource;
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 
         struct AnimationData
         {
@@ -295,33 +280,16 @@ namespace xy
         sf::Shader m_depthShader;
         void drawDepth() const;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
         sf::Shader m_waterShader;
         sf::Texture m_surfaceTexture;
         sf::Clock m_shaderClock;
 
-<<<<<<< HEAD
-=======
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
         mutable std::vector<Model*> m_models;
         mutable xy::MultiRenderTexture m_gBuffer;
         void drawScene() const;
 
         sf::Shader m_debugShader;
-<<<<<<< HEAD
-<<<<<<< HEAD
         sf::Texture m_dummyTexture;
-=======
-        sf::Texture m_dummyTetxure;
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
-        sf::Texture m_dummyTexture;
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
         sf::Sprite m_dummySprite;
         std::unique_ptr<RenderQuad> m_outputQuad;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;

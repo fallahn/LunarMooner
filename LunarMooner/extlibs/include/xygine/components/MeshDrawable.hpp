@@ -57,35 +57,17 @@ namespace xy
         void entityUpdate(Entity&, float) override;
         sf::FloatRect globalBounds() const override { return m_sprite.getGlobalBounds(); }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
         void enableWater(bool);
         void setWaterLevel(float);
         void setWaterColour(const sf::Color&);
 
-<<<<<<< HEAD
-=======
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
     private:
         MeshRenderer& m_meshRenderer;
 
         mutable sf::RenderTexture m_renderTexture;
         sf::Sprite m_sprite;
-<<<<<<< HEAD
-<<<<<<< HEAD
 
         sf::Shader* m_waterShader;
-=======
-        sf::Vector2f m_offset;
->>>>>>> 3d17c1ca0691b82c0cfb95fae20d994b0fc4d3c8
-=======
-
-        sf::Shader* m_waterShader;
->>>>>>> 244daf100b1e6cde9ee8a6768696ce5f3fdbe42b
 
         void draw(sf::RenderTarget& rt, sf::RenderStates states) const override;
     };
