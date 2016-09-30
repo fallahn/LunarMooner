@@ -276,6 +276,15 @@
     <ClInclude Include="include\LevelEditorState.hpp">
       <Filter>Header Files\level editor</Filter>
     </ClInclude>
+    <ClInclude Include="include\LESelectableItem.hpp">
+      <Filter>Header Files\level editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LESelectableCollection.hpp">
+      <Filter>Header Files\level editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LEPointCollection.hpp">
+      <Filter>Header Files\level editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -468,6 +477,12 @@
       <Filter>Source Files\rock dodger</Filter>
     </ClCompile>
     <ClCompile Include="src\LevelEditorState.cpp">
+      <Filter>Source Files\level editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LESelectableItem.cpp">
+      <Filter>Source Files\level editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LEPointCollection.cpp">
       <Filter>Source Files\level editor</Filter>
     </ClCompile>
   </ItemGroup>

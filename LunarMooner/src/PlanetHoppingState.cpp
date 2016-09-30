@@ -266,7 +266,7 @@ void PlanetHoppingState::loadMeshes()
     m_scene.getSkyLight().setSpecularColour({ 255, 255, 250 });
     m_scene.getSkyLight().setDirection({ 0.2f, 0.3f, -0.4f });
 
-    m_meshRenderer.setFOV(58.f);
+    m_meshRenderer.setFOV(52.f);
 
     //m_meshRenderer.setView(context.defaultView);
     auto meshDrawable = m_meshRenderer.createDrawable(m_messageBus);
@@ -280,6 +280,9 @@ void PlanetHoppingState::loadMeshes()
 
     xy::IQMBuilder ib("assets/models/moon.iqm");
     m_meshRenderer.loadModel(Mesh::Moon, ib);
+
+    xy::IQMBuilder ib2("assets/models/doofer.iqm", true);
+    m_meshRenderer.loadModel(Mesh::Doofer, ib2);
 
     //preload shaders
     m_resources.shaderResource.preload(Shader::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
@@ -298,9 +301,16 @@ void PlanetHoppingState::loadMeshes()
     auto& moon = m_resources.materialResource.add(Material::Moon, m_resources.shaderResource.get(Shader::MeshNormalMapped));
     moon.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     moon.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
-    //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/lava_planet_mask.png") });
+    //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/moon_mask.png") });
     moon.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
     moon.addProperty({ "u_colour", sf::Color::White });
+
+    auto& doofer = m_resources.materialResource.add(Material::Doofer, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+    doofer.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    doofer.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/doofer_diffuse.png") });
+    //doofer.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/doofer_mask.png") });
+    doofer.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/doofer_normal.png") });
+    doofer.addProperty({ "u_colour", sf::Color::White });
 }
 
 void PlanetHoppingState::loadParticles()

@@ -46,6 +46,7 @@ namespace Mesh
         RockIsland01,
         RockIsland02,
         Platform,
+        Doofer,
         Ground
     };
 }
@@ -61,6 +62,7 @@ namespace Material
         RockWall01,
         Ground,
         Platform,
+        Doofer,
         End
     };
 }

@@ -30,6 +30,8 @@ source distribution.
 #include <PHPlanetRotation.hpp>
 #include <BGStarfield.hpp>
 
+#include <LEPointCollection.hpp>
+
 #include <xygine/App.hpp>
 #include <xygine/Entity.hpp>
 #include <xygine/components/Model.hpp>
@@ -40,6 +42,8 @@ source distribution.
 #include <xygine/mesh/QuadBuilder.hpp>
 #include <xygine/mesh/CubeBuilder.hpp>
 #include <xygine/util/Random.hpp>
+
+#include <xygine/imgui/imgui.h>
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -54,22 +58,81 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
     : xy::State     (stack, context),
     m_messageBus    (context.appInstance.getMessageBus()),
     m_scene         (m_messageBus),
-    m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene)
+    m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene),
+    m_selectedItem  (nullptr),
+    m_hasClicked    (false)
 {
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
 
     loadMeshes();
     buildScene();
+    addWindows();
+
+    //TODO make sure this lines up with enum values
+    m_collections.emplace_back(std::make_unique<le::PointCollection>());
 
     quitLoadingScreen();
 
     context.appInstance.setMouseCursorVisible(true);
 }
 
+EditorState::~EditorState()
+{
+    xy::App::removeUserWindows(this);
+}
+
 //public
 bool EditorState::handleEvent(const sf::Event & evt)
-{
+{    
+    auto position = xy::App::getMouseWorldPosition();
+
+    //check if we're over anything when clicking
+    if (evt.type == sf::Event::MouseButtonPressed &&
+        evt.mouseButton.button == sf::Mouse::Left)
+    {
+        if (m_selectedItem && m_selectedItem->globalBounds().contains(position))
+        {
+            m_hasClicked = true;
+        }
+        else
+        {
+            if (m_selectedItem)
+            {
+                m_selectedItem->deselect();
+                m_selectedItem = nullptr;
+            }
+
+            std::size_t i = 0;
+            while (i < m_collections.size() && !m_selectedItem)
+            {
+                m_selectedItem = m_collections[i++]->getSelected(position);
+            }
+            if (m_selectedItem)
+            {
+                m_hasClicked = true;
+            }
+        }
+    }
+
+    if (evt.type == sf::Event::MouseButtonReleased &&
+        evt.mouseButton.button == sf::Mouse::Left)
+    {
+        m_hasClicked = false;
+    }
+
+    //if the mouse moves while left button pressed
+    //move any selected item
+    if (evt.type == sf::Event::MouseMoved && m_hasClicked)
+    {
+        if (m_selectedItem)
+        {    
+            position.x = std::min(alienArea.left + alienArea.width, std::max(alienArea.left, position.x));
+            position.y = std::min(xy::DefaultSceneSize.y, std::max(0.f, position.y)); //probably needs to be clamped smaller?
+
+            m_selectedItem->setPosition(position);
+        }
+    }
 
     return false;
 }
@@ -95,6 +158,11 @@ void EditorState::handleMessage(const xy::Message& msg)
 
 bool EditorState::update(float dt)
 {
+    for (auto& c : m_collections)
+    {
+        c->update();
+    }
+    
     m_scene.update(dt);
     m_meshRenderer.update();
     return false;
@@ -104,6 +172,12 @@ void EditorState::draw()
 {
     auto& rw = getContext().renderWindow;
     rw.draw(m_scene);
+
+    rw.setView(getContext().defaultView);
+    for (const auto& c : m_collections)
+    {
+        rw.draw(*c);
+    }
 }
 
 //private
@@ -220,12 +294,12 @@ void EditorState::buildScene()
     entity->setPosition(900.f, 800.f);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
 
-    for (auto i = 0; i < 10; ++i)
+    /*for (auto i = 0; i < 10; ++i)
     {
         spawnDeadGuy(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width),
             xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height), 
             {xy::Util::Random::value(-300.f, 200.f), xy::Util::Random::value(-200.f, 300.f)});
-    }
+    }*/
     //----------------------------------------
 
     auto meshRenderer = m_meshRenderer.createDrawable(m_messageBus);
@@ -276,4 +350,59 @@ void EditorState::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
         entity->setPosition(x, y);
         m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
     }
+}
+
+void EditorState::addWindows()
+{
+    xy::App::addUserWindow(
+        [this]()
+    {
+        nim::SetNextWindowSize({ 240.f, 368.f });
+        nim::Begin("Editor");
+        static int currentIndex = 0;
+        nim::Combo("", &currentIndex, "Platform\0Point\0Prop\0");
+        nim::SameLine();
+        if (nim::Button("Add", {40.f, 20.f}))
+        {
+            //add button clicked
+            switch (currentIndex)
+            {
+            default:break;
+            case 0:
+                //add a platform
+                break;
+            case 1:
+                //add a point
+                if (auto i = m_collections[0]->add(xy::DefaultSceneSize / 2.f))
+                {
+                    if (m_selectedItem)
+                    {
+                        m_selectedItem->deselect();
+                    }
+                    m_selectedItem = i;
+                    m_selectedItem->select();
+                }
+                break;
+            case 2:
+                //add a prop
+                break;
+            }
+        }
+
+        if (nim::Button("Remove Selected", { 120, 20.f }))
+        {
+            //remove the currently selected item
+            if (m_selectedItem)
+            {
+                m_selectedItem = m_selectedItem->remove();
+            }
+        }
+
+        nim::NewLine();
+        static float fov = 52.f;
+        float lastVal = fov;
+        nim::SliderFloat("FOV", &fov, 10.f, 60.f);
+        if (lastVal != fov) m_meshRenderer.setFOV(fov);
+        nim::End();
+    }, this);
 }

@@ -30,11 +30,14 @@ source distribution.
 
 #include <StateIds.hpp>
 #include <ResourceCollection.hpp>
+#include <LESelectableCollection.hpp>
 
 #include <xygine/State.hpp>
 #include <xygine/Scene.hpp>
 #include <xygine/mesh/MeshRenderer.hpp>
 #include <xygine/State.hpp>
+
+#include <vector>
 
 namespace xy
 {
@@ -45,7 +48,7 @@ class EditorState final : public xy::State
 {
 public:
     EditorState(xy::StateStack&, Context);
-    ~EditorState() = default;
+    ~EditorState();
 
     bool handleEvent(const sf::Event&) override;
     void handleMessage(const xy::Message&) override;
@@ -62,9 +65,18 @@ private:
 
     ResourceCollection m_resources;
 
+    //TODO convert to array
+    le::SelectableItem* m_selectedItem;
+    std::vector<std::unique_ptr<le::SelectableCollection>> m_collections;
+    bool m_hasClicked;
+
     void loadMeshes();
     void buildScene();
+
+    //TODO remove this and mesh caching
     void spawnDeadGuy(float, float, const sf::Vector2f&);
+
+    void addWindows();
 };
 
 #endif //LM_EDITOR_STATE_HPP_

@@ -145,6 +145,8 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\DemoRecorder.hpp" />
     <ClInclude Include="include\GameMessage.hpp" />
     <ClInclude Include="include\IntroState.hpp" />
+    <ClInclude Include="include\LEPointCollection.hpp" />
+    <ClInclude Include="include\LESelectableItem.hpp" />
     <ClInclude Include="include\LevelEditorState.hpp" />
     <ClInclude Include="include\LMClockDisplay.hpp" />
     <ClInclude Include="include\LMCoolDownMeter.hpp" />
@@ -204,6 +206,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\RDRockPool.hpp" />
     <ClInclude Include="include\ResourceCollection.hpp" />
     <ClInclude Include="include\RockDodgingState.hpp" />
+    <ClInclude Include="include\LESelectableCollection.hpp" />
     <ClInclude Include="include\StateIds.hpp" />
     <ClInclude Include="include\TutorialState.hpp" />
     <ClInclude Include="include\TutorialTip.hpp" />
@@ -218,6 +221,8 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\DemoRecorder.cpp" />
     <ClCompile Include="src\GameMessage.cpp" />
     <ClCompile Include="src\IntroState.cpp" />
+    <ClCompile Include="src\LEPointCollection.cpp" />
+    <ClCompile Include="src\LESelectableItem.cpp" />
     <ClCompile Include="src\LevelEditorState.cpp" />
     <ClCompile Include="src\LMClockDisplay.cpp" />
     <ClCompile Include="src\LMCoolDownMeter.cpp" />
