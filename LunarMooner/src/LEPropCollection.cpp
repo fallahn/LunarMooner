@@ -25,27 +25,24 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LE_SELECTABLE_COLLECTION_HPP_
-#define LE_SELECTABLE_COLLECTION_HPP_
+#include <LEPropCollection.hpp>
 
-#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
 
-namespace le
+using namespace le;
+
+//public
+SelectableItem* PropCollection::getSelected(const sf::Vector2f& mousePos)
 {
-    class SelectableItem;
-    class SelectableCollection : public sf::Drawable
-    {
-    public:
-        SelectableCollection() = default;
-        virtual ~SelectableCollection() = default;
-
-        virtual SelectableItem* getSelected(const sf::Vector2f&) = 0;
-        virtual void update() = 0;
-        virtual SelectableItem* add(const sf::Vector2f&) = 0;
-
-    protected:
-        void draw(sf::RenderTarget&, sf::RenderStates) const override = 0;
-    };
+    return nullptr;
 }
 
-#endif //LE_SELECTABLE_COLLECTION_HPP_
+void PropCollection::update() {}
+
+SelectableItem* PropCollection::add(const sf::Vector2f& position)
+{
+    return nullptr;
+}
+
+//private
+void PropCollection::draw(sf::RenderTarget& rt, sf::RenderStates states) const {}

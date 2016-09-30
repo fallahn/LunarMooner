@@ -37,7 +37,7 @@ source distribution.
 #include <xygine/mesh/MeshRenderer.hpp>
 #include <xygine/State.hpp>
 
-#include <vector>
+#include <array>
 
 namespace xy
 {
@@ -65,17 +65,19 @@ private:
 
     ResourceCollection m_resources;
 
-    //TODO convert to array
+    enum Collection
+    {
+        Points = 0,
+        Platforms,
+        Props
+    };
+
     le::SelectableItem* m_selectedItem;
-    std::vector<std::unique_ptr<le::SelectableCollection>> m_collections;
+    std::array<std::unique_ptr<le::SelectableCollection>, 3> m_collections;
     bool m_hasClicked;
 
     void loadMeshes();
     void buildScene();
-
-    //TODO remove this and mesh caching
-    void spawnDeadGuy(float, float, const sf::Vector2f&);
-
     void addWindows();
 };
 

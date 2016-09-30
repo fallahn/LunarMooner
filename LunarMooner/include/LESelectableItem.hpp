@@ -72,6 +72,39 @@ namespace le
         sf::RectangleShape m_shape;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
+
+    class PlatformItem final : public SelectableItem
+    {
+    public:
+        PlatformItem();
+        ~PlatformItem() = default;
+
+        Type type() const override { return Type::Platform; }
+        void select() override;
+        void deselect() override;
+        sf::FloatRect globalBounds() const override;
+        void setSize(const sf::Vector2f&);
+        const sf::Vector2f& getSize() const;
+    private:
+        sf::RectangleShape m_shape;
+        void draw(sf::RenderTarget&, sf::RenderStates) const override;
+    };
+
+    class PropItem final : public SelectableItem
+    {
+    public:
+        PropItem();
+        ~PropItem() = default;
+
+        Type type() const { return Type::Prop; }
+        void select() override;
+        void deselect() override;
+        sf::FloatRect globalBounds() const override;
+
+    private:
+
+        void draw(sf::RenderTarget&, sf::RenderStates) const override;
+    };
 }
 
 #endif //LE_SELECTABLE_HPP_

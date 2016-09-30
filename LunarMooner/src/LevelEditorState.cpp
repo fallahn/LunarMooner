@@ -31,6 +31,8 @@ source distribution.
 #include <BGStarfield.hpp>
 
 #include <LEPointCollection.hpp>
+#include <LEPlatformCollection.hpp>
+#include <LEPropCollection.hpp>
 
 #include <xygine/App.hpp>
 #include <xygine/Entity.hpp>
@@ -69,8 +71,9 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
     buildScene();
     addWindows();
 
-    //TODO make sure this lines up with enum values
-    m_collections.emplace_back(std::make_unique<le::PointCollection>());
+    m_collections[Collection::Points] = std::make_unique<le::PointCollection>();
+    m_collections[Collection::Platforms] = std::make_unique<le::PlatformCollection>();
+    m_collections[Collection::Props] = std::make_unique<le::PropCollection>();
 
     quitLoadingScreen();
 
@@ -233,9 +236,6 @@ void EditorState::loadMeshes()
 
     xy::CubeBuilder cb(1.f);
     m_meshRenderer.loadModel(Mesh::ID::Platform, cb);
-
-    xy::IQMBuilder ib4("assets/models/corpse.iqm");
-    m_meshRenderer.loadModel(Mesh::ID::DeadDoofer, ib4);
 }
 
 void EditorState::buildScene()
@@ -287,19 +287,12 @@ void EditorState::buildScene()
     m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
 
     auto box = m_meshRenderer.createModel(Mesh::ID::Platform, m_messageBus);
-    box->setScale({ 300.f, 50.f, 120.f });
+    box->setScale({ 200.f, 25.f, 80.f });
     box->setBaseMaterial(m_resources.materialResource.get(Material::ID::Platform));
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(box);
     entity->setPosition(900.f, 800.f);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
-
-    /*for (auto i = 0; i < 10; ++i)
-    {
-        spawnDeadGuy(xy::Util::Random::value(alienArea.left, alienArea.left + alienArea.width),
-            xy::Util::Random::value(alienArea.top, alienArea.top + alienArea.height), 
-            {xy::Util::Random::value(-300.f, 200.f), xy::Util::Random::value(-200.f, 300.f)});
-    }*/
     //----------------------------------------
 
     auto meshRenderer = m_meshRenderer.createDrawable(m_messageBus);
@@ -333,25 +326,6 @@ void EditorState::buildScene()
     m_scene.addEntity(entity, xy::Scene::Layer::UI);
 }
 
-#include <LMAlienController.hpp>
-void EditorState::spawnDeadGuy(float x, float y, const sf::Vector2f& vel)
-{
-    if (alienArea.contains(x, y))
-    {
-        auto model = m_meshRenderer.createModel(Mesh::DeadDoofer, m_messageBus);
-        model->setScale({ 0.2f, 0.2f, 0.2f });
-        model->setBaseMaterial(m_resources.materialResource.get(Material::DeadDoofer));
-
-        auto controller = xy::Component::create<lm::AlienController>(m_messageBus, alienArea);
-        controller->setVelocity(vel);
-        auto entity = xy::Entity::create(m_messageBus);
-        entity->addComponent(model);
-        entity->addComponent(controller);
-        entity->setPosition(x, y);
-        m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
-    }
-}
-
 void EditorState::addWindows()
 {
     xy::App::addUserWindow(
@@ -360,32 +334,18 @@ void EditorState::addWindows()
         nim::SetNextWindowSize({ 240.f, 368.f });
         nim::Begin("Editor");
         static int currentIndex = 0;
-        nim::Combo("", &currentIndex, "Platform\0Point\0Prop\0");
+        nim::Combo("", &currentIndex, "Point\0Platform\0Prop\0");
         nim::SameLine();
         if (nim::Button("Add", {40.f, 20.f}))
         {
-            //add button clicked
-            switch (currentIndex)
+            if (auto i = m_collections[currentIndex]->add(xy::DefaultSceneSize / 2.f))
             {
-            default:break;
-            case 0:
-                //add a platform
-                break;
-            case 1:
-                //add a point
-                if (auto i = m_collections[0]->add(xy::DefaultSceneSize / 2.f))
+                if (m_selectedItem)
                 {
-                    if (m_selectedItem)
-                    {
-                        m_selectedItem->deselect();
-                    }
-                    m_selectedItem = i;
-                    m_selectedItem->select();
+                    m_selectedItem->deselect();
                 }
-                break;
-            case 2:
-                //add a prop
-                break;
+                m_selectedItem = i;
+                m_selectedItem->select();
             }
         }
 
@@ -395,6 +355,30 @@ void EditorState::addWindows()
             if (m_selectedItem)
             {
                 m_selectedItem = m_selectedItem->remove();
+            }
+        }
+
+        nim::NewLine();
+        if (m_selectedItem)
+        {
+            switch (m_selectedItem->type())
+            {
+            default:break;
+            case le::SelectableItem::Type::Platform:
+            {
+                sf::Vector2f size = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getSize();
+                sf::Vector2f lastSize = size;
+                nim::Text("Size");
+                nim::InputFloat("x", &size.x, 1.f, 10.f);
+                nim::InputFloat("y", &size.y, 1.f, 10.f);
+                if (lastSize != size)
+                {
+                    size.x = std::min(500.f, std::max(0.f, size.x));
+                    size.y = std::min(500.f, std::max(0.f, size.y));
+                    dynamic_cast<le::PlatformItem*>(m_selectedItem)->setSize(size);
+                }
+            }
+                break;
             }
         }
 

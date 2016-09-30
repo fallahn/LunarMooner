@@ -55,7 +55,6 @@ SelectableItem* PointCollection::getSelected(const sf::Vector2f& mousePos)
             return p.get();
         }
     }
-
     return nullptr;
 }
 
@@ -86,8 +85,8 @@ SelectableItem* PointCollection::add(const sf::Vector2f& position)
     else
     {
         xy::Logger::log("Maximum number of points is " + std::to_string(maxPoints), xy::Logger::Type::Info);
-        return nullptr;
     }
+    return nullptr;
 }
 
 std::vector<sf::Vector2f> PointCollection::getPoints() const

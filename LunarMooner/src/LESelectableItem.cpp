@@ -35,9 +35,7 @@ using namespace le;
 namespace
 {
     const sf::Vector2f pointSize(10.f, 10.f);
-    const sf::Color outlineColour = sf::Color::Red;
-    const sf::Color selectedColour = sf::Color::Red;
-    const sf::Color deselectedColour = sf::Color::Transparent;
+    const sf::Vector2f platSize(100.f, 25.f);
 }
 
 //----POINTS----//
@@ -46,19 +44,19 @@ PointItem::PointItem()
     m_shape.setSize(pointSize);
     m_shape.setOrigin(pointSize / 2.f);
     m_shape.setOutlineThickness(2.f);
-    m_shape.setOutlineColor(outlineColour);
-    m_shape.setFillColor(deselectedColour);
+    m_shape.setOutlineColor(sf::Color::Red);
+    m_shape.setFillColor(sf::Color::Transparent);
 }
 
 //public
 void PointItem::select()
 {
-    m_shape.setFillColor(selectedColour);
+    m_shape.setFillColor(sf::Color::Red);
 }
 
 void PointItem::deselect()
 {
-    m_shape.setFillColor(deselectedColour);
+    m_shape.setFillColor(sf::Color::Transparent);
 }
 
 sf::FloatRect PointItem::globalBounds() const
@@ -72,3 +70,57 @@ void PointItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const
     states.transform *= getTransform();
     rt.draw(m_shape, states);
 }
+
+//------PLATFORM------//
+PlatformItem::PlatformItem()
+{
+    m_shape.setSize(platSize);
+    m_shape.setOutlineThickness(2.f);
+    m_shape.setOutlineColor(sf::Color::Green);
+    m_shape.setFillColor({ 0, 255, 0, 120 });
+}
+
+//public
+void PlatformItem::select()
+{
+    m_shape.setOutlineColor(sf::Color::Red);
+}
+
+void PlatformItem::deselect()
+{
+    m_shape.setOutlineColor(sf::Color::Green);
+}
+
+sf::FloatRect PlatformItem::globalBounds() const
+{
+    return getTransform().transformRect(m_shape.getGlobalBounds());
+}
+
+void PlatformItem::setSize(const sf::Vector2f& size)
+{
+    m_shape.setSize(size);
+}
+
+const sf::Vector2f& PlatformItem::getSize() const
+{
+    return m_shape.getSize();
+}
+
+//private
+void PlatformItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const
+{
+    states.transform *= getTransform();
+    rt.draw(m_shape, states);
+}
+
+//----PROP----//
+PropItem::PropItem()
+{}
+
+//public
+void PropItem::select() {}
+void PropItem::deselect() {}
+sf::FloatRect PropItem::globalBounds() const { return{}; }
+
+//private
+void PropItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const {}

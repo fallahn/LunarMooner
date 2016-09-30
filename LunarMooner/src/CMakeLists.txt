@@ -9,7 +9,9 @@ SET(LM_SRC
   ${LM_DIR}/GameMessage.cpp
   ${LM_DIR}/GameOverState.cpp
   ${LM_DIR}/IntroState.cpp
-  ${LM_DIR}/LESelectableCollection.cpp
+  ${LM_DIR}/LEPlatformCollection.cpp
+  ${LM_DIR}/LEPointCollection.cpp
+  ${LM_DIR}/LEPropCollection.cpp
   ${LM_DIR}/LESelectableItem.cpp
   ${LM_DIR}/LevelEditorState.cpp
   ${LM_DIR}/LMAlienController.cpp

@@ -25,27 +25,34 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LE_SELECTABLE_COLLECTION_HPP_
-#define LE_SELECTABLE_COLLECTION_HPP_
+#ifndef LE_PLATFORM_COLLECTION_HPP_
+#define LE_PLATFORM_COLLECTION_HPP_
 
-#include <SFML/Graphics/Drawable.hpp>
+#include <LESelectableCollection.hpp>
+#include <LESelectableItem.hpp>
+
+#include <vector>
+#include <memory>
 
 namespace le
 {
-    class SelectableItem;
-    class SelectableCollection : public sf::Drawable
+    class PlatformCollection final : public SelectableCollection
     {
     public:
-        SelectableCollection() = default;
-        virtual ~SelectableCollection() = default;
+        PlatformCollection();
+        ~PlatformCollection() = default;
 
-        virtual SelectableItem* getSelected(const sf::Vector2f&) = 0;
-        virtual void update() = 0;
-        virtual SelectableItem* add(const sf::Vector2f&) = 0;
+        SelectableItem* getSelected(const sf::Vector2f&) override;
+        void update() override;
+        SelectableItem* add(const sf::Vector2f&) override;
 
-    protected:
-        void draw(sf::RenderTarget&, sf::RenderStates) const override = 0;
+        //TODO getter for platform data
+
+    private:
+        std::vector<std::unique_ptr<PlatformItem>> m_platforms;
+        void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
 }
 
-#endif //LE_SELECTABLE_COLLECTION_HPP_
+
+#endif //LE_PLAFORM_COLLECTION_HPP_
