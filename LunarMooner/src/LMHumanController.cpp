@@ -34,13 +34,17 @@ source distribution.
 #include <xygine/util/Random.hpp>
 #include <xygine/components/AnimatedDrawable.hpp>
 
-//#include <SFML/Graphics/CircleShape.hpp>
+#include <xygine/Reports.hpp>
 
 using namespace lm;
 
 namespace
 {
-    const float walkSpeed = 120.f;
+    //const float walkSpeed = 120.f;
+
+    const float gravity = 12.f;
+    const float initialVelocity = 296.f;
+    const float maxXVelocity = 200.f;
 
     const auto waveTable = xy::Util::Wavetable::sine(5.f, 3.f);
 }
@@ -49,7 +53,8 @@ HumanController::HumanController(xy::MessageBus& mb, xy::AnimatedDrawable& ad)
     : xy::Component     (mb, this),
     m_drawable          (ad),
     m_gotoDestination   (false),
-    m_waveTableIndex    (xy::Util::Random::value(0, waveTable.size() - 1))
+    m_waveTableIndex    (xy::Util::Random::value(0, waveTable.size() - 1)),
+    m_velocity          (0.f, -initialVelocity)
 {
 
 }
@@ -60,29 +65,36 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
     if (m_gotoDestination)
     {
         auto position = entity.getPosition();
-        if (std::abs(position.x - m_destination.x) > 2.f)
-        {
-            float movement = (position.x < m_destination.x) ? walkSpeed : -walkSpeed;
-            entity.move(movement * dt, 0.f);
 
-            if (std::abs(entity.getPosition().x - m_destination.x) <= 2)
-            {
-                m_drawable.playAnimation(AnimationID::Climb);
-            }
-        }
-        else
+        //add gravity 
+        m_velocity.y += gravity;
+        //boost pack (do particle anim) if too low
+        if(position.y > m_destination.y)
         {
-            //we should always be starting below our destination
-            entity.move(0.f, -walkSpeed * dt);
-            if (position.y - m_destination.y < 2.f)
-            {
-                //ladies and gentlemen, we have reached out destination
-                entity.destroy();
-                auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
-                msg->type = LMGameEvent::HumanPickedUp;
-                msg->posX = position.x;
-                msg->posY = position.y;
-            }
+            m_velocity.y -= gravity * 1.5f;
+        }
+        //add direction to target
+        m_velocity += (m_destination - position) * 0.05f;
+
+        //clamp the speeds within some bounds
+        m_velocity *= 0.95f;
+
+        if (std::abs(m_velocity.x) > maxXVelocity)
+        {
+            m_velocity.x *= (maxXVelocity / std::abs(m_velocity.x));
+        }
+
+        //move by velocity
+        entity.move(m_velocity * dt);
+
+        //if dist to target < X we're there
+        if (xy::Util::Vector::lengthSquared(m_destination - entity.getPosition()) < 100.f)
+        {
+            entity.destroy();
+            auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
+            msg->type = LMGameEvent::HumanPickedUp;
+            msg->posX = position.x;
+            msg->posY = position.y;
         }
     }
     else if (destroyed())
@@ -94,11 +106,11 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
     if (!m_gotoDestination)
     {
         m_waveTableIndex = (m_waveTableIndex + 1) % waveTable.size();
-        entity.getComponent<xy::AnimatedDrawable>()->setPosition(0.f, waveTable[m_waveTableIndex]);
+        m_drawable.setPosition(0.f, waveTable[m_waveTableIndex]);
     }
     else
     {
-        entity.getComponent<xy::AnimatedDrawable>()->setPosition(0.f, 0.f);
+        m_drawable.setPosition(0.f, 0.f);
     }
     //store position for when switching player states
     m_position = entity.getPosition();

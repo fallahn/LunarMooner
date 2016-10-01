@@ -65,6 +65,8 @@ namespace lm
         sf::Vector2f m_position;
 
         std::size_t m_waveTableIndex;
+
+        sf::Vector2f m_velocity;
     };
 }
 

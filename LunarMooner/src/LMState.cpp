@@ -380,7 +380,7 @@ void LunarMoonerState::handleMessage(const xy::Message& msg)
 }
 
 bool LunarMoonerState::update(float dt)
-{
+{    
     //get input
     if(m_useController) parseControllerInput(m_inputFlags);
     
