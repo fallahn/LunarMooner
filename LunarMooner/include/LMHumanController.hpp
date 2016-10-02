@@ -32,7 +32,7 @@ source distribution.
 
 namespace xy
 {
-    class AnimatedDrawable;
+    class Model;
 }
 
 namespace lm
@@ -48,7 +48,7 @@ namespace lm
             RunRight
         };
 
-        HumanController(xy::MessageBus&, xy::AnimatedDrawable&);
+        HumanController(xy::MessageBus&, xy::Model&);
         ~HumanController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -59,7 +59,7 @@ namespace lm
         const sf::Vector2f& getPosition() const { return m_position; }
 
     private:
-        xy::AnimatedDrawable& m_drawable;
+        xy::Model& m_drawable;
         bool m_gotoDestination;
         sf::Vector2f m_destination;
         sf::Vector2f m_position;

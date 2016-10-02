@@ -32,7 +32,9 @@ source distribution.
 #include <xygine/util/Vector.hpp>
 #include <xygine/util/Wavetable.hpp>
 #include <xygine/util/Random.hpp>
-#include <xygine/components/AnimatedDrawable.hpp>
+#include <xygine/components/Model.hpp>
+#include <xygine/components/ParticleSystem.hpp>
+#include <xygine/components/AudioSource.hpp>
 
 #include <xygine/Reports.hpp>
 
@@ -43,13 +45,14 @@ namespace
     //const float walkSpeed = 120.f;
 
     const float gravity = 12.f;
-    const float initialVelocity = 296.f;
+    const float initialVelocity = 9.f;
     const float maxXVelocity = 200.f;
 
     const auto waveTable = xy::Util::Wavetable::sine(5.f, 3.f);
+    const float modelOffset = 20.f;
 }
 
-HumanController::HumanController(xy::MessageBus& mb, xy::AnimatedDrawable& ad)
+HumanController::HumanController(xy::MessageBus& mb, xy::Model& ad)
     : xy::Component     (mb, this),
     m_drawable          (ad),
     m_gotoDestination   (false),
@@ -71,7 +74,7 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
         //boost pack (do particle anim) if too low
         if(position.y > m_destination.y)
         {
-            m_velocity.y -= gravity * 1.5f;
+            m_velocity.y -= gravity * 1.2f;
         }
         //add direction to target
         m_velocity += (m_destination - position) * 0.05f;
@@ -79,10 +82,12 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
         //clamp the speeds within some bounds
         m_velocity *= 0.95f;
 
+        float xRatio = maxXVelocity / std::abs(m_velocity.x);
         if (std::abs(m_velocity.x) > maxXVelocity)
         {
-            m_velocity.x *= (maxXVelocity / std::abs(m_velocity.x));
+            m_velocity.x *= (xRatio);
         }
+        entity.getComponent<xy::AudioSource>()->setPitch(xRatio);
 
         //move by velocity
         entity.move(m_velocity * dt);
@@ -96,6 +101,8 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
             msg->posX = position.x;
             msg->posY = position.y;
         }
+
+        entity.getComponent<xy::ParticleSystem>()->setInertia(m_velocity);
     }
     else if (destroyed())
     {
@@ -106,11 +113,11 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
     if (!m_gotoDestination)
     {
         m_waveTableIndex = (m_waveTableIndex + 1) % waveTable.size();
-        m_drawable.setPosition(0.f, waveTable[m_waveTableIndex]);
+        m_drawable.setPosition({ 0.f, waveTable[m_waveTableIndex] + modelOffset, 0.f });
     }
     else
     {
-        m_drawable.setPosition(0.f, 0.f);
+        m_drawable.setPosition({ 0.f, modelOffset, 0.f });
     }
     //store position for when switching player states
     m_position = entity.getPosition();
@@ -121,5 +128,6 @@ void HumanController::setDestination(const sf::Vector2f& dest)
     m_destination = dest;
     m_gotoDestination = true;
 
-    m_drawable.playAnimation((dest.x - m_position.x > 0) ? AnimationID::RunRight : AnimationID::RunLeft);
+    //m_drawable.playAnimation((dest.x - m_position.x > 0) ? AnimationID::RunRight : AnimationID::RunLeft);
+    m_drawable.setRotation((dest.x - m_position.x > 0) ? sf::Vector3f(0.f, 0.f, 90.f) : sf::Vector3f(0.f, 0.f, -90.f));
 }

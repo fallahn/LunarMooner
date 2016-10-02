@@ -180,6 +180,7 @@ enum LMParticleID
     RcsRight,
     RcsDown,
     RoidTrail,
+    JetPack,
     SmallExplosion,
     LargeExplosion
 };

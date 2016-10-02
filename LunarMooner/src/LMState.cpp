@@ -814,6 +814,9 @@ void LunarMoonerState::initMeshes()
     xy::IQMBuilder ib5("assets/models/rock_wall_01.iqm");
     m_meshRenderer.loadModel(Mesh::RockWall01, ib5);
 
+    xy::IQMBuilder ib6("assets/models/doofer.iqm");
+    m_meshRenderer.loadModel(Mesh::Doofer, ib6);
+
     auto& playerMat = m_resources.materialResource.add(Material::Player, m_resources.shaderResource.get(Shader::MeshTextured));
     playerMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/ship_diffuse.png") });
     playerMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
@@ -824,21 +827,36 @@ void LunarMoonerState::initMeshes()
     shipMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/mothership_diffuse.png") });
     shipMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
 
-    auto& dooferMat = m_resources.materialResource.add(Material::DeadDoofer, m_resources.shaderResource.get(Shader::MeshVertexColoured));
+    auto& corpseMat = m_resources.materialResource.add(Material::DeadDoofer, m_resources.shaderResource.get(Shader::MeshVertexColoured));
+    corpseMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    corpseMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+
+    //auto& moon = m_resources.materialResource.add(Material::Moon, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+    //moon.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    //moon.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
+    ////moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/mask.png") });
+    //moon.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+
+    //auto& rockwallMat = m_resources.materialResource.add(Material::RockWall01, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+    //rockwallMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    //rockwallMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
+    ////rockwallMat.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/mask.png") });
+    //rockwallMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
+    ////rockwallMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+
+    auto& dooferMat = m_resources.materialResource.add(Material::Doofer, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
     dooferMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-
-    auto& moon = m_resources.materialResource.add(Material::Moon, m_resources.shaderResource.get(Shader::MeshNormalMapped));
-    moon.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    moon.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
-    //moon.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/mask.png") });
-    moon.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
-
-    auto& rockwallMat = m_resources.materialResource.add(Material::RockWall01, m_resources.shaderResource.get(Shader::MeshNormalMapped));
-    rockwallMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    rockwallMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
-    //rockwallMat.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/mask.png") });
-    rockwallMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
-    //rockwallMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+    auto& diffuse = m_resources.textureResource.get("assets/images/game/textures/doofer_diffuse.png");
+    diffuse.setRepeated(true);
+    dooferMat.addProperty({ "u_diffuseMap", diffuse });
+    auto& mask = m_resources.textureResource.get("assets/images/game/textures/doofer_mask.png");
+    mask.setRepeated(true);
+    dooferMat.addProperty({ "u_maskMap", mask });
+    auto& normal = m_resources.textureResource.get("assets/images/game/textures/doofer_normal.png");
+    normal.setRepeated(true);
+    dooferMat.addProperty({ "u_normalMap", normal });
+    dooferMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+    dooferMat.getRenderPass(xy::RenderPass::ShadowMap)->setCullFace(xy::CullFace::Front);
 
     //add drawable to scene
     auto md = m_meshRenderer.createDrawable(m_messageBus);

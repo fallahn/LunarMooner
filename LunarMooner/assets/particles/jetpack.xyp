@@ -1,0 +1,48 @@
+{
+  "Editor": {
+    "EmitterPosition": "99, 17",
+    "BackgroundColour": 255,
+    "EnableMovement": true
+  },
+  "ReleaseCount": 1,
+  "Delay": 0.0,
+  "Duration": -1.0,
+  "Texture": "assets/images/particles/puff01.png",
+  "Colour": -1,
+  "BlendMode": "Add",
+  "ParticleSize": "2, 2",
+  "ParticlePosition": "0, 0",
+  "FollowParent": false,
+  "Lifetime": 1.0,
+  "InitialVelocity": "0, 80",
+  "RandomInitialVelocities": [],
+  "EmitRate": 50.0,
+  "RandomInitialPositions": [
+    "-2, -3",
+    "2, -1",
+    "-3, -1",
+    "1, -1"
+  ],
+  "Affectors": [
+    {
+      "Type": "Scale",
+      "Data": [
+        10.0,
+        10.0
+      ]
+    },
+    {
+      "Type": "Velocity",
+      "Data": [
+        0.99,
+        0.99
+      ]
+    },
+    {
+      "Type": "Rotation",
+      "Data": [
+        90.0
+      ]
+    }
+  ]
+}

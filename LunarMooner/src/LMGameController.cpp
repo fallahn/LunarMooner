@@ -232,6 +232,8 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
                 }
             }
             m_humans[index]->getComponent<HumanController>()->setDestination(pos);
+            m_humans[index]->getComponent<xy::ParticleSystem>()->start();
+            m_humans[index]->getComponent<xy::AudioSource>()->play(true);
 
             auto tutMsg = sendMessage<LMTutorialEvent>(TutorialEvent);
             tutMsg->action = LMTutorialEvent::RescueSurvivors;
@@ -391,6 +393,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_particleDefs[LMParticleID::RcsRight].loadFromFile("assets/particles/rcs_right.xyp", m_resources.textureResource);
     m_particleDefs[LMParticleID::RcsDown].loadFromFile("assets/particles/rcs_down.xyp", m_resources.textureResource);
     m_particleDefs[LMParticleID::RoidTrail].loadFromFile("assets/particles/roid_trail.xyp", m_resources.textureResource);
+    m_particleDefs[LMParticleID::JetPack].loadFromFile("assets/particles/jetpack.xyp", m_resources.textureResource);
 
     m_soundCache.insert(std::make_pair(LMSoundID::Engine, m_resources.soundResource.get("assets/sound/fx/thrust.wav")));
     m_soundCache.insert(std::make_pair(LMSoundID::RCS, m_resources.soundResource.get("assets/sound/fx/rcs.wav")));
@@ -885,22 +888,27 @@ namespace
 
 void GameController::spawnHuman(const sf::Vector2f& position)
 {
-    /*auto shadow = getHumanDrawable(getMessageBus(), m_resources);
-    shadow->setScale(1.2f, 1.2f);
-    shadow->setColour({ 0, 0, 0, 140 });
-*/
-    auto drawable = getHumanDrawable(getMessageBus(), m_resources);
+    auto model = m_meshRenderer.createModel(Mesh::ID::Doofer, getMessageBus());
+    auto& material = m_resources.materialResource.get(Material::Doofer);
+    model->setBaseMaterial(material);
+    model->setScale({ 0.5f, 0.5f, 0.5f });
+    model->rotate(xy::Model::Axis::X, 20.f);
 
-    auto controller = xy::Component::create<HumanController>(getMessageBus(), *drawable.get());
+    auto controller = xy::Component::create<HumanController>(getMessageBus(), *model.get());
+    auto jetsound = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
+    jetsound->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
+    jetsound->setVolume(60.f);
+    jetsound->setFadeInTime(0.5f);
 
     auto entity = xy::Entity::create(getMessageBus());
-    //entity->addComponent(shadow);
-    entity->addComponent(drawable);
+    entity->addComponent(m_particleDefs[LMParticleID::JetPack].createSystem(getMessageBus()));
+    entity->addComponent(model);
     entity->addComponent(controller);
+    entity->addComponent(jetsound);
     entity->setPosition(position);
     entity->addCommandCategories(LMCommandID::Human);
 
-    m_humans.push_back(m_scene.addEntity(entity, xy::Scene::Layer::FrontRear));
+    m_humans.push_back(m_scene.addEntity(entity, xy::Scene::Layer::BackFront));
 }
 
 void GameController::spawnHumans()
@@ -1016,7 +1024,7 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left, xy::DefaultSceneSize.y - 320.f); //TODO fix these numbers
     m_terrain = entity->addComponent(terrain);
 
-    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
 
     //need to do this after adding to entity to get correct transforms
     updatePlatforms();
