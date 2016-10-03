@@ -44,6 +44,7 @@ source distribution.
 #include <xygine/mesh/QuadBuilder.hpp>
 #include <xygine/mesh/CubeBuilder.hpp>
 #include <xygine/util/Random.hpp>
+#include <xygine/FileSystem.hpp>
 
 #include <xygine/imgui/imgui.h>
 
@@ -54,6 +55,10 @@ namespace
 {
 #include "ConstParams.inl"
 
+    bool showHelp = false;
+    int currentItemIndex = 0;
+    int currentPropIndex = 0;
+    std::vector<std::string> modelFiles;
 }
 
 EditorState::EditorState(xy::StateStack& stack, Context context)
@@ -64,6 +69,10 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
     m_selectedItem  (nullptr),
     m_hasClicked    (false)
 {
+    m_loadingSprite.setTexture(m_resources.textureResource.get("assets/images/game/meteor.png"));
+    m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
+    m_loadingSprite.setPosition(m_loadingSprite.getOrigin());
+
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
 
@@ -73,7 +82,7 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
 
     m_collections[Collection::Points] = std::make_unique<le::PointCollection>();
     m_collections[Collection::Platforms] = std::make_unique<le::PlatformCollection>();
-    m_collections[Collection::Props] = std::make_unique<le::PropCollection>();
+    m_collections[Collection::Props] = std::make_unique<le::PropCollection>(m_scene, m_meshRenderer, m_resources, m_messageBus);
 
     quitLoadingScreen();
 
@@ -88,54 +97,8 @@ EditorState::~EditorState()
 //public
 bool EditorState::handleEvent(const sf::Event & evt)
 {    
-    auto position = xy::App::getMouseWorldPosition();
-
-    //check if we're over anything when clicking
-    if (evt.type == sf::Event::MouseButtonPressed &&
-        evt.mouseButton.button == sf::Mouse::Left)
-    {
-        if (m_selectedItem && m_selectedItem->globalBounds().contains(position))
-        {
-            m_hasClicked = true;
-        }
-        else
-        {
-            if (m_selectedItem)
-            {
-                m_selectedItem->deselect();
-                m_selectedItem = nullptr;
-            }
-
-            std::size_t i = 0;
-            while (i < m_collections.size() && !m_selectedItem)
-            {
-                m_selectedItem = m_collections[i++]->getSelected(position);
-            }
-            if (m_selectedItem)
-            {
-                m_hasClicked = true;
-            }
-        }
-    }
-
-    if (evt.type == sf::Event::MouseButtonReleased &&
-        evt.mouseButton.button == sf::Mouse::Left)
-    {
-        m_hasClicked = false;
-    }
-
-    //if the mouse moves while left button pressed
-    //move any selected item
-    if (evt.type == sf::Event::MouseMoved && m_hasClicked)
-    {
-        if (m_selectedItem)
-        {    
-            position.x = std::min(alienArea.left + alienArea.width, std::max(alienArea.left, position.x));
-            position.y = std::min(xy::DefaultSceneSize.y, std::max(0.f, position.y)); //probably needs to be clamped smaller?
-
-            m_selectedItem->setPosition(position);
-        }
-    }
+    doMouseEvent(evt);
+    doKeyEvent(evt);
 
     return false;
 }
@@ -184,6 +147,103 @@ void EditorState::draw()
 }
 
 //private
+void EditorState::doMouseEvent(const sf::Event& evt)
+{
+    auto position = xy::App::getMouseWorldPosition();
+
+    //check if we're over anything when clicking
+    if (evt.type == sf::Event::MouseButtonPressed)
+    {
+        if (evt.mouseButton.button == sf::Mouse::Left)
+        {
+            if (m_selectedItem && m_selectedItem->globalBounds().contains(position))
+            {
+                m_hasClicked = true;
+                m_clickedOffset = m_selectedItem->getPosition() - position;
+            }
+            else
+            {
+                if (m_selectedItem)
+                {
+                    m_selectedItem->deselect();
+                    m_selectedItem = nullptr;
+                }
+
+                std::size_t i = 0;
+                while (i < m_collections.size() && !m_selectedItem)
+                {
+                    m_selectedItem = m_collections[i++]->getSelected(position);
+                }
+                if (m_selectedItem)
+                {
+                    m_hasClicked = true;
+                    m_clickedOffset = m_selectedItem->getPosition() - position;
+                }
+            }
+        }
+        else if (evt.mouseButton.button == sf::Mouse::Right)
+        {
+            if (auto i = m_collections[currentItemIndex]->add(position))
+            {
+                if (m_selectedItem)
+                {
+                    m_selectedItem->deselect();
+                }
+                m_selectedItem = i;
+                m_selectedItem->select();
+            }
+        }
+    }
+
+    if (evt.type == sf::Event::MouseButtonReleased &&
+        evt.mouseButton.button == sf::Mouse::Left)
+    {
+        m_hasClicked = false;
+    }
+
+    //if the mouse moves while left button pressed
+    //move any selected item
+    if (evt.type == sf::Event::MouseMoved && m_hasClicked)
+    {
+        if (m_selectedItem)
+        {
+            position.x = std::min(alienArea.left + alienArea.width, std::max(alienArea.left, position.x));
+            position.y = std::min(xy::DefaultSceneSize.y, std::max(0.f, position.y)); //probably needs to be clamped smaller?
+
+            m_selectedItem->setPosition(position + m_clickedOffset);
+        }
+    }
+}
+
+void EditorState::doKeyEvent(const sf::Event& evt)
+{
+    if (evt.type == sf::Event::KeyReleased)
+    {
+        switch (evt.key.code)
+        {
+        default: break;
+        case sf::Keyboard::W:
+            currentItemIndex = std::max(0, --currentItemIndex);
+            break;
+        case sf::Keyboard::S:
+            currentItemIndex = std::min(2, ++currentItemIndex); //TODO const here! this changes with the number of items :/
+            break;
+        case sf::Keyboard::A:
+
+            break;
+        case sf::Keyboard::D:
+
+            break;
+        case sf::Keyboard::Delete:
+            if (m_selectedItem)
+            {
+                m_selectedItem = m_selectedItem->remove();
+            }
+            break;
+        }
+    }
+}
+
 void EditorState::loadMeshes()
 {
     m_scene.setAmbientColour(SceneAmbientColour);
@@ -228,14 +288,18 @@ void EditorState::loadMeshes()
     xy::IQMBuilder ib("assets/models/rock_wall_01.iqm");
     m_meshRenderer.loadModel(Mesh::ID::RockWall01, ib);
 
-    xy::IQMBuilder ib2("assets/models/island_rock_01.iqm");
-    m_meshRenderer.loadModel(Mesh::ID::RockIsland01, ib2);
 
-    xy::IQMBuilder ib3("assets/models/island_rock_02.iqm");
-    m_meshRenderer.loadModel(Mesh::ID::RockIsland02, ib3);
-
-    xy::CubeBuilder cb(1.f);
-    m_meshRenderer.loadModel(Mesh::ID::Platform, cb);
+    //go through props folder and load each valid mesh
+    modelFiles = xy::FileSystem::listFiles(propsDirectory);
+    auto i = 0u;
+    for (const auto& f : modelFiles)
+    {
+        if (xy::FileSystem::getFileExtension(f) == ".iqm")
+        {
+            xy::IQMBuilder builder(propsDirectory + f);
+            m_meshRenderer.loadModel(Mesh::ID::Count + i++, builder);
+        }
+    }
 }
 
 void EditorState::buildScene()
@@ -268,32 +332,6 @@ void EditorState::buildScene()
         entity->addComponent(rockWall);
         m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
     }
-
-    //-----------------------------------------
-    auto rock = m_meshRenderer.createModel(Mesh::ID::RockIsland01, m_messageBus);
-    rock->setBaseMaterial(m_resources.materialResource.get(Material::ID::DeadDoofer));
-    rock->setPosition({ 0.f, 0.f, playerOffsetDepth });
-    entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(rock);
-    entity->setPosition(500.f, xy::DefaultSceneSize.y - groundOffset);
-    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
-
-    rock = m_meshRenderer.createModel(Mesh::ID::RockIsland02, m_messageBus);
-    rock->setBaseMaterial(m_resources.materialResource.get(Material::ID::DeadDoofer));
-    rock->setPosition({ 0.f, 0.f, playerOffsetDepth });
-    entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(rock);
-    entity->setPosition(1200.f, xy::DefaultSceneSize.y - groundOffset);
-    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
-
-    auto box = m_meshRenderer.createModel(Mesh::ID::Platform, m_messageBus);
-    box->setScale({ 200.f, 25.f, 80.f });
-    box->setBaseMaterial(m_resources.materialResource.get(Material::ID::Platform));
-    entity = xy::Entity::create(m_messageBus);
-    entity->addComponent(box);
-    entity->setPosition(900.f, 800.f);
-    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
-    //----------------------------------------
 
     auto meshRenderer = m_meshRenderer.createDrawable(m_messageBus);
     //meshRenderer->enableWater(true);
@@ -332,13 +370,34 @@ void EditorState::addWindows()
         [this]()
     {
         nim::SetNextWindowSize({ 240.f, 368.f });
-        nim::Begin("Editor");
-        static int currentIndex = 0;
-        nim::Combo("", &currentIndex, "Point\0Platform\0Prop\0");
+        nim::Begin("Editor", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_ShowBorders);
+
+        if (nim::BeginMenuBar())
+        {
+            if (nim::BeginMenu("Help"))
+            {
+                //if (nim::MenuItem("Keyboard Shortcuts", nullptr, &showHelp))
+                {
+                    nim::TextUnformatted("Right-click: Place selected item\nW/S: Scroll through items\nA/D Choose item property\nDelete: remove selected item");
+                }
+                nim::EndMenu();
+            }
+
+            if (nim::BeginMenu("Exit"))
+            {
+                //TODO save map on exit
+                requestStackClear();
+                requestStackPush(States::ID::MenuBackground);
+                nim::EndMenu();
+            }
+            nim::EndMenuBar();
+        }
+
+        nim::Combo("", &currentItemIndex, "Point\0Platform\0Prop\0");
         nim::SameLine();
         if (nim::Button("Add", {40.f, 20.f}))
         {
-            if (auto i = m_collections[currentIndex]->add(xy::DefaultSceneSize / 2.f))
+            if (auto i = m_collections[currentItemIndex]->add(xy::DefaultSceneSize / 2.f))
             {
                 if (m_selectedItem)
                 {
@@ -379,6 +438,25 @@ void EditorState::addWindows()
                 }
             }
                 break;
+            case le::SelectableItem::Type::Prop:
+            {
+                int idx = currentPropIndex;
+                nim::Combo("Prop:", &currentPropIndex, 
+                    [](void* data, int idx, const char** out_text)
+                {
+                    *out_text = (*(const std::vector<std::string>*)data)[idx].c_str();
+                    return true;
+                }, (void*)&modelFiles, modelFiles.size());
+                if (idx != currentPropIndex && m_selectedItem)
+                {
+                    auto model = m_meshRenderer.createModel(Mesh::Count + currentPropIndex, m_messageBus);
+                    //TODO set model material
+                    dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(model);
+
+                    dynamic_cast<le::PropCollection*>(m_collections[Collection::Props].get())->setPropIndex(currentPropIndex);
+                }
+            }
+            break;
             }
         }
 
@@ -389,4 +467,14 @@ void EditorState::addWindows()
         if (lastVal != fov) m_meshRenderer.setFOV(fov);
         nim::End();
     }, this);
+}
+
+void EditorState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
+{
+    static float time = 0.f;
+    time += dt;
+    float value = std::sin(time * 12.f) * 128.f + 127.f;
+    
+    m_loadingSprite.setColor({ 255, 255, 255, static_cast<sf::Uint8>(value) });
+    rw.draw(m_loadingSprite, sf::BlendAdd);
 }

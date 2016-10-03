@@ -47,7 +47,8 @@ namespace Mesh
         RockIsland02,
         Platform,
         Doofer,
-        Ground
+        Ground,
+        Count
     };
 }
 namespace Material

@@ -40,5 +40,6 @@ const sf::Vector3f SceneLightDirection(0.25f, 0.5f, -1.f);
 const sf::Color SceneWaterColour(100, 100, 255);
 const float playerOffsetDepth = 0.f;// -60.f;
 const float groundOffset = 60.f;
+const std::string propsDirectory = "assets/models/props/";
 
 #endif //LM_CONST_PARAMS_INL_

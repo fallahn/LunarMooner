@@ -34,6 +34,8 @@ using namespace le;
 
 namespace
 {
+    const float maxPropHeight = 800.f;
+
     const sf::Vector2f pointSize(10.f, 10.f);
     const sf::Vector2f platSize(100.f, 25.f);
 }
@@ -114,13 +116,64 @@ void PlatformItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 }
 
 //----PROP----//
-PropItem::PropItem()
-{}
+#include <xygine/Entity.hpp>
+#include <xygine/components/Model.hpp>
+PropItem::PropItem(xy::Entity& entity)
+    : m_entity(entity)
+{
+    m_shape.setSize({ 200.f, 200.f });
+    //m_shape.setOrigin(m_shape.getSize() / 2.f);
+    m_shape.setOutlineThickness(2.f);
+    m_shape.setOutlineColor(sf::Color::White);
+    m_shape.setFillColor(sf::Color::Transparent);
+}
+
+PropItem::~PropItem()
+{
+    //delete entity
+    m_entity.destroy();
+}
 
 //public
-void PropItem::select() {}
-void PropItem::deselect() {}
-sf::FloatRect PropItem::globalBounds() const { return{}; }
+void PropItem::select()
+{
+    m_shape.setOutlineColor(sf::Color::Red);
+}
+
+void PropItem::deselect()
+{
+    m_shape.setOutlineColor(sf::Color::White);
+}
+
+sf::FloatRect PropItem::globalBounds() const 
+{ 
+    return m_shape.getGlobalBounds(); //entity global bounds
+}
+
+void PropItem::update()
+{
+    //clamp drawable Y position (see const.inl) 
+    auto position = getPosition();
+    position.y = std::max(maxPropHeight, position.y);
+    setPosition(position);
+    
+    //set our entity's position
+    m_entity.setPosition(getPosition());
+
+    //update drawable with bounds
+    auto bounds = m_entity.globalBounds();
+    m_shape.setPosition(bounds.left, bounds.top);
+    m_shape.setSize({ bounds.width, bounds.height });
+}
+
+void PropItem::setModel(std::unique_ptr<xy::Model>& model)
+{
+    m_entity.getComponent<xy::Model>()->destroy();
+    m_entity.addComponent(std::move(model));
+}
 
 //private
-void PropItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const {}
+void PropItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const
+{
+    rt.draw(m_shape, states);
+}

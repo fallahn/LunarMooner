@@ -37,6 +37,8 @@ source distribution.
 #include <xygine/mesh/MeshRenderer.hpp>
 #include <xygine/State.hpp>
 
+#include <SFML/Graphics/Sprite.hpp>
+
 #include <array>
 
 namespace xy
@@ -75,10 +77,17 @@ private:
     le::SelectableItem* m_selectedItem;
     std::array<std::unique_ptr<le::SelectableCollection>, 3> m_collections;
     bool m_hasClicked;
+    sf::Vector2f m_clickedOffset;
+
+    void doMouseEvent(const sf::Event&);
+    void doKeyEvent(const sf::Event&);
 
     void loadMeshes();
     void buildScene();
     void addWindows();
+
+    sf::Sprite m_loadingSprite;
+    void updateLoadingScreen(float dt, sf::RenderWindow& rw);
 };
 
 #endif //LM_EDITOR_STATE_HPP_

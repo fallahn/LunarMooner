@@ -26,23 +26,83 @@ source distribution.
 *********************************************************************/
 
 #include <LEPropCollection.hpp>
+#include <LMShaderIds.hpp>
+
+#include <xygine/Scene.hpp>
+#include <xygine/Entity.hpp>
+#include <xygine/mesh/MeshRenderer.hpp>
+#include <xygine/components/Model.hpp>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
 using namespace le;
 
+namespace
+{
+    std::size_t maxProps = 12;
+}
+
+PropCollection::PropCollection(xy::Scene& scene, xy::MeshRenderer& mr, ResourceCollection& rc, xy::MessageBus& mb)
+    : m_scene       (scene),
+    m_meshRenderer  (mr),
+    m_resources     (rc),
+    m_messageBus    (mb),
+    m_propIndex     (0)
+{
+
+}
+
 //public
 SelectableItem* PropCollection::getSelected(const sf::Vector2f& mousePos)
 {
+    for (auto& p : m_props)
+    {
+        if (p->globalBounds().contains(mousePos))
+        {
+            p->select();
+            return p.get();
+        }
+    }
     return nullptr;
 }
 
-void PropCollection::update() {}
+void PropCollection::update()
+{
+    for (auto& p : m_props) p->update();
+
+    m_props.erase(std::remove_if(std::begin(m_props), std::end(m_props), 
+        [](const std::unique_ptr<PropItem>& p) 
+    {
+        return p->deleted();
+    }), std::end(m_props));
+}
 
 SelectableItem* PropCollection::add(const sf::Vector2f& position)
 {
+    //TODO we need to assert at least one model is cached before trying to retrieve it
+
+    if (m_props.size() < maxProps)
+    {
+        auto model = m_meshRenderer.createModel(Mesh::Count + m_propIndex, m_messageBus);
+        //TODO identify material beloning to this model... we need to get materials done in xy
+        auto entity = xy::Entity::create(m_messageBus);
+        entity->addComponent(model);
+        entity->setPosition(position);
+        auto e = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+        
+        m_props.emplace_back(std::make_unique<PropItem>(*e));
+        m_props.back()->setPosition(position);
+        return m_props.back().get();
+    }
+    else
+    {
+        xy::Logger::log("Maximum number of platforms is " + std::to_string(maxProps), xy::Logger::Type::Info);
+    }
     return nullptr;
 }
 
 //private
-void PropCollection::draw(sf::RenderTarget& rt, sf::RenderStates states) const {}
+void PropCollection::draw(sf::RenderTarget& rt, sf::RenderStates states) const
+{
+    for (const auto& p : m_props) rt.draw(*p, states);
+}

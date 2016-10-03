@@ -32,6 +32,14 @@ source distribution.
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
+#include <memory>
+
+namespace xy
+{
+    class Entity;
+    class Model;
+}
+
 namespace le
 {
     class SelectableItem : public sf::Transformable, public sf::Drawable
@@ -93,15 +101,22 @@ namespace le
     class PropItem final : public SelectableItem
     {
     public:
-        PropItem();
-        ~PropItem() = default;
+        explicit PropItem(xy::Entity&);
+        ~PropItem();
 
         Type type() const { return Type::Prop; }
         void select() override;
         void deselect() override;
         sf::FloatRect globalBounds() const override;
 
+        void update();
+        void setModel(std::unique_ptr<xy::Model>&);
+
     private:
+
+        xy::Entity& m_entity;
+
+        sf::RectangleShape m_shape;
 
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

@@ -30,23 +30,40 @@ source distribution.
 
 #include <LESelectableCollection.hpp>
 #include <LESelectableItem.hpp>
+#include <ResourceCollection.hpp>
 
 #include <vector>
 #include <memory>
+
+namespace xy
+{
+    class Scene;
+    class MeshRenderer;
+    class MessageBus;
+}
 
 namespace le
 {
     class PropCollection final :public SelectableCollection
     {
     public:
-        PropCollection() = default;
+        PropCollection(xy::Scene&, xy::MeshRenderer&, ResourceCollection&, xy::MessageBus&);
         ~PropCollection() = default;
 
         SelectableItem* getSelected(const sf::Vector2f&) override;
         void update() override;
         SelectableItem* add(const sf::Vector2f&) override;
 
+        void setPropIndex(int idx) { m_propIndex = idx; }
+
     private:
+        xy::Scene& m_scene;
+        xy::MeshRenderer& m_meshRenderer;
+        ResourceCollection& m_resources;
+        xy::MessageBus& m_messageBus;
+
+        int m_propIndex;
+
         std::vector<std::unique_ptr<PropItem>> m_props;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };
