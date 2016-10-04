@@ -888,6 +888,8 @@ namespace
 
 void GameController::spawnHuman(const sf::Vector2f& position)
 {
+    auto particleSystem = m_particleDefs[LMParticleID::JetPack].createSystem(getMessageBus());
+
     auto model = m_meshRenderer.createModel(Mesh::ID::Doofer, getMessageBus());
     auto& material = m_resources.materialResource.get(Material::Doofer);
     model->setBaseMaterial(material);
@@ -901,7 +903,7 @@ void GameController::spawnHuman(const sf::Vector2f& position)
     jetsound->setFadeInTime(0.5f);
 
     auto entity = xy::Entity::create(getMessageBus());
-    entity->addComponent(m_particleDefs[LMParticleID::JetPack].createSystem(getMessageBus()));
+    entity->addComponent(particleSystem);
     entity->addComponent(model);
     entity->addComponent(controller);
     entity->addComponent(jetsound);

@@ -169,7 +169,7 @@ void PropItem::update()
 void PropItem::setModel(std::unique_ptr<xy::Model>& model)
 {
     m_entity.getComponent<xy::Model>()->destroy();
-    m_entity.addComponent(std::move(model));
+    m_entity.addComponent(model);
 }
 
 //private
