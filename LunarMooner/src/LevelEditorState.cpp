@@ -56,7 +56,6 @@ namespace
 {
 #include "ConstParams.inl"
 
-    bool showHelp = false;
     int currentItemIndex = 0;
     int currentPropIndex = 0;
     std::vector<std::string> modelFiles;
@@ -83,7 +82,7 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
 
     m_collections[Collection::Points] = std::make_unique<le::PointCollection>();
     m_collections[Collection::Platforms] = std::make_unique<le::PlatformCollection>();
-    m_collections[Collection::Props] = std::make_unique<le::PropCollection>(m_scene, m_meshRenderer, m_resources, m_messageBus);
+    m_collections[Collection::Props] = std::make_unique<le::PropCollection>(m_scene, m_meshRenderer, m_resources, m_messageBus, m_materialMap);
 
     quitLoadingScreen();
 
@@ -292,6 +291,12 @@ void EditorState::loadMeshes()
 
     //go through props folder and load each valid mesh
     modelFiles = xy::FileSystem::listFiles(propsDirectory);
+    modelFiles.erase(std::remove_if(std::begin(modelFiles), std::end(modelFiles),
+        [](const std::string& str)
+    {
+        return (xy::FileSystem::getFileExtension(str) != ".iqm");
+    }), std::end(modelFiles));
+
     auto i = 0u;
     for (const auto& f : modelFiles)
     {
@@ -468,7 +473,7 @@ void EditorState::addWindows()
             nim::EndMenuBar();
         }
 
-        nim::Combo("", &currentItemIndex, "Point\0Platform\0Prop\0");
+        nim::Combo("", &currentItemIndex, "Prop\0Point\0Platform\0");
         nim::SameLine();
         if (nim::Button("Add", {40.f, 20.f}))
         {
@@ -497,7 +502,7 @@ void EditorState::addWindows()
         {
             switch (m_selectedItem->type())
             {
-            default:break;
+            default: break;
             case le::SelectableItem::Type::Platform:
             {
                 sf::Vector2f size = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getSize();
@@ -517,11 +522,12 @@ void EditorState::addWindows()
             {
                 int idx = currentPropIndex;
                 nim::Combo("Prop:", &currentPropIndex, 
-                    [](void* data, int idx, const char** out_text)
+                    [](void* data, int idx, const char** out)
                 {
-                    *out_text = (*(const std::vector<std::string>*)data)[idx].c_str();
+                    *out = (*(const std::vector<std::string>*)data)[idx].c_str();
                     return true;
                 }, (void*)&modelFiles, modelFiles.size());
+
                 if (idx != currentPropIndex && m_selectedItem)
                 {
                     auto model = m_meshRenderer.createModel(Mesh::Count + currentPropIndex, m_messageBus);
@@ -544,6 +550,29 @@ void EditorState::addWindows()
                 }
             }
             break;
+            }
+        }
+        else //display the dropdown for current type TODO apply settings when item created
+        {
+            switch (currentItemIndex)
+            {
+            default:break;
+            case Collection::Props:
+                nim::Combo("Prop:", &currentPropIndex,
+                    [](void* data, int idx, const char** out)
+                {
+                    *out = (*(const std::vector<std::string>*)data)[idx].c_str();
+                    return true;
+                }, (void*)&modelFiles, modelFiles.size());
+                break;
+            case Collection::Platforms:
+            {
+                sf::Vector2f size(200.f, 20.f);
+                nim::Text("Size");
+                nim::InputFloat("x", &size.x, 1.f, 10.f);
+                nim::InputFloat("y", &size.y, 1.f, 10.f);
+            }
+                break;
             }
         }
 

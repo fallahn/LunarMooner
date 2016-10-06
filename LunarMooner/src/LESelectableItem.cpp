@@ -122,9 +122,8 @@ PropItem::PropItem(xy::Entity& entity)
     : m_entity(entity)
 {
     m_shape.setSize({ 200.f, 200.f });
-    //m_shape.setOrigin(m_shape.getSize() / 2.f);
     m_shape.setOutlineThickness(2.f);
-    m_shape.setOutlineColor(sf::Color::White);
+    m_shape.setOutlineColor(sf::Color::Transparent);
     m_shape.setFillColor(sf::Color::Transparent);
 }
 
@@ -142,7 +141,7 @@ void PropItem::select()
 
 void PropItem::deselect()
 {
-    m_shape.setOutlineColor(sf::Color::White);
+    m_shape.setOutlineColor(sf::Color::Transparent);
 }
 
 sf::FloatRect PropItem::globalBounds() const 

@@ -47,7 +47,7 @@ namespace le
     public:
         enum class Type
         {
-            Point, Platform, Prop
+            Prop, Point, Platform
         };
         SelectableItem() : m_deleted(false) {}
         virtual ~SelectableItem() = default;

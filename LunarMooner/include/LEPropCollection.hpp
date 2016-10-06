@@ -34,6 +34,7 @@ source distribution.
 
 #include <vector>
 #include <memory>
+#include <map>
 
 namespace xy
 {
@@ -47,7 +48,8 @@ namespace le
     class PropCollection final :public SelectableCollection
     {
     public:
-        PropCollection(xy::Scene&, xy::MeshRenderer&, ResourceCollection&, xy::MessageBus&);
+        PropCollection(xy::Scene&, xy::MeshRenderer&, ResourceCollection&, xy::MessageBus&,
+            std::map<std::uint32_t, std::vector<std::uint32_t>>&);
         ~PropCollection() = default;
 
         SelectableItem* getSelected(const sf::Vector2f&) override;
@@ -61,6 +63,7 @@ namespace le
         xy::MeshRenderer& m_meshRenderer;
         ResourceCollection& m_resources;
         xy::MessageBus& m_messageBus;
+        std::map<std::uint32_t, std::vector<std::uint32_t>>& m_materialMap;
 
         int m_propIndex;
 

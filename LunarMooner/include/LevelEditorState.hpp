@@ -69,9 +69,9 @@ private:
 
     enum Collection
     {
-        Points = 0,
-        Platforms,
-        Props
+        Props = 0,
+        Points,
+        Platforms        
     };
 
     le::SelectableItem* m_selectedItem;

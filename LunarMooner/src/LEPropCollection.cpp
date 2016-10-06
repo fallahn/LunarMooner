@@ -42,11 +42,13 @@ namespace
     std::size_t maxProps = 12;
 }
 
-PropCollection::PropCollection(xy::Scene& scene, xy::MeshRenderer& mr, ResourceCollection& rc, xy::MessageBus& mb)
+PropCollection::PropCollection(xy::Scene& scene, xy::MeshRenderer& mr, ResourceCollection& rc, xy::MessageBus& mb,
+    std::map<std::uint32_t, std::vector<std::uint32_t>>& mm)
     : m_scene       (scene),
     m_meshRenderer  (mr),
     m_resources     (rc),
     m_messageBus    (mb),
+    m_materialMap   (mm),
     m_propIndex     (0)
 {
 
@@ -84,7 +86,21 @@ SelectableItem* PropCollection::add(const sf::Vector2f& position)
     if (m_props.size() < maxProps)
     {
         auto model = m_meshRenderer.createModel(Mesh::Count + m_propIndex, m_messageBus);
-        //TODO identify material beloning to this model... we need to get materials done in xy
+        
+        //set model material
+        const auto& matIDs = m_materialMap[Mesh::Count + m_propIndex];
+        if (matIDs.size() == 1)
+        {
+            model->setBaseMaterial(m_resources.materialResource.get(matIDs[0]));
+        }
+        else
+        {
+            for (auto i = 0; i < matIDs.size(); ++i)
+            {
+                model->setSubMaterial(m_resources.materialResource.get(matIDs[i]), i);
+            }
+        }
+
         auto entity = xy::Entity::create(m_messageBus);
         entity->addComponent(model);
         entity->setPosition(position);
