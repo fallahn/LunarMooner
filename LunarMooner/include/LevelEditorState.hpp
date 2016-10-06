@@ -79,6 +79,8 @@ private:
     bool m_hasClicked;
     sf::Vector2f m_clickedOffset;
 
+    std::map<std::uint32_t, std::vector<std::uint32_t>> m_materialMap;
+
     void doMouseEvent(const sf::Event&);
     void doKeyEvent(const sf::Event&);
 

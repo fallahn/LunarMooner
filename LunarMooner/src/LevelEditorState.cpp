@@ -43,6 +43,7 @@ source distribution.
 #include <xygine/mesh/IQMBuilder.hpp>
 #include <xygine/mesh/QuadBuilder.hpp>
 #include <xygine/mesh/CubeBuilder.hpp>
+#include <xygine/mesh/MaterialDefinition.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/FileSystem.hpp>
 
@@ -273,9 +274,9 @@ void EditorState::loadMeshes()
     wallMat01.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
     wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
 
-    auto& vertMat = m_resources.materialResource.add(Material::ID::DeadDoofer, m_resources.shaderResource.get(Shader::ID::MeshVertexColoured));
-    vertMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    vertMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
+    //auto& vertMat = m_resources.materialResource.add(Material::ID::DeadDoofer, m_resources.shaderResource.get(Shader::ID::MeshVertexColoured));
+    //vertMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    //vertMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
 
     auto& platMat = m_resources.materialResource.add(Material::ID::Platform, m_resources.shaderResource.get(Shader::ID::MeshTextured));
     platMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
@@ -296,6 +297,80 @@ void EditorState::loadMeshes()
     {
         if (xy::FileSystem::getFileExtension(f) == ".iqm")
         {
+            //look for material with same name and load it if possible
+            auto matname = f;
+            matname.replace(matname.find(".iqm"), 4, ".xym");
+            auto materials = xy::MaterialDefinition::loadFile(propsDirectory + matname);
+            for (const auto& def : materials)
+            {
+                std::vector<std::uint32_t> materialIDs;
+                
+                switch (def.shaderType)
+                {
+                default:
+                case xy::MaterialDefinition::VertexColoured:
+                {
+                    auto id = def.uid();
+                    if (!m_resources.materialResource.hasMaterial(id))
+                    {
+                        auto& mat = m_resources.materialResource.add(id, m_resources.shaderResource.get(Shader::MeshVertexColoured));
+                        mat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+                        if (def.castShadows)
+                        {
+                            mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+                        }
+                    }
+                    materialIDs.push_back(id);
+                }
+                    break;
+                case xy::MaterialDefinition::Textured:
+                {
+                    auto id = def.uid();
+                    if (!m_resources.materialResource.hasMaterial(id))
+                    {
+                        if (def.textures[2].empty())
+                        {
+                            //no normal map
+                            auto& mat = m_resources.materialResource.add(id, m_resources.shaderResource.get(Shader::MeshTextured));
+                            mat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+
+                            m_resources.textureResource.setFallbackColour(sf::Color::Magenta);
+                            mat.addProperty({ "u_diffuseMap", m_resources.textureResource.get(def.textures[0]) });
+                            m_resources.textureResource.setFallbackColour(sf::Color::Black);
+                            mat.addProperty({ "u_maskMap", m_resources.textureResource.get(def.textures[1]) });
+
+                            if (def.castShadows)
+                            {
+                                mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+                            }
+                        }
+                        else
+                        {
+                            auto& mat = m_resources.materialResource.add(id, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+                            mat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+
+                            m_resources.textureResource.setFallbackColour(sf::Color::Magenta);
+                            mat.addProperty({ "u_diffuseMap", m_resources.textureResource.get(def.textures[0]) });
+                            m_resources.textureResource.setFallbackColour(sf::Color::Black);
+                            mat.addProperty({ "u_maskMap", m_resources.textureResource.get(def.textures[1]) });
+                            m_resources.textureResource.setFallbackColour(sf::Color(127, 127, 255));
+                            mat.addProperty({ "u_normalMap", m_resources.textureResource.get(def.textures[2]) });
+
+                            if (def.castShadows)
+                            {
+                                mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+                            }
+                        }
+                    }
+                    materialIDs.push_back(id);
+                }
+                    break;
+                }
+                //map all IDs to the mesh ID
+                m_materialMap[Mesh::Count + i] = std::move(materialIDs);
+            }
+
+            //load the mesh
             xy::IQMBuilder builder(propsDirectory + f);
             m_meshRenderer.loadModel(Mesh::ID::Count + i++, builder);
         }
@@ -450,9 +525,21 @@ void EditorState::addWindows()
                 if (idx != currentPropIndex && m_selectedItem)
                 {
                     auto model = m_meshRenderer.createModel(Mesh::Count + currentPropIndex, m_messageBus);
-                    //TODO set model material
-                    dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(model);
+                    //set model material
+                    const auto& matIDs = m_materialMap[Mesh::Count + currentPropIndex];
+                    if (matIDs.size() == 1)
+                    {
+                        model->setBaseMaterial(m_resources.materialResource.get(matIDs[0]));
+                    }
+                    else
+                    {
+                        for (auto i = 0; i < matIDs.size(); ++i)
+                        {
+                            model->setSubMaterial(m_resources.materialResource.get(matIDs[i]), i);
+                        }
+                    }
 
+                    dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(model);
                     dynamic_cast<le::PropCollection*>(m_collections[Collection::Props].get())->setPropIndex(currentPropIndex);
                 }
             }
