@@ -159,6 +159,12 @@ void PropItem::update()
     //set our entity's position
     m_entity.setPosition(getPosition());
 
+    //set our entity scale
+    m_entity.setScale(getScale());
+
+    //set entity rotation
+    m_entity.setRotation(getRotation());
+
     //update drawable with bounds
     auto bounds = m_entity.globalBounds();
     m_shape.setPosition(bounds.left, bounds.top);

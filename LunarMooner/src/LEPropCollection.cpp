@@ -49,7 +49,8 @@ PropCollection::PropCollection(xy::Scene& scene, xy::MeshRenderer& mr, ResourceC
     m_resources     (rc),
     m_messageBus    (mb),
     m_materialMap   (mm),
-    m_propIndex     (0)
+    m_propIndex     (0),
+    m_rotation      (0.f)
 {
 
 }
@@ -81,8 +82,6 @@ void PropCollection::update()
 
 SelectableItem* PropCollection::add(const sf::Vector2f& position)
 {
-    //TODO we need to assert at least one model is cached before trying to retrieve it
-
     if (m_props.size() < maxProps)
     {
         auto model = m_meshRenderer.createModel(Mesh::Count + m_propIndex, m_messageBus);
@@ -108,6 +107,8 @@ SelectableItem* PropCollection::add(const sf::Vector2f& position)
         
         m_props.emplace_back(std::make_unique<PropItem>(*e));
         m_props.back()->setPosition(position);
+        m_props.back()->setRotation(m_rotation);
+        m_props.back()->setScale(m_scale);
         return m_props.back().get();
     }
     else

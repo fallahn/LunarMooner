@@ -58,7 +58,12 @@ namespace
 
     int currentItemIndex = 0;
     int currentPropIndex = 0;
+    
     sf::Vector2f nextPlatformSize(100.f, 25.f);
+
+    float propScale[] = { 1.f, 1.f };
+    float propRotation = 0.f;
+
     std::vector<std::string> modelFiles;
 }
 
@@ -498,8 +503,8 @@ void EditorState::addWindows()
                 nextPlatformSize = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getSize();
                 sf::Vector2f lastSize = nextPlatformSize;
                 nim::Text("Size");
-                nim::InputFloat("x", &nextPlatformSize.x, 1.f, 10.f);
-                nim::InputFloat("y", &nextPlatformSize.y, 1.f, 10.f);
+                nim::DragFloat("x", &nextPlatformSize.x, 0.5f, 4.f, 500.f);
+                nim::DragFloat("y", &nextPlatformSize.y, 0.5f, 4.f, 100.f);
                 if (lastSize != nextPlatformSize)
                 {
                     nextPlatformSize.x = std::min(500.f, std::max(0.f, nextPlatformSize.x));
@@ -536,7 +541,26 @@ void EditorState::addWindows()
                     }
 
                     dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(model);
-                    dynamic_cast<le::PropCollection*>(m_collections[Collection::Props].get())->setPropIndex(currentPropIndex);
+                    dynamic_cast<le::PropCollection*>(m_collections[Collection::Props].get())->setPropIndex(currentPropIndex);   
+                }
+                //scale and rotation
+                auto scale = dynamic_cast<le::PropItem*>(m_selectedItem)->getScale();
+                float lastX = propScale[0] = scale.x;
+                float lastY = propScale[1] = scale.y;
+                nim::DragFloat2("Scale", propScale, 0.01f, 0.1f, 10.f);
+
+                if (lastX != propScale[0] || lastY != propScale[1])
+                {
+                    dynamic_cast<le::PropItem*>(m_selectedItem)->setScale(propScale[0], propScale[1]);
+                }
+
+                float lastRot =  dynamic_cast<le::PropItem*>(m_selectedItem)->getRotation();
+                while (lastRot > 180.f) { lastRot -= 360.f; }
+                propRotation = lastRot;
+                nim::DragFloat("Rotation", &propRotation, 0.1f, -180.f, 180.f);
+                if (lastRot != propRotation)
+                {
+                    dynamic_cast<le::PropItem*>(m_selectedItem)->setRotation(propRotation);
                 }
             }
             break;
@@ -554,12 +578,19 @@ void EditorState::addWindows()
                     *out = (*(const std::vector<std::string>*)data)[idx].c_str();
                     return true;
                 }, (void*)&modelFiles, modelFiles.size());
+
+                //scale
+                nim::DragFloat2("Scale", propScale, 0.01f, 0.1f, 10.f);
+
+                //rotation
+                nim::DragFloat("Rotation", &propRotation, 0.1f, -180.f, 180.f);
+
                 break;
             case Collection::Platforms:
             {
                 nim::Text("Size");
-                nim::InputFloat("x", &nextPlatformSize.x, 1.f, 10.f);
-                nim::InputFloat("y", &nextPlatformSize.y, 1.f, 10.f);
+                nim::DragFloat("x", &nextPlatformSize.x, 0.5f, 4.f, 500.f);
+                nim::DragFloat("y", &nextPlatformSize.y, 0.5f, 4.f, 100.f);
             }
                 break;
             }
@@ -586,7 +617,12 @@ void EditorState::addItem(const sf::Vector2f& position)
         dynamic_cast<le::PlatformCollection*>(m_collections[currentItemIndex].get())->setNextSize(nextPlatformSize);
         break;
     case Collection::Props:
-        dynamic_cast<le::PropCollection*>(m_collections[currentItemIndex].get())->setPropIndex(currentPropIndex);
+    {
+        auto props = dynamic_cast<le::PropCollection*>(m_collections[currentItemIndex].get());
+        props->setPropIndex(currentPropIndex);
+        props->setNextRotation(propRotation);
+        props->setNextScale({ propScale[0], propScale[1] });
+    }
         break;
     }
 

@@ -57,6 +57,8 @@ namespace le
         SelectableItem* add(const sf::Vector2f&) override;
 
         void setPropIndex(int idx) { m_propIndex = idx; }
+        void setNextScale(const sf::Vector2f& scale) { m_scale = scale; }
+        void setNextRotation(float rot) { m_rotation = rot; }
 
     private:
         xy::Scene& m_scene;
@@ -66,6 +68,8 @@ namespace le
         std::map<std::uint32_t, std::vector<std::uint32_t>>& m_materialMap;
 
         int m_propIndex;
+        sf::Vector2f m_scale;
+        float m_rotation;
 
         std::vector<std::unique_ptr<PropItem>> m_props;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
