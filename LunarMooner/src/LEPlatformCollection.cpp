@@ -39,6 +39,7 @@ namespace
 }
 
 PlatformCollection::PlatformCollection()
+    : m_nextPlatformSize(100.f, 25.f)
 {
 
 }
@@ -72,6 +73,7 @@ SelectableItem* PlatformCollection::add(const sf::Vector2f& position)
     {
         m_platforms.emplace_back(std::make_unique<PlatformItem>());
         m_platforms.back()->setPosition(position);
+        m_platforms.back()->setSize(m_nextPlatformSize);
         return m_platforms.back().get();
     }
     else

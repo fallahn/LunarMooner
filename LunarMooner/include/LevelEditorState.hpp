@@ -88,6 +88,8 @@ private:
     void buildScene();
     void addWindows();
 
+    void addItem(const sf::Vector2f&);
+
     sf::Sprite m_loadingSprite;
     void updateLoadingScreen(float dt, sf::RenderWindow& rw);
 };

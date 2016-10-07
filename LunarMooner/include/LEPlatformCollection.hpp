@@ -46,9 +46,13 @@ namespace le
         void update() override;
         SelectableItem* add(const sf::Vector2f&) override;
 
+        void setNextSize(const sf::Vector2f& size) { m_nextPlatformSize = size; }
+
         //TODO getter for platform data
 
     private:
+        sf::Vector2f m_nextPlatformSize;
+        
         std::vector<std::unique_ptr<PlatformItem>> m_platforms;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

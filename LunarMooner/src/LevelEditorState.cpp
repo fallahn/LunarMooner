@@ -58,6 +58,7 @@ namespace
 
     int currentItemIndex = 0;
     int currentPropIndex = 0;
+    sf::Vector2f nextPlatformSize(100.f, 25.f);
     std::vector<std::string> modelFiles;
 }
 
@@ -183,7 +184,7 @@ void EditorState::doMouseEvent(const sf::Event& evt)
         }
         else if (evt.mouseButton.button == sf::Mouse::Right)
         {
-            if (auto i = m_collections[currentItemIndex]->add(position))
+            /*if (auto i = m_collections[currentItemIndex]->add(position))
             {
                 if (m_selectedItem)
                 {
@@ -191,7 +192,8 @@ void EditorState::doMouseEvent(const sf::Event& evt)
                 }
                 m_selectedItem = i;
                 m_selectedItem->select();
-            }
+            }*/
+            addItem(position);
         }
     }
 
@@ -272,10 +274,6 @@ void EditorState::loadMeshes()
     wallMat01.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
     wallMat01.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
     wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
-
-    //auto& vertMat = m_resources.materialResource.add(Material::ID::DeadDoofer, m_resources.shaderResource.get(Shader::ID::MeshVertexColoured));
-    //vertMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    //vertMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
 
     auto& platMat = m_resources.materialResource.add(Material::ID::Platform, m_resources.shaderResource.get(Shader::ID::MeshTextured));
     platMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
@@ -477,15 +475,7 @@ void EditorState::addWindows()
         nim::SameLine();
         if (nim::Button("Add", {40.f, 20.f}))
         {
-            if (auto i = m_collections[currentItemIndex]->add(xy::DefaultSceneSize / 2.f))
-            {
-                if (m_selectedItem)
-                {
-                    m_selectedItem->deselect();
-                }
-                m_selectedItem = i;
-                m_selectedItem->select();
-            }
+            addItem(xy::DefaultSceneSize / 2.f);
         }
 
         if (nim::Button("Remove Selected", { 120, 20.f }))
@@ -505,16 +495,16 @@ void EditorState::addWindows()
             default: break;
             case le::SelectableItem::Type::Platform:
             {
-                sf::Vector2f size = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getSize();
-                sf::Vector2f lastSize = size;
+                nextPlatformSize = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getSize();
+                sf::Vector2f lastSize = nextPlatformSize;
                 nim::Text("Size");
-                nim::InputFloat("x", &size.x, 1.f, 10.f);
-                nim::InputFloat("y", &size.y, 1.f, 10.f);
-                if (lastSize != size)
+                nim::InputFloat("x", &nextPlatformSize.x, 1.f, 10.f);
+                nim::InputFloat("y", &nextPlatformSize.y, 1.f, 10.f);
+                if (lastSize != nextPlatformSize)
                 {
-                    size.x = std::min(500.f, std::max(0.f, size.x));
-                    size.y = std::min(500.f, std::max(0.f, size.y));
-                    dynamic_cast<le::PlatformItem*>(m_selectedItem)->setSize(size);
+                    nextPlatformSize.x = std::min(500.f, std::max(0.f, nextPlatformSize.x));
+                    nextPlatformSize.y = std::min(500.f, std::max(0.f, nextPlatformSize.y));
+                    dynamic_cast<le::PlatformItem*>(m_selectedItem)->setSize(nextPlatformSize);
                 }
             }
                 break;
@@ -528,7 +518,7 @@ void EditorState::addWindows()
                     return true;
                 }, (void*)&modelFiles, modelFiles.size());
 
-                if (idx != currentPropIndex && m_selectedItem)
+                if (idx != currentPropIndex && m_selectedItem) //selected prop changed
                 {
                     auto model = m_meshRenderer.createModel(Mesh::Count + currentPropIndex, m_messageBus);
                     //set model material
@@ -552,7 +542,7 @@ void EditorState::addWindows()
             break;
             }
         }
-        else //display the dropdown for current type TODO apply settings when item created
+        else //display the dropdown for current type
         {
             switch (currentItemIndex)
             {
@@ -567,10 +557,9 @@ void EditorState::addWindows()
                 break;
             case Collection::Platforms:
             {
-                sf::Vector2f size(200.f, 20.f);
                 nim::Text("Size");
-                nim::InputFloat("x", &size.x, 1.f, 10.f);
-                nim::InputFloat("y", &size.y, 1.f, 10.f);
+                nim::InputFloat("x", &nextPlatformSize.x, 1.f, 10.f);
+                nim::InputFloat("y", &nextPlatformSize.y, 1.f, 10.f);
             }
                 break;
             }
@@ -583,6 +572,33 @@ void EditorState::addWindows()
         if (lastVal != fov) m_meshRenderer.setFOV(fov);
         nim::End();
     }, this);
+}
+
+void EditorState::addItem(const sf::Vector2f& position)
+{
+    switch (currentItemIndex)
+    {
+    default: break;
+    case Collection::Points: break;
+    case Collection::Platforms:
+        nextPlatformSize.x = std::min(500.f, std::max(0.f, nextPlatformSize.x));
+        nextPlatformSize.y = std::min(500.f, std::max(0.f, nextPlatformSize.y));
+        dynamic_cast<le::PlatformCollection*>(m_collections[currentItemIndex].get())->setNextSize(nextPlatformSize);
+        break;
+    case Collection::Props:
+        dynamic_cast<le::PropCollection*>(m_collections[currentItemIndex].get())->setPropIndex(currentPropIndex);
+        break;
+    }
+
+    if (auto i = m_collections[currentItemIndex]->add(position))
+    {
+        if (m_selectedItem)
+        {
+            m_selectedItem->deselect();
+        }
+        m_selectedItem = i;
+        m_selectedItem->select();
+    }
 }
 
 void EditorState::updateLoadingScreen(float dt, sf::RenderWindow& rw)
