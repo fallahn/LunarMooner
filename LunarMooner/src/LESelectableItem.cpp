@@ -118,8 +118,9 @@ void PlatformItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 //----PROP----//
 #include <xygine/Entity.hpp>
 #include <xygine/components/Model.hpp>
-PropItem::PropItem(xy::Entity& entity)
-    : m_entity(entity)
+PropItem::PropItem(xy::Entity& entity, std::uint32_t modelID)
+    : m_entity  (entity),
+    m_modelID   (modelID)
 {
     m_shape.setSize({ 200.f, 200.f });
     m_shape.setOutlineThickness(2.f);
@@ -171,10 +172,12 @@ void PropItem::update()
     m_shape.setSize({ bounds.width, bounds.height });
 }
 
-void PropItem::setModel(std::unique_ptr<xy::Model>& model)
+void PropItem::setModel(std::uint32_t id, std::unique_ptr<xy::Model>& model)
 {
     m_entity.getComponent<xy::Model>()->destroy();
     m_entity.addComponent(model);
+
+    m_modelID = id;
 }
 
 //private

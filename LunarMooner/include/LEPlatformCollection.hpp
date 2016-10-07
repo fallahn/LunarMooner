@@ -48,7 +48,7 @@ namespace le
 
         void setNextSize(const sf::Vector2f& size) { m_nextPlatformSize = size; }
 
-        //TODO getter for platform data
+        const std::vector<std::unique_ptr<PlatformItem>>& getPlatforms() const { return m_platforms; }
 
     private:
         sf::Vector2f m_nextPlatformSize;

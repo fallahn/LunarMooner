@@ -43,7 +43,7 @@ namespace
 }
 
 PropCollection::PropCollection(xy::Scene& scene, xy::MeshRenderer& mr, ResourceCollection& rc, xy::MessageBus& mb,
-    std::map<std::uint32_t, std::vector<std::uint32_t>>& mm)
+    std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>>& mm)
     : m_scene       (scene),
     m_meshRenderer  (mr),
     m_resources     (rc),
@@ -87,7 +87,7 @@ SelectableItem* PropCollection::add(const sf::Vector2f& position)
         auto model = m_meshRenderer.createModel(Mesh::Count + m_propIndex, m_messageBus);
         
         //set model material
-        const auto& matIDs = m_materialMap[Mesh::Count + m_propIndex];
+        const auto& matIDs = m_materialMap[Mesh::Count + m_propIndex].second;
         if (matIDs.size() == 1)
         {
             model->setBaseMaterial(m_resources.materialResource.get(matIDs[0]));
@@ -105,7 +105,7 @@ SelectableItem* PropCollection::add(const sf::Vector2f& position)
         entity->setPosition(position);
         auto e = m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
         
-        m_props.emplace_back(std::make_unique<PropItem>(*e));
+        m_props.emplace_back(std::make_unique<PropItem>(*e, m_propIndex));
         m_props.back()->setPosition(position);
         m_props.back()->setRotation(m_rotation);
         m_props.back()->setScale(m_scale);

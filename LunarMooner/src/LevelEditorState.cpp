@@ -48,9 +48,14 @@ source distribution.
 #include <xygine/FileSystem.hpp>
 
 #include <xygine/imgui/imgui.h>
+#include <xygine/imgui/CommonDialogues.hpp>
+
+#include <xygine/parsers/picojson.h>
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+
+#include <fstream>
 
 namespace
 {
@@ -65,6 +70,8 @@ namespace
     float propRotation = 0.f;
 
     std::vector<std::string> modelFiles;
+
+    const std::string fileExtension = ".lmp";
 }
 
 EditorState::EditorState(xy::StateStack& stack, Context context)
@@ -375,7 +382,7 @@ void EditorState::loadMeshes()
                     break;
                 }
                 //map all IDs to the mesh ID
-                m_materialMap[Mesh::Count + i] = std::move(materialIDs);
+                m_materialMap[Mesh::Count + i] = std::make_pair(f, std::move(materialIDs));
             }
 
             //load the mesh
@@ -453,10 +460,18 @@ void EditorState::addWindows()
         [this]()
     {
         nim::SetNextWindowSize({ 240.f, 368.f });
-        nim::Begin("Editor", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_ShowBorders);
+        nim::Begin("Editor", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_ShowBorders | ImGuiWindowFlags_NoCollapse);
 
+        static std::string currentFile;
         if (nim::BeginMenuBar())
         {
+            if (nim::BeginMenu("File"))
+            {               
+                requestStackClear();
+                requestStackPush(States::ID::MenuBackground);
+                nim::EndMenu();
+            }  
+
             if (nim::BeginMenu("Help"))
             {
                 //if (nim::MenuItem("Keyboard Shortcuts", nullptr, &showHelp))
@@ -465,16 +480,26 @@ void EditorState::addWindows()
                 }
                 nim::EndMenu();
             }
-
-            if (nim::BeginMenu("Exit"))
-            {
-                //TODO save map on exit
-                requestStackClear();
-                requestStackPush(States::ID::MenuBackground);
-                nim::EndMenu();
-            }
             nim::EndMenuBar();
         }
+
+        if (nim::fileBrowseDialogue("Open File", currentFile, nim::Button("Load"))
+            && !currentFile.empty())
+        {
+            loadMap(currentFile);
+
+        }
+        nim::SameLine();
+        if (nim::fileBrowseDialogue("Save File", currentFile, nim::Button("Save##2"))
+            && !currentFile.empty())
+        {
+            if (xy::FileSystem::getFileExtension(currentFile) != fileExtension)
+            {
+                currentFile.append(fileExtension);
+            }
+            saveMap(currentFile);
+        }
+        nim::Separator();
 
         nim::Combo("", &currentItemIndex, "Prop\0Point\0Platform\0");
         nim::SameLine();
@@ -527,7 +552,7 @@ void EditorState::addWindows()
                 {
                     auto model = m_meshRenderer.createModel(Mesh::Count + currentPropIndex, m_messageBus);
                     //set model material
-                    const auto& matIDs = m_materialMap[Mesh::Count + currentPropIndex];
+                    const auto& matIDs = m_materialMap[Mesh::Count + currentPropIndex].second;
                     if (matIDs.size() == 1)
                     {
                         model->setBaseMaterial(m_resources.materialResource.get(matIDs[0]));
@@ -540,7 +565,7 @@ void EditorState::addWindows()
                         }
                     }
 
-                    dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(model);
+                    dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(currentPropIndex, model);
                     dynamic_cast<le::PropCollection*>(m_collections[Collection::Props].get())->setPropIndex(currentPropIndex);   
                 }
                 //scale and rotation
@@ -635,6 +660,96 @@ void EditorState::addItem(const sf::Vector2f& position)
         m_selectedItem = i;
         m_selectedItem->select();
     }
+}
+
+void EditorState::saveMap(const std::string& path)
+{
+    //**outputs array of selectable item objects**//
+    //****Type
+    //****Position
+    //****Size - for platforms
+    //****Rotation - for props
+    //****Scale - for props
+    //****File Name - for props
+
+    std::ofstream file(path, std::ios::out);
+    if (!file.good() || file.fail() || !file.is_open())
+    {
+        xy::Logger::log("Failed opening " + path + " for writing", xy::Logger::Type::Error, xy::Logger::Output::All);
+        file.close();
+        return;
+    }
+
+    pj::array outArray;
+    const auto points = dynamic_cast<le::PointCollection*>(m_collections[Collection::Points].get())->getPoints();
+    for (const auto& p : points)
+    {
+        pj::object item;
+        item["type"] = pj::value(static_cast<double>(static_cast<int>(Collection::Points)));
+
+        pj::object position;
+        position["x"] = pj::value(p.x);
+        position["y"] = pj::value(p.y);
+
+        item["position"] = pj::value(position);
+
+        outArray.push_back(pj::value(item));
+    }
+
+    const auto& plats = dynamic_cast<le::PlatformCollection*>(m_collections[Collection::Platforms].get())->getPlatforms();
+    for (const auto& p : plats)
+    {
+        pj::object item;
+        item["type"] = pj::value(static_cast<double>(static_cast<int>(Collection::Platforms)));
+
+        pj::object position;
+        position["x"] = pj::value(p->getPosition().x);
+        position["y"] = pj::value(p->getPosition().y);
+
+        item["position"] = pj::value(position);
+
+        pj::object size;
+        size["x"] = pj::value(p->getSize().x);
+        size["y"] = pj::value(p->getSize().y);
+
+        item["size"] = pj::value(size);
+
+        outArray.push_back(pj::value(item));
+    }
+
+    const auto& props = dynamic_cast<le::PropCollection*>(m_collections[Collection::Props].get())->getProps();
+    for (const auto& p : props)
+    {
+        pj::object item;
+        item["type"] = pj::value(static_cast<double>(static_cast<int>(Collection::Props)));
+
+        pj::object position;
+        position["x"] = pj::value(p->getPosition().x);
+        position["y"] = pj::value(p->getPosition().y);
+
+        item["position"] = pj::value(position);
+
+        item["rotation"] = pj::value(p->getRotation()); //remember when unpacking this we need to move to +- 180!
+
+        pj::object scale;
+        scale["x"] = pj::value(p->getScale().x);
+        scale["y"] = pj::value(p->getScale().y);
+
+        item["scale"] = pj::value(scale);
+
+        item["name"] = pj::value(m_materialMap[Mesh::Count + p->getModelID()].first);
+
+        outArray.push_back(pj::value(item));
+    }
+
+    auto json = pj::value(outArray).serialize();
+    file.write(json.c_str(), json.size());
+    file.close();
+}
+
+void EditorState::loadMap(const std::string& path)
+{
+    //remember when unpacking this we need to move rotations to +- 180!
 }
 
 void EditorState::updateLoadingScreen(float dt, sf::RenderWindow& rw)

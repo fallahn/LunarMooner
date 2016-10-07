@@ -101,7 +101,7 @@ namespace le
     class PropItem final : public SelectableItem
     {
     public:
-        explicit PropItem(xy::Entity&);
+        PropItem(xy::Entity&, std::uint32_t);
         ~PropItem();
 
         Type type() const { return Type::Prop; }
@@ -110,11 +110,13 @@ namespace le
         sf::FloatRect globalBounds() const override;
 
         void update();
-        void setModel(std::unique_ptr<xy::Model>&);
+        void setModel(std::uint32_t, std::unique_ptr<xy::Model>&);
+        std::uint32_t getModelID() const { return m_modelID; }
 
     private:
 
         xy::Entity& m_entity;
+        std::uint32_t m_modelID;
 
         sf::RectangleShape m_shape;
 

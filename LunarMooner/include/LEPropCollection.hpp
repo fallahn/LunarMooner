@@ -49,7 +49,7 @@ namespace le
     {
     public:
         PropCollection(xy::Scene&, xy::MeshRenderer&, ResourceCollection&, xy::MessageBus&,
-            std::map<std::uint32_t, std::vector<std::uint32_t>>&);
+            std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>>&);
         ~PropCollection() = default;
 
         SelectableItem* getSelected(const sf::Vector2f&) override;
@@ -60,12 +60,14 @@ namespace le
         void setNextScale(const sf::Vector2f& scale) { m_scale = scale; }
         void setNextRotation(float rot) { m_rotation = rot; }
 
+        const std::vector<std::unique_ptr<PropItem>>& getProps() const { return m_props; }
+
     private:
         xy::Scene& m_scene;
         xy::MeshRenderer& m_meshRenderer;
         ResourceCollection& m_resources;
         xy::MessageBus& m_messageBus;
-        std::map<std::uint32_t, std::vector<std::uint32_t>>& m_materialMap;
+        std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>>& m_materialMap;
 
         int m_propIndex;
         sf::Vector2f m_scale;

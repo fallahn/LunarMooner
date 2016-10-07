@@ -79,7 +79,7 @@ private:
     bool m_hasClicked;
     sf::Vector2f m_clickedOffset;
 
-    std::map<std::uint32_t, std::vector<std::uint32_t>> m_materialMap;
+    std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>> m_materialMap;
 
     void doMouseEvent(const sf::Event&);
     void doKeyEvent(const sf::Event&);
@@ -89,6 +89,8 @@ private:
     void addWindows();
 
     void addItem(const sf::Vector2f&);
+    void saveMap(const std::string&);
+    void loadMap(const std::string&);
 
     sf::Sprite m_loadingSprite;
     void updateLoadingScreen(float dt, sf::RenderWindow& rw);
