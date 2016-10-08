@@ -34,10 +34,9 @@ using namespace le;
 
 namespace
 {
-    const float maxPropHeight = 800.f;
+    const float maxPropHeight = 700.f;
 
     const sf::Vector2f pointSize(10.f, 10.f);
-    const sf::Vector2f platSize(100.f, 25.f);
 }
 
 //----POINTS----//
@@ -73,23 +72,34 @@ void PointItem::draw(sf::RenderTarget& rt, sf::RenderStates states) const
     rt.draw(m_shape, states);
 }
 
+namespace
+{
+    const sf::Vector2f platSize(100.f, 25.f);
+    const sf::Color normalFill(0, 255, 0, 120);
+    const sf::Color frozenFill(0, 0, 255, 120);
+}
+
 //------PLATFORM------//
 PlatformItem::PlatformItem()
+    : m_value   (10),
+    m_frozen    (false)
 {
     m_shape.setSize(platSize);
     m_shape.setOutlineThickness(2.f);
     m_shape.setOutlineColor(sf::Color::Green);
-    m_shape.setFillColor({ 0, 255, 0, 120 });
+    m_shape.setFillColor(normalFill);
 }
 
 //public
 void PlatformItem::select()
 {
+    if (m_frozen) return;
     m_shape.setOutlineColor(sf::Color::Red);
 }
 
 void PlatformItem::deselect()
 {
+    if (m_frozen) return;
     m_shape.setOutlineColor(sf::Color::Green);
 }
 
@@ -106,6 +116,13 @@ void PlatformItem::setSize(const sf::Vector2f& size)
 const sf::Vector2f& PlatformItem::getSize() const
 {
     return m_shape.getSize();
+}
+
+void PlatformItem::setFrozen(bool frozen)
+{
+    m_shape.setFillColor(frozen ? frozenFill : normalFill);
+    m_shape.setOutlineColor(frozen ? sf::Color::Blue : sf::Color::Green);
+    m_frozen = frozen;
 }
 
 //private

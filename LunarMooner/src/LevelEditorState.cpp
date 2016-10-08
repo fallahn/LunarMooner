@@ -64,7 +64,8 @@ namespace
     int currentItemIndex = 0;
     int currentPropIndex = 0;
     
-    sf::Vector2f nextPlatformSize(100.f, 25.f);
+    float nextPlatformSize[] = { 100.f, 25.f };
+    int nextPlatValue = 10;
 
     float propScale[] = { 1.f, 1.f };
     float propRotation = 0.f;
@@ -79,8 +80,7 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
     m_messageBus    (context.appInstance.getMessageBus()),
     m_scene         (m_messageBus),
     m_meshRenderer  ({ context.appInstance.getVideoSettings().VideoMode.width, context.appInstance.getVideoSettings().VideoMode.height }, m_scene),
-    m_selectedItem  (nullptr),
-    m_hasClicked    (false)
+    m_selectedItem  (nullptr)
 {
     m_loadingSprite.setTexture(m_resources.textureResource.get("assets/images/game/meteor.png"));
     m_loadingSprite.setOrigin(sf::Vector2f(m_loadingSprite.getTexture()->getSize() / 2u));
@@ -160,8 +160,21 @@ void EditorState::draw()
 }
 
 //private
+namespace
+{
+    enum Mouse
+    {
+        Left = 0x1,
+        Middle = 0x2,
+        Right = 0x4
+    };
+}
+
 void EditorState::doMouseEvent(const sf::Event& evt)
 {
+    static sf::Uint8 mouseButtons = 0;
+    static sf::Vector2f middleMouseClickPosition;
+    
     auto position = xy::App::getMouseWorldPosition();
 
     //check if we're over anything when clicking
@@ -171,7 +184,7 @@ void EditorState::doMouseEvent(const sf::Event& evt)
         {
             if (m_selectedItem && m_selectedItem->globalBounds().contains(position))
             {
-                m_hasClicked = true;
+                mouseButtons |= Mouse::Left;
                 m_clickedOffset = m_selectedItem->getPosition() - position;
             }
             else
@@ -189,42 +202,83 @@ void EditorState::doMouseEvent(const sf::Event& evt)
                 }
                 if (m_selectedItem)
                 {
-                    m_hasClicked = true;
+                    mouseButtons |= Mouse::Left;
                     m_clickedOffset = m_selectedItem->getPosition() - position;
                 }
             }
         }
         else if (evt.mouseButton.button == sf::Mouse::Right)
         {
-            /*if (auto i = m_collections[currentItemIndex]->add(position))
-            {
-                if (m_selectedItem)
-                {
-                    m_selectedItem->deselect();
-                }
-                m_selectedItem = i;
-                m_selectedItem->select();
-            }*/
             addItem(position);
+        }
+        else if (evt.mouseButton.button == sf::Mouse::Middle)
+        {
+            mouseButtons |= Mouse::Middle;
+            middleMouseClickPosition = position;
         }
     }
 
-    if (evt.type == sf::Event::MouseButtonReleased &&
-        evt.mouseButton.button == sf::Mouse::Left)
+    if (evt.type == sf::Event::MouseButtonReleased)
     {
-        m_hasClicked = false;
+        switch (evt.mouseButton.button)
+        {
+        default: break;
+        case sf::Mouse::Left:
+            mouseButtons &= ~Mouse::Left;
+            break;
+        case sf::Mouse::Middle:
+            mouseButtons &= ~Mouse::Middle;
+            break;
+        }
     }
 
     //if the mouse moves while left button pressed
     //move any selected item
-    if (evt.type == sf::Event::MouseMoved && m_hasClicked)
+    if (evt.type == sf::Event::MouseMoved)
     {
         if (m_selectedItem)
         {
-            position.x = std::min(alienArea.left + alienArea.width, std::max(alienArea.left, position.x));
-            position.y = std::min(xy::DefaultSceneSize.y, std::max(0.f, position.y)); //probably needs to be clamped smaller?
+            if (mouseButtons & Mouse::Left)
+            {
+                position.x = std::min(alienArea.left + alienArea.width, std::max(alienArea.left, position.x));
+                position.y = std::min(xy::DefaultSceneSize.y, std::max(0.f, position.y)); //probably needs to be clamped smaller?
 
-            m_selectedItem->setPosition(position + m_clickedOffset);
+                m_selectedItem->setPosition(position + m_clickedOffset);
+            }
+            else if (mouseButtons & Mouse::Middle)
+            {
+                sf::Vector2f diff = position - middleMouseClickPosition;
+
+                if (m_selectedItem->type() == le::SelectableItem::Type::Platform)
+                {
+                    //change size
+                    auto item = dynamic_cast<le::PlatformItem*>(m_selectedItem);
+                    auto newSize = item->getSize() + diff;
+                    newSize.x = std::min(500.f, std::max(4.f, newSize.x));
+                    newSize.y = std::min(500.f, std::max(4.f, newSize.y));
+                    item->setSize(newSize);
+                }
+                else if (m_selectedItem->type() == le::SelectableItem::Type::Prop)
+                {
+                    //change scale
+                    auto item = dynamic_cast<le::PropItem*>(m_selectedItem);
+                    diff.y = -diff.y;
+                    auto newScale = item->getScale() + (diff * 0.01f);
+                    newScale.x = std::min(10.f, std::max(0.1f, newScale.x));
+                    newScale.y = std::min(10.f, std::max(0.1f, newScale.y));
+                    item->setScale(newScale);
+                }
+                middleMouseClickPosition = position;
+            }
+        }
+    }
+
+    //scroll mouse rotates items (only affects props)
+    if (evt.type == sf::Event::MouseWheelScrolled)
+    {
+        if (m_selectedItem && m_selectedItem->type() == le::SelectableItem::Type::Prop)
+        {
+            m_selectedItem->rotate(evt.mouseWheelScroll.delta * 5.f);
         }
     }
 }
@@ -240,13 +294,31 @@ void EditorState::doKeyEvent(const sf::Event& evt)
             currentItemIndex = std::max(0, --currentItemIndex);
             break;
         case sf::Keyboard::S:
-            currentItemIndex = std::min(2, ++currentItemIndex); //TODO const here! this changes with the number of items :/
+            currentItemIndex = std::min(static_cast<int>(m_collections.size() - 1), ++currentItemIndex);
             break;
         case sf::Keyboard::A:
-
+            currentPropIndex = std::max(0, --currentPropIndex);
             break;
         case sf::Keyboard::D:
-
+            currentPropIndex = std::min(static_cast<int>(m_materialMap.size() - 1), ++currentPropIndex);
+            break;
+        case sf::Keyboard::F:
+            m_collections[currentItemIndex]->setFrozen(!m_collections[currentItemIndex]->frozen());
+            if (currentItemIndex == Collection::Props)
+            {
+                for (auto& m : m_materialMap)
+                {
+                    for (auto& i : m.second.second)
+                    {
+                        m_resources.materialResource.get(i).getProperty("u_colour")->setValue(m_collections[currentItemIndex]->frozen() ? sf::Color(107, 107, 255) : sf::Color::White);
+                    }
+                }
+            }  
+            if (m_selectedItem)
+            {
+                m_selectedItem->deselect();
+                m_selectedItem = nullptr;
+            }
             break;
         case sf::Keyboard::Delete:
             if (m_selectedItem)
@@ -278,6 +350,7 @@ void EditorState::loadMeshes()
     groundMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     groundMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
     groundMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+    groundMat.addProperty({ "u_colour", sf::Color::White });
     groundMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
     groundMat.getRenderPass(xy::RenderPass::ID::ShadowMap)->setCullFace(xy::CullFace::Front);
 
@@ -285,12 +358,8 @@ void EditorState::loadMeshes()
     wallMat01.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     wallMat01.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
     wallMat01.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
+    wallMat01.addProperty({ "u_colour", sf::Color::White });
     wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
-
-    auto& platMat = m_resources.materialResource.add(Material::ID::Platform, m_resources.shaderResource.get(Shader::ID::MeshTextured));
-    platMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    platMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/platform_diffuse.png") });
-    platMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
 
     xy::IQMBuilder mb("assets/models/moon_surface.iqm");
     m_meshRenderer.loadModel(Mesh::ID::Ground, mb);
@@ -330,6 +399,7 @@ void EditorState::loadMeshes()
                     {
                         auto& mat = m_resources.materialResource.add(id, m_resources.shaderResource.get(Shader::MeshVertexColoured));
                         mat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+                        mat.addProperty({ "u_colour", sf::Color::White });
                         if (def.castShadows)
                         {
                             mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
@@ -353,7 +423,7 @@ void EditorState::loadMeshes()
                             mat.addProperty({ "u_diffuseMap", m_resources.textureResource.get(def.textures[0]) });
                             m_resources.textureResource.setFallbackColour(sf::Color::Black);
                             mat.addProperty({ "u_maskMap", m_resources.textureResource.get(def.textures[1]) });
-
+                            mat.addProperty({ "u_colour", sf::Color::White });
                             if (def.castShadows)
                             {
                                 mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
@@ -370,7 +440,7 @@ void EditorState::loadMeshes()
                             mat.addProperty({ "u_maskMap", m_resources.textureResource.get(def.textures[1]) });
                             m_resources.textureResource.setFallbackColour(sf::Color(127, 127, 255));
                             mat.addProperty({ "u_normalMap", m_resources.textureResource.get(def.textures[2]) });
-
+                            mat.addProperty({ "u_colour", sf::Color::White });
                             if (def.castShadows)
                             {
                                 mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
@@ -476,7 +546,8 @@ void EditorState::addWindows()
             {
                 //if (nim::MenuItem("Keyboard Shortcuts", nullptr, &showHelp))
                 {
-                    nim::TextUnformatted("Right-click: Place selected item\nW/S: Scroll through items\nA/D Choose item property\nDelete: remove selected item");
+                    nim::TextUnformatted("Right-click: Place selected item\nW/S: Scroll through items\n"
+                        "A/D Choose item property\nF: Toggle layer frozen\nDelete: remove selected item");
                 }
                 nim::EndMenu();
             }
@@ -516,6 +587,28 @@ void EditorState::addWindows()
                 m_selectedItem = m_selectedItem->remove();
             }
         }
+        nim::SameLine();
+        bool frozen = m_collections[currentItemIndex]->frozen();
+        nim::Checkbox("Freeze", &frozen);
+        if (frozen != m_collections[currentItemIndex]->frozen())
+        {
+            m_collections[currentItemIndex]->setFrozen(frozen);
+            if (currentItemIndex == Collection::Props)
+            {
+                for (auto& m : m_materialMap)
+                {
+                    for (auto& i : m.second.second)
+                    {
+                        m_resources.materialResource.get(i).getProperty("u_colour")->setValue(frozen ? sf::Color(107, 107, 255) : sf::Color::White);
+                    }
+                }
+            }
+            if (m_selectedItem)
+            {
+                m_selectedItem->deselect();
+                m_selectedItem = nullptr;
+            }
+        }
 
         nim::NewLine();
         if (m_selectedItem)
@@ -525,16 +618,23 @@ void EditorState::addWindows()
             default: break;
             case le::SelectableItem::Type::Platform:
             {
-                nextPlatformSize = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getSize();
-                sf::Vector2f lastSize = nextPlatformSize;
-                nim::Text("Size");
-                nim::DragFloat("x", &nextPlatformSize.x, 0.5f, 4.f, 500.f);
-                nim::DragFloat("y", &nextPlatformSize.y, 0.5f, 4.f, 100.f);
-                if (lastSize != nextPlatformSize)
+                auto platformSize = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getSize();
+                float lastX = nextPlatformSize[0] = platformSize.x;
+                float lastY = nextPlatformSize[1] = platformSize.y;
+
+                nim::DragFloat2("Size", nextPlatformSize, 0.5f, 4.f, 500.f);
+                if (lastX != nextPlatformSize[0] || lastY != nextPlatformSize[1])
                 {
-                    nextPlatformSize.x = std::min(500.f, std::max(0.f, nextPlatformSize.x));
-                    nextPlatformSize.y = std::min(500.f, std::max(0.f, nextPlatformSize.y));
-                    dynamic_cast<le::PlatformItem*>(m_selectedItem)->setSize(nextPlatformSize);
+                    nextPlatformSize[0] = std::min(500.f, std::max(4.f, nextPlatformSize[0]));
+                    nextPlatformSize[1] = std::min(500.f, std::max(4.f, nextPlatformSize[1]));
+                    dynamic_cast<le::PlatformItem*>(m_selectedItem)->setSize({ nextPlatformSize[0], nextPlatformSize[1] });
+                }
+
+                int lastValue = nextPlatValue = dynamic_cast<le::PlatformItem*>(m_selectedItem)->getValue();
+                nim::DragInt("Value", &nextPlatValue, 0.2f, 10, 200);
+                if (lastValue != nextPlatValue)
+                {
+                    dynamic_cast<le::PlatformItem*>(m_selectedItem)->setValue(nextPlatValue);
                 }
             }
                 break;
@@ -613,9 +713,8 @@ void EditorState::addWindows()
                 break;
             case Collection::Platforms:
             {
-                nim::Text("Size");
-                nim::DragFloat("x", &nextPlatformSize.x, 0.5f, 4.f, 500.f);
-                nim::DragFloat("y", &nextPlatformSize.y, 0.5f, 4.f, 100.f);
+                nim::DragFloat2("Size", nextPlatformSize, 0.5f, 4.f, 500.f);
+                nim::DragInt("Value", &nextPlatValue, 0.2f, 10, 200);
             }
                 break;
             }
@@ -632,14 +731,17 @@ void EditorState::addWindows()
 
 void EditorState::addItem(const sf::Vector2f& position)
 {
+    if (m_collections[currentItemIndex]->frozen()) return;
+    
     switch (currentItemIndex)
     {
     default: break;
     case Collection::Points: break;
     case Collection::Platforms:
-        nextPlatformSize.x = std::min(500.f, std::max(0.f, nextPlatformSize.x));
-        nextPlatformSize.y = std::min(500.f, std::max(0.f, nextPlatformSize.y));
-        dynamic_cast<le::PlatformCollection*>(m_collections[currentItemIndex].get())->setNextSize(nextPlatformSize);
+        nextPlatformSize[0] = std::min(500.f, std::max(4.f, nextPlatformSize[0]));
+        nextPlatformSize[1] = std::min(500.f, std::max(4.f, nextPlatformSize[1]));
+        dynamic_cast<le::PlatformCollection*>(m_collections[currentItemIndex].get())->setNextSize({ nextPlatformSize[0], nextPlatformSize[1] });
+        dynamic_cast<le::PlatformCollection*>(m_collections[currentItemIndex].get())->setNextValue(nextPlatValue);
         break;
     case Collection::Props:
     {
@@ -668,6 +770,7 @@ void EditorState::saveMap(const std::string& path)
     //****Type
     //****Position
     //****Size - for platforms
+    //****Value - for platforms
     //****Rotation - for props
     //****Scale - for props
     //****File Name - for props
@@ -713,6 +816,8 @@ void EditorState::saveMap(const std::string& path)
         size["y"] = pj::value(p->getSize().y);
 
         item["size"] = pj::value(size);
+
+        item["value"] = pj::value(static_cast<double>(p->getValue()));
 
         outArray.push_back(pj::value(item));
     }

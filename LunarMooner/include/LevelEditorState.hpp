@@ -76,7 +76,6 @@ private:
 
     le::SelectableItem* m_selectedItem;
     std::array<std::unique_ptr<le::SelectableCollection>, 3> m_collections;
-    bool m_hasClicked;
     sf::Vector2f m_clickedOffset;
 
     std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>> m_materialMap;

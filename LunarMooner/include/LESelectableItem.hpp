@@ -91,9 +91,17 @@ namespace le
         void select() override;
         void deselect() override;
         sf::FloatRect globalBounds() const override;
+        
         void setSize(const sf::Vector2f&);
         const sf::Vector2f& getSize() const;
+        
+        void setValue(int v) { m_value = v; }
+        int getValue() const { return m_value; }
+
+        void setFrozen(bool);
     private:
+        int m_value;
+        bool m_frozen;
         sf::RectangleShape m_shape;
         void draw(sf::RenderTarget&, sf::RenderStates) const override;
     };

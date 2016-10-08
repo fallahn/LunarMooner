@@ -39,7 +39,8 @@ namespace
 }
 
 PlatformCollection::PlatformCollection()
-    : m_nextPlatformSize(100.f, 25.f)
+    : m_nextPlatformSize    (100.f, 25.f),
+    m_nextPlatformValue     (10)
 {
 
 }
@@ -47,6 +48,8 @@ PlatformCollection::PlatformCollection()
 //public
 SelectableItem* PlatformCollection::getSelected(const sf::Vector2f& mousePosition)
 {
+    if (frozen()) return nullptr;
+    
     for (auto& p : m_platforms)
     {
         if (p->globalBounds().contains(mousePosition))
@@ -74,6 +77,7 @@ SelectableItem* PlatformCollection::add(const sf::Vector2f& position)
         m_platforms.emplace_back(std::make_unique<PlatformItem>());
         m_platforms.back()->setPosition(position);
         m_platforms.back()->setSize(m_nextPlatformSize);
+        m_platforms.back()->setValue(m_nextPlatformValue);
         return m_platforms.back().get();
     }
     else
@@ -81,6 +85,15 @@ SelectableItem* PlatformCollection::add(const sf::Vector2f& position)
         xy::Logger::log("Maximum number of platforms is " + std::to_string(maxPlatforms), xy::Logger::Type::Info);
     }
     return nullptr;
+}
+
+void PlatformCollection::setFrozen(bool frozen)
+{
+    SelectableCollection::setFrozen(frozen);
+    for (auto& p : m_platforms)
+    {
+        p->setFrozen(frozen);
+    }
 }
 
 //private

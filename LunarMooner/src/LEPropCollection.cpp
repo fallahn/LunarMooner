@@ -58,6 +58,8 @@ PropCollection::PropCollection(xy::Scene& scene, xy::MeshRenderer& mr, ResourceC
 //public
 SelectableItem* PropCollection::getSelected(const sf::Vector2f& mousePos)
 {
+    if (frozen()) return nullptr;
+    
     for (auto& p : m_props)
     {
         if (p->globalBounds().contains(mousePos))

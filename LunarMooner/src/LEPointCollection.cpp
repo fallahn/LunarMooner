@@ -47,6 +47,8 @@ PointCollection::PointCollection()
 //public
 SelectableItem* PointCollection::getSelected(const sf::Vector2f& mousePos)
 {
+    if (frozen()) return nullptr;
+    
     for (auto& p : m_points)
     {
         if (p->globalBounds().contains(mousePos))
@@ -70,7 +72,7 @@ void PointCollection::update()
     auto i = 0;
     for (const auto& p : m_points)
     {
-        m_vertices[i++] = sf::Vertex(p->getPosition(), sf::Color::Green);
+        m_vertices[i++] = sf::Vertex(p->getPosition(), frozen() ? sf::Color::Blue : sf::Color::Green);
     }
 }
 
