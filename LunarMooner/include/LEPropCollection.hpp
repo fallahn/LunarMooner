@@ -55,6 +55,7 @@ namespace le
         SelectableItem* getSelected(const sf::Vector2f&) override;
         void update() override;
         SelectableItem* add(const sf::Vector2f&) override;
+        void clear() override { for (auto& p : m_props) p->remove(); }
 
         void setPropIndex(int idx) { m_propIndex = idx; }
         void setNextScale(const sf::Vector2f& scale) { m_scale = scale; }

@@ -48,6 +48,7 @@ namespace le
         SelectableItem* getSelected(const sf::Vector2f&) override;
         void update() override;
         SelectableItem* add(const sf::Vector2f&) override;
+        void clear() override { for (auto& p : m_points) p->remove(); }
 
         std::vector<sf::Vector2f> getPoints() const;
 

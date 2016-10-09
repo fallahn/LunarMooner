@@ -45,6 +45,7 @@ namespace le
         SelectableItem* getSelected(const sf::Vector2f&) override;
         void update() override;
         SelectableItem* add(const sf::Vector2f&) override;
+        void clear() override { for (auto& p : m_platforms)p->remove(); }
         void setFrozen(bool) override;
 
         void setNextSize(const sf::Vector2f& size) { m_nextPlatformSize = size; }

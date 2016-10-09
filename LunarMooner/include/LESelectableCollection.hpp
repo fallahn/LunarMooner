@@ -42,6 +42,7 @@ namespace le
         virtual SelectableItem* getSelected(const sf::Vector2f&) = 0;
         virtual void update() = 0;
         virtual SelectableItem* add(const sf::Vector2f&) = 0;
+        virtual void clear() = 0;
 
         virtual void setFrozen(bool frozen) { m_frozen = frozen; }
         bool frozen() const { return m_frozen || m_hidden; }

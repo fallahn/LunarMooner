@@ -45,6 +45,7 @@ source distribution.
 #include <xygine/mesh/CubeBuilder.hpp>
 #include <xygine/mesh/MaterialDefinition.hpp>
 #include <xygine/util/Random.hpp>
+#include <xygine/util/Json.hpp>
 #include <xygine/FileSystem.hpp>
 
 #include <xygine/imgui/imgui.h>
@@ -73,6 +74,7 @@ namespace
     std::vector<std::string> modelFiles;
 
     const std::string fileExtension = ".lmp";
+    const float autosaveTime = 180.f;
 }
 
 EditorState::EditorState(xy::StateStack& stack, Context context)
@@ -144,6 +146,14 @@ bool EditorState::update(float dt)
     
     m_scene.update(dt);
     m_meshRenderer.update();
+
+    if (m_autosaveClock.getElapsedTime().asSeconds() > autosaveTime)
+    {
+        saveMap("autosave.lmp");
+        m_autosaveClock.restart();
+    }
+
+
     return false;
 }
 
@@ -901,7 +911,184 @@ void EditorState::saveMap(const std::string& path)
 
 void EditorState::loadMap(const std::string& path)
 {
+    //clear existing items
+    if (m_selectedItem)
+    {
+        m_selectedItem->deselect();
+        m_selectedItem = nullptr;
+    }
+    for (auto& c : m_collections)
+    {
+        c->clear();
+        c->setFrozen(false);
+        c->setHidden(false);
+        c->update();
+    }
+    for (auto& m : m_materialMap)
+    {
+        for (auto& i : m.second.second)
+        {
+            m_resources.materialResource.get(i).getProperty("u_colour")->setValue(sf::Color::White);
+            m_resources.materialResource.get(i).getRenderPass(xy::RenderPass::Default)->setCullFace(xy::Back);
+            m_resources.materialResource.get(i).getRenderPass(xy::RenderPass::ShadowMap)->setCullFace(xy::Back);
+        }
+    }
+
+
+    
     //remember when unpacking this we need to move rotations to +- 180!
+    if (xy::FileSystem::getFileExtension(path) != fileExtension)
+    {
+        xy::Logger::log(path + ": Not a material file", xy::Logger::Type::Error);
+        return;
+    }
+
+    std::ifstream file(path);
+    if (!file.good() || !xy::Util::File::validLength(file))
+    {
+        LOG("failed to open " + path + ", or file empty", xy::Logger::Type::Error);
+        file.close();
+        return;
+    }
+
+    std::string jsonString;
+    while (!file.eof())
+    {
+        std::string temp;
+        file >> temp;
+        jsonString += temp;
+    }
+    if (jsonString.empty())
+    {
+        LOG(path + "failed to read, or file empty", xy::Logger::Type::Error);
+        file.close();
+        return;
+    }
+    file.close();
+
+    pj::value pv;
+    auto err = pj::parse(pv, jsonString);
+    if (err.empty())
+    {
+        if (pv.is<pj::array>())
+        {
+            auto objArray = pv.get<pj::array>();
+            for (const auto& obj : objArray)
+            {
+                sf::Vector2f position = xy::DefaultSceneSize / 2.f;
+                if (obj.get("position").is<pj::object>())
+                {
+                    if (obj.get("position").get("x").is<double>())
+                    {
+                        position.x = static_cast<float>(obj.get("position").get("x").get<double>());
+                    }
+                    if (obj.get("position").get("y").is<double>())
+                    {
+                        position.y = static_cast<float>(obj.get("position").get("y").get<double>());
+                    }
+                }
+
+                le::SelectableItem::Type itemType = le::SelectableItem::Type::Count;
+                //remember if we don't get a valid type to skip!
+                if (obj.get("type").is<double>())
+                {
+                    int type = static_cast<int>(obj.get("type").get<double>());
+                    if (type < static_cast<int>(le::SelectableItem::Type::Count)
+                        && type >= 0)
+                    {
+                        itemType = static_cast<le::SelectableItem::Type>(type);
+                        switch (itemType)
+                        {
+                        default: continue;
+                        case le::SelectableItem::Type::Point:
+                            currentItemIndex = Collection::Points;
+                            addItem(position);
+                            break;
+                        case le::SelectableItem::Type::Platform:
+                        {
+                            if (obj.get("value").is<double>())
+                            {
+                                nextPlatValue = static_cast<int>(obj.get("value").get<double>());
+                            }
+                            if (obj.get("size").is<pj::object>())
+                            {
+                                if (obj.get("size").get("x").is<double>())
+                                {
+                                    nextPlatformSize[0] = static_cast<float>(obj.get("size").get("x").get<double>());
+                                }
+                                if (obj.get("size").get("y").is<double>())
+                                {
+                                    nextPlatformSize[1] = static_cast<float>(obj.get("size").get("y").get<double>());
+                                }
+                            }
+
+                            currentItemIndex = Collection::Platforms;
+                            addItem(position);
+                        }
+                            break;
+                        case le::SelectableItem::Type::Prop:
+                        {
+                            if (obj.get("rotation").is<double>())
+                            {
+                                propRotation = static_cast<float>(obj.get("rotation").get<double>());
+                                while (propRotation > 180.f) { propRotation -= 360; }
+                            }
+
+                            if (obj.get("scale").is<pj::object>())
+                            {
+                                if (obj.get("scale").get("x").is<double>())
+                                {
+                                    propScale[0] = static_cast<float>(obj.get("scale").get("x").get<double>());
+                                    propScale[0] = std::min(10.f, std::max(0.1f, propScale[0]));
+                                }
+
+                                if (obj.get("scale").get("y").is<double>())
+                                {
+                                    propScale[1] = static_cast<float>(obj.get("scale").get("y").get<double>());
+                                    propScale[1] = std::min(10.f, std::max(0.1f, propScale[1]));
+                                }
+                            }
+
+                            if (obj.get("name").is<std::string>())
+                            {
+                                auto name = obj.get("name").get<std::string>();
+                                auto i = 0;
+                                for (auto& m : m_materialMap)
+                                {
+                                    if (m.second.first == name)
+                                    {
+                                        break;
+                                    }
+                                    i++;
+                                }
+
+                                if (i >= m_materialMap.size())
+                                {
+                                    //skip this as we have invalid model ID
+                                    xy::Logger::log(name + " model ID not found!", xy::Logger::Type::Warning);
+                                    continue;
+                                }
+
+                                currentPropIndex = i;
+                            }
+
+                            currentItemIndex = Collection::Props;
+                            addItem(position);
+                        }
+                            break;
+                        }
+                        if(m_selectedItem) m_selectedItem->deselect();
+                        m_selectedItem = nullptr;
+                    }
+                    else
+                    {
+                        //invalid type!
+                        continue;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void EditorState::updateLoadingScreen(float dt, sf::RenderWindow& rw)

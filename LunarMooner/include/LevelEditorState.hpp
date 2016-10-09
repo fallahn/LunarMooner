@@ -80,6 +80,8 @@ private:
 
     std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>> m_materialMap;
 
+    sf::Clock m_autosaveClock;
+
     void doMouseEvent(const sf::Event&);
     void doKeyEvent(const sf::Event&);
 
