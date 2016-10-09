@@ -37,7 +37,7 @@ const float SceneLightIntensity = 0.6f;
 const sf::Color SceneDiffuseLight(255, 255, 200);
 const sf::Color SceneSpecularLight(250, 255, 248);
 const sf::Vector3f SceneLightDirection(0.25f, 0.5f, -1.f);
-const sf::Color SceneWaterColour(100, 100, 255);
+const sf::Color SceneWaterColour(200, 200, 255);
 const float playerOffsetDepth = 0.f;// -60.f;
 const float groundOffset = 60.f;
 const std::string propsDirectory = "assets/models/props/";

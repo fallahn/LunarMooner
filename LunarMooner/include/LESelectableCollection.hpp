@@ -36,7 +36,7 @@ namespace le
     class SelectableCollection : public sf::Drawable
     {
     public:
-        SelectableCollection() : m_frozen(false) {}
+        SelectableCollection() : m_frozen(false), m_hidden(false) {}
         virtual ~SelectableCollection() = default;
 
         virtual SelectableItem* getSelected(const sf::Vector2f&) = 0;
@@ -44,13 +44,17 @@ namespace le
         virtual SelectableItem* add(const sf::Vector2f&) = 0;
 
         virtual void setFrozen(bool frozen) { m_frozen = frozen; }
-        bool frozen() const { return m_frozen; }
+        bool frozen() const { return m_frozen || m_hidden; }
+
+        void setHidden(bool hidden) { m_hidden = hidden; }
+        bool hidden() const { return m_hidden; }
 
     protected:
         void draw(sf::RenderTarget&, sf::RenderStates) const override = 0;
         
     private:
         bool m_frozen;
+        bool m_hidden;
     };
 }
 

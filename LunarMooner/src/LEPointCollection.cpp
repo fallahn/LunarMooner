@@ -104,6 +104,7 @@ std::vector<sf::Vector2f> PointCollection::getPoints() const
 //private
 void PointCollection::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
+    if (hidden()) return;
     rt.draw(m_vertices.data(), m_points.size(), sf::PrimitiveType::LineStrip);
     for (const auto& p : m_points) rt.draw(*p);
 }

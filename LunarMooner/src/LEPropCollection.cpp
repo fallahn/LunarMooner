@@ -96,7 +96,7 @@ SelectableItem* PropCollection::add(const sf::Vector2f& position)
         }
         else
         {
-            for (auto i = 0; i < matIDs.size(); ++i)
+            for (auto i = 0u; i < matIDs.size(); ++i)
             {
                 model->setSubMaterial(m_resources.materialResource.get(matIDs[i]), i);
             }
@@ -115,7 +115,7 @@ SelectableItem* PropCollection::add(const sf::Vector2f& position)
     }
     else
     {
-        xy::Logger::log("Maximum number of platforms is " + std::to_string(maxProps), xy::Logger::Type::Info);
+        xy::Logger::log("Maximum number of props is " + std::to_string(maxProps), xy::Logger::Type::Info);
     }
     return nullptr;
 }
@@ -123,5 +123,6 @@ SelectableItem* PropCollection::add(const sf::Vector2f& position)
 //private
 void PropCollection::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
+    if (hidden()) return;
     for (const auto& p : m_props) rt.draw(*p, states);
 }

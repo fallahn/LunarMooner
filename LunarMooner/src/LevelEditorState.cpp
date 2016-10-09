@@ -320,6 +320,26 @@ void EditorState::doKeyEvent(const sf::Event& evt)
                 m_selectedItem = nullptr;
             }
             break;
+        case sf::Keyboard::H:
+            m_collections[currentItemIndex]->setHidden(!m_collections[currentItemIndex]->hidden());
+            if (currentItemIndex == Collection::Props)
+            {
+                for (auto& m : m_materialMap)
+                {
+                    for (auto& i : m.second.second)
+                    {
+                        bool hidden = m_collections[currentItemIndex]->hidden();
+                        m_resources.materialResource.get(i).getRenderPass(xy::RenderPass::Default)->setCullFace(hidden ? xy::FrontAndBack : xy::Back);
+                        m_resources.materialResource.get(i).getRenderPass(xy::RenderPass::ShadowMap)->setCullFace(hidden ? xy::FrontAndBack : xy::Back);
+                    }
+                }
+            }
+            if (m_selectedItem)
+            {
+                m_selectedItem->deselect();
+                m_selectedItem = nullptr;
+            }
+            break;
         case sf::Keyboard::Delete:
             if (m_selectedItem)
             {
@@ -535,19 +555,13 @@ void EditorState::addWindows()
         static std::string currentFile;
         if (nim::BeginMenuBar())
         {
-            if (nim::BeginMenu("File"))
-            {               
-                requestStackClear();
-                requestStackPush(States::ID::MenuBackground);
-                nim::EndMenu();
-            }  
-
             if (nim::BeginMenu("Help"))
             {
                 //if (nim::MenuItem("Keyboard Shortcuts", nullptr, &showHelp))
                 {
                     nim::TextUnformatted("Right-click: Place selected item\nW/S: Scroll through items\n"
-                        "A/D Choose item property\nF: Toggle layer frozen\nDelete: remove selected item");
+                        "A/D Choose item property\nF: Toggle layer frozen\nH: Toggle layer hidden\n"
+                        "Delete: remove selected item\nMiddle Mouse Drag: Size/Scale\nMiddle Mouse Scroll: rotate prop");
                 }
                 nim::EndMenu();
             }
@@ -570,6 +584,13 @@ void EditorState::addWindows()
             }
             saveMap(currentFile);
         }
+        nim::SameLine();
+        if (nim::Button("Exit"))
+        {
+            //TODO confirm/save box
+            requestStackClear();
+            requestStackPush(States::ID::MenuBackground);
+        }
         nim::Separator();
 
         nim::Combo("", &currentItemIndex, "Prop\0Point\0Platform\0");
@@ -578,16 +599,7 @@ void EditorState::addWindows()
         {
             addItem(xy::DefaultSceneSize / 2.f);
         }
-
-        if (nim::Button("Remove Selected", { 120, 20.f }))
-        {
-            //remove the currently selected item
-            if (m_selectedItem)
-            {
-                m_selectedItem = m_selectedItem->remove();
-            }
-        }
-        nim::SameLine();
+       
         bool frozen = m_collections[currentItemIndex]->frozen();
         nim::Checkbox("Freeze", &frozen);
         if (frozen != m_collections[currentItemIndex]->frozen())
@@ -607,6 +619,41 @@ void EditorState::addWindows()
             {
                 m_selectedItem->deselect();
                 m_selectedItem = nullptr;
+            }
+        }
+        nim::SameLine();
+        bool hidden = m_collections[currentItemIndex]->hidden();
+        nim::Checkbox("Hide", &hidden);
+        if (hidden != m_collections[currentItemIndex]->hidden())
+        {
+            m_collections[currentItemIndex]->setHidden(hidden);
+            
+            //hides props by face culling
+            if (currentItemIndex == Collection::Props)
+            {
+                for (auto& m : m_materialMap)
+                {
+                    for (auto& i : m.second.second)
+                    {
+                        m_resources.materialResource.get(i).getRenderPass(xy::RenderPass::Default)->setCullFace(hidden ? xy::FrontAndBack : xy::Back);
+                        m_resources.materialResource.get(i).getRenderPass(xy::RenderPass::ShadowMap)->setCullFace(hidden ? xy::FrontAndBack : xy::Back);
+                    }
+                }
+            }
+
+            if (m_selectedItem)
+            {
+                m_selectedItem->deselect();
+                m_selectedItem = nullptr;
+            }
+        }
+
+        if (nim::Button("Remove Selected", { 120, 20.f }))
+        {
+            //remove the currently selected item
+            if (m_selectedItem)
+            {
+                m_selectedItem = m_selectedItem->remove();
             }
         }
 
@@ -650,22 +697,22 @@ void EditorState::addWindows()
 
                 if (idx != currentPropIndex && m_selectedItem) //selected prop changed
                 {
-                    auto model = m_meshRenderer.createModel(Mesh::Count + currentPropIndex, m_messageBus);
-                    //set model material
-                    const auto& matIDs = m_materialMap[Mesh::Count + currentPropIndex].second;
-                    if (matIDs.size() == 1)
-                    {
-                        model->setBaseMaterial(m_resources.materialResource.get(matIDs[0]));
-                    }
-                    else
-                    {
-                        for (auto i = 0; i < matIDs.size(); ++i)
-                        {
-                            model->setSubMaterial(m_resources.materialResource.get(matIDs[i]), i);
-                        }
-                    }
+                    //auto model = m_meshRenderer.createModel(Mesh::Count + currentPropIndex, m_messageBus);
+                    ////set model material
+                    //const auto& matIDs = m_materialMap[Mesh::Count + currentPropIndex].second;
+                    //if (matIDs.size() == 1)
+                    //{
+                    //    model->setBaseMaterial(m_resources.materialResource.get(matIDs[0]));
+                    //}
+                    //else
+                    //{
+                    //    for (auto i = 0u; i < matIDs.size(); ++i)
+                    //    {
+                    //        model->setSubMaterial(m_resources.materialResource.get(matIDs[i]), i);
+                    //    }
+                    //}
 
-                    dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(currentPropIndex, model);
+                    //dynamic_cast<le::PropItem*>(m_selectedItem)->setModel(currentPropIndex, model);
                     dynamic_cast<le::PropCollection*>(m_collections[Collection::Props].get())->setPropIndex(currentPropIndex);   
                 }
                 //scale and rotation

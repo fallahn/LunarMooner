@@ -99,6 +99,7 @@ void PlatformCollection::setFrozen(bool frozen)
 //private
 void PlatformCollection::draw(sf::RenderTarget& rt, sf::RenderStates states) const
 {
+    if (hidden()) return;
     for (const auto& p : m_platforms)
     {
         rt.draw(*p);
