@@ -89,8 +89,6 @@ namespace
 
     const float meteorThreshold = 540.f; //player must be below this to spawn meteor
 
-    const sf::Vector2f shieldPosition(xy::DefaultSceneSize.x / 2.f, 3700.f);
-
     //humans to rescue per level
     std::array<sf::Uint8, 10u> humanCounts = 
     {
@@ -995,6 +993,7 @@ void GameController::createTerrain()
     entity->setPosition(alienArea.left, -40.f);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);*/
 
+    //TODO this should kill the player
     collision = m_collisionWorld.addComponent(getMessageBus(), sizes[1], lm::CollisionComponent::ID::Bounds, true);
     qtc = xy::Component::create<xy::QuadTreeComponent>(getMessageBus(), sizes[1]);
     entity = xy::Entity::create(getMessageBus());
@@ -1002,19 +1001,6 @@ void GameController::createTerrain()
     entity->addComponent(qtc);
     entity->setPosition(alienArea.left, xy::DefaultSceneSize.y);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
-
-    //flame effects - we know these work so lets make part of the map file
-    /*xy::ParticleSystem::Definition pd;
-    pd.loadFromFile("assets/particles/fire.xyp", m_textureResource);
-    
-    auto ps = pd.createSystem(getMessageBus());
-    ps->setLifetimeVariance(0.3f);
-    ps->start(pd.releaseCount);
-
-    entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(550.f, 860.f);
-    entity->addComponent(ps);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);*/
 
 
     //death zone at bottom

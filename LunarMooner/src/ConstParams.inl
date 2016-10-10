@@ -41,5 +41,6 @@ const sf::Color SceneWaterColour(200, 200, 255);
 const float playerOffsetDepth = 0.f;// -60.f;
 const float groundOffset = 60.f;
 const std::string propsDirectory = "assets/models/props/";
+const sf::Vector2f shieldPosition(xy::DefaultSceneSize.x / 2.f, 3700.f);
 
 #endif //LM_CONST_PARAMS_INL_

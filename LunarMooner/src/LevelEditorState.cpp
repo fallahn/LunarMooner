@@ -29,6 +29,7 @@ source distribution.
 #include <LMShaderIds.hpp>
 #include <PHPlanetRotation.hpp>
 #include <BGStarfield.hpp>
+#include <LMShieldDrawable.hpp>
 
 #include <LEPointCollection.hpp>
 #include <LEPlatformCollection.hpp>
@@ -536,6 +537,15 @@ void EditorState::buildScene()
     entity->addComponent(bg);
     m_scene.addEntity(entity, xy::Scene::Layer::BackRear);
 
+    auto shieldDrawable = xy::Component::create<lm::ShieldDrawable>(m_messageBus, 3000.f);
+    shieldDrawable->setTexture(m_resources.textureResource.get("assets/images/game/shield_noise.png"));
+
+    entity = xy::Entity::create(m_messageBus);
+    entity->setPosition(shieldPosition);
+    entity->rotate(-180.f);
+    entity->addComponent(shieldDrawable);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+
     //add a couple of panels just to mark where the UI would be
     sf::Color c(117, 115, 99);
     auto rect = xy::Component::create<xy::SfDrawableComponent<sf::RectangleShape>>(m_messageBus);
@@ -778,8 +788,8 @@ void EditorState::addWindows()
         }
 
         nim::NewLine();
-        static float fov = 52.f;
-        float lastVal = fov;
+        float fov;
+        float lastVal = fov = m_meshRenderer.getFOV();
         nim::SliderFloat("FOV", &fov, 10.f, 60.f);
         if (lastVal != fov) m_meshRenderer.setFOV(fov);
         nim::End();
