@@ -381,26 +381,26 @@ void EditorState::loadMeshes()
 
     auto& groundMat = m_resources.materialResource.add(Material::ID::Ground, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
     groundMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
-    groundMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
-    groundMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+    groundMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/terrain_diffuse.png") });
+    groundMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/terrain_normal.png") });
     groundMat.addProperty({ "u_maskMap", m_resources.textureResource.get("mask_fallback") });
     groundMat.addProperty({ "u_colour", sf::Color::White });
-    groundMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
-    groundMat.getRenderPass(xy::RenderPass::ID::ShadowMap)->setCullFace(xy::CullFace::Front);
+    //groundMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
+    //groundMat.getRenderPass(xy::RenderPass::ID::ShadowMap)->setCullFace(xy::CullFace::Front);
 
-    auto& wallMat01 = m_resources.materialResource.add(Material::ID::RockWall01, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
+    /*auto& wallMat01 = m_resources.materialResource.add(Material::ID::RockWall01, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
     wallMat01.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     wallMat01.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
     wallMat01.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
     wallMat01.addProperty({ "u_maskMap", m_resources.textureResource.get("mask_fallback") });
     wallMat01.addProperty({ "u_colour", sf::Color::White });
-    wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
+    wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));*/
 
-    xy::IQMBuilder mb("assets/models/moon_surface.iqm");
+    xy::IQMBuilder mb("assets/models/surface.iqm");
     m_meshRenderer.loadModel(Mesh::ID::Ground, mb);
 
-    xy::IQMBuilder ib("assets/models/rock_wall_01.iqm");
-    m_meshRenderer.loadModel(Mesh::ID::RockWall01, ib);
+    /*xy::IQMBuilder ib("assets/models/rock_wall_01.iqm");
+    m_meshRenderer.loadModel(Mesh::ID::RockWall01, ib);*/
 
 
     //go through props folder and load each valid mesh
@@ -503,8 +503,8 @@ void EditorState::buildScene()
     auto ground = m_meshRenderer.createModel(Mesh::ID::Ground, m_messageBus);
     ground->setBaseMaterial(m_resources.materialResource.get(Material::ID::Ground));
     ground->rotate(xy::Model::Axis::Y, 180.f);
-    ground->setPosition({ 0.f, 0.f, 580.f });
-    ground->setScale({ 1.2f, 1.f, 1.f });
+    ground->setPosition({ 0.f, 0.f, 80.f });
+    /*ground->setScale({ 1.2f, 1.f, 1.f });*/
 
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(ground);
@@ -513,7 +513,7 @@ void EditorState::buildScene()
     m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
     
     //rear walls
-    for (auto i = 0u; i < 5u; ++i)
+    /*for (auto i = 0u; i < 5u; ++i)
     {
         auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, m_messageBus);
         rockWall->setPosition({ 0.f, 20.f, -960.f });
@@ -526,7 +526,7 @@ void EditorState::buildScene()
         entity->setPosition(-80 + (rockWall->getMesh().getBoundingBox().asFloatRect().width / 2.f) + (i * 600.f), xy::DefaultSceneSize.y - groundOffset);
         entity->addComponent(rockWall);
         m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
-    }
+    }*/
 
     auto meshRenderer = m_meshRenderer.createDrawable(m_messageBus);
     //meshRenderer->enableWater(true);
