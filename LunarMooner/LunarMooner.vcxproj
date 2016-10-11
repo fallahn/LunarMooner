@@ -154,6 +154,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\LMCoolDownMeter.hpp" />
     <ClInclude Include="include\LMCounterDisplay.hpp" />
     <ClInclude Include="include\LMLevelMeter.hpp" />
+    <ClInclude Include="include\LMMapManager.hpp" />
     <ClInclude Include="include\LMPlayerDrawable.hpp" />
     <ClInclude Include="include\LMVelocityShader.hpp" />
     <ClInclude Include="include\MenuWeaponSelect.hpp" />
@@ -232,6 +233,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\LMCoolDownMeter.cpp" />
     <ClCompile Include="src\LMCounterDisplay.cpp" />
     <ClCompile Include="src\LMLevelMeter.cpp" />
+    <ClCompile Include="src\LMMapManager.cpp" />
     <ClCompile Include="src\LMPlayerDrawable.cpp" />
     <ClCompile Include="src\MenuWeaponSelect.cpp" />
     <ClCompile Include="src\OLAchievementTag.cpp" />

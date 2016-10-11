@@ -57,6 +57,7 @@ source distribution.
 
 #include <xygine/mesh/IQMBuilder.hpp>
 #include <xygine/mesh/shaders/DeferredRenderer.hpp>
+#include <xygine/mesh/MaterialDefinition.hpp>
 
 #include <SFML/Window/Event.hpp>
 
@@ -863,6 +864,99 @@ void LunarMoonerState::initMeshes()
     auto entity = xy::Entity::create(m_messageBus);
     entity->addComponent(md);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+
+    //preload all the props and their materials
+    auto modelFiles = xy::FileSystem::listFiles(propsDirectory);
+    modelFiles.erase(std::remove_if(std::begin(modelFiles), std::end(modelFiles),
+        [](const std::string& str)
+    {
+        return (xy::FileSystem::getFileExtension(str) != ".iqm");
+    }), std::end(modelFiles));
+
+    auto i = 0u;
+    for (const auto& f : modelFiles)
+    {
+        if (xy::FileSystem::getFileExtension(f) == ".iqm")
+        {
+            //look for material with same name and load it if possible
+            auto matname = f;
+            matname.replace(matname.find(".iqm"), 4, ".xym");
+            auto materials = xy::MaterialDefinition::loadFile(propsDirectory + matname);
+            for (const auto& def : materials)
+            {
+                std::vector<std::uint32_t> materialIDs;
+
+                switch (def.shaderType)
+                {
+                default:
+                case xy::MaterialDefinition::VertexColoured:
+                {
+                    auto id = def.uid();
+                    if (!m_resources.materialResource.hasMaterial(id))
+                    {
+                        auto& mat = m_resources.materialResource.add(id, m_resources.shaderResource.get(Shader::MeshVertexColoured));
+                        mat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+                        mat.addProperty({ "u_colour", sf::Color::White });
+                        if (def.castShadows)
+                        {
+                            mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+                        }
+                    }
+                    materialIDs.push_back(id);
+                }
+                break;
+                case xy::MaterialDefinition::Textured:
+                {
+                    auto id = def.uid();
+                    if (!m_resources.materialResource.hasMaterial(id))
+                    {
+                        if (def.textures[2].empty())
+                        {
+                            //no normal map
+                            auto& mat = m_resources.materialResource.add(id, m_resources.shaderResource.get(Shader::MeshTextured));
+                            mat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+
+                            m_resources.textureResource.setFallbackColour(sf::Color::Magenta);
+                            mat.addProperty({ "u_diffuseMap", m_resources.textureResource.get(def.textures[0]) });
+                            m_resources.textureResource.setFallbackColour(sf::Color::Black);
+                            mat.addProperty({ "u_maskMap", m_resources.textureResource.get(def.textures[1]) });
+                            mat.addProperty({ "u_colour", sf::Color::White });
+                            if (def.castShadows)
+                            {
+                                mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+                            }
+                        }
+                        else
+                        {
+                            auto& mat = m_resources.materialResource.add(id, m_resources.shaderResource.get(Shader::MeshNormalMapped));
+                            mat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+
+                            m_resources.textureResource.setFallbackColour(sf::Color::Magenta);
+                            mat.addProperty({ "u_diffuseMap", m_resources.textureResource.get(def.textures[0]) });
+                            m_resources.textureResource.setFallbackColour(sf::Color::Black);
+                            mat.addProperty({ "u_maskMap", m_resources.textureResource.get(def.textures[1]) });
+                            m_resources.textureResource.setFallbackColour(sf::Color(127, 127, 255));
+                            mat.addProperty({ "u_normalMap", m_resources.textureResource.get(def.textures[2]) });
+                            mat.addProperty({ "u_colour", sf::Color::White });
+                            if (def.castShadows)
+                            {
+                                mat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
+                            }
+                        }
+                    }
+                    materialIDs.push_back(id);
+                }
+                break;
+                }
+                //map all IDs to the mesh ID
+                m_materialMap[Mesh::Count + i] = std::make_pair(f, std::move(materialIDs));
+            }
+
+            //load the mesh
+            xy::IQMBuilder builder(propsDirectory + f);
+            m_meshRenderer.loadModel(Mesh::ID::Count + i++, builder);
+        }
+    }
 }
 
 void LunarMoonerState::buildBackground()
@@ -1082,6 +1176,8 @@ void LunarMoonerState::buildBackground()
     entity->addComponent(lc);
 
     m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
+
+    //TODO load the meshes used for the scene background
 }
 
 void LunarMoonerState::updateLoadingScreen(float dt, sf::RenderWindow& rw)

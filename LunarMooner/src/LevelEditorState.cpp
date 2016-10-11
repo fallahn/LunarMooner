@@ -377,10 +377,13 @@ void EditorState::loadMeshes()
     m_resources.shaderResource.preload(Shader::ID::MeshVertexColoured, DEFERRED_VERTCOLOURED_VERTEX, DEFERRED_VERTCOLOURED_FRAGMENT);
     m_resources.shaderResource.preload(Shader::ID::Shadow, SHADOW_VERTEX, SHADOW_FRAGMENT);
 
+    m_resources.textureResource.setFallbackColour(sf::Color::Black);
+
     auto& groundMat = m_resources.materialResource.add(Material::ID::Ground, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
     groundMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     groundMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/moon_diffuse.png") });
     groundMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/moon_normal.png") });
+    groundMat.addProperty({ "u_maskMap", m_resources.textureResource.get("mask_fallback") });
     groundMat.addProperty({ "u_colour", sf::Color::White });
     groundMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
     groundMat.getRenderPass(xy::RenderPass::ID::ShadowMap)->setCullFace(xy::CullFace::Front);
@@ -389,6 +392,7 @@ void EditorState::loadMeshes()
     wallMat01.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     wallMat01.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
     wallMat01.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
+    wallMat01.addProperty({ "u_maskMap", m_resources.textureResource.get("mask_fallback") });
     wallMat01.addProperty({ "u_colour", sf::Color::White });
     wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
 
@@ -530,7 +534,6 @@ void EditorState::buildScene()
     entity = xy::Entity::create(m_messageBus);
     entity->addComponent(meshRenderer);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
-
 
     auto bg = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
     entity = xy::Entity::create(m_messageBus);

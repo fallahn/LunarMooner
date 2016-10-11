@@ -291,6 +291,9 @@
     <ClInclude Include="include\LEPropCollection.hpp">
       <Filter>Header Files\level editor</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMMapManager.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -496,6 +499,9 @@
     </ClCompile>
     <ClCompile Include="src\LEPropCollection.cpp">
       <Filter>Source Files\level editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMMapManager.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

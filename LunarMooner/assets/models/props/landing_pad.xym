@@ -1,0 +1,1 @@
+[{"castShadows":true,"colour":{"a":255,"b":255,"g":255,"r":255},"name":"LandingPad","shaderType":2,"textures":{"diffuse":"assets\/images\/game\/textures\/landingPad_diffuse.png","mask":"assets\/images\/game\/textures\/landingPad_mask.png","normal":"assets\/images\/game\/textures\/landingPad_normal.png"}}]

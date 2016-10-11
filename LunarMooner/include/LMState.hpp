@@ -73,6 +73,8 @@ private:
     bool m_useController;
     std::size_t m_levelChangeCount;
     
+    std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>> m_materialMap;
+
     void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon);
     void initSounds();
     void initParticles();
