@@ -27,6 +27,8 @@ source distribution.
 
 #include <LMMapManager.hpp>
 #include <CommandIds.hpp>
+#include <LMShaderIds.hpp>
+#include <LESelectableItem.hpp>
 
 #include <xygine/util/Random.hpp>
 #include <xygine/Command.hpp>
@@ -34,19 +36,20 @@ source distribution.
 #include <xygine/Scene.hpp>
 #include <xygine/mesh/MeshRenderer.hpp>
 #include <xygine/components/Model.hpp>
+#include <xygine/util/Json.hpp>
 
 using namespace lm;
 
 namespace
 {
     const std::string mapDir("assets/maps/");
+    const std::string fileExtension(".lmp");
 }
 
 MapManager::MapManager(xy::MessageBus& mb, MaterialMap& mm, ResourceCollection& rc, xy::MeshRenderer& mr)
     : xy::Component (mb, this),
     m_materialMap   (mm),
     m_resources     (rc),
-    m_entity        (nullptr),
     m_meshRenderer  (mr),
     m_level         (0)
 {
@@ -66,57 +69,209 @@ MapManager::MapManager(xy::MessageBus& mb, MaterialMap& mm, ResourceCollection& 
     {
         loadMap(mapDir + files[i]);
     }
+    LOG("loaded " + std::to_string(m_chains.size()) + " maps", xy::Logger::Type::Info);
 }
 
 //public
 void MapManager::entityUpdate(xy::Entity&, float) {}
 
-void MapManager::onStart(xy::Entity& entity)
-{
-    m_entity = &entity;
-}
-
-const std::vector<MapManager::Platform>& MapManager::getPlatformData() const
+const std::vector<MapManager::Platform>& MapManager::getPlatforms() const
 {
     return m_platforms[m_level];
 }
 
-const std::vector<sf::Vector2f>& MapManager::getChains() const
+const std::vector<sf::Vector2f>& MapManager::getChain() const
 {
     return m_chains[m_level];
 }
 
-void MapManager::setLevel(sf::Uint8 level)
+void MapManager::setLevel(sf::Uint8 level, xy::Scene& scene)
 {
     m_level = level % m_propData.size();
-    updateScene();
+    updateScene(scene);
 }
 
 //private
 void MapManager::loadMap(const std::string& path)
 {
     //parse map file and store the properties in relevant array
-
-
-    /*std::uint32_t idx;
-    auto result = std::find_if(m_materialMap.begin(), m_materialMap.end(),
-        [](const std::pair<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>>& pair)
+    if (xy::FileSystem::getFileExtension(path) != fileExtension)
     {
-        return pair.second.first == modelString;
-    });*/
+        xy::Logger::log(path + ": Not a material file", xy::Logger::Type::Error);
+        return;
+    }
+
+    std::ifstream file(path);
+    if (!file.good() || !xy::Util::File::validLength(file))
+    {
+        xy::Logger::log("failed to open " + path + ", or file empty", xy::Logger::Type::Error);
+        file.close();
+        return;
+    }
+
+    std::string jsonString;
+    while (!file.eof())
+    {
+        std::string temp;
+        file >> temp;
+        jsonString += temp;
+    }
+    if (jsonString.empty())
+    {
+        xy::Logger::log(path + "failed to read, or file empty", xy::Logger::Type::Error);
+        file.close();
+        return;
+    }
+    file.close();
+
+    pj::value pv;
+    auto err = pj::parse(pv, jsonString);
+    if (err.empty())
+    {
+        if (pv.is<pj::array>())
+        {
+            auto objArray = pv.get<pj::array>();
+
+            m_chains.emplace_back();
+            auto& chain = m_chains.back();
+
+            m_platforms.emplace_back();
+            auto& platforms = m_platforms.back();
+
+            m_propData.emplace_back();
+            auto& props = m_propData.back();
+
+            for (const auto& obj : objArray)
+            {
+                sf::Vector2f position = xy::DefaultSceneSize / 2.f;
+                if (obj.get("position").is<pj::object>())
+                {
+                    if (obj.get("position").get("x").is<double>())
+                    {
+                        position.x = static_cast<float>(obj.get("position").get("x").get<double>());
+                    }
+                    if (obj.get("position").get("y").is<double>())
+                    {
+                        position.y = static_cast<float>(obj.get("position").get("y").get<double>());
+                    }
+                }
+
+                le::SelectableItem::Type itemType = le::SelectableItem::Type::Count;
+                //remember if we don't get a valid type to skip!
+                if (obj.get("type").is<double>())
+                {
+                    int type = static_cast<int>(obj.get("type").get<double>());
+                    if (type < static_cast<int>(le::SelectableItem::Type::Count)
+                        && type >= 0)
+                    {
+                        itemType = static_cast<le::SelectableItem::Type>(type);
+                        switch (itemType)
+                        {
+                        default: continue;
+                        case le::SelectableItem::Type::Point:
+                            chain.push_back(position);
+                            break;
+                        case le::SelectableItem::Type::Platform:
+                        {
+                            platforms.emplace_back();
+                            auto& platform = platforms.back();
+                            
+                            if (obj.get("value").is<double>())
+                            {
+                                platform.value = static_cast<int>(obj.get("value").get<double>());
+                            }
+                            if (obj.get("size").is<pj::object>())
+                            {
+                                if (obj.get("size").get("x").is<double>())
+                                {
+                                    platform.size.x = static_cast<float>(obj.get("size").get("x").get<double>());
+                                    platform.size.x = std::min(500.f, std::max(4.f, platform.size.x));
+                                }
+                                if (obj.get("size").get("y").is<double>())
+                                {
+                                    platform.size.y = static_cast<float>(obj.get("size").get("y").get<double>());
+                                    platform.size.y = std::min(500.f, std::max(4.f, platform.size.y));
+                                }
+                            }
+
+                            platform.position = position;
+                        }
+                        break;
+                        case le::SelectableItem::Type::Prop:
+                        {
+                            props.emplace_back();
+                            auto& prop = props.back();
+                            
+                            if (obj.get("rotation").is<double>())
+                            {
+                                prop.rotation = static_cast<float>(obj.get("rotation").get<double>());
+                            }
+
+                            if (obj.get("scale").is<pj::object>())
+                            {
+                                if (obj.get("scale").get("x").is<double>())
+                                {
+                                    prop.scale.x = static_cast<float>(obj.get("scale").get("x").get<double>());
+                                    prop.scale.x = std::min(10.f, std::max(0.1f, prop.scale.x));
+                                }
+
+                                if (obj.get("scale").get("y").is<double>())
+                                {
+                                    prop.scale.y = static_cast<float>(obj.get("scale").get("y").get<double>());
+                                    prop.scale.y = std::min(10.f, std::max(0.1f, prop.scale.y));
+                                }
+                            }
+
+                            if (obj.get("name").is<std::string>())
+                            {
+                                auto name = obj.get("name").get<std::string>();
+                                auto i = 0;
+                                for (auto& m : m_materialMap)
+                                {
+                                    if (m.second.first == name)
+                                    {
+                                        break;
+                                    }
+                                    i++;
+                                }
+
+                                if (i >= m_materialMap.size())
+                                {
+                                    //skip this as we have invalid model ID
+                                    xy::Logger::log(name + " model ID not found!", xy::Logger::Type::Warning);
+                                    continue;
+                                }
+
+                                prop.modelID = Mesh::ID::Count + i;
+                            }
+
+                            prop.position = position;
+                        }
+                        break;
+                        }
+                    }
+                    else
+                    {
+                        //invalid type!
+                        continue;
+                    }
+                }
+            }
+        }
+    }
 }
 
-void MapManager::updateScene()
+void MapManager::updateScene(xy::Scene& scene)
 {
     //clear old entities, add new
     xy::Command cmd;
     cmd.category = LMCommandID::InUse;
     cmd.action = [](xy::Entity& entity, float) {entity.destroy(); };
-    m_entity->getScene()->sendCommand(cmd);
+    scene.sendCommand(cmd);
 
     cmd.category = LMCommandID::Prop;
     cmd.action = [](xy::Entity& entity, float) {entity.addCommandCategories(LMCommandID::InUse); };
-    m_entity->getScene()->sendCommand(cmd);
+    scene.sendCommand(cmd);
 
     for (const auto& pd : m_propData[m_level])
     {
@@ -142,6 +297,6 @@ void MapManager::updateScene()
         entity->setPosition(pd.position);
         entity->addCommandCategories(LMCommandID::Prop);
 
-        m_entity->getScene()->addEntity(entity, xy::Scene::Layer::FrontRear);
+        scene.addEntity(entity, xy::Scene::Layer::FrontRear);
     }
 }

@@ -37,6 +37,7 @@ source distribution.
 namespace xy
 {
     class MeshRenderer;
+    class Scene;
 }
 
 namespace lm
@@ -62,17 +63,15 @@ namespace lm
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
         void entityUpdate(xy::Entity&, float) override;
-        void onStart(xy::Entity&) override;
 
-        const std::vector<Platform>& getPlatformData() const;
-        const std::vector<sf::Vector2f>& getChains() const;
+        const std::vector<Platform>& getPlatforms() const;
+        const std::vector<sf::Vector2f>& getChain() const;
 
-        void setLevel(sf::Uint8);
+        void setLevel(sf::Uint8, xy::Scene&);
 
     private:
         MaterialMap& m_materialMap;
         ResourceCollection& m_resources;
-        xy::Entity* m_entity;
         xy::MeshRenderer& m_meshRenderer;
         sf::Uint8 m_level;
 
@@ -89,7 +88,7 @@ namespace lm
         std::vector<std::vector<sf::Vector2f>> m_chains;
 
         void loadMap(const std::string&);
-        void updateScene();
+        void updateScene(xy::Scene&);
     };
 }
 

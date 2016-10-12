@@ -41,6 +41,11 @@ source distribution.
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+namespace lm
+{
+    class MapManager;
+}
+
 class PlayerProfile;
 class LunarMoonerState final : public xy::State
 {
@@ -75,12 +80,13 @@ private:
     
     std::map<std::uint32_t, std::pair<std::string, std::vector<std::uint32_t>>> m_materialMap;
 
-    void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon);
+    void initGameController(sf::Uint8, sf::Uint8, lm::SpecialWeapon, lm::MapManager*);
     void initSounds();
     void initParticles();
     void initMeshes();
 
     void buildBackground();
+    lm::MapManager* buildMoonground();
 
     sf::Sprite m_loadingSprite;
     void updateLoadingScreen(float, sf::RenderWindow&) override;

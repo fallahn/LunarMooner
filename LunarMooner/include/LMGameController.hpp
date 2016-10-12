@@ -63,10 +63,11 @@ namespace lm
     class CooldownMeter;
     class ScoreDisplay;
     class Terrain;
+    class MapManager;
     class GameController final : public xy::Component
     {
     public:
-        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, const xy::App::AudioSettings&, ResourceCollection&, xy::MeshRenderer&);
+        GameController(xy::MessageBus&, xy::Scene&, CollisionWorld&, const xy::App::AudioSettings&, ResourceCollection&, xy::MeshRenderer&, MapManager*);
         ~GameController() = default;
 
         xy::Component::Type type() const override { return xy::Component::Type::Script; }
@@ -108,7 +109,7 @@ namespace lm
         xy::Entity* m_mothership;
         void createMothership();
 
-        Terrain* m_terrain;
+        MapManager* m_mapManager;
 
         std::vector<xy::Entity*> m_humans;
         void spawnHuman(const sf::Vector2f&);

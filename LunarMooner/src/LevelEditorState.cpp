@@ -388,20 +388,30 @@ void EditorState::loadMeshes()
     //groundMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
     //groundMat.getRenderPass(xy::RenderPass::ID::ShadowMap)->setCullFace(xy::CullFace::Front);
 
-    /*auto& wallMat01 = m_resources.materialResource.add(Material::ID::RockWall01, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
+    auto& wallMat01 = m_resources.materialResource.add(Material::ID::RockWall01, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
     wallMat01.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
     wallMat01.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_diffuse.png") });
     wallMat01.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/rockwall_01_normal.png") });
     wallMat01.addProperty({ "u_maskMap", m_resources.textureResource.get("mask_fallback") });
     wallMat01.addProperty({ "u_colour", sf::Color::White });
-    wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));*/
+    wallMat01.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
+
+    auto& buildingMat = m_resources.materialResource.add(Material::ID::Building, m_resources.shaderResource.get(Shader::ID::MeshNormalMapped));
+    buildingMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    buildingMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/landingPad_diffuse.png") });
+    buildingMat.addProperty({ "u_normalMap", m_resources.textureResource.get("assets/images/game/textures/landingPad_normal.png") });
+    buildingMat.addProperty({ "u_maskMap", m_resources.textureResource.get("assets/images/game/textures/landingPad_mask.png") });
+    buildingMat.addProperty({ "u_colour", sf::Color::White });
+    buildingMat.addRenderPass(xy::RenderPass::ID::ShadowMap, m_resources.shaderResource.get(Shader::ID::Shadow));
 
     xy::IQMBuilder mb("assets/models/surface.iqm");
     m_meshRenderer.loadModel(Mesh::ID::Ground, mb);
 
-    /*xy::IQMBuilder ib("assets/models/rock_wall_01.iqm");
-    m_meshRenderer.loadModel(Mesh::ID::RockWall01, ib);*/
+    xy::IQMBuilder ib("assets/models/rock_wall_01.iqm");
+    m_meshRenderer.loadModel(Mesh::ID::RockWall01, ib);
 
+    xy::IQMBuilder lp("assets/models/landing_pad.iqm");
+    m_meshRenderer.loadModel(Mesh::ID::Building, lp);
 
     //go through props folder and load each valid mesh
     modelFiles = xy::FileSystem::listFiles(propsDirectory);
@@ -513,20 +523,35 @@ void EditorState::buildScene()
     m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
     
     //rear walls
-    /*for (auto i = 0u; i < 5u; ++i)
+    for (auto i = 0u; i < 5u; ++i)
     {
         auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, m_messageBus);
-        rockWall->setPosition({ 0.f, 20.f, -960.f });
-        rockWall->setScale({ 2.2f, xy::Util::Random::value(1.2f, 1.8f), 1.8f });
+        rockWall->setPosition({ 0.f, 20.f, -660.f + xy::Util::Random::value(-10.f, 30.f) });
+        rockWall->setScale({ 0.8f, xy::Util::Random::value(0.5f, 0.8f), 0.9f });
+        rockWall->rotate(xy::Model::Axis::Y, xy::Util::Random::value(-20.f, 20.f));
 
         auto& material = m_resources.materialResource.get(Material::ID::RockWall01);
         rockWall->setBaseMaterial(material);
 
         entity = xy::Entity::create(m_messageBus);
-        entity->setPosition(-80 + (rockWall->getMesh().getBoundingBox().asFloatRect().width / 2.f) + (i * 600.f), xy::DefaultSceneSize.y - groundOffset);
+        entity->setPosition(-80 + (rockWall->getMesh().getBoundingBox().asFloatRect().width / 2.f) + (i * 600.f) + xy::Util::Random::value(-100.f, 87.f),
+            xy::DefaultSceneSize.y - groundOffset);
         entity->addComponent(rockWall);
         m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
-    }*/
+    }
+
+    auto building = m_meshRenderer.createModel(Mesh::ID::Building, m_messageBus);
+    building->setPosition({ 0.f, 0.f, -1200.f });
+    building->rotate(xy::Model::Axis::Y, xy::Util::Random::value(0.f, 360.f));
+    building->setScale({ 0.7f, 0.7f, 0.7f });
+
+    auto& material = m_resources.materialResource.get(Material::ID::Building);
+    building->setBaseMaterial(material);
+
+    entity = xy::Entity::create(m_messageBus);
+    entity->setPosition(xy::Util::Random::value(200.f, 1100.f), xy::DefaultSceneSize.y - groundOffset);
+    entity->addComponent(building);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 
     auto meshRenderer = m_meshRenderer.createDrawable(m_messageBus);
     //meshRenderer->enableWater(true);
@@ -959,7 +984,7 @@ void EditorState::loadMap(const std::string& path)
     std::ifstream file(path);
     if (!file.good() || !xy::Util::File::validLength(file))
     {
-        LOG("failed to open " + path + ", or file empty", xy::Logger::Type::Error);
+        xy::Logger::log("failed to open " + path + ", or file empty", xy::Logger::Type::Error);
         file.close();
         return;
     }
@@ -973,7 +998,7 @@ void EditorState::loadMap(const std::string& path)
     }
     if (jsonString.empty())
     {
-        LOG(path + "failed to read, or file empty", xy::Logger::Type::Error);
+        xy::Logger::log(path + "failed to read, or file empty", xy::Logger::Type::Error);
         file.close();
         return;
     }

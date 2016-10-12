@@ -38,7 +38,7 @@ source distribution.
 #include <LMCoolDownMeter.hpp>
 #include <LMPlayerInfoDisplay.hpp>
 #include <LMRoundSummary.hpp>
-#include <LMTerrain.hpp>
+#include <LMMapManager.hpp>
 #include <LMEarlyWarning.hpp>
 #include <LMShieldDrawable.hpp>
 #include <LMLaserSight.hpp>
@@ -130,7 +130,7 @@ namespace
     const float hardCoolDown = 12.f;
 }
 
-GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as, ResourceCollection& rc, xy::MeshRenderer& mr)
+GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWorld& cw, const xy::App::AudioSettings& as, ResourceCollection& rc, xy::MeshRenderer& mr, MapManager* mm)
     : xy::Component     (mb, this),
     m_difficulty        (xy::Difficulty::Easy),
     m_cooldownTime      (easyCoolDown),
@@ -144,7 +144,7 @@ GameController::GameController(xy::MessageBus& mb, xy::Scene& scene, CollisionWo
     m_player            (nullptr),
     m_timeRound         (false),
     m_mothership        (nullptr),
-    m_terrain           (nullptr),
+    m_mapManager        (mm),
     m_alienBatch        (nullptr),
     m_scoreDisplay      (nullptr),
     m_currentPlayer     (0),
@@ -652,9 +652,7 @@ void GameController::setDifficulty(xy::Difficulty difficulty)
 void GameController::spawnPlayer()
 {
     if (!m_player && m_spawnReady)
-    {
-        if (!m_terrain->valid()) return;
-        
+    {        
         const auto& children = m_mothership->getChildren();
         auto spawnPos = children.back()->getWorldPosition();
         xy::Command cmd;
@@ -682,7 +680,7 @@ void GameController::spawnPlayer()
         dropshipDrawable->addMessageHandler(mh);
 
         auto playerController = xy::Component::create<lm::PlayerController>(getMessageBus(),
-            m_mothership->getComponent<MothershipController>(), m_terrain->getChain());
+            m_mothership->getComponent<MothershipController>(), m_mapManager->getChain());
         playerController->setSize(playerSize);
 
         auto collision = m_collisionWorld.addComponent(getMessageBus(), { {0.f, 0.f}, playerSize }, CollisionComponent::ID::Player, true);
@@ -800,7 +798,7 @@ void GameController::spawnPlayer()
         {
             auto tutMessage = sendMessage<LMTutorialEvent>(TutorialEvent);
             tutMessage->action = LMTutorialEvent::LandingPad;
-            const auto& platform = m_terrain->getPlatforms()[xy::Util::Random::value(0, m_terrain->getPlatforms().size() - 1)];
+            const auto& platform = m_mapManager->getPlatforms()[xy::Util::Random::value(0, m_mapManager->getPlatforms().size() - 1)];
             auto position = platform.position + (platform.size / 2.f);
             tutMessage->posX = position.x;
             tutMessage->posY = position.y;
@@ -1004,15 +1002,7 @@ void GameController::createTerrain()
 
 
     //death zone at bottom
-    auto terrain = xy::Component::create<Terrain>(getMessageBus());
-    terrain->init("assets/maps", m_resources.textureResource);
-    terrain->setShader(&m_resources.shaderResource.get(Shader::NormalMapGame));
-
-    entity = xy::Entity::create(getMessageBus());
-    entity->setPosition(alienArea.left, xy::DefaultSceneSize.y - 320.f); //TODO fix these numbers
-    m_terrain = entity->addComponent(terrain);
-
-    m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
+    m_mapManager->setLevel(m_playerStates[m_currentPlayer].level, m_scene);
 
     //need to do this after adding to entity to get correct transforms
     updatePlatforms();
@@ -1030,8 +1020,6 @@ void GameController::createTerrain()
 
 void GameController::updatePlatforms()
 {
-    if (!m_terrain->valid()) return;
-
     //remove old platforms
     xy::Command cmd;
     cmd.category = LMCommandID::TerrainObject;
@@ -1046,7 +1034,7 @@ void GameController::updatePlatforms()
     de.time = 0.02f;
     de.action = [this]()
     {
-        auto platforms = m_terrain->getPlatforms();
+        auto platforms = m_mapManager->getPlatforms();
         for (const auto& p : platforms)
         {
             auto collision = m_collisionWorld.addComponent(getMessageBus(), { {}, p.size }, lm::CollisionComponent::ID::Tower);
@@ -1062,8 +1050,6 @@ void GameController::updatePlatforms()
 
             m_scene.addEntity(entity, xy::Scene::Layer::BackFront);
         }
-
-        m_terrain->updateWater();
     };
 }
 
@@ -1319,7 +1305,7 @@ void GameController::restorePlayerState()
     m_playerStates[m_currentPlayer].ammo = 0;
 
     //set the terrain to the current level
-    m_terrain->setLevel(ps.level);
+    m_mapManager->setLevel(ps.level, m_scene);
     updatePlatforms();
 
     //reset round time if new round

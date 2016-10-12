@@ -23,6 +23,7 @@ errors are gratefully accepted.
 Contributions should be acknowledged and are gratefully accepted from:  
 Jonny Paton  
 Jean-Sebastien Fauteux (OS X Testing)  
+Josh Mercier (3D Models)  
 
 
 
