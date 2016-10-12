@@ -907,7 +907,7 @@ void GameController::spawnHuman(const sf::Vector2f& position)
     entity->setPosition(position);
     entity->addCommandCategories(LMCommandID::Human);
 
-    m_humans.push_back(m_scene.addEntity(entity, xy::Scene::Layer::BackFront));
+    m_humans.push_back(m_scene.addEntity(entity, xy::Scene::Layer::FrontFront));
 }
 
 void GameController::spawnHumans()

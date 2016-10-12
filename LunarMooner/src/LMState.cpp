@@ -835,6 +835,7 @@ void LunarMoonerState::initMeshes()
     auto& shipMat = m_resources.materialResource.add(Material::MotherShip, m_resources.shaderResource.get(Shader::MeshTextured));
     shipMat.addProperty({ "u_diffuseMap", m_resources.textureResource.get("assets/images/game/textures/mothership_diffuse.png") });
     shipMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
+    shipMat.addRenderPass(xy::RenderPass::ShadowMap, m_resources.shaderResource.get(Shader::Shadow));
 
     auto& corpseMat = m_resources.materialResource.add(Material::DeadDoofer, m_resources.shaderResource.get(Shader::MeshVertexColoured));
     corpseMat.addUniformBuffer(m_meshRenderer.getMatrixUniforms());
