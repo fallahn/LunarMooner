@@ -45,17 +45,19 @@ namespace
     //const float walkSpeed = 120.f;
 
     const float gravity = 12.f;
-    const float initialVelocity = 9.f;
+    const float initialVelocity = 19.f;
     const float maxXVelocity = 200.f;
 
     const auto waveTable = xy::Util::Wavetable::sine(5.f, 3.f);
     const float modelOffset = 20.f;
+    const float modelDepth = 140.f;
 }
 
 HumanController::HumanController(xy::MessageBus& mb, xy::Model& ad)
     : xy::Component     (mb, this),
     m_drawable          (ad),
     m_gotoDestination   (false),
+    m_launchDistance    (0.f),
     m_waveTableIndex    (xy::Util::Random::value(0, waveTable.size() - 1)),
     m_velocity          (0.f, -initialVelocity)
 {
@@ -65,6 +67,7 @@ HumanController::HumanController(xy::MessageBus& mb, xy::Model& ad)
 //public
 void HumanController::entityUpdate(xy::Entity& entity, float dt)
 {
+    float currentDistance = 0.f;
     if (m_gotoDestination)
     {
         auto position = entity.getPosition();
@@ -93,7 +96,8 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
         entity.move(m_velocity * dt);
 
         //if dist to target < X we're there
-        if (xy::Util::Vector::lengthSquared(m_destination - entity.getPosition()) < 100.f)
+        currentDistance = xy::Util::Vector::lengthSquared(m_destination - entity.getPosition());
+        if (currentDistance < 100.f)
         {
             entity.destroy();
             auto msg = getMessageBus().post<LMGameEvent>(LMMessageId::GameEvent);
@@ -113,11 +117,11 @@ void HumanController::entityUpdate(xy::Entity& entity, float dt)
     if (!m_gotoDestination)
     {
         m_waveTableIndex = (m_waveTableIndex + 1) % waveTable.size();
-        m_drawable.setPosition({ 0.f, waveTable[m_waveTableIndex] + modelOffset, 0.f });
+        m_drawable.setPosition({ 0.f, waveTable[m_waveTableIndex] + modelOffset, modelDepth });
     }
     else
     {
-        m_drawable.setPosition({ 0.f, modelOffset, 0.f });
+        m_drawable.setPosition({ 0.f, modelOffset, modelDepth * (currentDistance / m_launchDistance) });
     }
     //store position for when switching player states
     m_position = entity.getPosition();
@@ -127,6 +131,7 @@ void HumanController::setDestination(const sf::Vector2f& dest)
 {
     m_destination = dest;
     m_gotoDestination = true;
+    m_launchDistance = xy::Util::Vector::lengthSquared(dest - m_position);
 
     //m_drawable.playAnimation((dest.x - m_position.x > 0) ? AnimationID::RunRight : AnimationID::RunLeft);
     m_drawable.setRotation((dest.x - m_position.x > 0) ? sf::Vector3f(0.f, 0.f, 90.f) : sf::Vector3f(0.f, 0.f, -90.f));

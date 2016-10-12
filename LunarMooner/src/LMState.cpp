@@ -781,7 +781,7 @@ void LunarMoonerState::initParticles()
 
     auto entity = xy::Entity::create(m_messageBus);
     auto pc = entity->addComponent(particleManager);
-    m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontFront);
 
     xy::ParticleSystem::Definition pd;
     pd.loadFromFile("assets/particles/small_explosion.xyp", m_resources.textureResource);
@@ -1216,7 +1216,7 @@ lm::MapManager* LunarMoonerState::buildMoonground()
     for (auto i = 0u; i < 5u; ++i)
     {
         auto rockWall = m_meshRenderer.createModel(Mesh::ID::RockWall01, m_messageBus);
-        rockWall->setPosition({ 0.f, 20.f, -660.f + xy::Util::Random::value(-10.f, 30.f) });
+        rockWall->setPosition({ 0.f, 20.f, -1260.f + xy::Util::Random::value(-10.f, 30.f) });
         rockWall->setScale({ 0.8f, xy::Util::Random::value(0.5f, 0.8f), 0.9f });
         rockWall->rotate(xy::Model::Axis::Y, xy::Util::Random::value(-20.f, 20.f));
 
@@ -1231,7 +1231,7 @@ lm::MapManager* LunarMoonerState::buildMoonground()
     }
 
     auto building = m_meshRenderer.createModel(Mesh::ID::Building, m_messageBus);
-    building->setPosition({ 0.f, 0.f, -1200.f });
+    building->setPosition({ 0.f, 0.f, -920.f });
     building->rotate(xy::Model::Axis::Y, xy::Util::Random::value(0.f, 360.f));
     building->setScale({ 0.7f, 0.7f, 0.7f });
 
@@ -1239,7 +1239,7 @@ lm::MapManager* LunarMoonerState::buildMoonground()
     building->setBaseMaterial(material);
 
     entity = xy::Entity::create(m_messageBus);
-    entity->setPosition(xy::Util::Random::value(200.f, 1100.f), xy::DefaultSceneSize.y - (groundOffset * 0.7f));
+    entity->setPosition(xy::Util::Random::value(200.f, 1700.f), xy::DefaultSceneSize.y - (groundOffset * 0.7f));
     entity->addComponent(building);
     m_scene.addEntity(entity, xy::Scene::Layer::FrontRear);
 

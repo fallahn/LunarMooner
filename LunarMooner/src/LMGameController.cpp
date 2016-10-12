@@ -43,7 +43,6 @@ source distribution.
 #include <LMShieldDrawable.hpp>
 #include <LMLaserSight.hpp>
 #include <LMWeaponEMP.hpp>
-#include <LMWaterDrawable.hpp>
 #include <LMShaderIds.hpp>
 #include <LMVelocityShader.hpp>
 #include <ResourceCollection.hpp>
@@ -576,7 +575,7 @@ void GameController::addPlayer(sf::Uint8 level, SpecialWeapon weapon)
     auto& humans = state.humansRemaining;
     for (auto i = 0; i < humanCounts[level]; ++i)
     {
-        humans.emplace_back(xy::Util::Random::value(290.f, 1600.f), xy::Util::Random::value(1025.f, 1030.f));
+        humans.emplace_back(xy::Util::Random::value(alienArea.left + 80.f, alienArea.left + alienArea.width - 80.f), xy::DefaultSceneSize.y - (groundOffset * 2.f));
     }
 
     state.alienCount = alienCounts[level];
@@ -798,7 +797,9 @@ void GameController::spawnPlayer()
         {
             auto tutMessage = sendMessage<LMTutorialEvent>(TutorialEvent);
             tutMessage->action = LMTutorialEvent::LandingPad;
-            const auto& platform = m_mapManager->getPlatforms()[xy::Util::Random::value(0, m_mapManager->getPlatforms().size() - 1)];
+            const auto& platform = (m_mapManager->getPlatforms().size() > 1) 
+                ? m_mapManager->getPlatforms()[xy::Util::Random::value(0, m_mapManager->getPlatforms().size() - 1)]
+                : m_mapManager->getPlatforms()[0];
             auto position = platform.position + (platform.size / 2.f);
             tutMessage->posX = position.x;
             tutMessage->posY = position.y;

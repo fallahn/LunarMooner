@@ -31,7 +31,7 @@ source distribution.
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Color.hpp>
 
-const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 480.f);
+const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 420.f); //TODO move up rather than shorten by ground offset?
 const sf::Color SceneAmbientColour({ 76, 70, 72 });
 const float SceneLightIntensity = 0.6f;
 const sf::Color SceneDiffuseLight(255, 255, 200);
@@ -41,6 +41,6 @@ const sf::Color SceneWaterColour(200, 200, 255);
 const float playerOffsetDepth = 0.f;// -60.f;
 const float groundOffset = 60.f;
 const std::string propsDirectory = "assets/models/props/";
-const sf::Vector2f shieldPosition(xy::DefaultSceneSize.x / 2.f, 3700.f);
+const sf::Vector2f shieldPosition(xy::DefaultSceneSize.x / 2.f, 3700.f - groundOffset);
 
 #endif //LM_CONST_PARAMS_INL_

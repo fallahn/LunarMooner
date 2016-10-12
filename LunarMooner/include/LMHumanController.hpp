@@ -63,6 +63,7 @@ namespace lm
         bool m_gotoDestination;
         sf::Vector2f m_destination;
         sf::Vector2f m_position;
+        float m_launchDistance;
 
         std::size_t m_waveTableIndex;
 
