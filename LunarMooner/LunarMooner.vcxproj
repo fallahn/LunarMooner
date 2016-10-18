@@ -202,6 +202,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\PHPlayerController.hpp" />
     <ClInclude Include="include\PlanetHoppingState.hpp" />
     <ClInclude Include="include\PlayerProfile.hpp" />
+    <ClInclude Include="include\PostShieldDistortion.hpp" />
     <ClInclude Include="include\RDDistanceDrawable.hpp" />
     <ClInclude Include="include\RDGameController.hpp" />
     <ClInclude Include="include\RDPlayerController.hpp" />
@@ -276,6 +277,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\PHPlayerController.cpp" />
     <ClCompile Include="src\PlanetHoppingState.cpp" />
     <ClCompile Include="src\PlayerProfile.cpp" />
+    <ClCompile Include="src\PostShieldDistortion.cpp" />
     <ClCompile Include="src\RDDistanceDrawable.cpp" />
     <ClCompile Include="src\RDGameController.cpp" />
     <ClCompile Include="src\RDPlayerController.cpp" />

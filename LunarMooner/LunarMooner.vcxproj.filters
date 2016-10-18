@@ -294,6 +294,9 @@
     <ClInclude Include="include\LMMapManager.hpp">
       <Filter>Header Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\PostShieldDistortion.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -502,6 +505,9 @@
     </ClCompile>
     <ClCompile Include="src\LMMapManager.cpp">
       <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostShieldDistortion.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

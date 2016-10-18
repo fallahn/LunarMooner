@@ -1008,7 +1008,7 @@ void GameController::createTerrain()
     //need to do this after adding to entity to get correct transforms
     updatePlatforms();
 
-    auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), 3000.f);   
+    auto shieldDrawable = xy::Component::create<ShieldDrawable>(getMessageBus(), shieldRadius);   
     shieldDrawable->setTexture(m_resources.textureResource.get("assets/images/game/shield_noise.png"));
     
     entity = xy::Entity::create(getMessageBus());

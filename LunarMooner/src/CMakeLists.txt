@@ -59,6 +59,7 @@ SET(LM_SRC
   ${LM_DIR}/PHPlayerController.cpp
   ${LM_DIR}/PlanetHoppingState.cpp
   ${LM_DIR}/PlayerProfile.cpp
+  ${LM_DIR}/PostShieldDistortion.cpp
   ${LM_DIR}/RDDistanceDrawable.cpp
   ${LM_DIR}/RDGameController.cpp
   ${LM_DIR}/RDPlayerController.cpp

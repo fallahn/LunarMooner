@@ -30,6 +30,7 @@ source distribution.
 #include <PHPlanetRotation.hpp>
 #include <BGStarfield.hpp>
 #include <LMShieldDrawable.hpp>
+#include <PostShieldDistortion.hpp>
 
 #include <LEPointCollection.hpp>
 #include <LEPlatformCollection.hpp>
@@ -91,6 +92,9 @@ EditorState::EditorState(xy::StateStack& stack, Context context)
 
     launchLoadingScreen();
     m_scene.setView(context.defaultView);
+
+    //auto pp = xy::PostProcess::create<lm::PostShield>(shieldRadius);
+    //m_scene.addPostProcess(pp);
 
     loadMeshes();
     buildScene();

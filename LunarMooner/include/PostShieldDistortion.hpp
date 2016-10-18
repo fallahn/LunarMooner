@@ -25,23 +25,29 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef LM_CONST_PARAMS_INL_
-#define LM_CONST_PARAMS_INL_
+#ifndef LM_POST_SHIELD_HPP_
+#define LM_POST_SHIELD_HPP_
 
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/Color.hpp>
+#include <xygine/PostProcess.hpp>
 
-const sf::FloatRect alienArea(280.f, 200.f, 1360.f, 420.f); //TODO move up rather than shorten by ground offset?
-const sf::Color SceneAmbientColour({ 76, 70, 72 });
-const float SceneLightIntensity = 0.6f;
-const sf::Color SceneDiffuseLight(255, 255, 200);
-const sf::Color SceneSpecularLight(250, 255, 248);
-const sf::Vector3f SceneLightDirection(0.25f, 0.5f, -1.f);
-const sf::Color SceneWaterColour(200, 200, 255);
-const float playerOffsetDepth = 0.f;// -60.f;
-const float groundOffset = 60.f;
-const std::string propsDirectory = "assets/models/props/";
-const sf::Vector2f shieldPosition(xy::DefaultSceneSize.x / 2.f, 3700.f - groundOffset);
-const float shieldRadius = 3000.f;
+#include <SFML/Graphics/Shader.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
-#endif //LM_CONST_PARAMS_INL_
+namespace lm
+{
+    class PostShield final : public xy::PostProcess
+    {
+    public:
+        explicit PostShield(float);
+        ~PostShield() = default;
+
+        void apply(const sf::RenderTexture&, sf::RenderTarget&) override;
+
+    private:
+
+        sf::Shader m_shader;
+        sf::Texture m_normalMap;
+    };
+}
+
+#endif //LM_POST_SHIELD_HPP_

@@ -45,12 +45,12 @@ namespace
 #include "ConstParams.inl"
     const float speed = 1000.f;
 
-    const float shieldRadius = 3000.f * 3000.f;
+    const float shieldRadiusSqr = shieldRadius * shieldRadius;
     //const sf::Vector2f shieldCentre = shieldPosition;
 
     bool collides(const sf::Vector2f& position)
     {
-        return (xy::Util::Vector::lengthSquared(position - shieldPosition) < shieldRadius);
+        return (xy::Util::Vector::lengthSquared(position - shieldPosition) < shieldRadiusSqr);
     }
 }
 
