@@ -45,6 +45,7 @@ source distribution.
 #include <LMWeaponEMP.hpp>
 #include <LMShaderIds.hpp>
 #include <LMVelocityShader.hpp>
+#include <LMShipLight.hpp>
 #include <ResourceCollection.hpp>
 #include <StateIds.hpp>
 #include <Game.hpp>
@@ -726,10 +727,10 @@ void GameController::spawnPlayer()
         sfx4->setName("thrustEffect");
         sfx4->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
 
-        /*auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
-        lc->setDepth(110.f);
-        lc->setDiffuseColour({ 255u, 185u, 135u });
-        lc->setIntensity(1.1f);*/
+        auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
+        lc->setDepth(60.f);
+        lc->setDiffuseColour(sf::Color::Red);
+        lc->setIntensity(1.1f);
 
         auto model = m_meshRenderer.createModel(Mesh::Player, getMessageBus());
         model->rotate(xy::Model::Axis::Y, 180.f);
@@ -737,6 +738,9 @@ void GameController::spawnPlayer()
         model->setPosition({ 25.f, 66.f, 0.f });
         model->setScale({ 1.05f, 1.05f, 1.05f });
         model->setBaseMaterial(m_resources.materialResource.get(Material::Player));
+
+        auto shiplight = xy::Component::create<lm::ShipLight>(getMessageBus(), m_resources.textureResource.get("assets/images/game/ship_light.png"));
+        shiplight->setPosition(playerSize.x / 2.f, 0.f);
 
         auto entity = xy::Entity::create(getMessageBus());
         entity->setPosition(spawnPos);
@@ -752,8 +756,9 @@ void GameController::spawnPlayer()
         auto fx2 = entity->addComponent(sfx2);
         auto fx3 = entity->addComponent(sfx3);
         auto fx4 = entity->addComponent(sfx4);
-        //entity->addComponent(lc);
+        entity->addComponent(lc);
         entity->addComponent(model);
+        entity->addComponent(shiplight);
         entity->addCommandCategories(LMCommandID::Player);
         m_scene.addEntity(entity, xy::Scene::FrontFront);
 

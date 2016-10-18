@@ -211,6 +211,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClInclude Include="include\ResourceCollection.hpp" />
     <ClInclude Include="include\RockDodgingState.hpp" />
     <ClInclude Include="include\LESelectableCollection.hpp" />
+    <ClInclude Include="include\LMShipLight.hpp" />
     <ClInclude Include="include\StateIds.hpp" />
     <ClInclude Include="include\TutorialState.hpp" />
     <ClInclude Include="include\TutorialTip.hpp" />
@@ -236,6 +237,7 @@ xcopy /y /d "$(ProjectDir)extlibs\lib\xygine\xygine.dll" "$(SolutionDir)Release\
     <ClCompile Include="src\LMLevelMeter.cpp" />
     <ClCompile Include="src\LMMapManager.cpp" />
     <ClCompile Include="src\LMPlayerDrawable.cpp" />
+    <ClCompile Include="src\LMShipLight.cpp" />
     <ClCompile Include="src\MenuWeaponSelect.cpp" />
     <ClCompile Include="src\OLAchievementTag.cpp" />
     <ClCompile Include="src\LMLaserSight.cpp" />

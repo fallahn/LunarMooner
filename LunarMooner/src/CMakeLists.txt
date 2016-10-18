@@ -36,6 +36,7 @@ SET(LM_SRC
   ${LM_DIR}/LMPostBlur.cpp
   ${LM_DIR}/LMRoundSummary.cpp
   ${LM_DIR}/LMShieldDrawable.cpp
+  ${LM_DIR}/LMShipLight.cpp
   ${LM_DIR}/LMSpeedMeter.cpp
   ${LM_DIR}/LMState.cpp
   ${LM_DIR}/LMTerrain.cpp

@@ -297,6 +297,9 @@
     <ClInclude Include="include\PostShieldDistortion.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\LMShipLight.hpp">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -508,6 +511,9 @@
     </ClCompile>
     <ClCompile Include="src\PostShieldDistortion.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LMShipLight.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

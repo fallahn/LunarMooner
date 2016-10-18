@@ -46,7 +46,6 @@ namespace
     const float speed = 1000.f;
 
     const float shieldRadiusSqr = shieldRadius * shieldRadius;
-    //const sf::Vector2f shieldCentre = shieldPosition;
 
     bool collides(const sf::Vector2f& position)
     {
