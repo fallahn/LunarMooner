@@ -125,8 +125,12 @@ LunarMoonerState::LunarMoonerState(xy::StateStack& stack, Context context, sf::U
     m_resources.shaderResource.get(Shader::NormalMapGame).setUniform("u_directionalLightDirection", sf::Glsl::Vec3(0.25f, 0.5f, -1.f));
     m_resources.shaderResource.get(Shader::NormalMapGame).setUniform("u_ambientColour", sf::Glsl::Vec3(0.06f, 0.06f, 0.02f));
     m_resources.shaderResource.get(Shader::NormalMapGame).setUniform("u_directionalLight.diffuseColour", sf::Glsl::Vec4(1.f, 0.8f, 0.7f, 1.f));
-    m_resources.shaderResource.preload(Shader::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);
+    
+    m_resources.shaderResource.preload(Shader::NormalMapPlanet, xy::Shader::NormalMapped::vertex, NORMAL_FRAGMENT_TEXTURED);    
     m_resources.shaderResource.get(Shader::NormalMapPlanet).setUniform("u_ambientColour", sf::Glsl::Vec3(0.03f, 0.03f, 0.01f));
+    m_resources.shaderResource.get(Shader::NormalMapPlanet).setUniform("u_directionalLight.intensity", 0.4f);
+    m_resources.shaderResource.get(Shader::NormalMapPlanet).setUniform("u_directionalLight.diffuseColour", sf::Glsl::Vec4(1.f, 0.8f, 0.7f, 1.f));
+    m_resources.shaderResource.get(Shader::NormalMapPlanet).setUniform("u_directionalLightDirection", sf::Glsl::Vec3(0.25f, 0.5f, -1.f));
     m_resources.shaderResource.preload(Shader::Prepass, xy::Shader::Default::vertex, lm::materialPrepassFrag);    
 
     m_resources.shaderResource.preload(Shader::MeshTextured, DEFERRED_TEXTURED_VERTEX, DEFERRED_TEXTURED_FRAGMENT);
@@ -401,7 +405,7 @@ bool LunarMoonerState::update(float dt)
     }
     
     //update lights
-    auto& normalMapPlanetShader = m_resources.shaderResource.get(Shader::NormalMapPlanet);
+    //auto& normalMapPlanetShader = m_resources.shaderResource.get(Shader::NormalMapPlanet);
     auto& normalMapGameShader = m_resources.shaderResource.get(Shader::NormalMapGame);
     auto lights = m_scene.getVisibleLights(m_scene.getVisibleArea());
     auto i = 0u;
@@ -413,11 +417,11 @@ bool LunarMoonerState::update(float dt)
             const std::string idx = std::to_string(i);
             auto pos = light->getWorldPosition();
 
-            normalMapPlanetShader.setUniform("u_pointLightPositions[" + idx + "]", pos);
-            normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
-            normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
-            //normalMapShader.setUniform("u_pointLights[" + idx + "].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
-            normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].inverseRange", light->getInverseRange());
+            //normalMapPlanetShader.setUniform("u_pointLightPositions[" + idx + "]", pos);
+            //normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
+            //normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].diffuseColour", sf::Glsl::Vec4(light->getDiffuseColour()));
+            ////normalMapShader.setUniform("u_pointLights[" + idx + "].specularColour", sf::Glsl::Vec4(light->getSpecularColour()));
+            //normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].inverseRange", light->getInverseRange());
 
             normalMapGameShader.setUniform("u_pointLightPositions[" + idx + "]", pos);
             normalMapGameShader.setUniform("u_pointLights[" + idx + "].intensity", light->getIntensity());
@@ -431,7 +435,7 @@ bool LunarMoonerState::update(float dt)
     for (; i < xy::Shader::NormalMapped::MaxPointLights; ++i)
     {
         const auto idx = std::to_string(i);
-        normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].intensity", 0.f);
+        //normalMapPlanetShader.setUniform("u_pointLights[" + idx + "].intensity", 0.f);
         normalMapGameShader.setUniform("u_pointLights[" + idx + "].intensity", 0.f);
     }
     REPORT("Light Count", std::to_string(lights.size()));
@@ -1150,18 +1154,8 @@ void LunarMoonerState::buildBackground()
     camEntity->setPosition(xy::DefaultSceneSize / 2.f);
     camEntity->addCommandCategories(LMCommandID::Background);
     m_scene.setActiveCamera(camEntity->addComponent(camera));
-    m_scene.addEntity(camEntity, xy::Scene::Layer::FrontFront);
+    //m_scene.addEntity(camEntity, xy::Scene::Layer::BackMiddle);
   
-    //background
-    auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
-    background->setVelocity({ 0.f, 1.f });
-    auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea, m_resources.textureResource.get("assets/images/game/console/panel.png"));
-
-    m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
-    m_scene.getLayer(xy::Scene::Layer::BackRear).addCommandCategories(LMCommandID::Background);
-    m_scene.getLayer(xy::Scene::Layer::UI).addComponent(scoreMask);
-    m_scene.getLayer(xy::Scene::Layer::UI).addCommandCategories(LMCommandID::Background);
-
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
     moon->setBaseNormal(m_resources.textureResource.get("assets/images/background/sphere_normal.png"));
     moon->setDetailNormal(m_resources.textureResource.get("assets/images/background/moon_normal_02.png"));
@@ -1179,10 +1173,23 @@ void LunarMoonerState::buildBackground()
     auto rotation = xy::Component::create<ph::PlanetRotation>(m_messageBus);*/
 
     auto entity = xy::Entity::create(m_messageBus);
-    entity->setPosition((xy::DefaultSceneSize.x / 2.f) - (moonWidth), (xy::DefaultSceneSize.y / 2.f) - (moonWidth * 0.25f));
+    entity->setPosition(/*(xy::DefaultSceneSize.x / 2.f)*/ -(moonWidth), /*(xy::DefaultSceneSize.y / 2.f)*/ -(moonWidth * 0.25f));
     entity->addComponent(moon);
     //entity->addComponent(rotation);
-    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    //m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    camEntity->addChild(entity);
+    m_scene.addEntity(camEntity, xy::Scene::Layer::BackMiddle);
+
+
+    //background
+    auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
+    background->setVelocity({ 0.f, 1.f });
+    auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea, m_resources.textureResource.get("assets/images/game/console/panel.png"));
+
+    m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
+    m_scene.getLayer(xy::Scene::Layer::BackRear).addCommandCategories(LMCommandID::Background);
+    m_scene.getLayer(xy::Scene::Layer::UI).addComponent(scoreMask);
+    m_scene.getLayer(xy::Scene::Layer::UI).addCommandCategories(LMCommandID::Background);
 
     //background lighting
     auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f, 250.f);

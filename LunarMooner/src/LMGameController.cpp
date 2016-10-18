@@ -1545,7 +1545,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
     entity->addComponent(lc);
     entity->setPosition(position);
 
-    m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
+    m_scene.addEntity(entity, xy::Scene::Layer::FrontMiddle);
 }
 
 void GameController::addDelayedAsteroid()
