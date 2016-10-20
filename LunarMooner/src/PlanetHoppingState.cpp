@@ -38,7 +38,7 @@ source distribution.
 #include <xygine/components/SoundPlayer.hpp>
 #include <xygine/components/ParticleController.hpp>
 #include <xygine/components/MeshDrawable.hpp>
-#include <xygine/PostChromeAb.hpp>
+#include <xygine/postprocess/ChromeAb.hpp>
 #include <xygine/mesh/SphereBuilder.hpp>
 #include <xygine/mesh/IQMBuilder.hpp>
 #include <xygine/Reports.hpp>

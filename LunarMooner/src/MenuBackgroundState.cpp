@@ -42,7 +42,7 @@ source distribution.
 #include <xygine/components/QuadTreeComponent.hpp>
 #include <xygine/shaders/NormalMapped.hpp>
 #include <xygine/util/Random.hpp>
-#include <xygine/PostChromeAb.hpp>
+#include <xygine/postprocess/ChromeAb.hpp>
 #include <xygine/Console.hpp>
 
 #include <SFML/Window/Mouse.hpp>

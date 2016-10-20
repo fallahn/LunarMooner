@@ -42,7 +42,7 @@ source distribution.
 #include <xygine/App.hpp>
 #include <xygine/Assert.hpp>
 #include <xygine/Reports.hpp>
-#include <xygine/PostChromeAb.hpp>
+#include <xygine/postprocess/ChromeAb.hpp>
 #include <xygine/util/Random.hpp>
 #include <xygine/components/ParticleController.hpp>
 #include <xygine/components/SfDrawableComponent.hpp>

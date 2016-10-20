@@ -36,7 +36,7 @@ source distribution.
 #include <xygine/App.hpp>
 #include <xygine/KeyBinds.hpp>
 #include <xygine/Command.hpp>
-#include <xygine/PostChromeAb.hpp>
+#include <xygine/postprocess/ChromeAb.hpp>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>

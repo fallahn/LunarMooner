@@ -28,7 +28,7 @@ source distribution.
 #ifndef LM_POST_SHIELD_HPP_
 #define LM_POST_SHIELD_HPP_
 
-#include <xygine/PostProcess.hpp>
+#include <xygine/postprocess/PostProcess.hpp>
 
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/Texture.hpp>
