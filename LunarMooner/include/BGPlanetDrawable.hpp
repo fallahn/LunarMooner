@@ -33,12 +33,13 @@ source distribution.
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Transformable.hpp>
 
 #include <vector>
 
 namespace lm
 {
-    class PlanetDrawable final : public sf::Drawable, public xy::Component
+    class PlanetDrawable final : public sf::Drawable, public sf::Transformable, public xy::Component
     {
     public:
         PlanetDrawable(xy::MessageBus&, float);

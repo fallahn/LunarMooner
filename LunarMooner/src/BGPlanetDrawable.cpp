@@ -202,5 +202,6 @@ void PlanetDrawable::draw(sf::RenderTarget& rt, sf::RenderStates states) const
     
     states.texture = &m_renderTexture.getTexture(1);
     states.shader = m_normalShader;
+    states.transform *= getTransform();
     rt.draw(m_vertices.data(), m_vertices.size(), sf::Quads, states);
 }

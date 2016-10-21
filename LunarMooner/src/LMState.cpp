@@ -984,7 +984,7 @@ void LunarMoonerState::initMeshes()
 
 void LunarMoonerState::buildBackground()
 {    
-    //nuke effect
+    //nuke effect - this needs to follow the camera
     auto ne = xy::Component::create<lm::NukeEffect>(m_messageBus, sf::Vector2f(alienArea.width, xy::DefaultSceneSize.y));
     auto camera = xy::Component::create<xy::Camera>(m_messageBus, m_scene.getView());
     
@@ -1154,8 +1154,10 @@ void LunarMoonerState::buildBackground()
     camEntity->setPosition(xy::DefaultSceneSize / 2.f);
     camEntity->addCommandCategories(LMCommandID::Background);
     m_scene.setActiveCamera(camEntity->addComponent(camera));
-    //m_scene.addEntity(camEntity, xy::Scene::Layer::BackMiddle);
-  
+    m_scene.addEntity(camEntity, xy::Scene::Layer::FrontFront);
+
+
+    //background
     auto moon = xy::Component::create<lm::PlanetDrawable>(m_messageBus, moonWidth);
     moon->setBaseNormal(m_resources.textureResource.get("assets/images/background/sphere_normal.png"));
     moon->setDetailNormal(m_resources.textureResource.get("assets/images/background/moon_normal_02.png"));
@@ -1164,6 +1166,7 @@ void LunarMoonerState::buildBackground()
     moon->setPrepassShader(m_resources.shaderResource.get(Shader::Prepass));
     moon->setNormalShader(m_resources.shaderResource.get(Shader::NormalMapPlanet));
     moon->setRotationVelocity({ 0.f, 0.009f });
+    moon->setPosition((xy::DefaultSceneSize / 2.f) - sf::Vector2f(moonWidth, moonWidth * 0.25f));
 
     /*auto moon = m_meshRenderer.createModel(Mesh::Moon, m_messageBus);
     moon->setScale({ moonWidth, moonWidth, moonWidth });
@@ -1172,24 +1175,16 @@ void LunarMoonerState::buildBackground()
 
     auto rotation = xy::Component::create<ph::PlanetRotation>(m_messageBus);*/
 
-    auto entity = xy::Entity::create(m_messageBus);
-    entity->setPosition(/*(xy::DefaultSceneSize.x / 2.f)*/ -(moonWidth), /*(xy::DefaultSceneSize.y / 2.f)*/ -(moonWidth * 0.25f));
-    entity->addComponent(moon);
-    //entity->addComponent(rotation);
-    //m_scene.addEntity(entity, xy::Scene::Layer::BackMiddle);
-    camEntity->addChild(entity);
-    m_scene.addEntity(camEntity, xy::Scene::Layer::BackMiddle);
-
-
-    //background
     auto background = xy::Component::create<lm::Starfield>(m_messageBus, m_resources.textureResource);
     background->setVelocity({ 0.f, 1.f });
     auto scoreMask = xy::Component::create<lm::ScoreMask>(m_messageBus, alienArea, m_resources.textureResource.get("assets/images/game/console/panel.png"));
 
     m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(background);
+    m_scene.getLayer(xy::Scene::Layer::BackRear).addComponent(moon);
     m_scene.getLayer(xy::Scene::Layer::BackRear).addCommandCategories(LMCommandID::Background);
     m_scene.getLayer(xy::Scene::Layer::UI).addComponent(scoreMask);
     m_scene.getLayer(xy::Scene::Layer::UI).addCommandCategories(LMCommandID::Background);
+
 
     //background lighting
     auto lc = xy::Component::create<xy::PointLight>(m_messageBus, 1200.f, 250.f);
@@ -1197,7 +1192,7 @@ void LunarMoonerState::buildBackground()
     lc->setDiffuseColour({ 255u, 245u, 235u });
     lc->setIntensity(1.2f);
 
-    entity = xy::Entity::create(m_messageBus);
+    auto entity = xy::Entity::create(m_messageBus);
     entity->setPosition(alienArea.left + alienArea.width, xy::DefaultSceneSize.y / 2.f);
     entity->addComponent(lc);
 

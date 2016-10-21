@@ -92,7 +92,6 @@ PostShield::PostShield(float radius)
         }
 
         std::vector<sf::Uint8> mapData(size.x * size.y * 4);
-        auto i = 0u;
         for (auto y = 1u; y < size.y - 1; ++y)
         {
             for (auto x = 1u; x < size.x - 1; ++x)
