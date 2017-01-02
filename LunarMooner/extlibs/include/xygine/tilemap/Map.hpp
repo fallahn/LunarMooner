@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -45,6 +45,7 @@ namespace xy
 {
     class TileMapLayer;
     class ShaderResource;
+    class TextureResource;
     namespace tmx
     {
         struct XY_EXPORT_API Version

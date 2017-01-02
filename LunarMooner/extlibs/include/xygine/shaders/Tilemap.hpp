@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -36,7 +36,7 @@ namespace xy
 {
     namespace Shader
     {
-        namespace tsx
+        namespace tmx
         {
             static const std::string vertex =
                 "#version 120\n"
@@ -118,7 +118,7 @@ namespace xy
                 "    }\n"
                 "    colour *= v_colour;\n"
                 "}";
-        } //namespace tsx
+        } //namespace tmx
     } //namespace Shader
 } //namespace xy
 

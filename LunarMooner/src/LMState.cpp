@@ -463,7 +463,7 @@ void LunarMoonerState::draw()
 namespace
 {
     const float moonWidth = 570.f;
-    const float gameMusicVolume = 30.f;
+    const float gameMusicVolume = 0.3f;
 #include "ConstParams.inl"
 }
 
@@ -993,7 +993,7 @@ void LunarMoonerState::buildBackground()
     nukeAudio->setSound("assets/sound/fx/nuke.wav");
     nukeAudio->setFadeInTime(5.f);
     nukeAudio->setFadeOutTime(1.f);
-    nukeAudio->setVolume(audioSettings.muted ? 0.f : audioSettings.volume * Game::MaxVolume);
+    nukeAudio->setVolume(audioSettings.muted ? 0.f : audioSettings.volume/* * Game::MaxVolume*/);
     xy::Component::MessageHandler mh;
     mh.id = LMMessageId::GameEvent;
     mh.action = [](xy::Component* c, const xy::Message& msg)
@@ -1059,7 +1059,7 @@ void LunarMoonerState::buildBackground()
             break;
         case xy::Message::UIEvent::RequestAudioUnmute:
         case xy::Message::UIEvent::RequestVolumeChange:
-            as->setVolume(audioSettings.volume * Game::MaxVolume);
+            as->setVolume(audioSettings.volume/* * Game::MaxVolume*/);
             break;
         }
     };
@@ -1068,7 +1068,7 @@ void LunarMoonerState::buildBackground()
     auto finalWarning = xy::Component::create<xy::AudioSource>(m_messageBus, m_resources.soundResource);
     finalWarning->setSound("assets/sound/speech/meltdown5.wav");
     finalWarning->setFadeOutTime(1.f);
-    finalWarning->setVolume(audioSettings.muted ? 0.f : audioSettings.volume * Game::MaxVolume);
+    finalWarning->setVolume(audioSettings.muted ? 0.f : audioSettings.volume/* * Game::MaxVolume*/);
     auto fw = finalWarning.get();
     mh.id = LMMessageId::GameEvent;
     mh.action = [fw](xy::Component*, const xy::Message& msg)
@@ -1141,7 +1141,7 @@ void LunarMoonerState::buildBackground()
             break;
         case xy::Message::UIEvent::RequestAudioUnmute:
         case xy::Message::UIEvent::RequestVolumeChange:
-            as->setVolume(audioSettings.volume * Game::MaxVolume);
+            as->setVolume(audioSettings.volume/* * Game::MaxVolume*/);
             break;
         }
     };

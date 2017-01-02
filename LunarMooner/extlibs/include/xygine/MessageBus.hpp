@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -156,7 +156,7 @@ namespace xy
                 RequestControllerEnable,
                 RequestControllerDisable,
                 ResizedWindow,
-                ButtonPressed,
+                SelectionActivated,
                 SelectionChanged
             }type;
             float value = 0.f;

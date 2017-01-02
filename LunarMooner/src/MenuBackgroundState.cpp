@@ -49,7 +49,7 @@ source distribution.
 
 namespace
 {
-    const float maxMusicVol = 35.f;
+    const float maxMusicVol = 0.35f;
     const std::string version = "0.1." + std::string(__TIME__) + __DATE__;
 }
 

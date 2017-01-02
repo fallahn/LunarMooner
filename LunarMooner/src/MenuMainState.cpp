@@ -92,7 +92,7 @@ void MenuMainState::buildMenu()
     const float centreX = xy::DefaultSceneSize.x / 2.f;
     
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("One Player");
+    button->setString("One Player");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 325.f);
     button->addCallback([this]()
@@ -103,7 +103,7 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Two Player");
+    button->setString("Two Player");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 425.f);
     button->addCallback([this]()
@@ -114,7 +114,7 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Options");
+    button->setString("Options");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 525.f);
     button->addCallback([this]()
@@ -125,7 +125,7 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("High Scores");
+    button->setString("High Scores");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 625.f);
     button->addCallback([this]()
@@ -136,7 +136,7 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Achievements");
+    button->setString("Achievements");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 725.f);
     button->addCallback([this]()
@@ -147,7 +147,7 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Exit to Desktop");
+    button->setString("Exit to Desktop");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 825.f);
     button->addCallback([this]()
@@ -160,7 +160,7 @@ void MenuMainState::buildMenu()
 #ifdef _DEBUG_
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Test Hop");
+    button->setString("Test Hop");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(180.f, 40.f);
     button->addCallback([this]()
@@ -171,7 +171,7 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Test Dodge");
+    button->setString("Test Dodge");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(180.f, 110.f);
     button->addCallback([this]()
@@ -182,7 +182,7 @@ void MenuMainState::buildMenu()
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Level Editor");
+    button->setString("Level Editor");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(180.f, 180.f);
     button->addCallback([this]()

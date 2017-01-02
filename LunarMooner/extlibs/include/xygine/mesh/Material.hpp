@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -61,6 +61,27 @@ namespace xy
     class XY_EXPORT_API Material final
     {
     public:
+        /*!
+        \brief Used to describe the appearance of Materials,
+        useful for selecting the correct shader in multipass
+        Materials
+        */
+        enum Description
+        {
+            Coloured = 0,
+            ColouredBumped,
+            ColouredSkinned,
+            ColouredSkinnedBumped,
+            Textured,
+            TexturedBumped,
+            TexturedSkinned,
+            TexturedSkinnedBumped,
+            VertexColoured,
+            VertexColouredBumped,
+            VertexColouredSkinned,
+            VertexColouredSkinnedBumped
+        };
+
         /*!
         \brief Constructor.
         \param Shader used to create the default render pass for this material

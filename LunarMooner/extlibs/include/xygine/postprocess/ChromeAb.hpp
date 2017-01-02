@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -52,6 +52,7 @@ namespace xy
         CRT style bowed distortion around the edge of the screen
         */
         PostChromeAb(bool distort = false);
+        ~PostChromeAb();
         /*!
         \see PostProcess
         */

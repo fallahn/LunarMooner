@@ -130,7 +130,7 @@ void MenuWeaponState::buildMenu(const sf::Font& font)
     m_uiContainer.addControl(weaponSelect);
 
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Back");
+    button->setString("Back");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(600.f, 975.f);
     button->addCallback([this]()
@@ -146,7 +146,7 @@ void MenuWeaponState::buildMenu(const sf::Font& font)
     m_uiContainer.addControl(button);
 
     button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("Begin!");
+    button->setString("Begin!");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(1320.f, 975.f);
     button->addCallback([this, weaponSelect, flags]()

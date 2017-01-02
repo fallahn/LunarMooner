@@ -704,28 +704,28 @@ void GameController::spawnPlayer()
         sfx1->setFadeInTime(0.1f);
         sfx1->setFadeOutTime(0.3f);
         sfx1->setName("rcsEffectLeft");
-        sfx1->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+        sfx1->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume/* * Game::MaxVolume*/);
 
         auto sfx2 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
         sfx2->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx2->setFadeInTime(0.1f);
         sfx2->setFadeOutTime(0.3f);
         sfx2->setName("rcsEffectRight");
-        sfx2->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+        sfx2->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume/* * Game::MaxVolume*/);
 
         auto sfx3 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
         sfx3->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
         sfx3->setFadeInTime(0.1f);
         sfx3->setFadeOutTime(0.3f);
         sfx3->setName("rcsEffectDown");
-        sfx3->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+        sfx3->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume/* * Game::MaxVolume*/);
 
         auto sfx4 = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
         sfx4->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
         sfx4->setFadeInTime(0.1f);
         sfx4->setFadeOutTime(0.3f);
         sfx4->setName("thrustEffect");
-        sfx4->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+        sfx4->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume/* * Game::MaxVolume*/);
 
         auto lc = xy::Component::create<xy::PointLight>(getMessageBus(), 200.f, 50.f);
         lc->setDepth(60.f);
@@ -901,7 +901,7 @@ void GameController::spawnHuman(const sf::Vector2f& position)
     auto controller = xy::Component::create<HumanController>(getMessageBus(), *model.get());
     auto jetsound = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
     jetsound->setSoundBuffer(m_soundCache[LMSoundID::RCS]);
-    jetsound->setVolume(60.f);
+    jetsound->setVolume(0.6f);
     jetsound->setFadeInTime(0.5f);
 
     auto entity = xy::Entity::create(getMessageBus());
@@ -1503,7 +1503,7 @@ void GameController::spawnAsteroid(const sf::Vector2f& position)
 
     auto as = xy::Component::create<xy::AudioSource>(getMessageBus(), m_resources.soundResource);
     as->setPitch(0.7f);
-    as->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+    as->setVolume(m_audioSettings.muted ? 0.f : m_audioSettings.volume/* * Game::MaxVolume*/);
     as->setSoundBuffer(m_soundCache[LMSoundID::Engine]);
     as->setFadeInTime(1.5f);
     as->play(true);
@@ -1681,8 +1681,8 @@ void GameController::spawnCollectable(const sf::Vector2f& position)
 void GameController::showRoundSummary(bool doScores)
 {
     auto summary = xy::Component::create<RoundSummary>(getMessageBus(), m_playerStates[m_currentPlayer], m_resources, doScores);
-    summary->setSoundBuffer(LMSoundID::RoundCountEnd, m_soundCache[LMSoundID::RoundCountEnd], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
-    summary->setSoundBuffer(LMSoundID::RoundCountLoop, m_soundCache[LMSoundID::RoundCountLoop], m_audioSettings.muted ? 0.f : m_audioSettings.volume * Game::MaxVolume);
+    summary->setSoundBuffer(LMSoundID::RoundCountEnd, m_soundCache[LMSoundID::RoundCountEnd], m_audioSettings.muted ? 0.f : m_audioSettings.volume/* * Game::MaxVolume*/);
+    summary->setSoundBuffer(LMSoundID::RoundCountLoop, m_soundCache[LMSoundID::RoundCountLoop], m_audioSettings.muted ? 0.f : m_audioSettings.volume/* * Game::MaxVolume*/);
     
     auto entity = xy::Entity::create(getMessageBus());
     entity->addCommandCategories(LMCommandID::UI);

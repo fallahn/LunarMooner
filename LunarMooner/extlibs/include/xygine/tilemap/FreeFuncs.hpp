@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -135,7 +135,13 @@ namespace xy
 
         static inline sf::Color colourFromString(std::string str)
         {
-            std::remove(str.begin(), str.end(), '#');
+            //removes preceding #
+            auto result = str.find_last_of('#');
+            if (result != std::string::npos)
+            {
+                str = str.substr(result + 1);
+            }
+
             if (str.size() == 6 || str.size() == 8)
             {
                 unsigned int value, r, g, b;

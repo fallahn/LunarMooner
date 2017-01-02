@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -62,6 +62,10 @@ namespace xy
         the file name, including trailing separator char.
         */
         static std::string getFilePath(const std::string& path);
+        /*!
+        \brief Returns true if a file exists with the name at the given path
+        */
+        static bool fileExists(const std::string&);
         /*!
         \brief Tries to create a directory relative to the executable
         or via an absolute path.

@@ -135,7 +135,7 @@ void MenuAchievementState::buildMenu(const sf::Font& font)
     m_uiContainer.addControl(label);
 
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("OK");
+    button->setString("OK");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 975.f);
     button->addCallback([this]()

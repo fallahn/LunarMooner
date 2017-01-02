@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -139,7 +139,7 @@ namespace xy
             /*!
             \brief Set the text string of the slider
             */
-            void setText(const std::string& text);
+            void setString(const std::string& text);
             /*!
             \brief Set the colour of the slider text
             */
@@ -155,6 +155,12 @@ namespace xy
             \see Slider::Event
             */
             void addCallback(const Callback& c, Event e);
+            /*!
+            \brief Sets the colour of the slider bar
+            \param inner Inner colours of the bar
+            \param outer Outer colour of the bar
+            */
+            void setBarColour(sf::Color inner, sf::Color outer = sf::Color::Transparent);
 
         private:
             enum State

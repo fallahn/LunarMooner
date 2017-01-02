@@ -125,10 +125,10 @@ PlayerController::PlayerController(xy::MessageBus& mb, const MothershipControlle
         case xy::Message::UIEvent::RequestAudioUnmute:
         case xy::Message::UIEvent::RequestVolumeChange:
         {
-            const float vol = std::min(msgData.value * Game::MaxVolume, Game::MaxVolume);
-            m_rcsEffectLeft->setVolume(vol);
-            m_rcsEffectRight->setVolume(vol);
-            m_thrustEffect->setVolume(vol);
+            //const float vol = std::min(msgData.value * Game::MaxVolume, Game::MaxVolume);
+            m_rcsEffectLeft->setVolume(msgData.value);
+            m_rcsEffectRight->setVolume(msgData.value);
+            m_thrustEffect->setVolume(msgData.value);
         }
         break;
         }

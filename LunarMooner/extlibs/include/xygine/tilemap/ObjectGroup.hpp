@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -61,7 +61,7 @@ namespace xy
             /*!
             \brief Returns the colour associated with this layer
             */
-            const sf::Color getColour() const { return m_colour; }
+            const sf::Color& getColour() const { return m_colour; }
             /*!
             \brief Returns the DrawOrder for the objects in this group.
             Defaults to TopDown, where Objects are drawn sorted by Y position

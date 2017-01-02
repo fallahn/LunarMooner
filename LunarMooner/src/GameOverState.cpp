@@ -134,12 +134,12 @@ void GameOverState::buildMenu(const sf::Font& font)
     textbox->setAlignment(xy::UI::Alignment::Centre);
     textbox->setPosition(centreX, 540.f);
     textbox->setLabelText("Enter your name:");
-    textbox->setText("Player 1");
+    textbox->setString("Player 1");
     textbox->setMaxLength(18u);
     m_uiContainer.addControl(textbox);
 
     auto button = xy::UI::create<xy::UI::Button>(font, m_textureResource.get("assets/images/ui/start_button.png"));
-    button->setText("OK");
+    button->setString("OK");
     button->setAlignment(xy::UI::Alignment::Centre);
     button->setPosition(centreX, 675.f);
     button->addCallback([this, textbox]()
@@ -149,7 +149,7 @@ void GameOverState::buildMenu(const sf::Font& font)
             getContext().appInstance.addScore(textbox->getText(), m_scores[m_currentPlayer++]);
             if (m_currentPlayer < m_playerCount)
             {
-                textbox->setText("Player " + std::to_string(m_currentPlayer + 1));
+                textbox->setString("Player " + std::to_string(m_currentPlayer + 1));
                 m_scoreLabel->setString("Your Score: " + std::to_string(m_scores[m_currentPlayer]));
             }
         }

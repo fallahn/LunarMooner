@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2016
+Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -46,7 +46,7 @@ namespace xy
             struct Tile final
             {
                 sf::Uint32 ID = 0; //< Global ID of the tile
-                sf::Uint8 flipFlags = 0; //< Flags marking if the tile shjould be flipped when drawn
+                sf::Uint8 flipFlags = 0; //< Flags marking if the tile should be flipped when drawn
             };
 
             /*!

@@ -106,9 +106,9 @@ RoundSummary::RoundSummary(xy::MessageBus& mb, PlayerState& ps, ResourceCollecti
             case xy::Message::UIEvent::RequestAudioUnmute:
             case xy::Message::UIEvent::RequestVolumeChange:
             {
-                const float vol = msgData.value * Game::MaxVolume;
-                m_countLoop.setVolume(vol);
-                m_countEnd.setVolume(vol);
+                //const float vol = msgData.value * Game::MaxVolume;
+                m_countLoop.setVolume(msgData.value);
+                m_countEnd.setVolume(msgData.value);
             }
                 break;
             case xy::Message::UIEvent::MenuClosed:
