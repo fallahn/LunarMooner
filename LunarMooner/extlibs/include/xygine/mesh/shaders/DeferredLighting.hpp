@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2017
+© Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -208,7 +208,7 @@ namespace xy
                 "{\n"
                 "    vec3 reflection = reflect(normal, eyeDirection);\n"
                 "    vec2 coord = vec2(reflection.x, reflection.y);\n"
-                "    return texture(u_reflectMap, coord).rgb;\n"
+                "    return texture(u_reflectMap, normal.xy + 1.0 * 0.5).rgb;\n"
                 "}\n"
 
                 //#include "Water.inl"
@@ -249,8 +249,8 @@ namespace xy
 
                 "    //blendedColour *= texture(u_aoMap, v_texCoord).rgb;\n"
                 "    blendedColour = mix(blendedColour, diffuse.rgb, mask.b);\n"
-                "    //blendedColour = mix(getReflection(normal), blendedColour, mask.a);\n"
-                "    blendedColour += getReflection(normal) * (1.0 - mask.a);\n"
+                "    blendedColour = mix(getReflection(normal), blendedColour, mask.a);\n"
+                "    //blendedColour += getReflection(normal) * (1.0 - mask.a);\n"
 
                 /*"    vec3 illumination  = texture(u_illuminationMap, v_texCoord).rgb;\n"
                 "    illumination.r = blendOverlay(blendedColour.r, illumination.r);\n"

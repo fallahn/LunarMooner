@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2017
+© Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -218,6 +218,12 @@ namespace xy
         the default material.
         */
         xy::Material& getMaterial(std::uint32_t) const;
+
+        /*!
+        \brief Provides a texture to be used as a reflection map.
+        Materials with a mask texture may contain a reflection mask in the alpha channel.
+        */
+        void setReflectionMap(const sf::Texture&);
     private:
         struct Lock final {};
 

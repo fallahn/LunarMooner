@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2017
+© Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -65,12 +65,17 @@ namespace xy
             colour to use as transparency
             */
             bool hasTransparency() const { return m_hasTransparency; }
+            /*!
+            \brief Returns the size of the image in the image layer in pixels
+            */
+            const sf::Vector2u& getImageSize() const { return m_imageSize; }
 
         private:
             std::string m_workingDir;
             std::string m_filePath;
             sf::Color m_transparencyColour;
             bool m_hasTransparency;
+            sf::Vector2u m_imageSize;
         };
     }
 }

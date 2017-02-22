@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2017
+© Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -76,12 +76,14 @@ namespace xy
         {
             sf::Int32 WindowStyle;
             sf::VideoMode VideoMode;
+            sf::ContextSettings ContextSettings;
             bool VSync;
             std::vector<sf::VideoMode> AvailableVideoModes;
 
             VideoSettings()
                 : WindowStyle(sf::Style::Close /*sf::Style::Fullscreen*/),
                 VideoMode(1024, 768),
+                ContextSettings(),
                 VSync(true){}
 
             bool operator == (const VideoSettings& vs)
@@ -89,6 +91,7 @@ namespace xy
                 if (&vs == this) return true;
                 return
                     (vs.VideoMode == this->VideoMode
+                    && vs.ContextSettings.antialiasingLevel == this->ContextSettings.antialiasingLevel
                     && vs.VSync == this->VSync
                     && vs.WindowStyle == this->WindowStyle);
             }
@@ -126,7 +129,7 @@ namespace xy
         (or other 3D features) a context with OpenGL version 3.2 or 
         higher is needed, as well as a depth buffer.
         */
-        App(sf::ContextSettings = sf::ContextSettings());
+        App();
         virtual ~App() = default;
         App(const App&) = delete;
         const App& operator = (const App&) = delete;
@@ -253,6 +256,32 @@ namespace xy
         */
         static void quit();
 
+        /*!
+        \brief Sets the clear colour for the render window.
+        Defaults to sf::Color::Black
+        */
+        static void setClearColour(sf::Color);
+
+        /*!
+        \brief Gets the current clear colour of the app render window
+        */
+        static sf::Color getClearColour();
+
+        /*!
+        \brief Sets the window title.
+        Prefer this when setting the window title over setting it directly
+        as it will ensure the title is maintained when switching video modes
+        */
+        void setWindowTitle(const std::string&);
+
+        /*!
+        \brief Sets the window icon.
+        This should be a path to a 16x16px image. Prefer this to
+        setting the icon directly on the window object, as it will
+        make sure to maintain the icon when video modes are modified
+        */
+        void setWindowIcon(const std::string&);
+
     protected:
         /*!
         \brief Returns a reference to the current render window
@@ -325,6 +354,7 @@ namespace xy
             int version;
 
             sf::VideoMode videoMode;
+            sf::ContextSettings contextSettings;
             sf::Int32 windowStyle;
             AudioSettings audioSettings;
             GameSettings gameSettings;
@@ -335,6 +365,7 @@ namespace xy
 
         VideoSettings m_videoSettings;
         sf::RenderWindow m_renderWindow;
+        sf::Image m_windowIcon;
 
         MessageBus m_messageBus;
 

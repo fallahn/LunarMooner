@@ -1,5 +1,5 @@
 /*********************************************************************
-Matt Marchant 2014 - 2017
+© Matt Marchant 2014 - 2017
 http://trederia.blogspot.com
 
 xygine - Zlib license.
@@ -158,6 +158,11 @@ namespace xy
             {
                 //store a reference to drawables so they can be drawn
                 m_drawables.push_back(dynamic_cast<sf::Drawable*>(c.get()));
+                m_boundedComponents.push_back(c.get());
+            }
+            else if (c->type() == Component::Type::Mesh)
+            {
+                m_boundedComponents.push_back(c.get());
             }
             c->setParentUID(m_uid);
             c->onStart(*this);
@@ -261,11 +266,18 @@ namespace xy
                 m_components.erase(it);
                 if (component->type() == Component::Type::Drawable)
                 {
-                    std::remove_if(m_drawables.begin(), m_drawables.end(), [component](const sf::Drawable* ptr)
+                    m_drawables.erase(std::remove_if(m_drawables.begin(), m_drawables.end(), [component](const sf::Drawable* ptr)
                     {
                         return ptr == dynamic_cast<const sf::Drawable*>(component);
-                    });
+                    }), m_drawables.end());
                 }
+
+                m_boundedComponents.erase(std::remove_if(m_boundedComponents.begin(), m_boundedComponents.end(),
+                    [component](const Component* p)
+                {
+                    return p == static_cast<Component*>(component);
+                }), m_boundedComponents.end());
+
                 retVal->setParentUID(0u);
                 return std::move(retVal);
             }
@@ -335,6 +347,11 @@ namespace xy
         given categories.
         */
         bool hasCommandCategories(sf::Int32);
+        /*!
+        \brief Removes the given command categories if the entity currently
+        belongs to them by ANDing the inverse value with the category flags
+        */
+        void removeCommandCategories(sf::Int32);
 
         /*!
         \brief Returns the total number of entities parented to this
@@ -371,6 +388,7 @@ namespace xy
         std::vector<std::unique_ptr<Component>> m_pendingComponents;
         std::vector<std::unique_ptr<Component>> m_components;
         std::vector<sf::Drawable*> m_drawables;
+        std::vector<Component*> m_boundedComponents;
 
         std::vector<Ptr> m_children;
         std::vector<Entity*> m_deadChildren;
